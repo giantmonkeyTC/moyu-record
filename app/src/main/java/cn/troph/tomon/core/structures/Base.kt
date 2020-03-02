@@ -1,6 +1,6 @@
 package cn.troph.tomon.core.structures
 
-import cn.troph.tomon.Client
+import cn.troph.tomon.core.Client
 
 open class Base(val client: Client, private var data: Map<String, Any>) {
     init {

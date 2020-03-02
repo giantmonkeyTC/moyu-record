@@ -1,5 +1,7 @@
 package cn.troph.tomon.core
 
-class Client {
+import cn.troph.tomon.core.collections.UserCollection
 
+class Client {
+    val users = UserCollection(this)
 }

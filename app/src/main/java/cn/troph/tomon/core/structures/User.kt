@@ -1,6 +1,6 @@
 package cn.troph.tomon.core.structures
 
-import cn.troph.tomon.Client
+import cn.troph.tomon.core.Client
 
 class User(client: Client, data: Map<String, Any>) : Base(client, data) {
     var username: String = ""
