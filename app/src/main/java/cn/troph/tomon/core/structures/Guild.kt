@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.collections.RoleCollection
 import java.time.LocalDateTime
 
 class Guild(client: Client, data: JsonData) : Base(client, data) {
@@ -13,6 +14,8 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
     var ownerId: String = ""
     var systemChannelId: String? = null
     var systemChannelFlags: Int = 0
+
+    val guilds = RoleCollection(client, null, id)
 
     override fun patch(data: JsonData) {
         super.patch(data)
