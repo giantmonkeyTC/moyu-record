@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 
 class Me(client: Client, data: JsonData) : User(client, data) {
     constructor(client: Client): this(client, mapOf())

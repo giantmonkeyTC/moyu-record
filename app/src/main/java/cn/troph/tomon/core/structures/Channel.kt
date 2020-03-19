@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 
 abstract class Channel(client: Client, data: JsonData) : Base(client, data) {
     var id: String = ""

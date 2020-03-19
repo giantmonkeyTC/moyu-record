@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 
 open class User(client: Client, data: JsonData) : Base(client, data) {
     var id: String = ""

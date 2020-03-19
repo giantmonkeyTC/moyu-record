@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 
 class Presence(client: Client, data: JsonData) : Base(client, data) {
     var userId: String = ""

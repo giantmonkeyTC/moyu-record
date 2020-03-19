@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.collections.RoleCollection
 import java.time.LocalDateTime
 
