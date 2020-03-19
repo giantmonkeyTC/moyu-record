@@ -1,8 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-
-typealias JsonData = Map<String, Any>
+import cn.troph.tomon.core.JsonData
 
 open class Base(val client: Client, private var data: JsonData = mapOf()) {
     init {
