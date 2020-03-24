@@ -1,7 +1,7 @@
 package cn.troph.tomon.core.utils
 
 open class Collection<T>(m: Map<String, T>?) {
-    private var map: LinkedHashMap<String, T> = LinkedHashMap(m)
+    private var map: LinkedHashMap<String, T> = LinkedHashMap(m ?: mapOf<String, T>())
 
     fun get(key: String): T? = map[key]
 
