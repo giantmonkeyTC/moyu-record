@@ -8,13 +8,13 @@ import retrofit2.http.*
 interface ChannelService {
 
     @GET("guilds/{id}/channels")
-    fun getGuildChannels(
+    suspend fun getGuildChannels(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Call<JsonArray>
+    ): JsonArray
 
     @GET("channels/{id}")
-    fun getChannel(@Path("id") id: String, @Header("Authorization") token: String): Call<JsonData>
+    suspend fun getChannel(@Path("id") id: String, @Header("Authorization") token: String): JsonData
 
     data class CreateGuildChannelRequest(
         val name: String,
@@ -24,11 +24,11 @@ interface ChannelService {
     )
 
     @POST("guilds/{id}/channels")
-    fun createGuildChannel(
+    suspend fun createGuildChannel(
         @Path("id") id: String,
         @Body request: CreateGuildChannelRequest,
         @Header("Authorization") token: String
-    ): Call<JsonData>
+    ): JsonData
 
     data class PermissionOverwrites(
         val id: String,
@@ -46,17 +46,17 @@ interface ChannelService {
     )
 
     @PATCH("channels/{id}")
-    fun modifyChannel(
+    suspend fun modifyChannel(
         @Path("id") id: String,
         @Body request: ModifyChannelRequest,
         @Header("Authorization") token: String
-    ): Call<JsonData>
+    ): JsonData
 
     @DELETE("channels/{id}")
-    fun deleteChannel(
+    suspend fun deleteChannel(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Call<Void>
+    ): Void
 
     data class UpsertPermissionOverwritesRequest(
         val type: String?,
@@ -65,17 +65,17 @@ interface ChannelService {
     )
 
     @PUT("channels/{channelId}/permissions/{id}")
-    fun upsertPermissionOverwrites(
+    suspend fun upsertPermissionOverwrites(
         @Path("channelId") channelId: String,
         @Path("id") id: String,
         @Body request: UpsertPermissionOverwritesRequest,
         @Header("Authorization") token: String
-    ): Call<Void>
+    ): Void
 
     @DELETE("channels/{channelId}/permissions/{id}")
-    fun deletePermissionOverwrites(
+    suspend fun deletePermissionOverwrites(
         @Path("channelId") channelId: String,
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Call<Void>
+    ): Void
 }
