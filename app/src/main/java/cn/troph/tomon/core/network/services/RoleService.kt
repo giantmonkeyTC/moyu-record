@@ -36,10 +36,21 @@ interface RoleService {
         ) token: String
     ): Call<JsonData>
 
+    data class UpdatePositionsRequest(
+        val positions: Int
+    )
+
+    @PATCH("guilds/{guildId}/roles")
+    fun updatePositions(
+        @Path("guildId") guildId: String, @Body request: UpdatePositionsRequest, @Header(
+            "Authorization"
+        ) token: String
+    ): Call<JsonData>
+
     @DELETE("guilds/{guildId}/roles/{roleId}")
     fun deleteRole(
         @Path("guildId") guildId: String, @Path("roleId") roleId: String, @Header(
             "Authorization"
         ) token: String
-    ): Call<JsonData>
+    ): Call<Void>
 }
