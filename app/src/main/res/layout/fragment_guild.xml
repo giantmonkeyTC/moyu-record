@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="350dp"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    tools:context=".page.GuildFragment"
+    android:layout_marginLeft="-30dp">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:text="Guild"
+        android:gravity="center"
+        android:textSize="30dp"/>
+    <include layout="@layout/fragment_channel" />
+
+</FrameLayout>
