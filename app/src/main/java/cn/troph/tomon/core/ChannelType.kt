@@ -5,5 +5,10 @@ enum class ChannelType(val value: Int) {
     VOICE(1),
     DM(2),
     GROUP(3),
-    CATEGORY(4)
+    CATEGORY(4);
+
+    companion object {
+        private val map = ChannelType.values().associateBy(ChannelType::value)
+        fun fromInt(type: Int) = map[type]
+    }
 }

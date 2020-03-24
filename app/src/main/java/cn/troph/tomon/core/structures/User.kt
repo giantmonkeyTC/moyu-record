@@ -1,32 +1,38 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 
-class User(client: Client, data: Map<String, Any>) : Base(client, data) {
+open class User(client: Client, data: JsonData) : Base(client, data) {
+    var id: String = ""
     var username: String = ""
     var discriminator: String = ""
     var name: String = ""
     var avatar: String = ""
     var avatarURL: String = ""
 
-    override fun patch(data: Map<String, Any>) {
+    override fun patch(data: JsonData) {
         super.patch(data)
+        if (data.contains("id")) {
+            id = data["id"] as String
+        }
         if (data.contains("username")) {
-            this.username = data["username"] as String
+            username = data["username"] as String
         }
         if (data.contains("discriminator")) {
-            this.discriminator = data["discriminator"] as String
+            discriminator = data["discriminator"] as String
         }
         if (data.contains("name")) {
-            this.name = data["name"] as String
+            name = data["name"] as String
         }
         if (data.contains("avatar")) {
-            this.avatar = data["avatar"] as String
+            avatar = data["avatar"] as String
         }
         if (data.contains("avatarURL")) {
-            this.avatarURL = data["avatarURL"] as String
+            avatarURL = data["avatarURL"] as String
         }
     }
 
     val identifier: String get() = "$username#$discriminator"
+
 }
