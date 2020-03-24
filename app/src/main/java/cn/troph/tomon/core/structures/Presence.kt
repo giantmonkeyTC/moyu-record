@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.utils.BitField
 
 class Presence(client: Client, data: JsonData) : Base(client, data) {
     var userId: String = ""
@@ -19,6 +20,5 @@ class Presence(client: Client, data: JsonData) : Base(client, data) {
             status = data["status"] as String
         }
     }
-
     val user get() = client.users.get(userId)
 }

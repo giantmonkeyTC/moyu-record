@@ -23,16 +23,18 @@ open class BitField {
         return value
     }
 
-    private fun resolve(b: Any): Int {
-        if (b is Int) {
-            return b;
+    companion object{
+        fun resolve(b: Any): Int {
+            if (b is Int) {
+                return b;
+            }
+            if (b is BitField) {
+                return b.value;
+            }
+            if (b is Iterable<*>) {
+                return b.map { p -> resolve(p!!) }.fold(0) { prev, p -> prev or p };
+            }
+            throw IllegalArgumentException("unsolved input")
         }
-        if (b is BitField) {
-            return b.value;
-        }
-        if (b is Iterable<*>) {
-            return b.map { p -> resolve(p!!) }.fold(0) { prev, p -> prev or p };
-        }
-        throw IllegalArgumentException("unsolved input")
     }
 }
