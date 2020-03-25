@@ -2,16 +2,15 @@ package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonArray
 import cn.troph.tomon.core.JsonData
-import retrofit2.Call
 import retrofit2.http.*
 
 interface GuildService {
 
     @GET("users/@me/guilds")
-    fun getGuilds(@Header("Authorization") token: String): Call<JsonArray>;
+    suspend fun getGuilds(@Header("Authorization") token: String): JsonArray;
 
     @GET("guilds/{id}")
-    fun getGuild(@Path("id") id: String, @Header("Authorization") token: String?): Call<JsonData>;
+    suspend fun getGuild(@Path("id") id: String, @Header("Authorization") token: String?): JsonData;
 
     data class CreateGuildRequest(
         val name: String,
@@ -19,10 +18,10 @@ interface GuildService {
     )
 
     @POST("guilds")
-    fun createGuild(
+    suspend fun createGuild(
         @Body request: CreateGuildRequest,
         @Header("Authorization") token: String
-    ): Call<JsonData>
+    ): JsonData
 
     data class ModifyGuildRequest(
         val name: String?,
@@ -30,22 +29,22 @@ interface GuildService {
     )
 
     @PATCH("guilds/{id}")
-    fun modifyGuild(
+    suspend fun modifyGuild(
         @Path("id") id: String,
         @Body request: ModifyGuildRequest,
         @Header("Authorization") token: String
-    ): Call<JsonData>
+    ): JsonData
 
     @DELETE("guilds/{id}")
-    fun deleteGuild(
+    suspend fun deleteGuild(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Call<Void>
+    ): Void
 
     @DELETE("users/@me/guilds/{id}")
-    fun leaveGuild(
+    suspend fun leaveGuild(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Call<Void>
+    ): Void
 
 }

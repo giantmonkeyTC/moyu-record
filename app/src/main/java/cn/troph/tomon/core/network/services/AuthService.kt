@@ -1,23 +1,22 @@
 package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonData
-import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthService {
 
     data class LoginRequest(
-        val email: String?,
-        val phone: String?,
-        val password: String?,
-        val token: String?
+        val email: String? = null,
+        val phone: String? = null,
+        val password: String? = null,
+        val token: String? = null
     )
 
     @POST("auth/login")
-    fun login(
+    suspend fun login(
         @Body request: LoginRequest
-    ): Call<JsonData>;
+    ): JsonData;
 
     data class RegisterRequest(
         val username: String?,
@@ -28,8 +27,8 @@ interface AuthService {
     )
 
     @POST("auth/register")
-    fun register(
+    suspend fun register(
         @Body request: RegisterRequest
-    ): Call<JsonData>;
+    ): JsonData;
 
 }
