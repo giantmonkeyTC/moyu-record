@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.Configs
 import cn.troph.tomon.core.network.socket.handlers.handleGuildCreate
+import cn.troph.tomon.core.utils.Converter
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -27,6 +28,7 @@ class Socket : SocketClientListener {
     private val _socketClient: SocketClient = SocketClient(this)
     private val _client: Client
     private var _ready: Boolean = false
+    private var _sessionId: String? = null
     private var _heartbeatTimer = Timer()
     private var _heartbeatTimerTask: TimerTask? = null
     private var _heartbeatInterval: Long = 40000
@@ -69,12 +71,7 @@ class Socket : SocketClientListener {
     }
 
     override fun onMessage(data: JsonData) {
-        val intOp = when (val rawOp = data["op"]) {
-            is Int -> rawOp as Int
-            is Double -> rawOp.toInt()
-            is String -> rawOp.toInt()
-            else -> 0
-        }
+        val intOp = Converter.toInt(data["op"])
         when (val op = GatewayOp.fromInt(intOp)) {
             GatewayOp.DISPATCH -> {
                 val event = data["e"] as String
@@ -88,11 +85,13 @@ class Socket : SocketClientListener {
                 if (handler != null) {
                     handler(_client, data)
                 }
+                println(data)
             }
             GatewayOp.HELLO -> {
                 val d = data["d"] as? JsonData
-                println(data)
-//                _heartbeatInterval = d["heartbeat_interval"] as? Int
+                _heartbeatInterval = Converter.toLong(d!!["heartbeat_interval"])
+                _sessionId = d!!["session_id"] as String
+                heartbeat()
             }
             GatewayOp.HEARTBEAT -> {
                 send(GatewayOp.HEARTBEAT_ACK)
