@@ -40,6 +40,7 @@ interface RoleService {
         val positions: Int
     )
 
+
     @PATCH("guilds/{guildId}/roles")
     fun updatePositions(
         @Path("guildId") guildId: String, @Body request: UpdatePositionsRequest, @Header(
