@@ -1,6 +1,8 @@
 package cn.troph.tomon.core.network
 
+import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.services.*
+import com.google.gson.JsonArray
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
