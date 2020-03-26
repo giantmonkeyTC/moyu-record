@@ -6,17 +6,17 @@ import cn.troph.tomon.core.utils.Collection
 import java.time.Instant
 import java.util.*
 
-class Message(client: Client,data: JsonData):Base(client, data) {
-    var channel:Channel? =null
-    var id : String = ""
-    var author : User? = null
-    var type : Int = 0
-    var content : String = ""
-    var timestamp : Date? = null
-    var nonce : String = ""
-    var pending :Boolean = false
-    var attachments : cn.troph.tomon.core.utils.Collection<MessageAttachment>? = null
-    var reactions : Collection<Reaction>? = null
+class Message(client: Client, data: JsonData) : Base(client, data) {
+    var channel: Channel? = null
+    var id: String = ""
+    var author: User? = null
+    var type: Int = 0
+    var content: String = ""
+    var timestamp: Date? = null
+    var nonce: String = ""
+    var pending: Boolean = false
+    var attachments: cn.troph.tomon.core.utils.Collection<MessageAttachment>? = null
+    var reactions: Collection<Reaction>? = null
 
     override fun patch(data: JsonData) {
         super.patch(data)
@@ -37,20 +37,26 @@ class Message(client: Client,data: JsonData):Base(client, data) {
         }
         if (data.containsKey("attachments")) {
             attachments?.clear()
-            for ( attachment in data["attachments"] as Map<String,JsonData>) {
-                attachments?.put((attachment as JsonData)["id"] as String, MessageAttachment(client,attachment))
+            for (attachment in data["attachments"] as Map<String, JsonData>) {
+                attachments?.put(
+                    (attachment as JsonData)["id"] as String,
+                    MessageAttachment(client, attachment)
+                )
             }
         }
         if (data.containsKey("pending")) {
             pending = data["pending"] as Boolean
         }
-        if(data.containsKey("reactions")){
+        if (data.containsKey("reactions")) {
             reactions?.clear()
-            for( reaction in data["reactions"] as JsonData){
-                reactions?.put((reaction as Map<String,JsonData>)["emoji"]?.get("name") as String ,Reaction(client,reaction))
+            for (reaction in data["reactions"] as JsonData) {
+                reactions?.put(
+                    (reaction as Map<String, JsonData>)["emoji"]?.get("name") as String,
+                    Reaction(client, reaction)
+                )
             }
         }
-        if(data.containsKey("author") && data["author"] != null){
+        if (data.containsKey("author") && data["author"] != null) {
             author = User(client, data["author"] as JsonData)
         }
     }

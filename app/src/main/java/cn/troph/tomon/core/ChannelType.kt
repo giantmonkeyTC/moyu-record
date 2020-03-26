@@ -13,7 +13,7 @@ enum class ChannelType(val value: Int) {
     }
 }
 
-enum class PermissionOverwriteType(){
+enum class PermissionOverwriteType() {
     ROLE,
     MEMBER
 }

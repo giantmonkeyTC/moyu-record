@@ -36,6 +36,7 @@ interface RoleService {
         ) token: String
     ): JsonData
 
+
     data class UpdatePositionsRequest(
         val positions: Int
     )

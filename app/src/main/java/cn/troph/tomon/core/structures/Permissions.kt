@@ -68,7 +68,7 @@ class Permissions(b: Int) : BitField(b) {
             manageRoles,
             manageWebhooks,
             manageEmojis
-            )
+        )
 
         const val defaultPermissions: Int = createInstantInvite or
                 viewChannel or
@@ -84,6 +84,6 @@ class Permissions(b: Int) : BitField(b) {
                 speak or
                 changeNickname
 
-        val all = flags.reduce{a , b -> a or b}
+        val all = flags.reduce { a, b -> a or b }
     }
 }

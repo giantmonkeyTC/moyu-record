@@ -20,5 +20,6 @@ class Presence(client: Client, data: JsonData) : Base(client, data) {
             status = data["status"] as String
         }
     }
+
     val user get() = client.users.get(userId)
 }

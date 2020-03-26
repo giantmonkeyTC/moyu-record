@@ -3,7 +3,8 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 
-class TextChannel(client: Client,data: JsonData,guild: Guild) : GuildChannel(client, data, guild) {
+class TextChannel(client: Client, data: JsonData, guild: Guild) :
+    GuildChannel(client, data, guild) {
     var topic = ""
     var lastMessageId = ""
     var ackMessageId = ""

@@ -7,7 +7,7 @@ open class BitField {
         value = resolve(b)
     }
 
-    fun has(bit : Int):Boolean{
+    fun has(bit: Int): Boolean {
         return (value and bit) == bit
     }
 
@@ -27,7 +27,7 @@ open class BitField {
         return value
     }
 
-    companion object{
+    companion object {
         fun resolve(b: Any): Int {
             if (b is Int) {
                 return b;

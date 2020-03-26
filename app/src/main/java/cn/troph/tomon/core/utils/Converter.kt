@@ -9,6 +9,7 @@ object Converter {
             else -> 0
         }
     }
+
     fun toLong(value: Any?): Long {
         return when (value) {
             is Int -> value.toLong()

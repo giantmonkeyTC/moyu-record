@@ -17,6 +17,7 @@ interface GuildService {
         val icon: String
     )
 
+
     @POST("guilds")
     suspend fun createGuild(
         @Body request: CreateGuildRequest,
@@ -46,5 +47,6 @@ interface GuildService {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Void
+
 
 }

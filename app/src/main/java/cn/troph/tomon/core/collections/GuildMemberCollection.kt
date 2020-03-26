@@ -5,7 +5,7 @@ import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildMember
 
-class GuildMemberCollection(val guild: Guild) :BaseCollection<GuildMember>(guild.client){
+class GuildMemberCollection(val guild: Guild) : BaseCollection<GuildMember>(guild.client) {
     override fun add(
         data: Map<String, Any>,
         identify: ((d: Map<String, Any>) -> String)?
@@ -15,7 +15,7 @@ class GuildMemberCollection(val guild: Guild) :BaseCollection<GuildMember>(guild
     }
 
     override fun instantiate(data: Map<String, Any>): GuildMember? {
-        return GuildMember(client,data,guild)
+        return GuildMember(client, data, guild)
     }
 
 }
