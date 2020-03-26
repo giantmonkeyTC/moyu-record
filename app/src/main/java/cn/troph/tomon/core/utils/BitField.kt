@@ -7,6 +7,10 @@ open class BitField {
         value = resolve(b)
     }
 
+    fun has(bit : Int):Boolean{
+        return (value and bit) == bit
+    }
+
     fun plus(b: BitField): BitField {
         return BitField(value or b.value)
     }

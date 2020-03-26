@@ -15,8 +15,8 @@ class Message(client: Client,data: JsonData):Base(client, data) {
     var timestamp : Date? = null
     var nonce : String = ""
     var pending :Boolean = false
-    var attachments : cn.troph.tomon.core.utils.Collection<MessageAttachment>? = null
-    var reactions : Collection<Reaction>? = null
+    var attachments : cn.troph.tomon.core.utils.Collection<MessageAttachment> = Collection<MessageAttachment>()
+    var reactions : Collection<Reaction> = Collection<Reaction>()
 
     override fun patch(data: JsonData) {
         super.patch(data)

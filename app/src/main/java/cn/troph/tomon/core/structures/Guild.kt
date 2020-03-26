@@ -2,6 +2,8 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.collections.GuildChannelCollection
+import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
 import java.time.LocalDateTime
 
@@ -15,6 +17,12 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
     var ownerId: String = ""
     var systemChannelId: String? = null
     var systemChannelFlags: Int = 0
+    private var _channels : GuildChannelCollection = GuildChannelCollection(this)
+    private var _members : GuildMemberCollection = GuildMemberCollection(this)
+
+
+    val channels get() = _channels
+    val members get() = _members
 
     val guilds = RoleCollection(client, null, id)
 

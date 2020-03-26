@@ -7,7 +7,7 @@ import retrofit2.http.*
 
 interface RoleService {
     @GET("guilds/{guildId}/roles")
-    fun getRoles(@Path("guildId") guildId: String, @Header("Authorization") token: String): Call<JsonArray>;
+    suspend fun getRoles(@Path("guildId") guildId: String, @Header("Authorization") token: String): JsonArray;
 
     data class CreateRoleRequest(
         val name: String,
@@ -16,11 +16,11 @@ interface RoleService {
     )
 
     @POST("guilds/{guildId}/roles/{id}")
-    fun createRole(
+    suspend fun createRole(
         @Path("guildId") guildId: String,
         @Body request: CreateRoleRequest,
         @Header("Authorization") token: String
-    ): Call<JsonData>
+    ): JsonData
 
     data class UpdateRoleRequest(
         val name: String?,
@@ -30,11 +30,11 @@ interface RoleService {
     )
 
     @PATCH("guilds/{guildId}/roles/{roleId}")
-    fun updateRole(
+    suspend fun updateRole(
         @Path("guildId") guildId: String, @Path("roleId") roleId: String, @Body request: UpdateRoleRequest, @Header(
             "Authorization"
         ) token: String
-    ): Call<JsonData>
+    ): JsonData
 
     data class UpdatePositionsRequest(
         val positions: Int
@@ -42,16 +42,16 @@ interface RoleService {
 
 
     @PATCH("guilds/{guildId}/roles")
-    fun updatePositions(
+    suspend fun updatePositions(
         @Path("guildId") guildId: String, @Body request: UpdatePositionsRequest, @Header(
             "Authorization"
         ) token: String
-    ): Call<JsonData>
+    ): JsonData
 
     @DELETE("guilds/{guildId}/roles/{roleId}")
-    fun deleteRole(
+    suspend fun deleteRole(
         @Path("guildId") guildId: String, @Path("roleId") roleId: String, @Header(
             "Authorization"
         ) token: String
-    ): Call<Void>
+    ): Void
 }

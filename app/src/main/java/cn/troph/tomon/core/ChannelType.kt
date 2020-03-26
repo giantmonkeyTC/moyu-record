@@ -12,3 +12,8 @@ enum class ChannelType(val value: Int) {
         fun fromInt(type: Int) = map[type]
     }
 }
+
+enum class PermissionOverwriteType(){
+    ROLE,
+    MEMBER
+}

@@ -25,6 +25,9 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         return entry
     }
 
+
+
+
     open fun instantiate(data: Map<String, Any>): T? {
         return null
     }
