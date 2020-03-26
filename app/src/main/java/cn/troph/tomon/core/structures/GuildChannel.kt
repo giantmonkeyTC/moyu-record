@@ -10,7 +10,7 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
     var name: String = ""
     var position: Int = 0
     var parentId: String = ""
-    var permissionOverwrites: Collection<PermissionOverwrites> = Collection<PermissionOverwrites>()
+    var permissionOverwrites: Collection<PermissionOverwrites>?= null
 
     override fun patch(data: JsonData) {
         super.patch(data)
@@ -65,8 +65,8 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
         if (role.permissions.has(Permissions.administrator)) {
             return Permissions(Permissions.all)
         }
-        val everyoneOverwrites: PermissionOverwrites? = guild?.id?.let { permissionOverwrites.get(it) }//TODO let
-        val roleOverwrites: PermissionOverwrites? = permissionOverwrites.get(role.id)
+        val everyoneOverwrites: PermissionOverwrites? = guild?.id?.let { permissionOverwrites?.get(it) }//TODO let
+        val roleOverwrites: PermissionOverwrites? = permissionOverwrites?.get(role.id)
         role.permissions.minus(BitField(if (everyoneOverwrites != null) everyoneOverwrites.deny else 0))
             .plus(
                 BitField(if (everyoneOverwrites != null) everyoneOverwrites.allow else 0)

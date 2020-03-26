@@ -36,7 +36,7 @@ open class Collection<T>(m: Map<String, T>?) {
     fun forEach(each: (element: T) -> Unit) = map.values.forEach(each)
 
     fun filter(predicate: (element: T) -> Boolean): Collection<T> =
-        Collection<T>()
+        Collection<T>(map.filter { entry -> predicate(entry.value) })
 
     fun <F> map(transform: (key: String, value: T) -> F): Iterable<F> =
         map.map { e -> transform(e.key, e.value) }
