@@ -6,7 +6,7 @@ import cn.troph.tomon.core.utils.Collection
 
 
 open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = null) : Collection<T>(m) {
-    open fun add(data: Map<String, Any>, identify: ((d: Map<String, Any>) -> String)?): T? {
+    open fun add(data: Map<String, Any>, identify: ((d: Map<String, Any>) -> String)? = null): T? {
         val id = (if (identify != null) {
             identify(data)
         } else {
