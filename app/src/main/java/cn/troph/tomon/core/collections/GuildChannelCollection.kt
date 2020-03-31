@@ -11,7 +11,7 @@ class GuildChannelCollection(val guild: Guild) : BaseCollection<GuildChannel>(gu
         return null
     }
 
-    //TODO fetch,create,etc.
+    //TODO fetch, create, etc.
 
     override fun instantiate(data: Map<String, Any>): GuildChannel? {
         val guild = client.guilds.get(data["guild_id"] as String)

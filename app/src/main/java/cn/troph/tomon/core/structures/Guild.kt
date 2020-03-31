@@ -19,10 +19,12 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
     var systemChannelFlags: Int = 0
     private var _channels: GuildChannelCollection = GuildChannelCollection(this)
     private var _members: GuildMemberCollection = GuildMemberCollection(this)
+    private var _roles:RoleCollection = RoleCollection(this.client,guildId = this.id)
 
 
     val channels get() = _channels
     val members get() = _members
+    val roles get() = _roles
 
     val guilds = RoleCollection(client, null, id)
 

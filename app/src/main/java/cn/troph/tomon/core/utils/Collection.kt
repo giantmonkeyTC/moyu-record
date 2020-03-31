@@ -13,7 +13,7 @@ open class Collection<T>(m: Map<String, T>?) {
 
     fun put(key: String, value: T): T? = set(key, value)
 
-    fun remove(key: String): T? = map.remove(key)
+    open fun remove(key: String): T? = map.remove(key)
 
     fun contains(key: String): Boolean = map.contains(key)
 

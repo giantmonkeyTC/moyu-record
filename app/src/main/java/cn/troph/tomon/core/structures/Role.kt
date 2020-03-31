@@ -45,5 +45,9 @@ class Role(client: Client, data: JsonData) : Base(client, data) {
 
     val isEveryone get() = id === guild?.id
 
+    fun comparePositionTo(role: Role){
+//        role = this.guild.roles
+    }
+
 
 }

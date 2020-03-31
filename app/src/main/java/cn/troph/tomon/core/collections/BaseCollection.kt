@@ -26,6 +26,15 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         return entry
     }
 
+    fun resolve(idOrInstance:Any): Any? {
+        if(idOrInstance is Base)
+        return idOrInstance
+        if (idOrInstance is String)
+            return if (get(idOrInstance)==null) null else idOrInstance
+        return null
+
+    }
+
     open fun instantiate(data: Map<String, Any>): T? {
         return null
     }
