@@ -11,7 +11,7 @@ open class Collection<T>(m: Map<String, T>?) {
         return prev
     }
 
-    fun has(key: String) : Boolean= map.containsKey(key)
+    fun has(key: String): Boolean = map.containsKey(key)
 
     fun put(key: String, value: T): T? = set(key, value)
 

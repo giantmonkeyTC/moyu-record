@@ -44,9 +44,10 @@ class Role(client: Client, data: JsonData) : Base(client, data) {
         }
     }
 
-    val index get() : Int{
-        return guild!!.roles.list().indexOf(this)
-    }
+    val index
+        get() : Int {
+            return guild!!.roles.list().indexOf(this)
+        }
 
     val guild get() = client.guilds.get(guildId)
 

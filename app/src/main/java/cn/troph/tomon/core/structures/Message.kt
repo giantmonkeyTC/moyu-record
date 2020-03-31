@@ -6,7 +6,7 @@ import cn.troph.tomon.core.utils.Collection
 import java.time.Instant
 import java.util.*
 
-class Message(client: Client, data: JsonData,val channel: Channel) : Base(client, data) {
+class Message(client: Client, data: JsonData, val channel: Channel) : Base(client, data) {
     var id: String = ""
     var author: User? = null
     var type: Int = 0

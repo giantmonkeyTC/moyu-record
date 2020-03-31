@@ -37,9 +37,9 @@ class GuildMember(client: Client, data: JsonData, val guild: Guild) : Base(clien
 
     val isOwner get() = id == guild.ownerId
 
-    fun hasRole(role : Role) : Boolean{
-        val roleId = guild.roles.resolveId(role){it.id}
-        if(roleId == guild.id)
+    fun hasRole(role: Role): Boolean {
+        val roleId = guild.roles.resolveId(role) { it.id }
+        if (roleId == guild.id)
             return true
         return rawRoles!!.indexOf(roleId) != -1
     }

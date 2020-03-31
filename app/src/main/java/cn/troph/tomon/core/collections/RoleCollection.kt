@@ -20,9 +20,9 @@ class RoleCollection(client: Client, m: Map<String, Role>? = null, var guildId: 
             roles.sortWith(Comparator { a: Role, b: Role ->
                 var compare: Int =
                     (if (a.isEveryone) 1 else 0).compareTo(if (b.isEveryone) 1 else 0)
-                if(compare == 0)
+                if (compare == 0)
                     compare = b.position.compareTo(a.position)
-                if(compare == 0)
+                if (compare == 0)
                     compare = a.id.compareTo(b.id)
                 compare
             })

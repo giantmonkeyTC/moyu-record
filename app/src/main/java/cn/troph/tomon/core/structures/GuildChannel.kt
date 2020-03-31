@@ -113,12 +113,12 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
             overwrites["roles"] as List<PermissionOverwrites>
         val overwritesMember: PermissionOverwrites =
             overwrites["member"] as PermissionOverwrites
-        permissions.minus(BitField(if (overwritesEveryone!=null) overwritesEveryone.deny else 0))
-            .plus(BitField(if (overwritesEveryone!=null) overwritesEveryone.allow else 0))
+        permissions.minus(BitField(if (overwritesEveryone != null) overwritesEveryone.deny else 0))
+            .plus(BitField(if (overwritesEveryone != null) overwritesEveryone.allow else 0))
             .minus(BitField(if (overwritesRoles.size > 0) overwritesRoles.map { it.deny } else 0))
             .plus(BitField(if (overwritesRoles.size > 0) overwritesRoles.map { it.allow } else 0))
-            .minus(BitField(if (overwritesMember!=null)overwritesMember.deny else 0))
-            .plus(BitField(if (overwritesMember!=null)overwritesMember.allow else 0))
+            .minus(BitField(if (overwritesMember != null) overwritesMember.deny else 0))
+            .plus(BitField(if (overwritesMember != null) overwritesMember.allow else 0))
         return permissions
 
     }

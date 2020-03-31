@@ -13,8 +13,8 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
         identify: ((d: Map<String, Any>) -> String)?
     ): Channel? {
         val channel = super.add(data, identify)
-        if(channel is GuildChannel){
-            channel.guild?.channels?.put(channel.id,channel)
+        if (channel is GuildChannel) {
+            channel.guild?.channels?.put(channel.id, channel)
         }
         return channel
     }
@@ -33,17 +33,17 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
         when (type) {
             ChannelType.TEXT -> {
                 if (guild != null) {
-                    return TextChannel(client,data, guild)
+                    return TextChannel(client, data, guild)
                 }
             }
             ChannelType.VOICE -> {
                 if (guild != null) {
-                    return VoiceChannel(client,data, guild)
+                    return VoiceChannel(client, data, guild)
                 }
             }
             ChannelType.CATEGORY -> {
                 if (guild != null) {
-                    return CategoryChannel(client,data, guild)
+                    return CategoryChannel(client, data, guild)
                 }
             }
             else -> return null
