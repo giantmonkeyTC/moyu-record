@@ -6,8 +6,7 @@ import cn.troph.tomon.core.utils.Collection
 import java.time.Instant
 import java.util.*
 
-class Message(client: Client, data: JsonData) : Base(client, data) {
-    var channel: Channel? = null
+class Message(client: Client, data: JsonData,val channel: Channel) : Base(client, data) {
     var id: String = ""
     var author: User? = null
     var type: Int = 0
@@ -15,7 +14,7 @@ class Message(client: Client, data: JsonData) : Base(client, data) {
     var timestamp: Date? = null
     var nonce: String = ""
     var pending: Boolean = false
-    var attachments: cn.troph.tomon.core.utils.Collection<MessageAttachment>? = null
+    var attachments: Collection<MessageAttachment>? = null
     var reactions: Collection<Reaction>? = null
 
     override fun patch(data: JsonData) {
@@ -61,7 +60,7 @@ class Message(client: Client, data: JsonData) : Base(client, data) {
         }
     }
 
-    val guild get() : Guild = TODO()
+    val guild get() : Guild? = if (this.channel is GuildChannel) (this.channel as GuildChannel).guild else null
 
     override fun toString(): String {
         return "[CoreMessage $id] { channel: ${channel?.id} }"

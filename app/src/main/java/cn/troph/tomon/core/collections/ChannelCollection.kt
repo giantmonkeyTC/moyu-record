@@ -14,7 +14,7 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
     ): Channel? {
         val channel = super.add(data, identify)
         if(channel is GuildChannel){
-            channel.guild.channels.put(channel.id,channel)
+            channel.guild?.channels?.put(channel.id,channel)
         }
         return channel
     }

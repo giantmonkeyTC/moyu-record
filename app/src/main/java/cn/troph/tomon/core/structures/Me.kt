@@ -46,6 +46,8 @@ class Me(client: Client, data: JsonData) : User(client, data) {
         token = null
     }
 
+    //TODO LOGIN, REGISTER, ETC.
+
     suspend fun login(
         emailOrPhone: String? = null,
         password: String? = null,

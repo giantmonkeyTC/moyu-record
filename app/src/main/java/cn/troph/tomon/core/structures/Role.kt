@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.structures
 
+import android.nfc.FormatException
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 
@@ -13,6 +14,8 @@ class Role(client: Client, data: JsonData) : Base(client, data) {
     var permissions: Permissions = Permissions(0)
     var mentionable: Boolean = true
 
+
+    // TODO DELETE, UPDATE, ETC.
     override fun patch(data: JsonData) {
         super.patch(data)
         if (data.contains("id")) {
@@ -41,12 +44,32 @@ class Role(client: Client, data: JsonData) : Base(client, data) {
         }
     }
 
+    val index get() : Int{
+        return guild!!.roles.list().indexOf(this)
+    }
+
     val guild get() = client.guilds.get(guildId)
 
-    val isEveryone get() = id === guild?.id
+    val isEveryone get() = id == guild?.id
 
-    fun comparePositionTo(role: Role){
-//        role = this.guild.roles
+    fun comparePositionTo(role: Any): Int {
+        var roleInstance = this.guild?.roles?.resolve(role)
+        if (roleInstance == null)
+            return throw FormatException("Role nor a Snowflake")
+        return comparePositions(this, roleInstance as Role)
+
+    }
+
+    fun comparePositions(role1: Role, role2: Role): Int {
+        if (role1.isEveryone != role2.isEveryone)
+            return (if (role1.isEveryone) 1 else 0) - (if (role1.isEveryone) 1 else 0)
+        if (role1.position != role2.position)
+            return role2.position - role1.position
+        return role1.id.compareTo(role2.id)
+    }
+
+    override fun toString(): String {
+        return "[CoreRole $id] { name: $name }"
     }
 
 

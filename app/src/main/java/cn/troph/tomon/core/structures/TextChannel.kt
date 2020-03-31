@@ -9,6 +9,7 @@ class TextChannel(client: Client, data: JsonData, guild: Guild) :
     var lastMessageId = ""
     var ackMessageId = ""
     var syncAckMessageId = ""
+
     override fun patch(data: JsonData) {
         super.patch(data)
         if (data.containsKey("topic")) {

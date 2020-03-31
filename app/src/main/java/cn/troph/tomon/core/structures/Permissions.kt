@@ -2,7 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.utils.BitField
 
-class Permissions(b: Int) : BitField(b) {
+class Permissions(b: Any) : BitField(b) {
     companion object {
         const val createInstantInvite: Int = 1 shl 0
         const val kickMembers: Int = 1 shl 1

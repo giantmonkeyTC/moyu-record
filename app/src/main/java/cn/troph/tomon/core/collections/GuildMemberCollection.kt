@@ -14,6 +14,24 @@ class GuildMemberCollection(val guild: Guild) : BaseCollection<GuildMember>(guil
         return super.add(data, identify)
     }
 
+    override fun resolve(member: Any): Any? {
+        val memberResolvable = super.resolve(member)
+        if(memberResolvable != null)
+            return memberResolvable
+        val userResolvable = client.users.resolveId(member){it.id}
+        if (userResolvable!= null)
+            return super.resolve(userResolvable)
+        return null
+    }
+
+    override fun resolveId(member: Any, id: (value: GuildMember) -> String?): String? {
+        val memberResolvable =super.resolveId(member){it.id}
+        if (memberResolvable!=null)
+            return memberResolvable
+        val userResolvable = client.users.resolveId(member){it.id}
+        return if(this.has(userResolvable!!)) userResolvable else null
+    }
+
     override fun instantiate(data: Map<String, Any>): GuildMember? {
         return GuildMember(client, data, guild)
     }

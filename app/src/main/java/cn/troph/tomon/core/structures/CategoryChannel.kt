@@ -6,7 +6,7 @@ import cn.troph.tomon.core.utils.Collection
 
 class CategoryChannel(client: Client, data: JsonData, guild: Guild) :
     GuildChannel(client, data, guild) {
-//    val children get() : Collection<GuildChannel> = guild.channels.filter TODO
+    val children get() : Collection<GuildChannel> = guild!!.channels.filter { c: Channel -> c is GuildChannel && c.parentId == id }
 
     override fun patch(data: JsonData) {
         super.patch(data)

@@ -3,6 +3,8 @@ package cn.troph.tomon.core.collections
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Base
 import cn.troph.tomon.core.utils.Collection
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 
 open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = null) :
@@ -26,13 +28,25 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         return entry
     }
 
-    fun resolve(idOrInstance:Any): Any? {
-        if(idOrInstance is Base)
-        return idOrInstance
+
+    open fun resolve(idOrInstance: Any): Any? {
+        if (this.values.contains(idOrInstance))
+            return idOrInstance
         if (idOrInstance is String)
-            return if (get(idOrInstance)==null) null else idOrInstance
+            return if (get(idOrInstance) == null) null else idOrInstance
         return null
 
+    }
+
+
+    //idOrInstance must be of the same type as T
+    open fun resolveId(idOrInstance: Any, id: (value: T) -> String?): String? {
+
+        return if (idOrInstance is String)
+            idOrInstance
+        else
+            @Suppress("UNCHECKED_CAST")
+            id(idOrInstance as T)
     }
 
     open fun instantiate(data: Map<String, Any>): T? {
