@@ -2,16 +2,17 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.collections.ChannelMemberCollection
 import cn.troph.tomon.core.collections.GuildMemberRoleCollection
 import cn.troph.tomon.core.utils.BitField
 import cn.troph.tomon.core.utils.Collection
 
 open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Channel(client, data) {
-    //channelMemberCollection TODO
     var name: String = ""
     var position: Int = 0
     var parentId: String = ""
     var permissionOverwrites: Collection<PermissionOverwrites>? = null
+    var members = ChannelMemberCollection(this)
 
     override fun patch(data: JsonData) {
         super.patch(data)
@@ -128,7 +129,7 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
             return Permissions(Permissions.all)
         }
         val everyoneOverwrites: PermissionOverwrites? =
-            guild?.id?.let { permissionOverwrites?.get(it) }//TODO let
+            permissionOverwrites?.get(guild!!.id)
         val roleOverwrites: PermissionOverwrites? = permissionOverwrites?.get(role.id)
         role.permissions.minus(BitField(if (everyoneOverwrites != null) everyoneOverwrites.deny else 0))
             .plus(

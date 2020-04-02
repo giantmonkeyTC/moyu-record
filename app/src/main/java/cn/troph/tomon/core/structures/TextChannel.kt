@@ -2,6 +2,8 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.collections.MessageCollection
+import cn.troph.tomon.core.collections.PendMessageCollection
 
 class TextChannel(client: Client, data: JsonData, guild: Guild) :
     GuildChannel(client, data, guild) {
@@ -9,6 +11,8 @@ class TextChannel(client: Client, data: JsonData, guild: Guild) :
     var lastMessageId = ""
     var ackMessageId = ""
     var syncAckMessageId = ""
+    private var messageCollection = MessageCollection(this)
+    private var pendMessageCollection = PendMessageCollection(this)
 
     override fun patch(data: JsonData) {
         super.patch(data)
@@ -24,8 +28,11 @@ class TextChannel(client: Client, data: JsonData, guild: Guild) :
         }
     }
 
-    //TODO messages getter, pending messages getter
     val unread get() : Boolean = false //TODO snowfalke.isgreaterthan
+
+    val messages get() = messageCollection
+
+    val pendingMessages get() = pendMessageCollection
 
     override fun toString(): String {
         return "[CoreTextChannel $id] { name: $name }"
