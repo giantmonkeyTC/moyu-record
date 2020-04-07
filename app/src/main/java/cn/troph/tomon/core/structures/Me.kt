@@ -4,8 +4,8 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.Validator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class Me(client: Client, data: JsonData) : User(client, data) {
     constructor(client: Client) : this(client, mapOf())
@@ -48,11 +48,11 @@ class Me(client: Client, data: JsonData) : User(client, data) {
 
     //TODO LOGIN, REGISTER, ETC.
 
-    suspend fun login(
+    fun login(
         emailOrPhone: String? = null,
         password: String? = null,
         token: String? = null
-    ): User? {
+    ): Observable<User?> {
         var request = when {
             token != null -> AuthService.LoginRequest(token = token)
             Validator.isEmail(emailOrPhone) -> AuthService.LoginRequest(
@@ -66,10 +66,11 @@ class Me(client: Client, data: JsonData) : User(client, data) {
             else -> null
         }
         if (request != null) {
-            val data = client.rest.authService.login(request)
-            println(Thread.currentThread())
-            return client.actions.userLogin(data)
+            return client.rest.authService.login(request).subscribeOn(Schedulers.io()).map {
+                return@map client.actions.userLogin(it)
+            }
         }
-        return null
+        return Observable.error(Exception("invalid parameter"))
     }
+
 }
