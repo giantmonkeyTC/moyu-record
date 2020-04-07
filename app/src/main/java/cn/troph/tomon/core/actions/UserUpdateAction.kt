@@ -11,9 +11,9 @@ class UserUpdateAction(client: Client) : Action<User>(client) {
         var user = client.users.get(obj["id"] as String)
         if (user != null) {
             if (user.id == client.me.id) {
-                client.me.patch(data)
+                client.me.update(data)
             }
-            user.patch(data)
+            user.update(data)
         } else {
             user = client.users.add(data)
         }

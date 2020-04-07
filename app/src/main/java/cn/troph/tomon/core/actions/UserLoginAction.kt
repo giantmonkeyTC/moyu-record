@@ -10,9 +10,8 @@ class UserLoginAction(client: Client) : Action<User>(client) {
         val obj = data as JsonData
         val user = client.users.add(obj)
         // TODO token
-        client.me.patch(obj)
+        client.me.update(obj)
         if (user != null) {
-            // TODO event
         }
         return user
     }

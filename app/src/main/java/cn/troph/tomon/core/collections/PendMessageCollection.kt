@@ -16,7 +16,7 @@ class PendMessageCollection(val channel: Channel) : BaseCollection<Message>(chan
     ): Message? {
         val existing = get(data["id"] as String)
         if (existing != null) {
-            existing.patch(data)
+            existing.update(data)
             return existing
         }
         val entry = instantiate(data)
