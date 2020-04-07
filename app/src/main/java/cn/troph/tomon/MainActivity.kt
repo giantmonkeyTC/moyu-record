@@ -46,21 +46,21 @@ class MainActivity : AppCompatActivity() {
             onError = { it.printStackTrace() },
             onComplete = { println("complete") }
         )
-        client.me.login(
+        client.login(
                 emailOrPhone = "qiang.l.x@gmail.com",
                 password = "1wq23re45ty67ui8"
             ).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ user -> println(user) }, { error -> println(error) })
 
-        Observable.timer(5, TimeUnit.SECONDS).flatMap {
-            return@flatMap Observable.create<String> { emitter ->
-                println("666")
-                client.me.update(mapOf("username" to "abcdefg"))
-                emitter.onNext("666")
-            }
-        }.observeOn(Schedulers.io()).subscribe {
-            println("trigger")
-        }
+//        Observable.timer(5, TimeUnit.SECONDS).flatMap {
+//            return@flatMap Observable.create<String> { emitter ->
+//                println("666")
+//                client.me.update(mapOf("username" to "abcdefg"))
+//                emitter.onNext("666")
+//            }
+//        }.observeOn(Schedulers.io()).subscribe {
+//            println("trigger")
+//        }
     }
 
 

@@ -5,6 +5,7 @@ import cn.troph.tomon.core.structures.User
 
 class ActionManager(val client: Client) {
 
-    fun userUpdate(data: Any): User? = UserUpdateAction(client).handle(data)
     fun userLogin(data: Any): User? = UserLoginAction(client).handle(data)
+    fun userUpdate(data: Any): User? = UserUpdateAction(client).handle(data)
+
 }
