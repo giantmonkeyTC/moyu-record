@@ -11,13 +11,10 @@ import cn.troph.tomon.page.MemberFragment
 import cn.troph.tomon.page.MessageFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlin.system.measureTimeMillis
+import java.util.concurrent.TimeUnit
 
 private const val DEBUG_TAG = "Gestures"
 
@@ -35,23 +32,34 @@ class MainActivity : AppCompatActivity() {
         viewPager.currentItem = 1
 
         val client = Client()
-        Single.create()
-        Observable.just(client.me.username).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(onNext = {
-                println("subscribe")
-                println(it)
-            })
-
-        println(Thread.currentThread())
-        GlobalScope.async {
-            val time = measureTimeMillis {
-                client.me.login(
-                    emailOrPhone = "qiang.l.x@gmail.com",
-                    password = "1wq23re45ty67ui8"
-                )
+        Observable.create(client.users).subscribeBy(
+            onNext = { event ->
+                println("user update")
+                println(event)
             }
-            println(Thread.currentThread())
-            println("login finish $time")
+        )
+        Observable.create(client.me).subscribeBy(
+            onNext = {
+                println("me update")
+                println(client.me.username)
+            },
+            onError = { it.printStackTrace() },
+            onComplete = { println("complete") }
+        )
+        client.me.login(
+                emailOrPhone = "qiang.l.x@gmail.com",
+                password = "1wq23re45ty67ui8"
+            ).observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ user -> println(user) }, { error -> println(error) })
+
+        Observable.timer(5, TimeUnit.SECONDS).flatMap {
+            return@flatMap Observable.create<String> { emitter ->
+                println("666")
+                client.me.update(mapOf("username" to "abcdefg"))
+                emitter.onNext("666")
+            }
+        }.observeOn(Schedulers.io()).subscribe {
+            println("trigger")
         }
     }
 
