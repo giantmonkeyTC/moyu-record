@@ -1,14 +1,13 @@
 package cn.troph.tomon.core.collections
 
-import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildMember
 
 class GuildMemberCollection(val guild: Guild) : BaseCollection<GuildMember>(guild.client) {
     override fun add(
-        data: Map<String, Any>,
-        identify: ((d: Map<String, Any>) -> String)?
+        data: JsonData,
+        identify: ((d: JsonData) -> String)?
     ): GuildMember? {
         data.toMutableMap()["id"] = (data["user"] as Map<*, *>)["id"] as String
         return super.add(data, identify)
@@ -32,7 +31,7 @@ class GuildMemberCollection(val guild: Guild) : BaseCollection<GuildMember>(guil
         return if (this.has(userResolvable!!)) userResolvable else null
     }
 
-    override fun instantiate(data: Map<String, Any>): GuildMember? {
+    override fun instantiate(data: JsonData): GuildMember? {
         return GuildMember(client, data, guild)
     }
 

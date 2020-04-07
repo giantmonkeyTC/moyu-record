@@ -1,16 +1,16 @@
 package cn.troph.tomon.core.collections
 
-import android.R.attr
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.*
 
 
 class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
     BaseCollection<Channel>(client, m) {
     override fun add(
-        data: Map<String, Any>,
-        identify: ((d: Map<String, Any>) -> String)?
+        data: JsonData,
+        identify: ((d: JsonData) -> String)?
     ): Channel? {
         val channel = super.add(data, identify)
         if (channel is GuildChannel) {
@@ -26,11 +26,9 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
         return super.remove(key)
     }
 
-
-    override fun instantiate(data: Map<String, Any>): Channel? {
+    override fun instantiate(data: JsonData): Channel? {
         var guild = client.guilds.get(data["guild_id"] as String)
-        val type = Channel.typeOf(data["type"] as Int)
-        when (type) {
+        when (Channel.typeOf(data["type"] as Int)) {
             ChannelType.TEXT -> {
                 if (guild != null) {
                     return TextChannel(client, data, guild)
