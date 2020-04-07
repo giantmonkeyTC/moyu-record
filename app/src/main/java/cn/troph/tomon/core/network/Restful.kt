@@ -1,14 +1,16 @@
 package cn.troph.tomon.core.network
 
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.services.*
-import com.google.gson.JsonArray
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import hu.akarnokd.rxjava3.retrofit.*;
 
 class Restful {
 
-    private val retrofit = Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+    private val retrofit = Retrofit
+        .Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
         .baseUrl(Configs.baseUrl).build()
 
     val authService: AuthService = retrofit.create(AuthService::class.java)

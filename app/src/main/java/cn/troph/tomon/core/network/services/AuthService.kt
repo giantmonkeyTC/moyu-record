@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonData
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -14,9 +15,9 @@ interface AuthService {
     )
 
     @POST("auth/login")
-    suspend fun login(
+    fun login(
         @Body request: LoginRequest
-    ): JsonData;
+    ): Observable<JsonData>;
 
     data class RegisterRequest(
         val username: String?,
@@ -27,8 +28,8 @@ interface AuthService {
     )
 
     @POST("auth/register")
-    suspend fun register(
+    fun register(
         @Body request: RegisterRequest
-    ): JsonData;
+    ): Observable<JsonData>;
 
 }
