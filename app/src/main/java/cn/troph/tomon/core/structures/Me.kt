@@ -18,6 +18,9 @@ class Me(client: Client, data: JsonData) : User(client, data) {
 
     override fun patch(data: JsonData) {
         super.patch(data)
+        if (data.contains("token")) {
+            token = data["token"] as? String
+        }
         if (data.contains("email")) {
             email = data["email"] as? String
         }
