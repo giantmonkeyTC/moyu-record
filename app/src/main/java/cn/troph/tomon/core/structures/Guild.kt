@@ -69,7 +69,8 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
         }
         if (data.contains("default_message_notifications")) {
             val value = data["default_message_notifications"] as Int
-            defaultMessageNotifications = MessageNotificationsType.fromInt(value)
+            defaultMessageNotifications =
+                MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.ONLY_MENTION
         }
     }
 }
