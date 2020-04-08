@@ -12,13 +12,13 @@ interface MessageService {
     @GET("channels/{channelId}/messages")
     suspend fun getMessages(@Path("channelId") channelId: String, @Header("Authorization") token: String): JsonArray
 
-    data class createMessageRequest(
+    data class CreateMessageRequest(
         var content: String
     )
 
     @POST("channels/{channelId}/messages")
     fun createMessage(
-        @Path("channelID") channelId: String, @Body request: createMessageRequest, @Header(
+        @Path("channelID") channelId: String, @Body request: CreateMessageRequest, @Header(
             "Authorization"
         ) token: String
     ): JsonData
@@ -38,13 +38,13 @@ interface MessageService {
         ) token: String
     ): Void
 
-    data class updateMessageRequest(
+    data class UpdateMessageRequest(
         val content: String
     )
 
     @PATCH("channels/{channelId}/messages/{messageId}")
     suspend fun updateMessage(
-        @Path("channelId") channelId: String, @Path("messageId") messageId: String, @Body request: updateMessageRequest, @Header(
+        @Path("channelId") channelId: String, @Path("messageId") messageId: String, @Body request: UpdateMessageRequest, @Header(
             "Authorization"
         ) token: String
     ): JsonArray
