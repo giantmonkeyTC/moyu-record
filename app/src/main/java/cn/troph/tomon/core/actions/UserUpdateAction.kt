@@ -2,6 +2,7 @@ package cn.troph.tomon.core.actions
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.events.UserUpdateEvent
 import cn.troph.tomon.core.structures.User
 
 class UserUpdateAction(client: Client) : Action<User>(client) {
@@ -16,6 +17,9 @@ class UserUpdateAction(client: Client) : Action<User>(client) {
             user.update(data)
         } else {
             user = client.users.add(data)
+        }
+        if (user != null) {
+            client.eventBus.postEvent(UserUpdateEvent(user))
         }
         return user
     }

@@ -2,12 +2,15 @@ package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonArray
 import cn.troph.tomon.core.JsonData
-import retrofit2.Call
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
 interface RoleService {
     @GET("guilds/{guildId}/roles")
-    suspend fun getRoles(@Path("guildId") guildId: String, @Header("Authorization") token: String): JsonArray;
+    fun getRoles(
+        @Path("guildId") guildId: String,
+        @Header("Authorization") token: String
+    ): Observable<JsonArray>;
 
     data class CreateRoleRequest(
         val name: String,
@@ -16,11 +19,11 @@ interface RoleService {
     )
 
     @POST("guilds/{guildId}/roles/{id}")
-    suspend fun createRole(
+    fun createRole(
         @Path("guildId") guildId: String,
         @Body request: CreateRoleRequest,
         @Header("Authorization") token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     data class UpdateRoleRequest(
         val name: String?,
@@ -30,11 +33,14 @@ interface RoleService {
     )
 
     @PATCH("guilds/{guildId}/roles/{roleId}")
-    suspend fun updateRole(
-        @Path("guildId") guildId: String, @Path("roleId") roleId: String, @Body request: UpdateRoleRequest, @Header(
+    fun updateRole(
+        @Path("guildId") guildId: String,
+        @Path("roleId") roleId: String,
+        @Body request: UpdateRoleRequest,
+        @Header(
             "Authorization"
         ) token: String
-    ): JsonData
+    ): Observable<JsonData>
 
 
     data class UpdatePositionsRequest(
@@ -43,16 +49,16 @@ interface RoleService {
 
 
     @PATCH("guilds/{guildId}/roles")
-    suspend fun updatePositions(
+    fun updatePositions(
         @Path("guildId") guildId: String, @Body request: UpdatePositionsRequest, @Header(
             "Authorization"
         ) token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     @DELETE("guilds/{guildId}/roles/{roleId}")
-    suspend fun deleteRole(
+    fun deleteRole(
         @Path("guildId") guildId: String, @Path("roleId") roleId: String, @Header(
             "Authorization"
         ) token: String
-    ): Void
+    ): Observable<Void>
 }

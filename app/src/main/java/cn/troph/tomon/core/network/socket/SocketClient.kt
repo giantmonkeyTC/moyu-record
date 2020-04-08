@@ -3,6 +3,8 @@ package cn.troph.tomon.core.network.socket
 import cn.troph.tomon.core.JsonData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.reactivex.rxjava3.core.ObservableEmitter
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
 import java.util.*
 import kotlin.concurrent.schedule
@@ -14,6 +16,22 @@ enum class SocketClientState(val value: Int) {
     CLOSED(3),
 }
 
+enum class SocketEventType {
+    CONNECTING,
+    OPEN,
+    CLOSING,
+    CLOSED,
+    SEND,
+    RECEIVE,
+}
+
+data class SocketEvent(
+    val type: SocketEventType,
+    val data: JsonData? = null,
+    val code: Int = 0,
+    val reason: String? = null
+)
+
 fun retryDelay(times: Int): Long {
     return when (times) {
         0 -> 500
@@ -24,16 +42,8 @@ fun retryDelay(times: Int): Long {
     }
 }
 
-interface SocketClientListener {
-    fun onOpen() {}
-    fun onClose(code: Int, reason: String?) {}
-    fun onMessage(data: JsonData) {}
-    fun onError(text: String) {}
-    fun onConnecting() {}
-    fun onFailure(t: Throwable) {}
-}
-
-class SocketClient(private val listener: SocketClientListener) : WebSocketListener() {
+class SocketClient() : WebSocketListener(),
+    ObservableOnSubscribe<SocketEvent> {
 
     private var _webSocket: WebSocket? = null
     private var _url: String? = null
@@ -42,6 +52,11 @@ class SocketClient(private val listener: SocketClientListener) : WebSocketListen
     private var _state: SocketClientState = SocketClientState.CLOSED
     private val _timer = Timer()
     private var _timerTask: TimerTask? = null
+    private var _emitter: ObservableEmitter<SocketEvent>? = null
+
+    override fun subscribe(emitter: ObservableEmitter<SocketEvent>?) {
+        this._emitter = emitter
+    }
 
     fun open(url: String) {
         if (_state == SocketClientState.CLOSED) {
@@ -70,7 +85,7 @@ class SocketClient(private val listener: SocketClientListener) : WebSocketListen
         _url = url
         val request = Request.Builder().url(url).build()
         _webSocket = OkHttpClient().newWebSocket(request, this)
-        listener?.onConnecting()
+        _emitter?.onNext(SocketEvent(SocketEventType.CONNECTING))
     }
 
     private fun reconnect() {
@@ -91,13 +106,14 @@ class SocketClient(private val listener: SocketClientListener) : WebSocketListen
         _state = SocketClientState.OPEN
         _retryCount = 0
         _reconnecting = false
-        listener?.onOpen()
+        _emitter?.onNext(SocketEvent(SocketEventType.OPEN))
     }
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosing(webSocket, code, reason)
         println("[ws] closing")
         _state = SocketClientState.CLOSING
+        _emitter?.onNext(SocketEvent(SocketEventType.CLOSING))
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
@@ -107,7 +123,7 @@ class SocketClient(private val listener: SocketClientListener) : WebSocketListen
         when (code) {
             1006 -> if (url != null) reconnect()
         }
-        listener?.onClose(code, reason)
+        _emitter?.onNext(SocketEvent(SocketEventType.CLOSED, code = code, reason = reason))
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
@@ -115,15 +131,15 @@ class SocketClient(private val listener: SocketClientListener) : WebSocketListen
         try {
             val mapType = object : TypeToken<JsonData>() {}.type
             val data = Gson().fromJson<JsonData>(text, mapType)
-            listener?.onMessage(data)
+            _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))
         } catch (e: Exception) {
-            listener?.onError(text)
+            _emitter?.onError(e)
         }
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         super.onFailure(webSocket, t, response)
-        listener?.onFailure(t)
+        _emitter?.onError(t)
     }
 
 }

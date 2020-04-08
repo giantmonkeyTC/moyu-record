@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Base
 import cn.troph.tomon.core.utils.Collection
 import io.reactivex.rxjava3.core.ObservableEmitter
@@ -22,7 +23,7 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         this.emitter = emitter
     }
 
-    open fun add(data: Map<String, Any>, identify: ((d: Map<String, Any>) -> String)? = null): T? {
+    open fun add(data: JsonData, identify: ((d: JsonData) -> String)? = null): T? {
         val id = (if (identify != null) {
             identify(data)
         } else {
@@ -70,7 +71,7 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
             id(idOrInstance as T)
     }
 
-    open fun instantiate(data: Map<String, Any>): T? {
+    open fun instantiate(data: JsonData): T? {
         return null
     }
 }

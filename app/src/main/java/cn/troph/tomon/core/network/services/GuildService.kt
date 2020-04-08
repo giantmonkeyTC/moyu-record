@@ -2,12 +2,13 @@ package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonArray
 import cn.troph.tomon.core.JsonData
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
 interface GuildService {
 
     @GET("users/@me/guilds")
-    suspend fun getGuilds(@Header("Authorization") token: String): JsonArray;
+    fun getGuilds(@Header("Authorization") token: String): Observable<JsonArray>;
 
     @GET("guilds/{id}")
     suspend fun getGuild(@Path("id") id: String, @Header("Authorization") token: String?): JsonData;
@@ -19,10 +20,10 @@ interface GuildService {
 
 
     @POST("guilds")
-    suspend fun createGuild(
+    fun createGuild(
         @Body request: CreateGuildRequest,
         @Header("Authorization") token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     data class ModifyGuildRequest(
         val name: String?,
@@ -30,23 +31,23 @@ interface GuildService {
     )
 
     @PATCH("guilds/{id}")
-    suspend fun modifyGuild(
+    fun modifyGuild(
         @Path("id") id: String,
         @Body request: ModifyGuildRequest,
         @Header("Authorization") token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     @DELETE("guilds/{id}")
-    suspend fun deleteGuild(
+    fun deleteGuild(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Void
+    ): Observable<Void>
 
     @DELETE("users/@me/guilds/{id}")
-    suspend fun leaveGuild(
+    fun leaveGuild(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Void
+    ): Observable<Void>
 
 
 }

@@ -4,7 +4,12 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.Configs
 import cn.troph.tomon.core.network.socket.handlers.handleGuildCreate
+import cn.troph.tomon.core.network.socket.handlers.handleIdentity
 import cn.troph.tomon.core.utils.Converter
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -23,21 +28,23 @@ enum class GatewayOp(val value: Int) {
     }
 }
 
-class Socket : SocketClientListener {
+class Socket : Observer<SocketEvent> {
 
-    private val _socketClient: SocketClient = SocketClient(this)
+    private val _socketClient: SocketClient = SocketClient()
     private val _client: Client
     private var _ready: Boolean = false
     private var _sessionId: String? = null
     private var _heartbeatTimer = Timer()
     private var _heartbeatTimerTask: TimerTask? = null
     private var _heartbeatInterval: Long = 40000
-    private val _handlers = mapOf<String, Handler>(
+    private val _handlers = mapOf(
+        "IDENTITY" to handleIdentity,
         "GUILD_CREATE" to handleGuildCreate
     )
 
     constructor(client: Client) {
         _client = client
+        Observable.create(_socketClient).observeOn(Schedulers.io()).subscribe(this)
     }
 
     fun open() {
@@ -59,6 +66,7 @@ class Socket : SocketClientListener {
     val state get() = _socketClient.state
 
     private fun heartbeat() {
+        println("heartbeat")
         send(GatewayOp.HEARTBEAT)
         _heartbeatTimerTask = _heartbeatTimer.schedule(_heartbeatInterval) {
             heartbeat()
@@ -70,7 +78,25 @@ class Socket : SocketClientListener {
         _heartbeatTimerTask = null
     }
 
-    override fun onMessage(data: JsonData) {
+    override fun onSubscribe(d: Disposable?) {
+
+    }
+
+    override fun onNext(t: SocketEvent?) {
+        when (t?.type) {
+            SocketEventType.RECEIVE -> handleMessage(t.data!!)
+        }
+    }
+
+    override fun onError(e: Throwable?) {
+
+    }
+
+    override fun onComplete() {
+
+    }
+
+    private fun handleMessage(data: JsonData) {
         val intOp = Converter.toInt(data["op"])
         when (val op = GatewayOp.fromInt(intOp)) {
             GatewayOp.DISPATCH -> {
@@ -85,13 +111,15 @@ class Socket : SocketClientListener {
                 if (handler != null) {
                     handler(_client, data)
                 }
-                println(data)
             }
             GatewayOp.HELLO -> {
                 val d = data["d"] as? JsonData
                 _heartbeatInterval = Converter.toLong(d!!["heartbeat_interval"])
                 _sessionId = d!!["session_id"] as String
                 heartbeat()
+                send(GatewayOp.IDENTITY, mapOf(
+                    "token" to _client.me.token
+                ))
             }
             GatewayOp.HEARTBEAT -> {
                 send(GatewayOp.HEARTBEAT_ACK)
@@ -103,7 +131,4 @@ class Socket : SocketClientListener {
         }
     }
 
-    override fun onClose(code: Int, reason: String?) {
-
-    }
 }

@@ -2,19 +2,22 @@ package cn.troph.tomon.core.network.services
 
 import cn.troph.tomon.core.JsonArray
 import cn.troph.tomon.core.JsonData
-import retrofit2.Call
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
 interface ChannelService {
 
     @GET("guilds/{id}/channels")
-    suspend fun getGuildChannels(
+    fun getGuildChannels(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): JsonArray
+    ): Observable<JsonArray>
 
     @GET("channels/{id}")
-    suspend fun getChannel(@Path("id") id: String, @Header("Authorization") token: String): JsonData
+    fun getChannel(
+        @Path("id") id: String,
+        @Header("Authorization") token: String
+    ): Observable<JsonData>
 
     data class CreateGuildChannelRequest(
         val name: String,
@@ -24,11 +27,11 @@ interface ChannelService {
     )
 
     @POST("guilds/{id}/channels")
-    suspend fun createGuildChannel(
+    fun createGuildChannel(
         @Path("id") id: String,
         @Body request: CreateGuildChannelRequest,
         @Header("Authorization") token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     data class PermissionOverwrites(
         val id: String,
@@ -46,17 +49,17 @@ interface ChannelService {
     )
 
     @PATCH("channels/{id}")
-    suspend fun modifyChannel(
+    fun modifyChannel(
         @Path("id") id: String,
         @Body request: ModifyChannelRequest,
         @Header("Authorization") token: String
-    ): JsonData
+    ): Observable<JsonData>
 
     @DELETE("channels/{id}")
-    suspend fun deleteChannel(
+    fun deleteChannel(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Void
+    ): Observable<Void>
 
     data class UpsertPermissionOverwritesRequest(
         val type: String?,
@@ -65,17 +68,17 @@ interface ChannelService {
     )
 
     @PUT("channels/{channelId}/permissions/{id}")
-    suspend fun upsertPermissionOverwrites(
+    fun upsertPermissionOverwrites(
         @Path("channelId") channelId: String,
         @Path("id") id: String,
         @Body request: UpsertPermissionOverwritesRequest,
         @Header("Authorization") token: String
-    ): Void
+    ): Observable<Void>
 
     @DELETE("channels/{channelId}/permissions/{id}")
-    suspend fun deletePermissionOverwrites(
+    fun deletePermissionOverwrites(
         @Path("channelId") channelId: String,
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Void
+    ): Observable<Void>
 }
