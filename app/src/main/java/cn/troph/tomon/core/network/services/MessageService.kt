@@ -56,5 +56,4 @@ interface MessageService {
         ) token: String
     ): JsonArray
 
-
 }
