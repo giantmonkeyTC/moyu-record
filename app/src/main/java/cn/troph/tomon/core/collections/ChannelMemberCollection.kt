@@ -19,7 +19,7 @@ class ChannelMemberCollection(val channel: GuildChannel) :
         val members = values.toMutableList()
         val list = channel.guild!!.roles.list().filter { it.hoist }
         val indices =
-            list.fold(null as MutableMap<String, Int>, { map: MutableMap<String, Int>, role: Role ->
+            list.fold(mutableMapOf(), { map: MutableMap<String, Int>, role: Role ->
                 val index = list.indexOf(role)
                 map += Pair(role.id, index)
                 map

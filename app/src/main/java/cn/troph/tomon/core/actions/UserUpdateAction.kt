@@ -7,7 +7,7 @@ import cn.troph.tomon.core.structures.User
 
 class UserUpdateAction(client: Client) : Action<User>(client) {
 
-    override fun handle(data: Any): User? {
+    override fun handle(data: Any, extra: Any?): User? {
         val obj = data as JsonData
         var user = client.users.get(obj["id"] as String)
         if (user != null) {

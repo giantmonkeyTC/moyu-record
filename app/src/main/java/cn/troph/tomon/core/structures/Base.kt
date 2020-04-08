@@ -25,7 +25,7 @@ open class Base(val client: Client, private var data: JsonData = mapOf()) :
         emitter?.onNext(this)
     }
 
-    protected open fun patch(data: JsonData) {
+    open fun patch(data: JsonData) {
         this.data += data
     }
 

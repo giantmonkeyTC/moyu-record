@@ -3,6 +3,10 @@ package cn.troph.tomon.core.utils
 open class Collection<T>(m: Map<String, T>?) {
     private var map: LinkedHashMap<String, T> = LinkedHashMap(m ?: mapOf<String, T>())
 
+    inline fun fromMap(map2 : MutableMap<String,T>) :Collection<T>{
+        return Collection(map2)
+    }
+
     fun get(key: String): T? = map[key]
 
     fun set(key: String, value: T): T? {
