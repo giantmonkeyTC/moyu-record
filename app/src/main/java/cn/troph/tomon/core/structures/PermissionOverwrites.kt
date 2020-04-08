@@ -4,44 +4,38 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.PermissionOverwriteType
 
-class PermissionOverwrites(client: Client, data: JsonData, val guildChannel: GuildChannel) :
+class PermissionOverwrites(client: Client, data: JsonData) :
     Base(client, data) {
     var id: String = ""
-    var type: PermissionOverwriteType? = null
+    var type: PermissionOverwriteType = PermissionOverwriteType.ROLE
     var allow = 0
     var deny = 0
 
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.containsKey("id")) {
+        if (data.contains("id")) {
             id = data["id"] as String;
         }
-        if (data.containsKey("type")) {
-            type =
-                if ((data["type"] as String) == "role")
-                    PermissionOverwriteType.ROLE
-                else
-                    PermissionOverwriteType.MEMBER;
+        if (data.contains("type")) {
+            val value = data["type"] as String
+            type = PermissionOverwriteType.fromString(value) ?: PermissionOverwriteType.ROLE
         }
-        if (data.containsKey("allow")) {
+        if (data.contains("allow")) {
             var raw = data["allow"];
-            if (raw is Int) {
-                allow = raw;
-            } else if (raw is String) {
-                allow = raw.toInt();
+            allow = when (raw) {
+                is Int -> raw
+                is String -> raw.toInt()
+                else -> 0
             }
         }
-        if (data.containsKey("deny")) {
+        if (data.contains("deny")) {
             var raw = data["deny"];
-            if (raw is Int) {
-                deny = raw;
-            } else if (raw is String) {
-                deny = raw.toInt();
+            deny = when (raw) {
+                is Int -> raw
+                is String -> raw.toInt()
+                else -> 0
             }
         }
     }
 
-    override fun toString(): String {
-        return "[CorePermissionOverwrites $id] { type: $type, allow: $allow, deny: $deny }"
-    }
 }
