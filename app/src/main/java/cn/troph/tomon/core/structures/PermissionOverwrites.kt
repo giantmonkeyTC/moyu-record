@@ -6,16 +6,16 @@ import cn.troph.tomon.core.PermissionOverwriteType
 
 class PermissionOverwrites(client: Client, data: JsonData) :
     Base(client, data) {
-    var id: String = ""
+    val id: String = data["id"] as String
     var type: PermissionOverwriteType = PermissionOverwriteType.ROLE
+        private set
     var allow = 0
+        private set
     var deny = 0
+        private set
 
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.contains("id")) {
-            id = data["id"] as String;
-        }
         if (data.contains("type")) {
             val value = data["type"] as String
             type = PermissionOverwriteType.fromString(value) ?: PermissionOverwriteType.ROLE

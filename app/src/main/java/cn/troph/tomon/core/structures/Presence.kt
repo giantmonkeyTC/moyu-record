@@ -10,14 +10,17 @@ class Presence(client: Client, data: JsonData) : Base(client, data) {
     var status: String = ""
         private set
 
-    override fun patch(data: JsonData) {
-        super.patch(data)
+    init {
         if (data.contains("user_id")) {
             userId = data["user_id"] as String
         }
-        if (data.contains("user")) {
+        else if (data.contains("user")) {
             userId = (data["user"] as JsonData)["id"] as String
         }
+    }
+
+    override fun patch(data: JsonData) {
+        super.patch(data)
         if (data.contains("status")) {
             status = data["status"] as String
         }

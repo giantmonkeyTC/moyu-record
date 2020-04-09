@@ -5,8 +5,7 @@ import cn.troph.tomon.core.JsonData
 
 class MessageAttachment(client: Client, data: JsonData) : Base(client, data) {
 
-    var id: String = ""
-        private set
+    val id: String = data["id"] as String
     var fileName: String = ""
         private set
     var url: String = ""
@@ -20,9 +19,6 @@ class MessageAttachment(client: Client, data: JsonData) : Base(client, data) {
 
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.contains("id")) {
-            id = data["id"] as String
-        }
         if (data.contains("filename")) {
             fileName = data["filename"] as String
         }
