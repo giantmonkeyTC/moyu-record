@@ -9,8 +9,7 @@ import cn.troph.tomon.core.collections.RoleCollection
 import java.time.LocalDateTime
 
 class Guild(client: Client, data: JsonData) : Base(client, data) {
-    var id: String = ""
-        private set
+    val id: String = data["id"] as String
     var name: String = ""
         private set
     var icon: String? = null
@@ -31,17 +30,14 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
         MessageNotificationsType.ONLY_MENTION
         private set
 
-    val channels: GuildChannelCollection = GuildChannelCollection(this)
+    val channels: GuildChannelCollection = GuildChannelCollection(client, guildId = id)
     val members: GuildMemberCollection = GuildMemberCollection(this)
-    val roles: RoleCollection = RoleCollection(this.client, guildId = id)
+    val roles: RoleCollection = RoleCollection(client, guildId = id)
 
     //TODO LEAVE, UPDATE, ETC.
 
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.contains("id")) {
-            id = data["id"] as String
-        }
         if (data.contains("name")) {
             name = data["name"] as String
         }
