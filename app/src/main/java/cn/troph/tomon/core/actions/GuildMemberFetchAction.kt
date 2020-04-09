@@ -9,7 +9,7 @@ import cn.troph.tomon.core.utils.Collection
 import java.util.function.Consumer
 
 class GuildMemberFetchAction(client: Client) : Action<List<GuildMember>>(client) {
-    override fun handle(data: Any, extra: Any?): List<GuildMember>? {
+    override fun handle(data: Any?, extra: Any?): List<GuildMember>? {
         val members = mutableListOf<GuildMember>()
         fun parse(data: Any?) {
             val guild = client.guilds.get((data as JsonData)["guild_id"] as String)

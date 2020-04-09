@@ -11,10 +11,15 @@ class Me(client: Client, data: JsonData) : User(client, data) {
     constructor(client: Client) : this(client, mapOf())
 
     var email: String? = null
+        private set
     var emailVerified: Boolean = false
+        private set
     var phone: String? = null
+        private set
     var phoneVerified: Boolean = false
+        private set
     var token: String? = null
+        private set
 
     override fun patch(data: JsonData) {
         super.patch(data)

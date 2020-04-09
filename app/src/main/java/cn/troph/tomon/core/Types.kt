@@ -80,3 +80,17 @@ enum class Permission(val value: Int) {
     MANAGE_WEBHOOKS(1 shl 29),
     MANAGE_EMOJIS(1 shl 30),
 }
+
+enum class MessageNotificationsType(val value: Int) {
+    ALL(0),
+    ONLY_MENTION(1),
+    SUPPRESS(2),
+    DEFAULT(3);
+
+    companion object {
+        private val map =
+            MessageNotificationsType.values().associateBy(MessageNotificationsType::value)
+
+        fun fromInt(type: Int) = map[type]
+    }
+}

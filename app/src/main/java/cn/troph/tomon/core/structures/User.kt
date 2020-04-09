@@ -5,11 +5,17 @@ import cn.troph.tomon.core.JsonData
 
 open class User(client: Client, data: JsonData) : Base(client, data) {
     var id: String = ""
+        protected set
     var username: String = ""
+        protected set
     var discriminator: String = ""
+        protected set
     var name: String = ""
+        protected set
     var avatar: String = ""
+        protected set
     var avatarURL: String = ""
+        protected set
 
     override fun patch(data: JsonData) {
         super.patch(data)

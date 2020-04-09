@@ -6,12 +6,14 @@ import cn.troph.tomon.core.events.GuildDeleteEvent
 import cn.troph.tomon.core.structures.Guild
 
 class GuildDeleteAction(client: Client) : Action<Guild>(client) {
-    override fun handle(data: Any, extra: Any?): Guild? {
+
+    override fun handle(data: Any?, extra: Any?): Guild? {
         val obj = data as JsonData
         val guild = client.guilds.get(obj["id"] as String)
         if (guild != null) {
-            for (channel in guild.channels.values)
+            guild.channels.forEach { channel ->
                 client.channels.remove(channel.id)
+            }
             client.guilds.remove(guild.id)
             client.eventBus.postEvent(GuildDeleteEvent(guild = guild))
         }
