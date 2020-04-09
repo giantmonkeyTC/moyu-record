@@ -2,7 +2,6 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
-import cn.troph.tomon.core.utils.BitField
 
 class Emoji(client: Client, data: JsonData) : Base(client, data) {
     var name: String = ""
