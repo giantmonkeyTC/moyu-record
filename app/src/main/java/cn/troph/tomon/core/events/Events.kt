@@ -1,23 +1,49 @@
 package cn.troph.tomon.core.events
 
-import cn.troph.tomon.core.structures.Guild
-import cn.troph.tomon.core.structures.GuildMember
-import cn.troph.tomon.core.structures.Me
-import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.structures.*
 
 open class Event
 class UserLoginEvent : Event()
 class UserLogoutEvent : Event()
 data class UserUpdateEvent(val user: User) : Event()
-data class UserFetchEvent(val user: User?) : Event()
-data class UserRegisterEvent(val me: Me) : Event()
+
 class GuildSyncEvent : Event()
 data class GuildFetchEvent(val guilds: List<Guild>) : Event()
 data class GuildCreateEvent(val guild: Guild) : Event()
 data class GuildDeleteEvent(val guild: Guild) : Event()
 data class GuildUpdateEvent(val guild: Guild) : Event()
-data class GuildMemberFetchEvent(val guildMembers: List<GuildMember>) : Event()
-data class GuildMemberAddEvent(val guildMember: GuildMember) : Event()
-data class GuildMemberRemoveEvent(val guildMember: GuildMember) : Event()
-data class GuildMemberUpdateEvent(val guildMember: GuildMember) : Event()
+data class GuildPositionEvent(val guilds: List<Guild>) : Event()
 
+class ChannelSyncEvent : Event()
+data class ChannelFetchEvent(val channel: Channel) : Event()
+data class ChannelCreateEvent(val channel: Channel) : Event()
+data class ChannelDeleteEvent(val channel: Channel) : Event()
+data class ChannelUpdateEvent(val channel: Channel) : Event()
+data class GuildChannelPositionEvent(val guild: Guild) : Event()
+data class ChannelAckEvent(val channel: Channel) : Event()
+data class ChannelTypingEvent(val channel: Channel) : Event()
+
+data class RoleSyncEvent(val guild: Guild) : Event()
+data class RoleFetchEvent(val role: Role) : Event()
+data class RoleCreateEvent(val role: Role) : Event()
+data class RoleDeleteEvent(val role: Role) : Event()
+data class RoleUpdateEvent(val role: Role) : Event()
+data class RolePositionEvent(val roles: List<Role>) : Event()
+
+data class EmojiSyncEvent(val guild: Guild) : Event()
+data class EmojiCreateEvent(val emoji: Emoji) : Event()
+data class EmojiDeleteEvent(val emoji: Emoji) : Event()
+data class EmojiUpdateEvent(val emoji: Emoji) : Event()
+
+data class GuildMemberFetchEvent(val members: List<GuildMember>) : Event()
+data class GuildMemberAddEvent(val member: GuildMember) : Event()
+data class GuildMemberRemoveEvent(val member: GuildMember) : Event()
+data class GuildMemberUpdateEvent(val member: GuildMember) : Event()
+
+data class MessageFetchEvent(val messages: List<Message>) : Event()
+data class MessageCreateEvent(val message: Message) : Event()
+data class MessageDeleteEvent(val message: Message) : Event()
+data class MessageUpdateEvent(val message: Message) : Event()
+
+data class PresenceFetchEvent(val presence: Presence) : Event()
+data class PresenceUpdateEvent(val presence: Presence) : Event()
