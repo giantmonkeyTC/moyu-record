@@ -12,6 +12,6 @@ class UserRegisterAction(client: Client) : Action<User>(client) {
         //TODO SAVE TOKEN
         if (user != null)
             client.eventBus.postEvent(UserRegisterEvent(client.me))
-        return client.me
+        return null
     }
 }

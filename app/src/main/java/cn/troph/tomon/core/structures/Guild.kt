@@ -28,7 +28,6 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
 
     //TODO LEAVE, UPDATE, ETC.
 
-    val guilds = RoleCollection(client, null, id)
 
     override fun patch(data: JsonData) {
         super.patch(data)
