@@ -22,6 +22,8 @@ class Client {
     val guilds = GuildCollection(this)
     val channels = ChannelCollection(this)
 
+    val token get() = me.token ?: ""
+
     fun login(
         emailOrPhone: String? = null,
         password: String? = null,
