@@ -3,55 +3,67 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.collections.ChannelMemberCollection
-import cn.troph.tomon.core.collections.GuildMemberRoleCollection
-import cn.troph.tomon.core.utils.BitField
 import cn.troph.tomon.core.utils.Collection
 
-open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Channel(client, data) {
+open class GuildChannel(client: Client, data: JsonData) : Channel(client, data) {
+
+    data class MemberPermissionOverwrites(
+        val everyone: PermissionOverwrites? = null,
+        val member: PermissionOverwrites? = null,
+        val roles: List<PermissionOverwrites> = listOf()
+    )
+
     var name: String = ""
+        private set
+    var guildId: String? = null
+        private set
     var position: Int = 0
-    var parentId: String = ""
-    var permissionOverwrites: Collection<PermissionOverwrites>? = null
-    var members = ChannelMemberCollection(this)
+        private set
+    var parentId: String? = null
+        private set
+    val permissionOverwrites: Collection<PermissionOverwrites> =
+        Collection<PermissionOverwrites>(null)
+    val members = ChannelMemberCollection(this)
 
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.containsKey("name")) {
+        if (data.contains("name")) {
             name = data["name"] as String
         }
-        if (data.containsKey("position")) {
+        if (data.contains("guild_id")) {
+            guildId = data["guild_id"] as? String
+        }
+        if (data.contains("position")) {
             position = data["position"] as Int
         }
-        if (data.containsKey("parent_id")) {
-            parentId = data["parent_id"] as String
+        if (data.contains("parent_id")) {
+            parentId = data["parent_id"] as? String
             if (parentId == "0") {
-                parentId = null.toString()
+                parentId = null
             }
         }
-        if (data.containsKey("permission_overwrites")) {
-            permissionOverwrites?.clear()
+        if (data.contains("permission_overwrites")) {
+            permissionOverwrites.clear()
             val list = data["permission_overwrites"] as List<*>
             for (obj in list) {
-                var overwrite = obj as MutableMap<String, String>
-                permissionOverwrites?.set(
-                    overwrite["id"]!!,
-                    PermissionOverwrites(this.client, overwrite, this)
+                var overwrite = obj as JsonData
+                permissionOverwrites.set(
+                    overwrite["id"] as String,
+                    PermissionOverwrites(client, overwrite)
                 )
             }
-            if (data.containsKey("guild_id") &&
-                !permissionOverwrites!!.has(data["guild_id"] as String)
-            ) {
-
-                permissionOverwrites!!.set(
-                    data["guild_id"] as String,
+            val gid = data["guild_id"] as? String
+            if (gid != null && !permissionOverwrites.has(gid)) {
+                permissionOverwrites.set(
+                    gid,
                     PermissionOverwrites(
-                        this.client,
-                        mapOf<String, Any>(
-                            "id" to (data["guild_id"] ?: error("guild_id is not a key")),
+                        client,
+                        mapOf(
+                            "id" to gid,
                             "type" to "role",
                             "allow" to 0,
                             "deny" to 0
-                        ), this
+                        )
                     )
                 )
 
@@ -59,87 +71,68 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
         }
     }
 
-    val parent get() : GuildChannel? = guild?.channels?.get(parentId)
+    val guild get(): Guild? = client.guilds.get(guildId ?: "")
 
-    fun permissionFor(memberOrRole: GuildMember): Permissions? {
-        val member = guild!!.members.resolve(memberOrRole)
-        if (member != null)
-            return memberPermissions(member as GuildMember)
-        val role = guild.roles.resolve(memberOrRole)
-        if (role != null)
-            return rolePermissions(member as Role)
-        return null
-    }
+    val parent get() : GuildChannel? = guild?.channels?.get(parentId ?: "")
 
-    fun overwritesFor(
-        member: GuildMember,
-        roles: GuildMemberRoleCollection? = member.roles
-    ): Map<String, Any?> {
-        if (member == null)
-            return mutableMapOf()
-        var varRole = roles ?: member.roles
+    fun overwritesForMember(member: GuildMember): MemberPermissionOverwrites {
+        if (member == null) {
+            return MemberPermissionOverwrites()
+        }
         var roleOverwrites = mutableListOf<PermissionOverwrites>()
         var memberOverwrites: PermissionOverwrites? = null
         var everyoneOverwrites: PermissionOverwrites? = null
-        for (overwrite in permissionOverwrites!!.values) {
-            if (overwrite.id == guild?.id)
-                everyoneOverwrites = overwrite
-            else if (roles!!.has(overwrite.id))
-                roleOverwrites.add(overwrite)
-            else if (overwrite.id == member.id)
-                memberOverwrites = overwrite
+        permissionOverwrites.forEach { overwrite ->
+            when {
+                overwrite.id == guildId -> everyoneOverwrites = overwrite
+                member.roles.has(overwrite.id) -> roleOverwrites.add(overwrite)
+                overwrite.id == member.id -> memberOverwrites = overwrite
+            }
         }
-        return mapOf(
-            "everyone" to everyoneOverwrites,
-            "roles" to roleOverwrites,
-            "member" to memberOverwrites
+        return MemberPermissionOverwrites(
+            everyone = everyoneOverwrites,
+            roles = roleOverwrites,
+            member = memberOverwrites
         )
-
-
     }
 
-    fun memberPermissions(member: GuildMember): Permissions {
-        if (member.isOwner)
-            return Permissions(Permissions.all)
-        val roles = member.roles
-        val permissions =
-            Permissions(roles.collection.map<Permissions> { _, role -> role.permissions })
-        if (permissions.has(Permissions.administrator))
-            return Permissions(Permissions.all)
-
-        val overwrites = overwritesFor(member, roles)
-        var overwritesEveryone: PermissionOverwrites =
-            overwrites["everyone"] as PermissionOverwrites
-        var overwritesRoles: List<PermissionOverwrites> =
-            overwrites["roles"] as List<PermissionOverwrites>
-        val overwritesMember: PermissionOverwrites =
-            overwrites["member"] as PermissionOverwrites
-        permissions.minus(BitField(if (overwritesEveryone != null) overwritesEveryone.deny else 0))
-            .plus(BitField(if (overwritesEveryone != null) overwritesEveryone.allow else 0))
-            .minus(BitField(if (overwritesRoles.size > 0) overwritesRoles.map { it.deny } else 0))
-            .plus(BitField(if (overwritesRoles.size > 0) overwritesRoles.map { it.allow } else 0))
-            .minus(BitField(if (overwritesMember != null) overwritesMember.deny else 0))
-            .plus(BitField(if (overwritesMember != null) overwritesMember.allow else 0))
-        return permissions
-
-    }
-
-    fun rolePermissions(role: Role): Permissions {
-        if (role.permissions.has(Permissions.administrator)) {
-            return Permissions(Permissions.all)
+    fun permissionForMember(member: GuildMember): Permissions? {
+        // 非本群
+        if (guild != member.guild) {
+            return null
         }
-        val everyoneOverwrites: PermissionOverwrites? =
-            permissionOverwrites?.get(guild!!.id)
-        val roleOverwrites: PermissionOverwrites? = permissionOverwrites?.get(role.id)
-        role.permissions.minus(BitField(if (everyoneOverwrites != null) everyoneOverwrites.deny else 0))
-            .plus(
-                BitField(if (everyoneOverwrites != null) everyoneOverwrites.allow else 0)
-            ).minus(
-                BitField(if (roleOverwrites != null) roleOverwrites.deny else 0)
-            ).plus(
-                BitField(if (roleOverwrites != null) roleOverwrites.deny else 0)
+        // 所有者
+        if (member.isOwner) {
+            return Permissions.all()
+        }
+        val permissions =
+            Permissions(
+                member.roles.collection.map { _, role -> role.permissions.value }
             )
+        if (permissions.has(Permissions.ADMINISTRATOR)) {
+            return Permissions.all()
+        }
+        val overwrites = overwritesForMember(member)
+        return permissions
+            .minus(overwrites.everyone?.deny)
+            .plus(overwrites.everyone?.allow)
+            .minus(overwrites.roles.map { role -> role.deny })
+            .plus(overwrites.roles.map { role -> role.allow })
+            .minus(overwrites.member?.deny)
+            .plus(overwrites.member?.allow)
+    }
+
+    fun permissionForRole(role: Role): Permissions {
+        if (role.permissions.has(Permissions.ADMINISTRATOR)) {
+            return Permissions.all()
+        }
+        val everyoneOverwrites = permissionOverwrites.get(guild!!.id)
+        val roleOverwrites = permissionOverwrites.get(role.id)
         return role.permissions
+            .minus(everyoneOverwrites?.deny)
+            .plus(everyoneOverwrites?.allow)
+            .minus(roleOverwrites?.deny)
+            .plus(roleOverwrites?.allow)
     }
 
     val indent
@@ -152,9 +145,5 @@ open class GuildChannel(client: Client, data: JsonData, val guild: Guild?) : Cha
             }
             return indent
         }
-
-    override fun toString(): String {
-        return "[CoreGuildChannel $id] { name: $name }"
-    }
 
 }
