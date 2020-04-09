@@ -51,26 +51,6 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         return entry
     }
 
-    open fun resolve(idOrInstance: Any): Any? {
-        if (this.values.contains(idOrInstance))
-            return idOrInstance
-        if (idOrInstance is String)
-            return if (get(idOrInstance) == null) null else idOrInstance
-        return null
-
-    }
-
-
-    //idOrInstance must be of the same type as T
-    open fun resolveId(idOrInstance: Any, id: (value: T) -> String?): String? {
-
-        return if (idOrInstance is String)
-            idOrInstance
-        else
-            @Suppress("UNCHECKED_CAST")
-            id(idOrInstance as T)
-    }
-
     open fun instantiate(data: JsonData): T? {
         return null
     }

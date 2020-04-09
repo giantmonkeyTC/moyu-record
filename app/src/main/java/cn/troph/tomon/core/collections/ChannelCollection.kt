@@ -8,6 +8,7 @@ import cn.troph.tomon.core.structures.*
 
 class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
     BaseCollection<Channel>(client, m) {
+
     override fun add(
         data: JsonData,
         identify: ((d: JsonData) -> String)?
@@ -21,32 +22,20 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
 
     override fun remove(key: String): Channel? {
         val channel = get(key)
-        if (channel is GuildChannel)
+        if (channel is GuildChannel) {
             channel.guild?.channels?.remove(key)
+        }
         return super.remove(key)
     }
 
     override fun instantiate(data: JsonData): Channel? {
-        var guild = client.guilds.get(data["guild_id"] as String)
-        when (Channel.typeOf(data["type"] as Int)) {
-            ChannelType.TEXT -> {
-                if (guild != null) {
-                    return TextChannel(client, data, guild)
-                }
-            }
-            ChannelType.VOICE -> {
-                if (guild != null) {
-                    return VoiceChannel(client, data, guild)
-                }
-            }
-            ChannelType.CATEGORY -> {
-                if (guild != null) {
-                    return CategoryChannel(client, data, guild)
-                }
-            }
-            else -> return null
+        val typeValue = data["type"] as Int
+        return when (ChannelType.fromInt(typeValue)) {
+            ChannelType.TEXT -> TextChannel(client, data)
+            ChannelType.VOICE -> VoiceChannel(client, data)
+            ChannelType.CATEGORY -> CategoryChannel(client, data)
+            else -> null
         }
-        return null
     }
 
 }
