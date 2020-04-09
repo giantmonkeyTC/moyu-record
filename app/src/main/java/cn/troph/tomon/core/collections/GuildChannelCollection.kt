@@ -5,6 +5,8 @@ import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildChannel
 
 class GuildChannelCollection(val guild: Guild) : BaseCollection<GuildChannel>(guild.client) {
+
+    // forbid add
     override fun add(
         data: JsonData,
         identify: ((d: JsonData) -> String)?
@@ -12,10 +14,4 @@ class GuildChannelCollection(val guild: Guild) : BaseCollection<GuildChannel>(gu
         return null
     }
 
-    //TODO fetch, create, etc.
-
-    override fun instantiate(data: JsonData): GuildChannel? {
-        val guild = client.guilds.get(data["guild_id"] as String)
-        return GuildChannel(client, data, guild)
-    }
 }
