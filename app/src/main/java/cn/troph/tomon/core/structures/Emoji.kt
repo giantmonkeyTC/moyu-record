@@ -2,23 +2,31 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.utils.Assets
 
-class Emoji(client: Client, data: JsonData) : Base(client, data) {
+open class Emoji(client: Client, data: JsonData) : Base(client, data) {
+
+    val id: String = data["id"] as String
     var name: String = ""
-    var id: String = ""
+        private set
+    var userId: String? = null
+        private set
+    var animated: Boolean = false
+        private set
+
     override fun patch(data: JsonData) {
         super.patch(data)
-        if (data.containsKey("name")) {
+        if (data.contains("name")) {
             name = data["name"] as String
-        } else if (data.containsKey("id")) {
-            id = data["id"] as String
+        }
+        if (data.contains("user")) {
+            val user = client.users.add(data["user"] as JsonData)
+            userId = user?.id
         }
     }
 
-    override fun toString(): String {
-        return if (id == null) "[CoreEmoji $name] { emojiName: $name }" else "[CoreEmoji $id] { emojiID: $id }"
+    val url get() = Assets.emojiURL(id, animated)
 
-    }
+    val user get() = client.users.get(userId ?: "")
 
-    val assest get() = "https://troph-1255393139.file.myqcloud.com/emojis/${id}.png"
 }
