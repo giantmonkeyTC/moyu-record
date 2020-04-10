@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.collections.GuildChannelCollection
+import cn.troph.tomon.core.collections.GuildEmojiCollection
 import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
 import java.time.LocalDateTime
@@ -33,6 +34,7 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
     val channels: GuildChannelCollection = GuildChannelCollection(client, guildId = id)
     val members: GuildMemberCollection = GuildMemberCollection(this)
     val roles: RoleCollection = RoleCollection(client, guildId = id)
+    val emojis: GuildEmojiCollection = GuildEmojiCollection(client, guildId = id)
 
     //TODO LEAVE, UPDATE, ETC.
 
