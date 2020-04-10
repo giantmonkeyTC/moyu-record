@@ -18,20 +18,13 @@ class RoleCollection(client: Client, m: Map<String, Role>? = null, var guildId: 
     fun list(): List<Role> {
         if (list == null) {
             val roles = values.toMutableList()
-            roles.sortWith(Comparator { a: Role, b: Role ->
-                var compare: Int =
-                    (if (a.isEveryone) 1 else 0).compareTo(if (b.isEveryone) 1 else 0)
-                if (compare == 0)
-                    compare = b.position.compareTo(a.position)
-                if (compare == 0)
-                    compare = a.id.compareTo(b.id)
-                compare
+            roles.sortWith(Comparator { a, b ->
+                a.comparePositionTo(b)
             })
             list = roles
         }
-        return list as List<Role>
+        return list!!
     }
-
 
     override fun instantiate(data: JsonData): Role? {
         return Role(client, data)
