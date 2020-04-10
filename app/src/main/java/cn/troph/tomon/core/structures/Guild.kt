@@ -53,8 +53,7 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
             position = data["position"] as Int
         }
         if (data.contains("joined_at")) {
-            val date = data["joined_at"] as String
-            joinedAt = LocalDateTime.parse(date)
+            joinedAt = LocalDateTime.parse(data["joined_at"] as String)
         }
         if (data.contains("owner_id")) {
             ownerId = data["owner_id"] as String

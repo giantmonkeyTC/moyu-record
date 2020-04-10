@@ -5,19 +5,10 @@ import cn.troph.tomon.core.JsonData
 
 class Presence(client: Client, data: JsonData) : Base(client, data) {
 
-    var userId: String = ""
-        private set
+    val userId: String =
+        if (data.contains("user_id")) data["user_id"] as String else (data["user"] as JsonData)["id"] as String
     var status: String = ""
         private set
-
-    init {
-        if (data.contains("user_id")) {
-            userId = data["user_id"] as String
-        }
-        else if (data.contains("user")) {
-            userId = (data["user"] as JsonData)["id"] as String
-        }
-    }
 
     override fun patch(data: JsonData) {
         super.patch(data)
