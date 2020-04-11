@@ -9,7 +9,7 @@ import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Snowflake
 import java.time.LocalDateTime
 
-class Message(client: Client, data: JsonData) : Base(client, data) {
+class Message(client: Client, data: JsonData) : Base(client, data), Comparable<Message> {
 
     val id: String = data["id"] as String
     val channelId: String = data["channel_id"] as String
@@ -88,10 +88,10 @@ class Message(client: Client, data: JsonData) : Base(client, data) {
 
     val guild get() : Guild? = if (this.channel is GuildChannel) (this.channel as GuildChannel).guild else null
 
-    fun compare(message: Message): Int {
-        val timeCompare = timestamp.compareTo(message.timestamp)
+    override fun compareTo(other: Message): Int {
+        val timeCompare = timestamp.compareTo(other.timestamp)
         return if (timeCompare == 0) {
-            Snowflake.aligned(id).compareTo(Snowflake.aligned(message.id))
+            Snowflake.aligned(id).compareTo(Snowflake.aligned(other.id))
         } else {
             timeCompare
         }
