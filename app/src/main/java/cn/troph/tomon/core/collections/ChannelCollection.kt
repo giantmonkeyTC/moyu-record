@@ -34,6 +34,7 @@ class ChannelCollection(client: Client, m: Map<String, Channel>? = null) :
             ChannelType.TEXT -> TextChannel(client, data)
             ChannelType.VOICE -> VoiceChannel(client, data)
             ChannelType.CATEGORY -> CategoryChannel(client, data)
+            ChannelType.DM -> DmChannel(client, data)
             else -> null
         }
     }
