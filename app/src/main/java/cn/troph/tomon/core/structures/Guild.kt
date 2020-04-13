@@ -32,7 +32,7 @@ class Guild(client: Client, data: JsonData) : Base(client, data) {
         private set
 
     val channels: GuildChannelCollection = GuildChannelCollection(client, guildId = id)
-    val members: GuildMemberCollection = GuildMemberCollection(this)
+    val members: GuildMemberCollection = GuildMemberCollection(client,guildId = id)
     val roles: RoleCollection = RoleCollection(client, guildId = id)
     val emojis: GuildEmojiCollection = GuildEmojiCollection(client, guildId = id)
 
