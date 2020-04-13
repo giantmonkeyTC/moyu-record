@@ -1,10 +1,12 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.utils.Snowflake
+import cn.troph.tomon.core.utils.optBoolean
+import cn.troph.tomon.core.utils.optInt
+import com.google.gson.JsonObject
 
-class Role(client: Client, data: JsonData) : Base(client, data) {
+class Role(client: Client, data: JsonObject) : Base(client, data) {
 
     val id: String = data["id"] as String
     var guildId: String = ""
@@ -22,28 +24,28 @@ class Role(client: Client, data: JsonData) : Base(client, data) {
     var mentionable: Boolean = true
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("guild_id")) {
-            guildId = data["guild_id"] as String
+        if (data.has("guild_id")) {
+            guildId = data["guild_id"].asString
         }
-        if (data.contains("name")) {
-            name = if (id == data["guild_id"]) "@所有人" else data["name"] as String
+        if (data.has("name")) {
+            name = if (id == data["guild_id"].asString) "@所有人" else data["name"].asString
         }
-        if (data.contains("color")) {
-            color = data["color"] as Int? ?: 0
+        if (data.has("color")) {
+            color = data["color"].optInt ?: 0
         }
-        if (data.contains("position")) {
-            position = data["position"] as Int
+        if (data.has("position")) {
+            position = data["position"].asInt
         }
-        if (data.contains("hoist")) {
-            hoist = data["hoist"] as Boolean? ?: false
+        if (data.has("hoist")) {
+            hoist = data["hoist"].optBoolean ?: false
         }
-        if (data.contains("permissions")) {
-            permissions = Permissions(data["permissions"] as Int? ?: 0)
+        if (data.has("permissions")) {
+            permissions = Permissions(data["permissions"].optInt ?: 0)
         }
-        if (data.contains("mentionable")) {
-            mentionable = data["mentionable"] as Boolean? ?: true
+        if (data.has("mentionable")) {
+            mentionable = data["mentionable"].optBoolean ?: true
         }
     }
 

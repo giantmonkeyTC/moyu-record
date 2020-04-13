@@ -1,7 +1,7 @@
 package cn.troph.tomon.core.network.services
 
-import cn.troph.tomon.core.JsonArray
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -23,7 +23,7 @@ interface RoleService {
         @Path("guildId") guildId: String,
         @Body request: CreateRoleRequest,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     data class UpdateRoleRequest(
         val name: String?,
@@ -40,20 +40,19 @@ interface RoleService {
         @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
 
     data class UpdatePositionsRequest(
         val positions: Int
     )
 
-
     @PATCH("guilds/{guildId}/roles")
     fun updatePositions(
         @Path("guildId") guildId: String, @Body request: UpdatePositionsRequest, @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     @DELETE("guilds/{guildId}/roles/{roleId}")
     fun deleteRole(

@@ -1,11 +1,12 @@
 package cn.troph.tomon.core.network.socket
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.Configs
 import cn.troph.tomon.core.network.socket.handlers.handleGuildCreate
 import cn.troph.tomon.core.network.socket.handlers.handleIdentity
-import cn.troph.tomon.core.utils.Converter
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -13,7 +14,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.*
 import kotlin.concurrent.schedule
 
-typealias Handler = (client: Client, packet: JsonData) -> Unit
+typealias Handler = (client: Client, packet: JsonObject) -> Unit
 
 enum class GatewayOp(val value: Int) {
     DISPATCH(0),
@@ -55,11 +56,11 @@ class Socket : Observer<SocketEvent> {
         _socketClient.close()
     }
 
-    fun send(op: GatewayOp, d: JsonData? = null) {
+    fun send(op: GatewayOp, d: JsonElement? = null) {
         if (d == null) {
-            _socketClient.send(mapOf("op" to op.value))
+            _socketClient.send(Gson().toJsonTree(mapOf("op" to op.value)))
         } else {
-            _socketClient.send(mapOf("op" to op.value, "d" to d))
+            _socketClient.send(Gson().toJsonTree(mapOf("op" to op.value, "d" to d)))
         }
     }
 
@@ -96,30 +97,39 @@ class Socket : Observer<SocketEvent> {
 
     }
 
-    private fun handleMessage(data: JsonData) {
-        val intOp = Converter.toInt(data["op"])
+    private fun handleMessage(data: JsonElement) {
+        if (data.isJsonArray) {
+            return
+        }
+        val obj = data.asJsonObject
+        val intOp = obj["op"].asInt
         when (val op = GatewayOp.fromInt(intOp)) {
             GatewayOp.DISPATCH -> {
-                val event = data["e"] as String
+                val event = obj["e"].asString
                 val handler = _handlers[event]
                 if (handler != null) {
-                    handler(_client, data)
+                    handler(_client, obj)
                 }
             }
             GatewayOp.IDENTITY -> {
                 val handler = _handlers["IDENTITY"]
                 if (handler != null) {
-                    handler(_client, data)
+                    handler(_client, obj)
                 }
             }
             GatewayOp.HELLO -> {
-                val d = data["d"] as? JsonData
-                _heartbeatInterval = Converter.toLong(d!!["heartbeat_interval"])
-                _sessionId = d!!["session_id"] as String
+                val d = obj["d"].asJsonObject
+                println(d)
+                _heartbeatInterval = d["heartbeat_interval"].asLong
+                _sessionId = d["session_id"].asString
                 heartbeat()
-                send(GatewayOp.IDENTITY, mapOf(
-                    "token" to _client.me.token
-                ))
+                send(
+                    GatewayOp.IDENTITY, Gson().toJsonTree(
+                        mapOf(
+                            "token" to _client.me.token
+                        )
+                    )
+                )
             }
             GatewayOp.HEARTBEAT -> {
                 send(GatewayOp.HEARTBEAT_ACK)

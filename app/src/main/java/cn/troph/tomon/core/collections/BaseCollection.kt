@@ -1,9 +1,10 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Base
 import cn.troph.tomon.core.utils.Collection
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 
@@ -23,11 +24,11 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         this.emitter = emitter
     }
 
-    open fun add(data: JsonData, identify: ((d: JsonData) -> String)? = null): T? {
+    open fun add(data: JsonObject, identify: ((d: JsonObject) -> String)? = null): T? {
         val id = (if (identify != null) {
             identify(data)
         } else {
-            data["id"] as String?
+            data["id"].optString
         })
             ?: return null
         val existing = get(id)
@@ -51,7 +52,7 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
         return entry
     }
 
-    open fun instantiate(data: JsonData): T? {
+    open fun instantiate(data: JsonObject): T? {
         return null
     }
 }

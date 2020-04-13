@@ -1,12 +1,12 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.utils.Assets
+import com.google.gson.JsonObject
 
-open class Emoji(client: Client, data: JsonData) : Base(client, data) {
+open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["id"] as String
+    val id: String = data["id"].asString
     var name: String = ""
         private set
     var userId: String? = null
@@ -14,13 +14,13 @@ open class Emoji(client: Client, data: JsonData) : Base(client, data) {
     var animated: Boolean = false
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("name")) {
-            name = data["name"] as String
+        if (data.has("name")) {
+            name = data["name"].asString
         }
-        if (data.contains("user")) {
-            val user = client.users.add(data["user"] as JsonData)
+        if (data.has("user")) {
+            val user = client.users.add(data["user"].asJsonObject)
             userId = user?.id
         }
     }

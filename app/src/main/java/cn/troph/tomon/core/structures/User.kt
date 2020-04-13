@@ -1,9 +1,9 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonObject
 
-open class User(client: Client, data: JsonData) : Base(client, data) {
+open class User(client: Client, data: JsonObject) : Base(client, data) {
     var id: String = ""
         protected set
     var username: String = ""
@@ -17,25 +17,25 @@ open class User(client: Client, data: JsonData) : Base(client, data) {
     var avatarURL: String = ""
         protected set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("id")) {
-            id = data["id"] as String
+        if (data.has("id")) {
+            id = data["id"].asString
         }
-        if (data.contains("username")) {
-            username = data["username"] as String
+        if (data.has("username")) {
+            username = data["username"].asString
         }
-        if (data.contains("discriminator")) {
-            discriminator = data["discriminator"] as String
+        if (data.has("discriminator")) {
+            discriminator = data["discriminator"].asString
         }
-        if (data.contains("name")) {
-            name = data["name"] as String
+        if (data.has("name")) {
+            name = data["name"].asString
         }
-        if (data.contains("avatar")) {
-            avatar = data["avatar"] as String
+        if (data.has("avatar")) {
+            avatar = data["avatar"].asString
         }
-        if (data.contains("avatarURL")) {
-            avatarURL = data["avatarURL"] as String
+        if (data.has("avatarURL")) {
+            avatarURL = data["avatarURL"].asString
         }
     }
 

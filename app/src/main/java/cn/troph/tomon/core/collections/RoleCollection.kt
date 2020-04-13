@@ -1,8 +1,8 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Role
+import com.google.gson.JsonObject
 
 class RoleCollection(client: Client, m: Map<String, Role>? = null, var guildId: String) :
     BaseCollection<Role>(client, m) {
@@ -26,7 +26,7 @@ class RoleCollection(client: Client, m: Map<String, Role>? = null, var guildId: 
         return list!!
     }
 
-    override fun instantiate(data: JsonData): Role? {
+    override fun instantiate(data: JsonObject): Role? {
         return Role(client, data)
     }
 }

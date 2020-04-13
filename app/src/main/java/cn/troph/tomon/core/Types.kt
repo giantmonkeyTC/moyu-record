@@ -1,9 +1,5 @@
 package cn.troph.tomon.core
 
-typealias JsonData = Map<String, Any?>
-
-typealias JsonArray = List<JsonData>
-
 enum class ChannelType(val value: Int) {
     TEXT(0),
     VOICE(1),

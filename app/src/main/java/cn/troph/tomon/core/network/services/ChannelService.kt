@@ -1,7 +1,7 @@
 package cn.troph.tomon.core.network.services
 
-import cn.troph.tomon.core.JsonArray
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -17,7 +17,7 @@ interface ChannelService {
     fun getChannel(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     data class CreateGuildChannelRequest(
         val name: String,
@@ -31,7 +31,7 @@ interface ChannelService {
         @Path("id") id: String,
         @Body request: CreateGuildChannelRequest,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     data class PermissionOverwrites(
         val id: String,
@@ -53,7 +53,7 @@ interface ChannelService {
         @Path("id") id: String,
         @Body request: ModifyChannelRequest,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     @DELETE("channels/{id}")
     fun deleteChannel(

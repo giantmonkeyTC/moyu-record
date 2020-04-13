@@ -1,7 +1,7 @@
 package cn.troph.tomon.core.network.services
 
-import cn.troph.tomon.core.JsonData
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -20,7 +20,7 @@ interface MessageService {
         @Path("channelId") channelId: String,
         @Path("messageId") messageId: String,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     data class CreateMessageRequest(
         var content: String
@@ -31,7 +31,7 @@ interface MessageService {
         @Path("channelID") channelId: String, @Body request: CreateMessageRequest, @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     @Multipart
     @POST("channels/{channelId}/messages")
@@ -42,7 +42,7 @@ interface MessageService {
         @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     @DELETE("channels/{channelId}/messages/{messageId}")
     fun deleteMessage(

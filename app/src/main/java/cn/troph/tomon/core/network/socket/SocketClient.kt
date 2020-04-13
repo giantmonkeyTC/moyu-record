@@ -1,8 +1,7 @@
 package cn.troph.tomon.core.network.socket
 
-import cn.troph.tomon.core.JsonData
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.gson.JsonElement
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
@@ -27,7 +26,7 @@ enum class SocketEventType {
 
 data class SocketEvent(
     val type: SocketEventType,
-    val data: JsonData? = null,
+    val data: JsonElement? = null,
     val code: Int = 0,
     val reason: String? = null
 )
@@ -68,8 +67,9 @@ class SocketClient() : WebSocketListener(),
         _webSocket?.close(code, reason)
     }
 
-    fun send(data: JsonData) {
+    fun send(data: JsonElement) {
         _webSocket?.send(Gson().toJson(data))
+        _emitter?.onNext(SocketEvent(SocketEventType.SEND, data = data))
     }
 
     val url get() = _url
@@ -129,8 +129,7 @@ class SocketClient() : WebSocketListener(),
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         try {
-            val mapType = object : TypeToken<JsonData>() {}.type
-            val data = Gson().fromJson<JsonData>(text, mapType)
+            val data = Gson().fromJson(text, JsonElement::class.java)
             _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))
         } catch (e: Exception) {
             _emitter?.onError(e)

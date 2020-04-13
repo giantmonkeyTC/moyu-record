@@ -1,10 +1,10 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.PermissionOverwriteType
+import com.google.gson.JsonObject
 
-class PermissionOverwrites(client: Client, data: JsonData) :
+class PermissionOverwrites(client: Client, data: JsonObject) :
     Base(client, data) {
     val id: String = data["id"] as String
     var type: PermissionOverwriteType = PermissionOverwriteType.ROLE
@@ -14,27 +14,17 @@ class PermissionOverwrites(client: Client, data: JsonData) :
     var deny = 0
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("type")) {
-            val value = data["type"] as String
+        if (data.has("type")) {
+            val value = data["type"].asString
             type = PermissionOverwriteType.fromString(value) ?: PermissionOverwriteType.ROLE
         }
-        if (data.contains("allow")) {
-            var raw = data["allow"];
-            allow = when (raw) {
-                is Int -> raw
-                is String -> raw.toInt()
-                else -> 0
-            }
+        if (data.has("allow")) {
+            allow = data["allow"].asInt
         }
-        if (data.contains("deny")) {
-            var raw = data["deny"];
-            deny = when (raw) {
-                is Int -> raw
-                is String -> raw.toInt()
-                else -> 0
-            }
+        if (data.has("deny")) {
+            deny = data["deny"].asInt
         }
     }
 

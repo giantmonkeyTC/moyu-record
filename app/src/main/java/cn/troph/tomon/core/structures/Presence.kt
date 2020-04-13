@@ -1,19 +1,19 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonObject
 
-class Presence(client: Client, data: JsonData) : Base(client, data) {
+class Presence(client: Client, data: JsonObject) : Base(client, data) {
 
     val userId: String =
-        if (data.contains("user_id")) data["user_id"] as String else (data["user"] as JsonData)["id"] as String
+        if (data.has("user_id")) data["user_id"].asString else data["user"].asJsonObject["id"].asString
     var status: String = ""
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("status")) {
-            status = data["status"] as String
+        if (data.has("status")) {
+            status = data["status"].asString
         }
     }
 

@@ -1,15 +1,15 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonArray
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Snowflake
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
-class Message(client: Client, data: JsonData) : Base(client, data), Comparable<Message> {
+class Message(client: Client, data: JsonObject) : Base(client, data), Comparable<Message> {
 
     val id: String = data["id"] as String
     val channelId: String = data["channel_id"] as String
@@ -28,53 +28,56 @@ class Message(client: Client, data: JsonData) : Base(client, data), Comparable<M
     val reactions: MessageReactionCollection = MessageReactionCollection(client, id)
     val mentions: Collection<User> = Collection(null)
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("type")) {
-            val value = data["type"] as Int
+        if (data.has("type")) {
+            val value = data["type"].asInt
             type = MessageType.fromInt(value) ?: MessageType.DEFAULT
         }
-        if (data.contains("content")) {
-            content = data["content"] as? String
+        if (data.has("content")) {
+            content = data["content"].optString
         }
-        if (data.contains("timestamp")) {
-            val date = data["timestamp"] as String
+        if (data.has("timestamp")) {
+            val date = data["timestamp"].asString
             timestamp = LocalDateTime.parse(date)
         }
-        if (data.contains("nonce")) {
-            nonce = data["nonce"] as? String
+        if (data.has("nonce")) {
+            nonce = data["nonce"].optString
         }
-        if (data.contains("attachments")) {
-            val array = data["attachments"] as JsonArray
+        if (data.has("attachments")) {
+            val array = data["attachments"].asJsonArray
             attachments.clear()
-            array.forEach { at ->
+            array.forEach { ele ->
+                val at = ele.asJsonObject
                 attachments.put(
-                    at["id"] as String,
+                    at["id"].asString,
                     MessageAttachment(client, at)
                 )
             }
         }
-        if (data.contains("reactions")) {
-            val array = data["reactions"] as JsonArray
+        if (data.has("reactions")) {
+            val array = data["reactions"].asJsonArray
             reactions.clear()
-            array.forEach {
-                reactions.add(it)
+            array.forEach { ele ->
+                val obj = ele.asJsonObject
+                reactions.add(obj)
             }
         }
-        if (data.contains("mentions")) {
-            val array = data["mentions"] as JsonArray
-            array.forEach { u ->
+        if (data.has("mentions")) {
+            val array = data["mentions"].asJsonArray
+            array.forEach { ele ->
+                val u = ele.asJsonObject
                 val user = client.users.add(u)
                 if (user != null) {
                     mentions.put(user.id, user)
                 }
             }
         }
-        if (data.contains("author") && data["author"] != null) {
+        if (data.has("author") && !data["author"].isJsonNull) {
             client.users.add(data)
         }
-        if (data.contains("pending")) {
-            pending = data["pending"] as Boolean
+        if (data.has("pending")) {
+            pending = data["pending"].asBoolean
         }
     }
 

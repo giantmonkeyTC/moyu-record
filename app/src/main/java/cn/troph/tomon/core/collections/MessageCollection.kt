@@ -1,8 +1,8 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.structures.Message
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 
 class MessageCollection(client: Client, private val channelId: String) :
@@ -14,7 +14,7 @@ class MessageCollection(client: Client, private val channelId: String) :
     var earliestMessage: Message? = null
     val sorted: MutableList<String> = mutableListOf()
 
-    override fun add(data: JsonData, identify: ((d: JsonData) -> String)?): Message? {
+    override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Message? {
         val message = super.add(data, identify ?: {
             val id = it["id"] as String
             val nonce = it["nonce"] as String
@@ -44,7 +44,7 @@ class MessageCollection(client: Client, private val channelId: String) :
         return super.remove(key)
     }
 
-    override fun instantiate(data: JsonData): Message? {
+    override fun instantiate(data: JsonObject): Message? {
         return Message(client, data)
     }
 

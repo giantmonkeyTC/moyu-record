@@ -1,11 +1,11 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonObject
 
-class MessageAttachment(client: Client, data: JsonData) : Base(client, data) {
+class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["id"] as String
+    val id: String = data["id"].asString
     var fileName: String = ""
         private set
     var url: String = ""
@@ -17,21 +17,21 @@ class MessageAttachment(client: Client, data: JsonData) : Base(client, data) {
     var height: Int = 0
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("filename")) {
+        if (data.has("filename")) {
             fileName = data["filename"] as String
         }
-        if (data.contains("size")) {
+        if (data.has("size")) {
             size = data["size"] as Int
         }
-        if (data.contains("url")) {
+        if (data.has("url")) {
             url = data["url"] as String
         }
-        if (data.contains("width")) {
+        if (data.has("width")) {
             width = data["width"] as Int
         }
-        if (data.contains("height")) {
+        if (data.has("height")) {
             height = data["height"] as Int
         }
     }

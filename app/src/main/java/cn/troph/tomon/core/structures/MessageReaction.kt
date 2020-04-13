@@ -1,9 +1,10 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonObject
 
-class MessageReaction(client: Client, data: JsonData, private val messageId: String) :
+class MessageReaction(client: Client, data: JsonObject, private val messageId: String) :
     Base(client, data) {
 
     data class EmojiData(val id: String? = null, val name: String? = null)
@@ -14,16 +15,16 @@ class MessageReaction(client: Client, data: JsonData, private val messageId: Str
         private set
     private var emojiData: EmojiData = EmojiData()
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("emoji")) {
-            emojiData = parseEmojiData(data["emoji"] as JsonData)
+        if (data.has("emoji")) {
+            emojiData = parseEmojiData(data["emoji"].asJsonObject)
         }
-        if (data.contains("count")) {
-            count = data["count"] as Int
+        if (data.has("count")) {
+            count = data["count"].asInt
         }
-        if (data.contains("me")) {
-            me = data["me"] as Boolean
+        if (data.has("me")) {
+            me = data["me"].asBoolean
         }
     }
 
@@ -43,9 +44,9 @@ class MessageReaction(client: Client, data: JsonData, private val messageId: Str
 
     companion object {
 
-        fun parseEmojiData(data: JsonData): EmojiData {
-            val id = data["id"] as? String
-            val name = data["name"] as? String ?: ""
+        fun parseEmojiData(data: JsonObject): EmojiData {
+            val id = data["id"].optString
+            val name = data["name"].optString ?: ""
             return EmojiData(id, name)
         }
 

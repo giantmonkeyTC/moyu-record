@@ -1,14 +1,16 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.Validator
+import cn.troph.tomon.core.utils.optBoolean
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class Me(client: Client, data: JsonData) : User(client, data) {
-    constructor(client: Client) : this(client, mapOf())
+class Me(client: Client, data: JsonObject) : User(client, data) {
+    constructor(client: Client) : this(client, JsonObject())
 
     var email: String? = null
         private set
@@ -21,22 +23,22 @@ class Me(client: Client, data: JsonData) : User(client, data) {
     var token: String? = null
         private set
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("token")) {
-            token = data["token"] as? String
+        if (data.has("token")) {
+            token = data["token"].optString
         }
-        if (data.contains("email")) {
-            email = data["email"] as? String
+        if (data.has("email")) {
+            email = data["email"].optString
         }
-        if (data.contains("email_verified")) {
-            emailVerified = data["email_verified"] as? Boolean ?: false
+        if (data.has("email_verified")) {
+            emailVerified = data["email_verified"].optBoolean ?: false
         }
-        if (data.contains("phone")) {
-            phone = data["phone"] as? String
+        if (data.has("phone")) {
+            phone = data["phone"].optString
         }
-        if (data.contains("phone_verified")) {
-            phoneVerified = data["phone_verified"] as? Boolean ?: false
+        if (data.has("phone_verified")) {
+            phoneVerified = data["phone_verified"].optBoolean ?: false
         }
     }
 

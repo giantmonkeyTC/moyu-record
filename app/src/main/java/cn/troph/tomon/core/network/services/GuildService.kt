@@ -1,7 +1,7 @@
 package cn.troph.tomon.core.network.services
 
-import cn.troph.tomon.core.JsonArray
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -11,19 +11,21 @@ interface GuildService {
     fun getGuilds(@Header("Authorization") token: String): Observable<JsonArray>;
 
     @GET("guilds/{id}")
-    suspend fun getGuild(@Path("id") id: String, @Header("Authorization") token: String?): JsonData;
+    fun getGuild(
+        @Path("id") id: String,
+        @Header("Authorization") token: String?
+    ): Observable<JsonObject>;
 
     data class CreateGuildRequest(
         val name: String,
         val icon: String
     )
 
-
     @POST("guilds")
     fun createGuild(
         @Body request: CreateGuildRequest,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     data class ModifyGuildRequest(
         val name: String?,
@@ -35,7 +37,7 @@ interface GuildService {
         @Path("id") id: String,
         @Body request: ModifyGuildRequest,
         @Header("Authorization") token: String
-    ): Observable<JsonData>
+    ): Observable<JsonObject>
 
     @DELETE("guilds/{id}")
     fun deleteGuild(

@@ -1,11 +1,13 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
 import cn.troph.tomon.core.collections.ChannelMemberCollection
 import cn.troph.tomon.core.utils.Collection
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 
-open class GuildChannel(client: Client, data: JsonData) : Channel(client, data) {
+open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data) {
 
     data class MemberPermissionOverwrites(
         val everyone: PermissionOverwrites? = null,
@@ -25,45 +27,48 @@ open class GuildChannel(client: Client, data: JsonData) : Channel(client, data) 
         Collection<PermissionOverwrites>(null)
     val members = ChannelMemberCollection(this)
 
-    override fun patch(data: JsonData) {
+    override fun patch(data: JsonObject) {
         super.patch(data)
-        if (data.contains("name")) {
-            name = data["name"] as String
+        if (data.has("name")) {
+            name = data["name"].asString
         }
-        if (data.contains("guild_id")) {
-            guildId = data["guild_id"] as? String
+        if (data.has("guild_id")) {
+            guildId = data["guild_id"].optString
         }
-        if (data.contains("position")) {
-            position = data["position"] as Int
+        if (data.has("position")) {
+            position = data["position"].asInt
         }
-        if (data.contains("parent_id")) {
-            parentId = data["parent_id"] as? String
+        if (data.has("parent_id")) {
+            parentId = data["parent_id"].optString
             if (parentId == "0") {
                 parentId = null
             }
         }
-        if (data.contains("permission_overwrites")) {
+        if (data.has("permission_overwrites")) {
             permissionOverwrites.clear()
-            val list = data["permission_overwrites"] as List<*>
-            for (obj in list) {
-                var overwrite = obj as JsonData
+            val list = data["permission_overwrites"].asJsonArray
+            list.forEach { obj ->
+                var overwrite = obj.asJsonObject
                 permissionOverwrites.set(
                     overwrite["id"] as String,
                     PermissionOverwrites(client, overwrite)
                 )
             }
-            val gid = data["guild_id"] as? String
+            val gid = data["guild_id"].optString
             if (gid != null && !permissionOverwrites.has(gid)) {
+                val everyone = Gson().toJsonTree(
+                    mapOf(
+                        "id" to gid,
+                        "type" to "role",
+                        "allow" to 0,
+                        "deny" to 0
+                    )
+                ).asJsonObject
                 permissionOverwrites.set(
                     gid,
                     PermissionOverwrites(
                         client,
-                        mapOf(
-                            "id" to gid,
-                            "type" to "role",
-                            "allow" to 0,
-                            "deny" to 0
-                        )
+                        everyone
                     )
                 )
 

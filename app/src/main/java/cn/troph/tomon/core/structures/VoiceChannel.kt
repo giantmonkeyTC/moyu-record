@@ -1,9 +1,9 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.JsonData
+import com.google.gson.JsonObject
 
-class VoiceChannel(client: Client, data: JsonData) :
+class VoiceChannel(client: Client, data: JsonObject) :
     GuildChannel(client, data) {
 
 }
