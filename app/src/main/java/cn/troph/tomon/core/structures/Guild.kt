@@ -9,9 +9,10 @@ import cn.troph.tomon.core.collections.RoleCollection
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class Guild(client: Client, data: JsonObject) : Base(client, data) {
-    val id: String = data["id"] as String
+    val id: String = data["id"].asString
     var name: String = ""
         private set
     var icon: String? = null
@@ -54,7 +55,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data) {
             position = data["position"].asInt
         }
         if (data.has("joined_at")) {
-            joinedAt = LocalDateTime.parse(data["joined_at"].asString)
+            joinedAt = LocalDateTime.parse(data["joined_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
         }
         if (data.has("owner_id")) {
             ownerId = data["owner_id"].asString
