@@ -27,6 +27,8 @@ open class Collection<T>(m: Map<String, T>?) {
 
     val length: Int get() = map.size
 
+    val size: Int get() = map.size
+
     val values: Iterable<T> get() = map.values
 
     val keys: Iterable<String> get() = map.keys
