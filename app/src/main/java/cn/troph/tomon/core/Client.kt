@@ -19,6 +19,7 @@ class Client {
     val users = UserCollection(this)
     val guilds = GuildCollection(this)
     val channels = ChannelCollection(this)
+    val dmChannels = DmChannelCollection(this)
     val emojis = EmojiCollection(this)
     val presences = PresenceCollection(this)
 

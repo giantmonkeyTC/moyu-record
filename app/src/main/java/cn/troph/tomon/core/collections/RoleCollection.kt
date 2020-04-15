@@ -1,17 +1,16 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.Role
 import com.google.gson.JsonObject
 
-class RoleCollection(client: Client, m: Map<String, Role>? = null, var guildId: String) :
-    BaseCollection<Role>(client, m) {
+class RoleCollection(client: Client, var guild: Guild) :
+    BaseCollection<Role>(client) {
 
     private var list: List<Role>? = null
 
-    val guild get() = client.guilds.get(guildId)
-
-    val everyone get() = get(guildId)
+    val everyone get() = get(guild.id)
 
     //TODO FETCH CREATE
 

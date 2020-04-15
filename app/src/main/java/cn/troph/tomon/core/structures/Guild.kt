@@ -6,13 +6,15 @@ import cn.troph.tomon.core.collections.GuildChannelCollection
 import cn.troph.tomon.core.collections.GuildEmojiCollection
 import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
+import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class Guild(client: Client, data: JsonObject) : Base(client, data) {
-    val id: String = data["id"].asString
+
+    var id: String = ""
+        private set
     var name: String = ""
         private set
     var icon: String? = null
@@ -33,15 +35,16 @@ class Guild(client: Client, data: JsonObject) : Base(client, data) {
         MessageNotificationsType.ONLY_MENTION
         private set
 
-    val channels: GuildChannelCollection = GuildChannelCollection(client, guildId = id)
-    val members: GuildMemberCollection = GuildMemberCollection(client, guildId = id)
-    val roles: RoleCollection = RoleCollection(client, guildId = id)
-    val emojis: GuildEmojiCollection = GuildEmojiCollection(client, guildId = id)
-
-    //TODO LEAVE, UPDATE, ETC.
+    val channels: GuildChannelCollection = GuildChannelCollection(client, this)
+    val members: GuildMemberCollection = GuildMemberCollection(client, this)
+    val roles: RoleCollection = RoleCollection(client, this)
+    val emojis: GuildEmojiCollection = GuildEmojiCollection(client, this)
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("id")) {
+            id = data["id"].asString
+        }
         if (data.has("name")) {
             name = data["name"].asString
         }
@@ -55,7 +58,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data) {
             position = data["position"].asInt
         }
         if (data.has("joined_at")) {
-            joinedAt = LocalDateTime.parse(data["joined_at"].asString, DateTimeFormatter.ISO_DATE_TIME)
+            joinedAt = Converter.toDate(data["joined_at"].asString)
         }
         if (data.has("owner_id")) {
             ownerId = data["owner_id"].asString

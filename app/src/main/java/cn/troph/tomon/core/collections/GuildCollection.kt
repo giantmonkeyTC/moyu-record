@@ -6,11 +6,11 @@ import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class GuildCollection(client: Client, m: Map<String, Guild>? = null) :
-    BaseCollection<Guild>(client, m) {
+class GuildCollection(client: Client) :
+    BaseCollection<Guild>(client) {
 
     override fun instantiate(data: JsonObject): Guild? {
-        return Guild(client, data);
+        return Guild(client, data)
     }
 
     fun fetch(sync: Boolean = true): Observable<List<Guild>?> {

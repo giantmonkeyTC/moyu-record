@@ -1,13 +1,12 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildChannel
 import com.google.gson.JsonObject
 
-class GuildChannelCollection(client: Client, private val guildId: String) :
+class GuildChannelCollection(client: Client, val guild: Guild) :
     BaseCollection<GuildChannel>(client) {
-
-    val guild get() = client.guilds.get(guildId)
 
     // forbid add
     override fun add(

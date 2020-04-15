@@ -10,13 +10,14 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe
 
 enum class EventType {
     ADD,
-    REMOVE
+    REMOVE,
+    CLEAR
 }
 
-data class Event<T>(val type: EventType, val obj: T)
+data class Event<T>(val type: EventType, val obj: T? = null)
 
-open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = null) :
-    Collection<T>(m), ObservableOnSubscribe<Event<T>> {
+open class BaseCollection<T : Base>(val client: Client) :
+    Collection<T>(null), ObservableOnSubscribe<Event<T>> {
 
     private var emitter: ObservableEmitter<Event<T>>? = null
 
@@ -50,6 +51,11 @@ open class BaseCollection<T : Base>(val client: Client, m: Map<String, T>? = nul
             emitter?.onNext(Event(EventType.REMOVE, entry))
         }
         return entry
+    }
+
+    override fun clear() {
+        super.clear()
+        emitter?.onNext(Event(EventType.CLEAR))
     }
 
     open fun instantiate(data: JsonObject): T? {

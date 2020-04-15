@@ -1,14 +1,14 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.Message
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 
-class MessageCollection(client: Client, private val channelId: String) :
+class MessageCollection(client: Client, val channel: Channel) :
     BaseCollection<Message>(client) {
 
-    val channel get() = client.channels.get(channelId)
     var gotBeginning: Boolean = false
     var latestMessage: Message? = null
     var earliestMessage: Message? = null

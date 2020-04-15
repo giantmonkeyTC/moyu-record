@@ -9,8 +9,7 @@ import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class Me(client: Client, data: JsonObject) : User(client, data) {
-    constructor(client: Client) : this(client, JsonObject())
+class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
 
     var email: String? = null
         private set

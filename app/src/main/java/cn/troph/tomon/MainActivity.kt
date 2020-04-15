@@ -12,9 +12,7 @@ import cn.troph.tomon.page.MessageFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.concurrent.TimeUnit
 
 private const val DEBUG_TAG = "Gestures"
 
@@ -46,10 +44,16 @@ class MainActivity : AppCompatActivity() {
             onError = { it.printStackTrace() },
             onComplete = { println("complete") }
         )
+        Observable.create(client.guilds).subscribeBy(
+            onNext = {
+                println("${it.type}${it.obj?.icon}")
+            },
+            onError = { it.printStackTrace() }
+        )
         client.login(
-                emailOrPhone = "qiang.l.x@gmail.com",
-                password = "1wq23re45ty67ui8"
-            ).observeOn(AndroidSchedulers.mainThread())
+            emailOrPhone = "qiang.l.x@gmail.com",
+            password = "1wq23re45ty67ui8"
+        ).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ user -> println(user) }, { error -> println(error) })
 
 //        Observable.timer(5, TimeUnit.SECONDS).flatMap {

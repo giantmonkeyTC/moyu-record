@@ -1,13 +1,12 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildEmoji
 import com.google.gson.JsonObject
 
-class GuildEmojiCollection(client: Client, private val guildId: String) :
+class GuildEmojiCollection(client: Client, val guild: Guild) :
     BaseCollection<GuildEmoji>(client) {
-
-    val guild get() = client.guilds.get(guildId)
 
     // forbid add
     override fun add(

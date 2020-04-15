@@ -9,11 +9,15 @@ import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
-class Message(client: Client, data: JsonObject) : Base(client, data), Comparable<Message> {
+class Message(client: Client, data: JsonObject) : Base(client, data),
+    Comparable<Message> {
 
-    val id: String = data["id"] as String
-    val channelId: String = data["channel_id"] as String
-    val authorId: String? = null
+    var id: String = ""
+        private set
+    var channelId: String = ""
+        private set
+    var authorId: String? = null
+        private set
     var type: MessageType = MessageType.DEFAULT
         private set
     var content: String? = null
@@ -24,15 +28,34 @@ class Message(client: Client, data: JsonObject) : Base(client, data), Comparable
         private set
     var pending: Boolean = false
         private set
-    val attachments: Collection<MessageAttachment> = Collection(null)
-    val reactions: MessageReactionCollection = MessageReactionCollection(client, id)
-    val mentions: Collection<User> = Collection(null)
+    var attachments: Collection<MessageAttachment> = Collection()
+        private set
+    var mentions: Collection<User> = Collection()
+        private set
+
+    lateinit var reactions: MessageReactionCollection
+        private set
+
+    override fun init(data: JsonObject) {
+        super.init(data)
+        reactions = MessageReactionCollection(client, this)
+    }
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("id")) {
+            id = data["id"].asString
+        }
+        if (data.has("channel_id")) {
+            channelId = data["channel_id"].asString
+        }
         if (data.has("type")) {
             val value = data["type"].asInt
             type = MessageType.fromInt(value) ?: MessageType.DEFAULT
+        }
+        if (data.has("author") && !data["author"].isJsonNull) {
+            val author = client.users.add(data)
+            authorId = author?.id
         }
         if (data.has("content")) {
             content = data["content"].optString
@@ -45,8 +68,8 @@ class Message(client: Client, data: JsonObject) : Base(client, data), Comparable
             nonce = data["nonce"].optString
         }
         if (data.has("attachments")) {
+            attachments = Collection()
             val array = data["attachments"].asJsonArray
-            attachments.clear()
             array.forEach { ele ->
                 val at = ele.asJsonObject
                 attachments.put(
@@ -72,9 +95,6 @@ class Message(client: Client, data: JsonObject) : Base(client, data), Comparable
                     mentions.put(user.id, user)
                 }
             }
-        }
-        if (data.has("author") && !data["author"].isJsonNull) {
-            client.users.add(data)
         }
         if (data.has("pending")) {
             pending = data["pending"].asBoolean

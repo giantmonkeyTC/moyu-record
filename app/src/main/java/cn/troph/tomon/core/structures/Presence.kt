@@ -5,13 +5,19 @@ import com.google.gson.JsonObject
 
 class Presence(client: Client, data: JsonObject) : Base(client, data) {
 
-    val userId: String =
-        if (data.has("user_id")) data["user_id"].asString else data["user"].asJsonObject["id"].asString
+    var userId: String = ""
+        private set
     var status: String = ""
         private set
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("user_id")) {
+            userId = data["user_id"].asString
+        } else if (data.has("user")) {
+            val user = client.users.add(data["user"].asJsonObject)
+            userId = user?.id ?: ""
+        }
         if (data.has("status")) {
             status = data["status"].asString
         }

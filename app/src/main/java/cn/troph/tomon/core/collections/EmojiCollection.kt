@@ -6,8 +6,8 @@ import cn.troph.tomon.core.structures.GuildEmoji
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 
-class EmojiCollection(client: Client, m: Map<String, Emoji>? = null) :
-    BaseCollection<Emoji>(client, m) {
+class EmojiCollection(client: Client) :
+    BaseCollection<Emoji>(client) {
 
     override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Emoji? {
         val emoji = super.add(data, identify)

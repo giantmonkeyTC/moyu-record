@@ -8,8 +8,10 @@ import java.time.LocalDateTime
 
 class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["user"].asJsonObject["id"].asString
-    val guildId: String = data["guild_id"].asString
+    var id: String = ""
+        private set
+    var guildId: String = ""
+        private set
     var nick: String? = null
         private set
     var joinedAt: LocalDateTime = LocalDateTime.now()
@@ -19,14 +21,18 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("user")) {
+            val user = client.users.add(data["user"].asJsonObject)
+            id = user?.id ?: ""
+        }
+        if (data.has("guild_id")) {
+            guildId = data["guild_id"].asString
+        }
         if (data.has("nick")) {
             nick = data["nick"].optString;
         }
         if (data.has("joined_at")) {
             joinedAt = LocalDateTime.parse(data["joined_at"].asString)
-        }
-        if (data.has("user")) {
-            client.users.add(data["user"].asJsonObject);
         }
         if (data.has("roles")) {
             rawRoles = if (data["roles"].isJsonNull) {

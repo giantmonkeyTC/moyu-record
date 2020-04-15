@@ -23,9 +23,10 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         private set
     var parentId: String? = null
         private set
-    val permissionOverwrites: Collection<PermissionOverwrites> =
-        Collection<PermissionOverwrites>(null)
-    val members = ChannelMemberCollection(this)
+    var permissionOverwrites: Collection<PermissionOverwrites> = Collection()
+        private set
+
+    open val members: ChannelMemberCollection = ChannelMemberCollection(this)
 
     override fun patch(data: JsonObject) {
         super.patch(data)
@@ -45,12 +46,12 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
             }
         }
         if (data.has("permission_overwrites")) {
-            permissionOverwrites.clear()
+            permissionOverwrites = Collection()
             val list = data["permission_overwrites"].asJsonArray
             list.forEach { obj ->
                 var overwrite = obj.asJsonObject
                 permissionOverwrites.set(
-                    overwrite["id"] as String,
+                    overwrite["id"].asString,
                     PermissionOverwrites(client, overwrite)
                 )
             }

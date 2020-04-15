@@ -8,7 +8,8 @@ import com.google.gson.JsonObject
 
 class Role(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["id"] as String
+    var id: String = ""
+        private set
     var guildId: String = ""
         private set
     var name: String = ""
@@ -26,6 +27,9 @@ class Role(client: Client, data: JsonObject) : Base(client, data) {
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("id")) {
+            id = data["id"].asString
+        }
         if (data.has("guild_id")) {
             guildId = data["guild_id"].asString
         }

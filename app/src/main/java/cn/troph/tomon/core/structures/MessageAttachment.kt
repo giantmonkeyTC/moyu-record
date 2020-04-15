@@ -5,7 +5,8 @@ import com.google.gson.JsonObject
 
 class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["id"].asString
+    var id: String = ""
+        private set
     var fileName: String = ""
         private set
     var url: String = ""
@@ -19,6 +20,9 @@ class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("id")) {
+            id = data["id"].asString
+        }
         if (data.has("filename")) {
             fileName = data["filename"] as String
         }

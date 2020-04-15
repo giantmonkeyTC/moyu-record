@@ -6,7 +6,8 @@ import com.google.gson.JsonObject
 
 open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
 
-    val id: String = data["id"].asString
+    var id: String = ""
+        private set
     var name: String = ""
         private set
     var userId: String? = null
@@ -16,6 +17,9 @@ open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
 
     override fun patch(data: JsonObject) {
         super.patch(data)
+        if (data.has("id")) {
+            id = data["id"].asString
+        }
         if (data.has("name")) {
             name = data["name"].asString
         }

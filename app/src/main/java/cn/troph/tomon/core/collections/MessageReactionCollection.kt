@@ -1,10 +1,11 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageReaction
 import com.google.gson.JsonObject
 
-class MessageReactionCollection(client: Client, private val messageId: String) :
+class MessageReactionCollection(client: Client, val message: Message) :
     BaseCollection<MessageReaction>(client) {
 
     override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): MessageReaction? {
@@ -18,6 +19,6 @@ class MessageReactionCollection(client: Client, private val messageId: String) :
     }
 
     override fun instantiate(data: JsonObject): MessageReaction? {
-        return MessageReaction(client, data, messageId)
+        return MessageReaction(client, data, message.id)
     }
 }
