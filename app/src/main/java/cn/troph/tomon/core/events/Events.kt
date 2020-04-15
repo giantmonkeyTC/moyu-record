@@ -31,9 +31,10 @@ data class RoleUpdateEvent(val role: Role) : Event()
 data class RolePositionEvent(val roles: List<Role>) : Event()
 
 data class EmojiSyncEvent(val guild: Guild) : Event()
-data class EmojiCreateEvent(val emoji: Emoji) : Event()
-data class EmojiDeleteEvent(val emoji: Emoji) : Event()
-data class EmojiUpdateEvent(val emoji: Emoji) : Event()
+data class EmojiFetchEvent(val emojis: List<GuildEmoji>) : Event()
+data class EmojiCreateEvent(val emoji: GuildEmoji) : Event()
+data class EmojiDeleteEvent(val emoji: GuildEmoji) : Event()
+data class EmojiUpdateEvent(val emoji: GuildEmoji) : Event()
 
 data class GuildMemberFetchEvent(val members: List<GuildMember>) : Event()
 data class GuildMemberAddEvent(val member: GuildMember) : Event()

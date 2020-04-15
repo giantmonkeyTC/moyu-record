@@ -1,10 +1,7 @@
 package cn.troph.tomon.core.actions
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Channel
-import cn.troph.tomon.core.structures.Guild
-import cn.troph.tomon.core.structures.Role
-import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.structures.*
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -33,4 +30,10 @@ class ActionManager(val client: Client) {
         isSync: Boolean = true,
         guildId: String? = null
     ): List<Role>? = RoleFetchAction(client).handle(data, isSync, guildId)
+
+    fun emojiFetch(
+        data: JsonElement,
+        isSync: Boolean = true,
+        guildId: String? = null
+    ): List<GuildEmoji>? = EmojiFetchAction(client).handle(data, isSync, guildId)
 }

@@ -26,6 +26,6 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
         val guild = it.asJsonObject
         client.actions.channelFetch(guild["channels"].asJsonArray, true, guild["id"].asString)
         client.actions.roleFetch(guild["roles"].asJsonArray, true, guild["id"].asString)
-
+        client.actions.emojiFetch(guild["emojis"].asJsonArray, true, guild["id"].asString)
     }
 }
