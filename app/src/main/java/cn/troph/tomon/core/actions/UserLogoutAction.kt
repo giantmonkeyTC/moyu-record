@@ -5,7 +5,7 @@ import cn.troph.tomon.core.events.UserLogoutEvent
 import com.google.gson.JsonElement
 
 class UserLogoutAction(client: Client) : Action<Unit>(client) {
-    override fun handle(data: JsonElement?, extra: Any?): Unit? {
+    override fun handle(data: JsonElement?, vararg extras: Any?): Unit? {
         client.users.clear()
         client.guilds.clear()
         client.channels.clear()

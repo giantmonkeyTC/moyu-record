@@ -8,8 +8,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 
 class GuildFetchAction(client: Client) : Action<List<Guild>>(client) {
-    override fun handle(data: JsonElement?, extra: Any?): List<Guild>? {
-        var isSync: Boolean = (extra as Boolean?) ?: true
+
+    override fun handle(data: JsonElement?, vararg extras: Any?): List<Guild>? {
+        var isSync: Boolean = (extras[0] as? Boolean) ?: true
         // 如果同步，移除没有出现过的guild
         if (isSync) {
             val keys = client.guilds.keys.asSequence().toMutableSet()

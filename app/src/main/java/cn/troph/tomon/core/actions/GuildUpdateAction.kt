@@ -6,7 +6,7 @@ import cn.troph.tomon.core.structures.Guild
 import com.google.gson.JsonElement
 
 class GuildUpdateAction(client: Client) : Action<Guild>(client) {
-    override fun handle(data: JsonElement?, extra: Any?): Guild? {
+    override fun handle(data: JsonElement?, vararg extras: Any?): Guild? {
         val obj = data!!.asJsonObject
         val guild = client.guilds.get(obj["id"].asString)
         if (guild != null) {

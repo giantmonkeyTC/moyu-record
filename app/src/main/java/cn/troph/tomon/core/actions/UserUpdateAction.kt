@@ -7,7 +7,7 @@ import com.google.gson.JsonElement
 
 class UserUpdateAction(client: Client) : Action<User>(client) {
 
-    override fun handle(data: JsonElement?, extra: Any?): User? {
+    override fun handle(data: JsonElement?, vararg extras: Any?): User? {
         val obj = data!!.asJsonObject
         var user = client.users.get(obj["id"].asString)
         if (user != null) {

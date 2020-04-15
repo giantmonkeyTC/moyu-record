@@ -7,7 +7,7 @@ import com.google.gson.JsonElement
 
 class GuildCreateAction(client: Client) : Action<Guild>(client) {
 
-    override fun handle(data: JsonElement?, extra: Any?): Guild? {
+    override fun handle(data: JsonElement?, vararg extras: Any?): Guild? {
         val obj = data!!.asJsonObject
         val existing = client.guilds.has(obj["id"].asString)
         val guild = client.guilds.add(obj)
