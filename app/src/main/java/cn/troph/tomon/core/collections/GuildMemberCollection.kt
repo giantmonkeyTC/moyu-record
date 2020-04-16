@@ -12,7 +12,7 @@ class GuildMemberCollection(client: Client, val guild: Guild) :
         data: JsonObject,
         identify: ((d: JsonObject) -> String)?
     ): GuildMember? {
-        val id = (data["user"] as JsonObject)["id"] as String
+        val id = data["user"].asJsonObject["id"].asString
         return super.add(data, identify ?: { _ -> id })
     }
 
