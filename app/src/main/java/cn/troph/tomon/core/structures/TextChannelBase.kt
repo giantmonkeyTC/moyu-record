@@ -4,7 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.collections.MessageCollection
 import cn.troph.tomon.core.utils.Collection
-import cn.troph.tomon.core.utils.Snowflake
+import cn.troph.tomon.core.utils.snowflake
 import java.time.LocalDateTime
 
 interface TextChannelBase {
@@ -24,9 +24,7 @@ interface TextChannelBase {
 }
 
 fun TextChannelBase.getUnread(): Boolean {
-    return Snowflake.aligned(lastMessageId ?: "0") > Snowflake.aligned(
-        localAckMessageId ?: "0"
-    )
+    return (lastMessageId ?: "").snowflake > (localAckMessageId ?: "").snowflake
 }
 
 fun TextChannelBase.getMessageNotifications(): MessageNotificationsType =

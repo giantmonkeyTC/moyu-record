@@ -79,7 +79,7 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
 
     val guild get(): Guild? = client.guilds.get(guildId ?: "")
 
-    val parent get() : GuildChannel? = guild?.channels?.get(parentId ?: "")
+    val parent get() : CategoryChannel? = guild?.channels?.get(parentId ?: "") as? CategoryChannel
 
     fun overwritesForMember(member: GuildMember): MemberPermissionOverwrites {
         if (member == null) {
