@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.GuildMemberRoleCollection
+import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
@@ -32,7 +33,7 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
             nick = data["nick"].optString;
         }
         if (data.has("joined_at")) {
-            joinedAt = LocalDateTime.parse(data["joined_at"].asString)
+            joinedAt = Converter.toDate(data["joined_at"].asString)
         }
         if (data.has("roles")) {
             rawRoles = if (data["roles"].isJsonNull) {
@@ -54,6 +55,10 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
     val isOwner get() = id == guild?.ownerId ?: false
 
     fun hasRole(role: Role): Boolean {
-        return if (role.isEveryone) true else rawRoles.indexOf(role.id) != -1
+        return hasRole(role.id)
+    }
+
+    fun hasRole(roleId: String): Boolean {
+        return if (roleId == guildId) true else rawRoles.indexOf(roleId) != -1
     }
 }

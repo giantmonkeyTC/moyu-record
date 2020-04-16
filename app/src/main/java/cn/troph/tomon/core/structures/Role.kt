@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Snowflake
 import cn.troph.tomon.core.utils.optBoolean
 import cn.troph.tomon.core.utils.optInt
+import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.JsonObject
 
 class Role(client: Client, data: JsonObject) : Base(client, data) {
@@ -71,7 +72,7 @@ class Role(client: Client, data: JsonObject) : Base(client, data) {
                 return (if (role1.isEveryone) 1 else 0) - (if (role1.isEveryone) 1 else 0)
             if (role1.position != role2.position)
                 return role2.position - role1.position
-            return Snowflake.aligned(role1.id).compareTo(Snowflake.aligned(role2.id))
+            return role1.id.snowflake.compareTo(role2.id.snowflake)
         }
     }
 

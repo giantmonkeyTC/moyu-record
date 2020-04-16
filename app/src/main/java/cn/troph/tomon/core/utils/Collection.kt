@@ -3,9 +3,9 @@ package cn.troph.tomon.core.utils
 open class Collection<T>(m: Map<String, T>? = null) {
     private var map: LinkedHashMap<String, T> = LinkedHashMap(m ?: mapOf<String, T>())
 
-    fun get(key: String): T? = map[key]
+    operator fun get(key: String): T? = map[key]
 
-    fun set(key: String, value: T): T? {
+    operator fun set(key: String, value: T): T? {
         val prev = map[key]
         map[key] = value
         return prev

@@ -3,9 +3,8 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
+import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.core.utils.Collection
-import cn.troph.tomon.core.utils.Snowflake
-import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
@@ -61,8 +60,7 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
             content = data["content"].optString
         }
         if (data.has("timestamp")) {
-            val date = data["timestamp"].asString
-            timestamp = LocalDateTime.parse(date)
+            timestamp = Converter.toDate(data["timestamp"].asString)
         }
         if (data.has("nonce")) {
             nonce = data["nonce"].optString
@@ -112,12 +110,7 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
     val guild get() : Guild? = if (this.channel is GuildChannel) (this.channel as GuildChannel).guild else null
 
     override fun compareTo(other: Message): Int {
-        val timeCompare = timestamp.compareTo(other.timestamp)
-        return if (timeCompare == 0) {
-            Snowflake.aligned(id).compareTo(Snowflake.aligned(other.id))
-        } else {
-            timeCompare
-        }
+        return id.snowflake.compareTo(other.id.snowflake)
     }
 
 }
