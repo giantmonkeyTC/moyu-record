@@ -12,7 +12,7 @@ class GuildCreateAction(client: Client) : Action<Guild>(client) {
         val existing = client.guilds.has(obj["id"].asString)
         val guild = client.guilds.add(obj)
         if (existing == null && guild != null) {
-            client.eventBus.postEvent(GuildCreateEvent(guild = guild))
+            client.eventBus.postEvent(GuildCreateEvent(guild))
         }
         return guild
     }

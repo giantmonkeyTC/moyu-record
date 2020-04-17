@@ -9,7 +9,7 @@ class UserUpdateAction(client: Client) : Action<User>(client) {
 
     override fun handle(data: JsonElement?, vararg extras: Any?): User? {
         val obj = data!!.asJsonObject
-        var user = client.users.get(obj["id"].asString)
+        var user = client.users[obj["id"].asString]
         if (user != null) {
             if (user.id == client.me.id) {
                 client.me.update(obj)

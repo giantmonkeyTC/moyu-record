@@ -22,6 +22,7 @@ class Client {
     val dmChannels = DmChannelCollection(this)
     val emojis = EmojiCollection(this)
     val presences = PresenceCollection(this)
+    val guildSettings = GuildSettingsCollection(this)
 
     val token get() = me.token ?: ""
 

@@ -1,11 +1,12 @@
 package cn.troph.tomon.core.utils
 
-open class Collection<T>(m: Map<String, T>? = null) {
+open class Collection<T>(m: Map<String, T>? = null): Iterable<T> {
+
     private var map: LinkedHashMap<String, T> = LinkedHashMap(m ?: mapOf<String, T>())
 
-    operator fun get(key: String): T? = map[key]
+    open operator fun get(key: String): T? = map[key]
 
-    operator fun set(key: String, value: T): T? {
+    open operator fun set(key: String, value: T): T? {
         val prev = map[key]
         map[key] = value
         return prev
@@ -52,10 +53,23 @@ open class Collection<T>(m: Map<String, T>? = null) {
 
     fun merge(other: Collection<T>) = map.putAll(other.map)
 
-    fun clone(): Collection<T> = Collection<T>(map)
+    fun clone(): Collection<T> = Collection(map)
 
     override fun toString(): String = map.toString()
 
     fun toMap(): Map<String, T> = LinkedHashMap(map)
 
+    override fun iterator(): Iterator<T> {
+        return values.iterator()
+    }
+
+}
+
+inline fun <reified V> Collection<*>.asCollectionOfType(): Collection<V>? {
+    return if (all { it is V }) {
+        @Suppress("UNCHECKED_CAST")
+        Collection(toMap() as Map<String, V>)
+    } else {
+        null
+    }
 }

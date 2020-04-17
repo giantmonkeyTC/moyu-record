@@ -22,6 +22,7 @@ data class ChannelUpdateEvent(val channel: Channel) : Event()
 data class GuildChannelPositionEvent(val guild: Guild) : Event()
 data class ChannelAckEvent(val channel: Channel) : Event()
 data class ChannelTypingEvent(val channel: Channel) : Event()
+data class ChannelMemberUpdateEvent(val channel: Channel) : Event()
 
 data class RoleSyncEvent(val guild: Guild) : Event()
 data class RoleFetchEvent(val roles: List<Role>) : Event()
@@ -46,5 +47,7 @@ data class MessageCreateEvent(val message: Message) : Event()
 data class MessageDeleteEvent(val message: Message) : Event()
 data class MessageUpdateEvent(val message: Message) : Event()
 
-data class PresenceFetchEvent(val presence: Presence) : Event()
+data class PresenceFetchEvent(val presences: List<Presence>) : Event()
 data class PresenceUpdateEvent(val presence: Presence) : Event()
+
+data class GuildSettingsUpdateEvent(val settings: GuildSettings): Event()
