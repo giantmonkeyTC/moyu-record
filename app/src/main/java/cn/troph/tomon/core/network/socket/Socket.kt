@@ -2,8 +2,7 @@ package cn.troph.tomon.core.network.socket
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.Configs
-import cn.troph.tomon.core.network.socket.handlers.handleGuildCreate
-import cn.troph.tomon.core.network.socket.handlers.handleIdentity
+import cn.troph.tomon.core.network.socket.handlers.*
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -40,7 +39,13 @@ class Socket : Observer<SocketEvent> {
     private var _heartbeatInterval: Long = 40000
     private val _handlers = mapOf(
         "IDENTITY" to handleIdentity,
-        "GUILD_CREATE" to handleGuildCreate
+        "GUILD_CREATE" to handleGuildCreate,
+        "GUILD_DELETE" to handleGuildDelete,
+        "GUILD_UPDATE" to handleGuildUpdate,
+        "CHANNEL_CREATE" to handleChannelCreate,
+        "CHANNEL_DELETE" to handleChannelDelete,
+        "CHANNEL_UPDATE" to handleChannelUpdate,
+        "USER_GUILD_SETTINGS" to handleGuildSettings
     )
 
     constructor(client: Client) {
