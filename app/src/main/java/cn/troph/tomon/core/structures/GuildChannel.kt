@@ -6,6 +6,7 @@ import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 
 open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data) {
 
@@ -139,6 +140,22 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
             .plus(everyoneOverwrites?.allow)
             .minus(roleOverwrites?.deny)
             .plus(roleOverwrites?.allow)
+    }
+
+    fun deletePermissionOverwritesLocal(id: String) {
+        if (!permissionOverwrites.has(id))
+            return
+        val newOverwrites = permissionOverwrites.clone()
+        newOverwrites.remove(id)
+        val overwrites = newOverwrites.map { _, overwrites ->
+            mutableMapOf<String, Any>().apply {
+                this["id"] = overwrites.id
+                this["type"] = overwrites.type
+                this["allow"] = overwrites.allow
+                this["deny"] = overwrites.deny
+            }
+        }
+        client.actions.channelUpdate(JsonParser.parseString("""{"id": id, "permission_overwrites": overwrites}""").asJsonObject)
     }
 
     val indent
