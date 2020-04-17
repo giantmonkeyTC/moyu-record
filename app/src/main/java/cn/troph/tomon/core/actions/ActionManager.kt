@@ -28,6 +28,8 @@ class ActionManager(val client: Client) {
     fun channelCreate(data: JsonObject): Channel? = ChannelCreateAction(client).handle(data)
     fun channelDelete(data: JsonObject): Channel? = ChannelDeleteAction(client).handle(data)
     fun channelUpdate(data: JsonObject): Channel? = ChannelUpdateAction(client).handle(data)
+    fun channelAck(channelId: String, id: String) =
+        ChannelAckAction(client).handle(null, channelId, id)
 
     fun roleFetch(
         data: JsonElement,
