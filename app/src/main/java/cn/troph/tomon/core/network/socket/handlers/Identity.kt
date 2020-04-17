@@ -8,6 +8,7 @@ import com.google.gson.JsonNull
 
 val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     val data = packet.asJsonObject["d"].asJsonObject
+    // data pre-processing
     data["guilds"].asJsonArray.forEach { ele ->
         val guild = ele.asJsonObject
         if (guild["system_channel_id"].optString == "0") {
@@ -18,6 +19,12 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
         val channel = ele.asJsonObject
         if (channel["guild_id"].optString == "0") {
             channel.addProperty("guild_id", "@me")
+        }
+    }
+    data["guild_settings"].asJsonArray.forEach { ele ->
+        val settings = ele.asJsonObject
+        if (settings["guild_id"].optString == "0") {
+            settings.add("guild_id", JsonNull.INSTANCE)
         }
     }
     client.actions.guildFetch(data["guilds"].asJsonArray, true)

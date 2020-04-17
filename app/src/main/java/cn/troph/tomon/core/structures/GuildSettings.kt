@@ -3,11 +3,12 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.utils.Collection
+import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 
 class GuildSettings(client: Client, data: JsonObject) : Base(client, data) {
 
-    var guildId: String = ""
+    var guildId: String? = null
         private set
     var messageNotifications: MessageNotificationsType = MessageNotificationsType.DEFAULT
         private set
@@ -21,7 +22,7 @@ class GuildSettings(client: Client, data: JsonObject) : Base(client, data) {
     override fun patch(data: JsonObject) {
         super.patch(data)
         if (data.has("guild_id")) {
-            guildId = data["guild_id"].asString
+            guildId = data["guild_id"].optString
         }
         if (data.has("message_notifications")) {
             val value = data["message_notifications"].asInt

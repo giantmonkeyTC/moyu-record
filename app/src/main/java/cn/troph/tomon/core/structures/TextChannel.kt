@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.collections.MessageCollection
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optString
@@ -16,6 +17,8 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
     override var ackMessageId: String? = null
         private set
     override var localAckMessageId: String? = null
+        private set
+    var defaultMessageNotifications: MessageNotificationsType = MessageNotificationsType.DEFAULT
         private set
 
     override val messages: MessageCollection = MessageCollection(client, this)
@@ -36,6 +39,11 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
         if (data.has("ack_message_id")) {
             ackMessageId = data["ack_message_id"].optString
             localAckMessageId = ackMessageId
+        }
+        if (data.has("default_message_notifications")) {
+            val value = data["default_message_notifications"].asInt
+            defaultMessageNotifications =
+                MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.DEFAULT
         }
     }
 
