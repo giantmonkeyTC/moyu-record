@@ -8,10 +8,11 @@ import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
 import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
+import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
-class Guild(client: Client, data: JsonObject) : Base(client, data) {
+class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<Guild> {
 
     var id: String = ""
         private set
@@ -74,5 +75,14 @@ class Guild(client: Client, data: JsonObject) : Base(client, data) {
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.ONLY_MENTION
         }
+    }
+
+    override fun compareTo(other: Guild): Int {
+        val comparator = Comparator<Guild> { o1, o2 ->
+            o1.joinedAt.compareTo(o2.joinedAt)
+        }.then(Comparator { o1, o2 ->
+            o1.id.snowflake.compareTo(o2.id.snowflake)
+        })
+        return comparator.compare(this, other)
     }
 }
