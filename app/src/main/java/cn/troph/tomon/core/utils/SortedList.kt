@@ -1,14 +1,22 @@
 package cn.troph.tomon.core.utils
 
+import cn.troph.tomon.core.structures.Guild
+import okhttp3.internal.toImmutableList
 import java.util.*
 
-class OrderedList<T : Comparable<T>>(
+class SortedList<T : Comparable<T>>(
     l: List<T>? = null,
     private val comparator: Comparator<T> = Comparator { o1, o2 ->
         o1.compareTo(o2)
     }
 ) :
     Iterable<T> {
+
+    class Immutable<V>(private val list: List<V>): Iterable<V> {
+        override fun iterator(): Iterator<V> = list.iterator()
+        operator fun get(index: Int): V = list[index]
+        val size: Int = list.size
+    }
 
     private var list: LinkedList<T> = LinkedList(l ?: listOf())
 
@@ -17,6 +25,7 @@ class OrderedList<T : Comparable<T>>(
     }
 
     operator fun get(index: Int): T = list[index]
+    val size: Int = list.size
 
     fun safeGet(index: Int): T? = if (index < 0 || index >= list.size) null else get(index)
 
@@ -34,5 +43,7 @@ class OrderedList<T : Comparable<T>>(
     }
 
     override fun iterator(): Iterator<T> = list.iterator()
+
+    val immutable: Immutable<T> = Immutable(list)
 
 }
