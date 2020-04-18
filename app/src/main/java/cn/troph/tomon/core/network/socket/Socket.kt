@@ -23,7 +23,7 @@ enum class GatewayOp(val value: Int) {
     HEARTBEAT_ACK(4);
 
     companion object {
-        private val map = GatewayOp.values().associateBy(GatewayOp::value)
+        private val map = values().associateBy(GatewayOp::value)
         fun fromInt(type: Int) = map[type]
     }
 }
