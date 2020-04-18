@@ -10,6 +10,14 @@ import io.reactivex.rxjava3.core.Observable
 
 class Client {
 
+    private object HOLDER {
+        val INSTANCE = Client()
+    }
+
+    companion object {
+        val instance: Client by lazy { HOLDER.INSTANCE }
+    }
+
     val rest = Restful()
     val actions = ActionManager(this)
     val socket = Socket(this)
