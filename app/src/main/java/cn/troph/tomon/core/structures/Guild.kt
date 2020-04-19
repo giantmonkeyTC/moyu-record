@@ -87,8 +87,10 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
 
     override fun compareTo(other: Guild): Int {
         val comparator = Comparator<Guild> { o1, o2 ->
-            o1.joinedAt.compareTo(o2.joinedAt)
+            o1.position.compareTo(o2.position)
         }.then(Comparator { o1, o2 ->
+            o1.joinedAt.compareTo(o2.joinedAt)
+        }).then(Comparator { o1, o2 ->
             o1.id.snowflake.compareTo(o2.id.snowflake)
         })
         return comparator.compare(this, other)
