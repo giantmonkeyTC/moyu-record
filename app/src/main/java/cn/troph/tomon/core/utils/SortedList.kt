@@ -15,7 +15,7 @@ class SortedList<T : Comparable<T>>(
     class Immutable<V>(private val list: List<V>): Iterable<V> {
         override fun iterator(): Iterator<V> = list.iterator()
         operator fun get(index: Int): V = list[index]
-        val size: Int = list.size
+        val size get(): Int = list.size
     }
 
     private var list: LinkedList<T> = LinkedList(l ?: listOf())
