@@ -41,8 +41,11 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     val roles: RoleCollection = RoleCollection(client, this)
     val emojis: GuildEmojiCollection = GuildEmojiCollection(client, this)
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -75,6 +78,11 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.ONLY_MENTION
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     override fun compareTo(other: Guild): Int {

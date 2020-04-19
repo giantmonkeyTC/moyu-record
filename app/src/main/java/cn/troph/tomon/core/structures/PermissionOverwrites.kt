@@ -14,8 +14,11 @@ class PermissionOverwrites(client: Client, data: JsonObject) : Base(client, data
     var deny = 0
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -29,6 +32,11 @@ class PermissionOverwrites(client: Client, data: JsonObject) : Base(client, data
         if (data.has("deny")) {
             deny = data["deny"].asInt
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
 }

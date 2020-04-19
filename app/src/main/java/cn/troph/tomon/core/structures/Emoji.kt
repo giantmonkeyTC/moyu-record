@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Assets
+import cn.troph.tomon.core.utils.optBoolean
 import com.google.gson.JsonObject
 
 open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
@@ -15,8 +16,11 @@ open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
     var animated: Boolean = false
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -27,10 +31,18 @@ open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
             val user = client.users.add(data["user"].asJsonObject)
             userId = user?.id
         }
+        if (data.has("animated")) {
+            animated = data["animated"].optBoolean ?: false
+        }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val url get() = Assets.emojiURL(id, animated)
 
-    val user get() = client.users.get(userId ?: "")
+    val user get() = client.users[userId ?: ""]
 
 }

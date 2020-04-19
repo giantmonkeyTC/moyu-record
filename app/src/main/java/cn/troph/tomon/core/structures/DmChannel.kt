@@ -18,6 +18,10 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
     override var localAckMessageId: String? = null
         private set
 
+    init {
+        patchSelf(data)
+    }
+
     override val messages: MessageCollection = MessageCollection(client, this)
     override val typings: Collection<LocalDateTime> = Collection()
 
@@ -25,8 +29,7 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
     override val messageNotifications get() = getMessageNotifications()
     override val muted get() = getMuted()
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    private fun patchSelf(data: JsonObject) {
         if (data.has("recipients")) {
             val recipients = data["recipients"].asJsonArray
             if (recipients.size() > 0) {
@@ -43,5 +46,10 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
         }
     }
 
-    val recipient get() = client.users.get(recipientId)
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
+    }
+
+    val recipient get() = client.users[recipientId]
 }

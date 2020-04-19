@@ -18,8 +18,11 @@ class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
     var height: Int = 0
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -38,6 +41,11 @@ class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
         if (data.has("height")) {
             height = data["height"] as Int
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
 }

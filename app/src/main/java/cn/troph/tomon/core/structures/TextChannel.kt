@@ -28,8 +28,11 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
     override val messageNotifications get() = getMessageNotifications()
     override val muted get() = getMuted()
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("topic")) {
             topic = data["topic"].asString
         }
@@ -45,6 +48,11 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.DEFAULT
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
 }

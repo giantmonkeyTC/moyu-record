@@ -15,14 +15,9 @@ open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<An
 
     private var emitter: ObservableEmitter<Any>? = null
 
-    private val data: JsonObject = JsonObject()
+    private val data: JsonObject = data
 
     val raw: JsonObject get() = data.deepCopy()
-
-    init {
-        init(data)
-        patch(data)
-    }
 
     override fun subscribe(emitter: ObservableEmitter<Any>?) {
         this.emitter = emitter
@@ -40,10 +35,6 @@ open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<An
     fun update(data: Map<String, Any?>) {
         val obj = Gson().toJsonTree(data)
         update(obj.asJsonObject)
-    }
-
-    open fun init(data: JsonObject) {
-
     }
 
     open fun patch(data: JsonObject) {

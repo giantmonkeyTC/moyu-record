@@ -29,8 +29,11 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
 
     open val members: ChannelMemberCollection = ChannelMemberCollection(this)
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("name")) {
             name = data["name"].asString
         }
@@ -76,6 +79,11 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
 
             }
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val guild get(): Guild? = client.guilds.get(guildId ?: "")

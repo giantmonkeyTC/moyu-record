@@ -26,8 +26,11 @@ class Role(client: Client, data: JsonObject) : Base(client, data) {
     var mentionable: Boolean = true
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -54,7 +57,12 @@ class Role(client: Client, data: JsonObject) : Base(client, data) {
         }
     }
 
-    val guild get() = client.guilds.get(guildId)
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
+    }
+
+    val guild get() = client.guilds[guildId]
 
     val isEveryone get() = id == guild?.id
 

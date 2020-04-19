@@ -19,8 +19,11 @@ class GuildSettings(client: Client, data: JsonObject) : Base(client, data) {
     var channelOverrides: Collection<GuildSettingsOverride> = Collection()
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("guild_id")) {
             guildId = data["guild_id"].optString
         }
@@ -43,5 +46,10 @@ class GuildSettings(client: Client, data: JsonObject) : Base(client, data) {
                 channelOverrides[o["channel_id"].asString] = GuildSettingsOverride(client, o)
             }
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 }

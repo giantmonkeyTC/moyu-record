@@ -11,13 +11,21 @@ abstract class Channel(client: Client, data: JsonObject) : Base(client, data) {
     var type: ChannelType = ChannelType.TEXT
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
         if (data.has("type")) {
             type = ChannelType.fromInt(data["type"].asInt) ?: ChannelType.TEXT
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 }

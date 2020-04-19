@@ -17,8 +17,11 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
     var avatarURL: String = ""
         protected set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -37,6 +40,11 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         if (data.has("avatarURL")) {
             avatarURL = data["avatarURL"].asString
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val identifier: String get() = "$username#$discriminator"

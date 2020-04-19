@@ -22,8 +22,11 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
     var token: String? = null
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("token")) {
             token = data["token"].optString
         }
@@ -39,6 +42,11 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
         if (data.has("phone_verified")) {
             phoneVerified = data["phone_verified"].optBoolean ?: false
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     fun clear() {

@@ -20,8 +20,11 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
     var rawRoles: List<String> = listOf()
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("user")) {
             val user = client.users.add(data["user"].asJsonObject)
             id = user?.id ?: ""
@@ -44,9 +47,14 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
         }
     }
 
-    val user get() = client.users.get(id)
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
+    }
 
-    val guild get() = client.guilds.get(guildId)
+    val user get() = client.users[id]
+
+    val guild get() = client.guilds[guildId]
 
     val roles get() : GuildMemberRoleCollection = GuildMemberRoleCollection(this)
 

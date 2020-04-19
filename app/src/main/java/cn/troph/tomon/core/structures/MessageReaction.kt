@@ -16,8 +16,11 @@ class MessageReaction(client: Client, data: JsonObject, private val messageId: S
 
     private var emojiData: EmojiData = EmojiData()
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("emoji")) {
             emojiData = parseEmojiData(data["emoji"].asJsonObject)
         }
@@ -27,6 +30,11 @@ class MessageReaction(client: Client, data: JsonObject, private val messageId: S
         if (data.has("me")) {
             me = data["me"].asBoolean
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val id get() = getKey(emojiData)
@@ -40,7 +48,7 @@ class MessageReaction(client: Client, data: JsonObject, private val messageId: S
             }
         }
 
-    val emoji get() = if (isChar) null else client.emojis.get(emojiData.id!!)
+    val emoji get() = if (isChar) null else client.emojis[emojiData.id!!]
 
     val isChar get() = isChar(emojiData)
 

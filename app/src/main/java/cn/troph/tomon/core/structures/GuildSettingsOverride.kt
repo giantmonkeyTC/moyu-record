@@ -13,8 +13,11 @@ class GuildSettingsOverride(client: Client, data: JsonObject) : Base(client, dat
     var muted: Boolean = false
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("channel_id")) {
             channelId = data["channel_id"].asString
         }
@@ -26,6 +29,11 @@ class GuildSettingsOverride(client: Client, data: JsonObject) : Base(client, dat
         if (data.has("muted")) {
             muted = data["muted"].asBoolean
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
 }

@@ -10,8 +10,11 @@ class Presence(client: Client, data: JsonObject) : Base(client, data) {
     var status: String = ""
         private set
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    init {
+        patchSelf(data)
+    }
+
+    private fun patchSelf(data: JsonObject) {
         if (data.has("user_id")) {
             userId = data["user_id"].asString
         } else if (data.has("user")) {
@@ -21,6 +24,11 @@ class Presence(client: Client, data: JsonObject) : Base(client, data) {
         if (data.has("status")) {
             status = data["status"].asString
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val user get() = client.users.get(userId)

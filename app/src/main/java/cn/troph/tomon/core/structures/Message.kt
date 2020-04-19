@@ -32,16 +32,13 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
     var mentions: Collection<User> = Collection()
         private set
 
-    lateinit var reactions: MessageReactionCollection
-        private set
+    val reactions: MessageReactionCollection = MessageReactionCollection(client, this)
 
-    override fun init(data: JsonObject) {
-        super.init(data)
-        reactions = MessageReactionCollection(client, this)
+    init {
+        patchSelf(data)
     }
 
-    override fun patch(data: JsonObject) {
-        super.patch(data)
+    private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -97,6 +94,11 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
         if (data.has("pending")) {
             pending = data["pending"].asBoolean
         }
+    }
+
+    override fun patch(data: JsonObject) {
+        super.patch(data)
+        patchSelf(data)
     }
 
     val author: User?
