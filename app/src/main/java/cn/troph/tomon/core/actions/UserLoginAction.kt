@@ -12,7 +12,7 @@ class UserLoginAction(client: Client) : Action<User>(client) {
         val user = client.users.add(obj)
         client.me.update(obj)
         client.preferences.edit {
-            this.putString("token", client.token)
+            putString("token", client.token)
         }
         if (user != null) {
             client.eventBus.postEvent(UserLoginEvent())

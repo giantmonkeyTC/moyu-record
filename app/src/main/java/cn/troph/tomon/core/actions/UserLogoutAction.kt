@@ -12,7 +12,7 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
         client.channels.clear()
         client.me.clear()
         client.preferences.edit {
-            this.remove("token")
+            remove("token")
         }
         client.eventBus.postEvent(UserLogoutEvent())
         return null
