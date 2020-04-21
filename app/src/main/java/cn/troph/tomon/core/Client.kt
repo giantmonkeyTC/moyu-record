@@ -1,5 +1,8 @@
 package cn.troph.tomon.core
 
+import android.app.Application
+import android.content.SharedPreferences
+import android.content.Context
 import cn.troph.tomon.core.actions.ActionManager
 import cn.troph.tomon.core.collections.*
 import cn.troph.tomon.core.network.Restful
@@ -15,13 +18,15 @@ class Client {
     }
 
     companion object {
-        val instance: Client by lazy { HOLDER.INSTANCE }
+        val global: Client by lazy { HOLDER.INSTANCE }
     }
 
     val rest = Restful()
     val actions = ActionManager(this)
     val socket = Socket(this)
     val eventBus = RxBus()
+    lateinit var preferences: SharedPreferences
+        private set
 
     val me = Me(this)
     val users = UserCollection(this)
@@ -34,10 +39,17 @@ class Client {
 
     val token get() = me.token ?: ""
 
+    fun initialize(app: Application) {
+        preferences = app.getSharedPreferences("tomon", Context.MODE_PRIVATE)
+        val token = preferences.getString("token", null)
+        if (token != null) {
+            me.update("token", token)
+        }
+    }
+
     fun login(
         emailOrPhone: String? = null,
-        password: String? = null,
-        token: String? = null
+        password: String? = null
     ): Observable<Void> {
         return me.login(emailOrPhone = emailOrPhone, password = password, token = token)
             .flatMap { _ ->

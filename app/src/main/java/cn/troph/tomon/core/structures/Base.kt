@@ -33,6 +33,10 @@ open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<An
         update(obj.asJsonObject)
     }
 
+    fun update(field: String, value: Any?) {
+        update(mapOf(field to value))
+    }
+
     open fun patch(data: JsonObject) {
         this.data.merge(data, GsonConflictStrategy.PREFER_SECOND_OBJ)
     }

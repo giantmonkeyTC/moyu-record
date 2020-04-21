@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.actions
 
+import androidx.core.content.edit
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.UserLogoutEvent
 import com.google.gson.JsonElement
@@ -10,7 +11,9 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
         client.guilds.clear()
         client.channels.clear()
         client.me.clear()
-        //TODO CLEAR TOKEN
+        client.preferences.edit {
+            this.remove("token")
+        }
         client.eventBus.postEvent(UserLogoutEvent())
         return null
     }
