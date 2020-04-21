@@ -24,12 +24,8 @@ open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<An
     }
 
     fun update(data: JsonObject) {
-        runBlocking {
-            withContext(Context.patch) {
-                patch(data)
-            }
-            emitter?.onNext(this)
-        }
+        patch(data)
+        emitter?.onNext(this)
     }
 
     fun update(data: Map<String, Any?>) {
