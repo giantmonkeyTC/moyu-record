@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#423981</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorBackground">#242424</color>
-    <color name="colorNavigationBackground">#1e1e1e</color>
-    <color name="colorNavigationText">#FFFFFF</color>
-    <color name="colorBrand">#423981</color>
-    <color name="colorWhite">#FFFFFF</color>
+    <color name="primary">#423981</color>
+    <color name="primaryLight">#7A74A6</color>
+    <color name="primaryLighter">#B3B0CD</color>
+    <color name="primaryDark">#2E285A</color>
+    <color name="primaryDarker">#1A1734</color>
+    <color name="accent">#D81B60</color>
+    <color name="activityBackground">#242424</color>
+    <color name="actionBarBackground">#1E1E1E</color>
+    <color name="actionBarText">#FFFFFF</color>
+    <color name="brand">#423981</color>
+    <color name="white">#FFFFFF</color>
+    <color name="whiteAlpha70">#B3FFFFFF</color>
 </resources>

@@ -25,7 +25,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.RegisterActivity" />
-        <activity android:name=".ui.activities.LoginActivity" />
+        <activity
+            android:name=".ui.activities.LoginActivity"
+            android:label="@string/login_title" />
         <activity
             android:name=".ui.activities.ChatActivity"
             android:label="ChatActivity"
