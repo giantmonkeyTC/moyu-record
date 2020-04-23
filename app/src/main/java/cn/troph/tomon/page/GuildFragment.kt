@@ -1,31 +1,41 @@
 package cn.troph.tomon.page
 
-import android.app.Activity
-import android.gesture.Gesture
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
+import kotlinx.android.synthetic.main.fragment_guild.*
 
-class GuildFragment : Fragment(),GestureDetector.OnGestureListener{
+class GuildFragment : Fragment(), GestureDetector.OnGestureListener {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view :View = inflater.inflate(R.layout.fragment_guild, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_guild, container, false)
         view.setOnTouchListener(View.OnTouchListener(
-            function = fun(v:View, event: MotionEvent):Boolean{
-                if(event.action == MotionEvent.ACTION_DOWN){
-                    Toast.makeText(context,"action down",Toast.LENGTH_SHORT).show()
+            function = fun(v: View, event: MotionEvent): Boolean {
+                if (event.action == MotionEvent.ACTION_DOWN) {
+                    Toast.makeText(context, "action down", Toast.LENGTH_SHORT).show()
                 }
-               return true
+                return true
             }
         ))
         // Inflate the layout for this fragment
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        listView.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = GuildListAdapter()
+            visibility = View.VISIBLE
+        }
     }
 
     override fun onShowPress(e: MotionEvent?) {
@@ -46,34 +56,32 @@ class GuildFragment : Fragment(),GestureDetector.OnGestureListener{
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        var result : Boolean = false
-        var diffY : Float = moveEvent!!.getY() - downEvent!!.getY()
-        var diffX : Float = moveEvent!!.getX() - downEvent!!.getX()
-        if (Math.abs(diffX)>Math.abs(diffY)){
+        var result: Boolean = false
+        var diffY: Float = moveEvent!!.getY() - downEvent!!.getY()
+        var diffX: Float = moveEvent!!.getX() - downEvent!!.getX()
+        if (Math.abs(diffX) > Math.abs(diffY)) {
             //left or right
-            val SWIPE_THRESHOLD : Int = 100
+            val SWIPE_THRESHOLD: Int = 100
             val VELOCITY_THRESHOLD: Int = 100
-            if(Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX)> VELOCITY_THRESHOLD){
-                if (diffX>0)
+            if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > VELOCITY_THRESHOLD) {
+                if (diffX > 0)
                     onSwipeRight()
                 else onSwipeLeft()
                 result = true
             }
-        }
-        else{
+        } else {
             //up or down
         }
-       return result
+        return result
     }
 
     private fun onSwipeLeft() {
-       Toast.makeText(context,"swipe left",Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "swipe left", Toast.LENGTH_LONG).show()
     }
 
     private fun onSwipeRight() {
-        Toast.makeText(context,"swipe right ",Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "swipe right ", Toast.LENGTH_LONG).show()
     }
-
 
 
     override fun onScroll(

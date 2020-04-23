@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Tomon</string>
     <string name="action_settings">Settings</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_id_hint">邮箱/手机</string>
+    <string name="login_password_hint">密码</string>
+    <string name="login_button">登录</string>
+    <string name="login_title">登录Tomon</string>
 </resources>

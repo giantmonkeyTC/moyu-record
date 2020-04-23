@@ -24,17 +24,17 @@ open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<An
     }
 
     fun update(data: JsonObject) {
-        runBlocking {
-            withContext(Context.patch) {
-                patch(data)
-            }
-            emitter?.onNext(this)
-        }
+        patch(data)
+        emitter?.onNext(this)
     }
 
     fun update(data: Map<String, Any?>) {
         val obj = Gson().toJsonTree(data)
         update(obj.asJsonObject)
+    }
+
+    fun update(field: String, value: Any?) {
+        update(mapOf(field to value))
     }
 
     open fun patch(data: JsonObject) {
