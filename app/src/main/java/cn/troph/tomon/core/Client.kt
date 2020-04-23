@@ -37,7 +37,8 @@ class Client {
     val presences = PresenceCollection(this)
     val guildSettings = GuildSettingsCollection(this)
 
-    val token get() = me.token ?: ""
+    val token get() = me.token
+    val auth get() = "Bearer ${token ?: ""}"
 
     fun initialize(app: Application) {
         preferences = app.getSharedPreferences("tomon", Context.MODE_PRIVATE)
