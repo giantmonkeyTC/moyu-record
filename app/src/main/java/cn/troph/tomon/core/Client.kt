@@ -51,7 +51,7 @@ class Client {
         emailOrPhone: String? = null,
         password: String? = null
     ): Observable<Void> {
-        return me.login(emailOrPhone = emailOrPhone, password = password, token = token)
+        return me.login(emailOrPhone = emailOrPhone, password = password, token = me.token)
             .flatMap { _ ->
                 socket.open()
                 return@flatMap Observable.empty<Void>()
