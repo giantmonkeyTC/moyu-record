@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.page.GuildFragment
 import cn.troph.tomon.page.MemberFragment
 import cn.troph.tomon.page.MessageFragment
@@ -13,6 +14,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.android.synthetic.main.content_main.*
+import kotlin.concurrent.thread
 
 private const val DEBUG_TAG = "Gestures"
 
@@ -54,7 +56,8 @@ class MainActivity : AppCompatActivity() {
             emailOrPhone = "qiang.l.x@gmail.com",
             password = "1wq23re45ty67ui8"
         ).observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ user -> println(user) }, { error -> println(error) })
+            .subscribe({ user -> println(user)
+            }, { error -> println(error) })
 
 //        Observable.timer(5, TimeUnit.SECONDS).flatMap {
 //            return@flatMap Observable.create<String> { emitter ->

@@ -1,15 +1,21 @@
 package cn.troph.tomon.page
 
-import android.app.Activity
-import android.gesture.Gesture
+
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.Restful
+import cn.troph.tomon.core.utils.Url
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.android.synthetic.main.bottom_sheet_guild.view.*
+import kotlinx.android.synthetic.main.fragment_guild.*
 
-class GuildFragment : Fragment(),GestureDetector.OnGestureListener{
+class GuildFragment : Fragment(){
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,65 +34,30 @@ class GuildFragment : Fragment(),GestureDetector.OnGestureListener{
         return view
     }
 
-    override fun onShowPress(e: MotionEvent?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        guildFab.setOnClickListener{callBottomSheet()}
     }
-
-    override fun onSingleTapUp(e: MotionEvent?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onDown(e: MotionEvent?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onFling(
-        downEvent: MotionEvent?,
-        moveEvent: MotionEvent?,
-        velocityX: Float,
-        velocityY: Float
-    ): Boolean {
-        var result : Boolean = false
-        var diffY : Float = moveEvent!!.getY() - downEvent!!.getY()
-        var diffX : Float = moveEvent!!.getX() - downEvent!!.getX()
-        if (Math.abs(diffX)>Math.abs(diffY)){
-            //left or right
-            val SWIPE_THRESHOLD : Int = 100
-            val VELOCITY_THRESHOLD: Int = 100
-            if(Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX)> VELOCITY_THRESHOLD){
-                if (diffX>0)
-                    onSwipeRight()
-                else onSwipeLeft()
-                result = true
-            }
+    private fun callBottomSheet(){
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_guild, null)
+        val dialog = BottomSheetDialog(this.requireContext())
+        dialog.setContentView(view)
+        view.cancel_button.setOnClickListener {
+            dialog.dismiss()
+            println("12423462356")
         }
-        else{
-            //up or down
+        val rest = Restful()
+        view.join_guild_button.setOnClickListener {
+            println("124346")
+            println(Client.global.token == "")
+            println(if (Client.global.token == "") Client.global.token else "there is no token!!!")
+            rest.inviteService.join(
+                Url.parseInviteCode("https://beta.tomon.co/invite/2AGdNF"),
+                token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc3ODIyNzQzNjQyMzc4MjQwIiwiaWF0IjoxNTc4MzAyNTA5fQ.ArVvMMFNLP3nxm60aZRWyjKBgu6tVdoe8oGEwqlaKdo"
+            )
+//            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/2AGdNF"))
         }
-       return result
-    }
-
-    private fun onSwipeLeft() {
-       Toast.makeText(context,"swipe left",Toast.LENGTH_LONG).show()
-    }
-
-    private fun onSwipeRight() {
-        Toast.makeText(context,"swipe right ",Toast.LENGTH_LONG).show()
-    }
-
-
-
-    override fun onScroll(
-        e1: MotionEvent?,
-        e2: MotionEvent?,
-        distanceX: Float,
-        distanceY: Float
-    ): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onLongPress(e: MotionEvent?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        dialog.show()
     }
 
 

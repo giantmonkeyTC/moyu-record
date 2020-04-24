@@ -3,7 +3,7 @@ package cn.troph.tomon.core.network
 import cn.troph.tomon.core.network.services.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import hu.akarnokd.rxjava3.retrofit.*;
+import hu.akarnokd.rxjava3.retrofit.*
 
 class Restful {
 
@@ -20,4 +20,5 @@ class Restful {
     val roleService: RoleService = retrofit.create(RoleService::class.java)
     val guildMemberService: GuildMemberService = retrofit.create(GuildMemberService::class.java)
     val guildEmojiService: GuildEmojiService = retrofit.create(GuildEmojiService::class.java)
+    val inviteService: InviteService = retrofit.create(InviteService::class.java)
 }

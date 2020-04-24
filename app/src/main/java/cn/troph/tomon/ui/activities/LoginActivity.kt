@@ -8,6 +8,11 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.Restful
+import cn.troph.tomon.core.utils.Url
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -18,7 +23,11 @@ class LoginActivity : AppCompatActivity() {
         view.setOnClickListener {
             closeKeyboard()
         }
+        button.setOnClickListener{
+        }
     }
+
+
 
     fun closeKeyboard() {
         val view = currentFocus
