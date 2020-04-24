@@ -86,10 +86,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        val view = findViewById<ConstraintLayout>(R.id.login_wrapper)
-        val union = findViewById<EditText>(R.id.login_id_input)
-        val password = findViewById<EditText>(R.id.login_password_input)
-        val button = findViewById<Button>(R.id.login_button)
+        val view = findViewById<ConstraintLayout>(R.id.layout_root)
+        val union = findViewById<EditText>(R.id.input_union_id)
+        val password = findViewById<EditText>(R.id.input_password)
+        val button = findViewById<Button>(R.id.button_login)
         bindProgressButton(button)
         button.attachTextChangeAnimator()
 
