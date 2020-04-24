@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             onError = { it.printStackTrace() }
         )
         client.login(
-            emailOrPhone = "qiang.l.x@gmail.com",
+            unionId = "qiang.l.x@gmail.com",
             password = "1wq23re45ty67ui8"
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ user -> println(user) }, { error -> println(error) })

@@ -15,9 +15,9 @@ class EntryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_entry)
         Client.global
             .login()
-            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                println("login")
+                gotoChat()
             }, {
                 gotoLogin()
             })
@@ -35,8 +35,16 @@ class EntryActivity : AppCompatActivity() {
         )
     }
 
-    private fun gotoRegister() {
-        
+    private fun gotoChat() {
+        val intent = Intent(this, ChatActivity::class.java)
+        startActivity(
+            intent,
+            ActivityOptions.makeCustomAnimation(
+                this,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            ).toBundle()
+        )
     }
 
 }

@@ -8,6 +8,7 @@ import retrofit2.http.POST
 interface AuthService {
 
     data class LoginRequest(
+        val full_name: String? = null,
         val email: String? = null,
         val phone: String? = null,
         val password: String? = null,
