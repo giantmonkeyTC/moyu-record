@@ -71,7 +71,7 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
         token: String? = null
     ): Observable<User?> {
         var request = when {
-            token != null -> AuthService.LoginRequest(token = token)
+            token?.isNotEmpty() == true -> AuthService.LoginRequest(token = token)
             Validator.isEmail(emailOrPhone) -> AuthService.LoginRequest(
                 email = emailOrPhone,
                 password = password

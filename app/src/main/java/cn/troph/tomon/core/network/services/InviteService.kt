@@ -10,6 +10,6 @@ interface InviteService {
     @POST("invites/{code}")
     fun join(
         @Path("code") code: String,
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String?
     ): Observable<JsonObject>
 }

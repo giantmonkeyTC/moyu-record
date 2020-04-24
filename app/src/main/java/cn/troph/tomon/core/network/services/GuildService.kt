@@ -13,7 +13,7 @@ interface GuildService {
     @GET("guilds/{id}")
     fun getGuild(
         @Path("id") id: String,
-        @Header("Authorization") token: String?
+        @Header("Authorization") token: String
     ): Observable<JsonObject>;
 
     data class CreateGuildRequest(

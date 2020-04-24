@@ -37,7 +37,8 @@ class Client {
     val presences = PresenceCollection(this)
     val guildSettings = GuildSettingsCollection(this)
 
-    val token get() = me.token ?: ""
+    val token get() = me.token
+    val auth get() = "Bearer ${token ?: ""}"
 
     fun initialize(app: Application) {
         preferences = app.getSharedPreferences("tomon", Context.MODE_PRIVATE)
@@ -51,7 +52,7 @@ class Client {
         emailOrPhone: String? = null,
         password: String? = null
     ): Observable<Void> {
-        return me.login(emailOrPhone = emailOrPhone, password = password, token = token)
+        return me.login(emailOrPhone = emailOrPhone, password = password, token = me.token)
             .flatMap { _ ->
                 socket.open()
                 return@flatMap Observable.empty<Void>()

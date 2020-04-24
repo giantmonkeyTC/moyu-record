@@ -33,7 +33,7 @@ class GuildCollection(client: Client) :
     }
 
     fun fetch(sync: Boolean = true): Observable<List<Guild>?> {
-        return client.rest.guildService.getGuilds(client.token).subscribeOn(Schedulers.io()).map {
+        return client.rest.guildService.getGuilds(client.auth).subscribeOn(Schedulers.io()).map {
             return@map client.actions.guildFetch(it)
         }
     }

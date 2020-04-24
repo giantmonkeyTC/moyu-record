@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Tomon</string>
     <string name="action_settings">Settings</string>
-    <string name="login_identifier_hint">邮箱/手机</string>
+    <string name="login_id_hint">邮箱/手机</string>
     <string name="login_password_hint">密码</string>
     <string name="login_button">登录</string>
     <string name="login_title">登录Tomon</string>
