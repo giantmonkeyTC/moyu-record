@@ -155,6 +155,7 @@ class LoginActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
+        finish()
     }
 
 }

@@ -33,6 +33,7 @@ class EntryActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
+        finish()
     }
 
     private fun gotoChat() {
@@ -45,6 +46,7 @@ class EntryActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
+        finish()
     }
 
 }
