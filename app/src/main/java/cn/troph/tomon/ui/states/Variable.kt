@@ -8,5 +8,5 @@ class Variable<T>(private val defaultValue: T) {
             field = value
             observable.onNext(value)
         }
-    private val observable = BehaviorSubject.createDefault(value)
+    val observable = BehaviorSubject.createDefault(value)
 }

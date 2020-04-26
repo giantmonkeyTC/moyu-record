@@ -44,9 +44,9 @@ open class BaseCollection<T : Base>(val client: Client) :
         return entry
     }
 
-    override fun set(key: String, value: T): T? {
+    override operator fun set(key: String, value: T): T? {
         val entry = super.set(key, value)
-        if (entry != null) {
+        if (value != null) {
             emitter?.onNext(Event(EventType.SET, entry))
         }
         return entry
