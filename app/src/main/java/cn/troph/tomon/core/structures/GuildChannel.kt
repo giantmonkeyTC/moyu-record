@@ -4,11 +4,15 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.ChannelMemberCollection
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optString
+import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import java.util.*
+import kotlin.Comparator
 
-open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data) {
+open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data),
+    Comparable<GuildChannel> {
 
     data class MemberPermissionOverwrites(
         val everyone: PermissionOverwrites? = null,
@@ -176,5 +180,37 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
             }
             return indent
         }
+
+    fun comparePositionTo(other: GuildChannel): Int {
+        val comparator = Comparator<GuildChannel> { o1, o2 ->
+            o1.position.compareTo(o2.position)
+        }.then(Comparator { o1, o2 ->
+            o1.id.snowflake.compareTo(o2.id.snowflake)
+        })
+        return comparator.compare(this, other)
+    }
+
+    val path: List<GuildChannel> get() {
+        val list = LinkedList<GuildChannel>()
+        var cursor: GuildChannel? = this
+        while (cursor != null) {
+            list.push(cursor)
+            cursor = cursor.parent
+        }
+        return list
+    }
+
+    override fun compareTo(other: GuildChannel): Int {
+        val path = this.path
+        val otherPath = other.path
+        val length = path.size.coerceAtMost(otherPath.size)
+        for (i in 0..length) {
+            val comp = path[i].comparePositionTo(otherPath[i])
+            if (comp != 0) {
+                return comp
+            }
+        }
+        return 0
+    }
 
 }

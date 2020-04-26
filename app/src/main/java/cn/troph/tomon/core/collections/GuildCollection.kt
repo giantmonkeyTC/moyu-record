@@ -10,7 +10,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class GuildCollection(client: Client) :
     BaseCollection<Guild>(client) {
 
-    private val sortedList: SortedList<Guild> = SortedList()
+    private val sortedList: SortedList<Guild> =
+        SortedList(Comparator { o1, o2 -> o1.compareTo(o2) })
 
     override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Guild? {
         val ins = super.add(data, identify)
