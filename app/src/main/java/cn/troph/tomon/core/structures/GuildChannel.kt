@@ -204,7 +204,7 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         val path = this.path
         val otherPath = other.path
         val length = path.size.coerceAtMost(otherPath.size)
-        for (i in 0..length) {
+        for (i in 0 until length) {
             val comp = path[i].comparePositionTo(otherPath[i])
             if (comp != 0) {
                 return comp
