@@ -15,10 +15,11 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_channel_selector"
-        android:name="cn.troph.tomon.ui.chat.fragments.GuildSelectorFragment"
+        android:name="cn.troph.tomon.ui.chat.fragments.ChannelSelectorFragment"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true" />
 
     <View
         android:layout_width="200dp"
