@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 
 enum class EventType {
-    ADD,
+    SET,
     REMOVE,
     CLEAR
 }
@@ -40,7 +40,14 @@ open class BaseCollection<T : Base>(val client: Client) :
         val entry = instantiate(data);
         if (entry != null) {
             put(id, entry)
-            emitter?.onNext(Event(EventType.ADD, entry))
+        }
+        return entry
+    }
+
+    override fun set(key: String, value: T): T? {
+        val entry = super.set(key, value)
+        if (entry != null) {
+            emitter?.onNext(Event(EventType.SET, entry))
         }
         return entry
     }
