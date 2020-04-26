@@ -27,12 +27,10 @@ class SortedList<T>(
 
     fun add(value: T) {
         val invertedInsertionPoint = list.binarySearch(value, comparator)
-        var actualInsertionPoint = invertedInsertionPoint
         if (invertedInsertionPoint < 0) {
-            actualInsertionPoint = -(invertedInsertionPoint + 1)
+            val actualInsertionPoint = -(invertedInsertionPoint + 1)
+            list.add(actualInsertionPoint, value)
         }
-        println(actualInsertionPoint)
-        list.add(actualInsertionPoint, value)
     }
 
     fun remove(value: T) {
