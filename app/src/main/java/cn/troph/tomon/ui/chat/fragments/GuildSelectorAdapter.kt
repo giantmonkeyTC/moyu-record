@@ -9,13 +9,18 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.Event
 import cn.troph.tomon.core.structures.Guild
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.Avatar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 
-class GuildSelectorAdapter: RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
+typealias GuildClickListener = (guildId: String?) -> Unit
 
-    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
+
+    class ViewHolder(itemView: View, private val listener: GuildClickListener?) :
+        RecyclerView.ViewHolder(itemView) {
 
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var avatar: Avatar = itemView.findViewById(R.id.image_avatar)
@@ -23,6 +28,9 @@ class GuildSelectorAdapter: RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder
         fun bind(guild: Guild) {
             text.text = guild.name
             avatar.url = guild.iconURL
+            itemView.setOnClickListener {
+                listener?.let { it1 -> it1(guild.id) }
+            }
         }
     }
 
@@ -37,8 +45,12 @@ class GuildSelectorAdapter: RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val inflatedView = layoutInflater.inflate(R.layout.widget_guild_selector_item, parent, false)
-        return ViewHolder(inflatedView)
+        val inflatedView =
+            layoutInflater.inflate(R.layout.widget_guild_selector_item, parent, false)
+        return ViewHolder(inflatedView) {
+            val old = AppState.global.channelSelection.value
+            AppState.global.channelSelection.value = ChannelSelection(guildId = it, channelId = old.channelId)
+        }
     }
 
     override fun getItemCount(): Int = Client.global.guilds.list.size

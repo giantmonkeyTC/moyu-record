@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 
 class GuildSelectorFragment : Fragment() {
 
