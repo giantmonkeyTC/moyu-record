@@ -22,8 +22,8 @@ class GuildChannelCollection(client: Client, val guild: Guild) :
 
     override fun set(key: String, value: GuildChannel): GuildChannel? {
         val ins = super.set(key, value)
-        if (ins != null) {
-            sortedList.add(ins)
+        if (value != null) {
+            sortedList.add(value)
         }
         return ins
     }
