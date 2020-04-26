@@ -14,7 +14,7 @@ class SortedList<T>(
         val size get(): Int = list.size
     }
 
-    private var list: LinkedList<T> = LinkedList(l ?: listOf())
+    private var list: MutableList<T> = l?.toMutableList() ?: mutableListOf()
 
     init {
         list.sortedWith(comparator)
@@ -27,7 +27,11 @@ class SortedList<T>(
 
     fun add(value: T) {
         val invertedInsertionPoint = list.binarySearch(value, comparator)
-        val actualInsertionPoint = -(invertedInsertionPoint + 1)
+        var actualInsertionPoint = invertedInsertionPoint
+        if (invertedInsertionPoint < 0) {
+            actualInsertionPoint = -(invertedInsertionPoint + 1)
+        }
+        println(actualInsertionPoint)
         list.add(actualInsertionPoint, value)
     }
 
