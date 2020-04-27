@@ -44,6 +44,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         image.setImageResource(R.drawable.ic_channel_voice)
                     }
                 }
+                ChannelType.CATEGORY -> {
+                    image.setImageResource(R.drawable.ic_category_unfolding)
+                }
                 else -> {
                     image.setImageDrawable(null)
                 }
@@ -65,7 +68,8 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         set(value) {
             field = value
             observable = if (value != null) {
-                Observable.create(Client.global.guilds[guildId!!]?.channels)
+                val channels = Client.global.guilds[value]?.channels
+                if (channels != null) Observable.create(Client.global.guilds[value]?.channels) else null
             } else {
                 null
             }
