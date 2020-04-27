@@ -13,5 +13,6 @@ class AppState {
     }
 
     val channelSelection: Variable<ChannelSelection> = Variable(ChannelSelection())
+    val channelCollapses: Variable<Map<String, Boolean>> = Variable(mapOf())
 
 }

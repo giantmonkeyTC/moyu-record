@@ -145,8 +145,8 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         if (role.permissions.has(Permissions.ADMINISTRATOR)) {
             return Permissions.all()
         }
-        val everyoneOverwrites = permissionOverwrites.get(guild!!.id)
-        val roleOverwrites = permissionOverwrites.get(role.id)
+        val everyoneOverwrites = permissionOverwrites[guild!!.id]
+        val roleOverwrites = permissionOverwrites[role.id]
         return role.permissions
             .minus(everyoneOverwrites?.deny)
             .plus(everyoneOverwrites?.allow)
@@ -170,18 +170,26 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         client.actions.channelUpdate(JsonParser.parseString("""{"id": id, "permission_overwrites": overwrites}""").asJsonObject)
     }
 
+    val isPrivate: Boolean get() {
+        if (guildId != null) {
+            val everyoneOverwrite = permissionOverwrites[guildId!!]
+            return (everyoneOverwrite?.deny ?: 0L and Permissions.VIEW_CHANNEL) != 0L
+        }
+        return false
+    }
+
     val indent
         get() : Int {
             var indent: Int = 0
             var cursor: GuildChannel? = parent
             while (cursor != null) {
-                cursor = cursor.parent!!
+                cursor = cursor.parent
                 indent++
             }
             return indent
         }
 
-    fun comparePositionTo(other: GuildChannel): Int {
+    private fun comparePositionTo(other: GuildChannel): Int {
         val comparator = Comparator<GuildChannel> { o1, o2 ->
             o1.position.compareTo(o2.position)
         }.then(Comparator { o1, o2 ->
@@ -210,7 +218,7 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
                 return comp
             }
         }
-        return 0
+        return path.size.compareTo(otherPath.size)
     }
 
 }
