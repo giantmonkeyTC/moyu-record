@@ -11,7 +11,8 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe
 enum class EventType {
     SET,
     REMOVE,
-    CLEAR
+    CLEAR,
+    INIT
 }
 
 data class Event<T>(val type: EventType, val obj: T? = null)
@@ -23,6 +24,7 @@ open class BaseCollection<T : Base>(val client: Client) :
 
     override fun subscribe(emitter: ObservableEmitter<Event<T>>?) {
         this.emitter = emitter
+        emitter?.onNext(Event(EventType.INIT))
     }
 
     open fun add(data: JsonObject, identify: ((d: JsonObject) -> String)? = null): T? {

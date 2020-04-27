@@ -11,16 +11,17 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<Any> {
+open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<Base> {
 
-    private var emitter: ObservableEmitter<Any>? = null
+    private var emitter: ObservableEmitter<Base>? = null
 
     private val data: JsonObject = data
 
     val raw: JsonObject get() = data.deepCopy()
 
-    override fun subscribe(emitter: ObservableEmitter<Any>?) {
+    override fun subscribe(emitter: ObservableEmitter<Base>?) {
         this.emitter = emitter
+        emitter?.onNext(this)
     }
 
     fun update(data: JsonObject) {
