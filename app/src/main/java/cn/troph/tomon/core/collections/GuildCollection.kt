@@ -41,8 +41,9 @@ class GuildCollection(client: Client) :
     val list: SortedList.Immutable<Guild> = sortedList.immutable
 
     fun join(code: String): Observable<Guild?> {
-        return client.rest.inviteService.join(code, client.token).subscribeOn(Schedulers.io()).map {
-            return@map client.actions.guildCreate(it)
+        return client.rest.inviteService.join(code, client.auth).subscribeOn(Schedulers.io()).map {
+            println(it)
+            client.actions.guildCreate(it)
         }
     }
 

@@ -1,6 +1,7 @@
 package cn.troph.tomon
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -12,22 +13,42 @@ import cn.troph.tomon.page.MemberFragment
 import cn.troph.tomon.page.MessageFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.exceptions.UndeliverableException
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.android.synthetic.main.content_main.*
+import java.io.IOException
+import java.net.SocketException
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        val adapter = ViewPagerAdapter(supportFragmentManager)
-//        adapter.addFragment(GuildFragment())
-//        adapter.addFragment(MessageFragment())
-//        adapter.addFragment(MemberFragment())
-//        viewPager.adapter = adapter
-//        viewPager.currentItem = 1
+        val adapter = ViewPagerAdapter(supportFragmentManager)
+        adapter.addFragment(GuildFragment())
+        adapter.addFragment(MessageFragment())
+        adapter.addFragment(MemberFragment())
+        viewPager.adapter = adapter
+        RxJavaPlugins.setErrorHandler{e ->
+            if (e is UndeliverableException) {
+                println(e)
+                return@setErrorHandler
+            }
+            if ((e is IOException) || (e is SocketException)) {
+                // fine, irrelevant network problem or API that throws on cancellation
+                return@setErrorHandler
+            }
+            if (e is InterruptedException) {
+                // fine, some blocking code was interrupted by a dispose call
+                return@setErrorHandler;
+            }
+            Log.println(Log.ERROR,"NOPE","Undeliverable exception received, not sure what to do")
+        }
+        viewPager.currentItem = 1
 
         val client = Client.global
+        client.me.clear()
         Observable.create(client.users).subscribeBy(
             onNext = { event ->
                 println("user update")
@@ -49,8 +70,8 @@ class MainActivity : AppCompatActivity() {
             onError = { it.printStackTrace() }
         )
         client.login(
-            emailOrPhone = "qiang.l.x@gmail.com",
-            password = "1wq23re45ty67ui8"
+            emailOrPhone = "18516901224",
+            password = "12345678"
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribe({ user -> println(user) }, { error -> println(error) })
 

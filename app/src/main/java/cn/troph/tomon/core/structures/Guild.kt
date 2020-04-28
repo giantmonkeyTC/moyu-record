@@ -7,8 +7,10 @@ import cn.troph.tomon.core.collections.GuildEmojiCollection
 import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
 import cn.troph.tomon.core.utils.Converter
+import cn.troph.tomon.core.utils.optInt
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
@@ -59,7 +61,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             iconURL = data["icon_url"].optString
         }
         if (data.has("position")) {
-            position = data["position"].asInt
+            position = data["position"].optInt ?: 0
         }
         if (data.has("joined_at")) {
             joinedAt = Converter.toDate(data["joined_at"].asString)

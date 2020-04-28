@@ -19,7 +19,6 @@ class GuildListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private var textView: TextView = itemView.findViewById(R.id.guild_item_text)
     private var imageView: ImageView = itemView.findViewById(R.id.guild_item_image)
-
     fun bind(guild: Guild) {
         textView.text = guild.name
         Glide.with(itemView).load(guild.iconURL).into(imageView)
@@ -36,7 +35,6 @@ class GuildListAdapter : RecyclerView.Adapter<GuildListViewHolder>() {
             notifyDataSetChanged()
         }
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuildListViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val inflatedView = layoutInflater.inflate(R.layout.guild_item, parent, false)

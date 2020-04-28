@@ -11,7 +11,7 @@ class GuildCreateAction(client: Client) : Action<Guild>(client) {
         val obj = data!!.asJsonObject
         val existing = client.guilds.has(obj["id"].asString)
         val guild = client.guilds.add(obj)
-        if (existing == null && guild != null) {
+        if (!existing && guild != null) {
             client.eventBus.postEvent(GuildCreateEvent(guild))
         }
         return guild
