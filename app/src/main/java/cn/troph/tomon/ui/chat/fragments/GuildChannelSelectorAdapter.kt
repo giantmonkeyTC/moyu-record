@@ -16,19 +16,31 @@ import cn.troph.tomon.core.structures.CategoryChannel
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
+
+    companion object {
+        const val TYPE_CHANNEL = 0
+        const val TYPE_CATEGORY = 1
+        const val TYPE_EMPTY = 2
+    }
+
 
     class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
+        var disposable: Disposable? = null
+        var channel: GuildChannel? = null
 
         fun bind(channel: GuildChannel) {
-            text.text = channel.name
+            println("on root bind")
+            itemView.isActivated = AppState.global.channelSelection.value.channelId == channel.id
             when (channel.type) {
                 ChannelType.TEXT -> {
                     if (channel.isPrivate) {
@@ -45,7 +57,12 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     }
                 }
                 ChannelType.CATEGORY -> {
-                    image.setImageResource(R.drawable.ic_category_unfolding)
+                    val collapse = AppState.global.channelIsCollapsed(channel.id)
+                    if (collapse) {
+                        image.setImageResource(R.drawable.ic_category_folding)
+                    } else {
+                        image.setImageResource(R.drawable.ic_category_unfolding)
+                    }
                 }
                 else -> {
                     image.setImageDrawable(null)
@@ -61,6 +78,28 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             lp.marginStart = px.toInt()
             val newLp = ConstraintLayout.LayoutParams(lp)
             image.layoutParams = newLp
+
+            text.text = channel.name
+            disposable?.dispose()
+            disposable =
+                Observable.create(channel).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    text.text = channel.name
+                }
+
+            itemView.setOnClickListener {
+                when (channel.type) {
+                    ChannelType.CATEGORY -> {
+                        val old = AppState.global.channelIsCollapsed(channel.id)
+                        AppState.global.channelCollapse(channel.id, !old)
+                    }
+                    ChannelType.TEXT -> {
+                        val old = AppState.global.channelSelection.value
+                        AppState.global.channelSelection.value =
+                            ChannelSelection(guildId = old.guildId, channelId = channel.id)
+                    }
+                }
+
+            }
         }
     }
 
@@ -73,10 +112,13 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             } else {
                 null
             }
-            observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+            disposable?.dispose()
+            disposable = observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
                 list = updateVisibility()
             }
         }
+
+    var disposable: Disposable? = null
 
     var list: List<String> = listOf()
         set(value) {
@@ -164,10 +206,35 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        val id = list[position]
+        val channel = Client.global.channels[id] as? GuildChannel ?: return TYPE_EMPTY
+        return when (channel.type) {
+            ChannelType.CATEGORY -> TYPE_CATEGORY
+            else -> TYPE_CHANNEL
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        val id = list[position]
+        return id.toLong()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val inflatedView =
-            layoutInflater.inflate(R.layout.widget_guild_channel_selector_item, parent, false)
+        val inflatedView = when (viewType) {
+            TYPE_CHANNEL -> layoutInflater.inflate(
+                R.layout.widget_guild_channel_selector_item,
+                parent,
+                false
+            )
+            TYPE_CATEGORY -> layoutInflater.inflate(
+                R.layout.widget_guild_channel_category_item,
+                parent,
+                false
+            )
+            else -> View(parent.context)
+        }
         return ViewHolder(inflatedView)
     }
 

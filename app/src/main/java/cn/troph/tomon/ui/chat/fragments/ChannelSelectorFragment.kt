@@ -14,11 +14,6 @@ class ChannelSelectorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_channel_selector, container, false)
-        val guildFragment = childFragmentManager.findFragmentById(R.id.fragment_guilds) as? GuildSelectorFragment
-//        guildFragment?.setOnSelectGuild {
-//            println(it)
-//        }
-        return view
+        return inflater.inflate(R.layout.fragment_channel_selector, container, false)
     }
 }

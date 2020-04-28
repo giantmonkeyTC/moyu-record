@@ -25,7 +25,7 @@ class GuildChannelSelectorFragment : Fragment() {
                 Observable.create(guild).observeOn(AndroidSchedulers.mainThread()).subscribe {
                     val g = it as? Guild
                     val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
-                    headerText?.text = guild?.name
+                    headerText?.text = guild.name
                 }
             }
         }
@@ -42,9 +42,8 @@ class GuildChannelSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val list = view.findViewById<RecyclerView>(R.id.view_guild_channels)
         list.apply {
-            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = GuildChannelSelectorAdapter()
+            adapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
         }
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }

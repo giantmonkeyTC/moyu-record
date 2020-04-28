@@ -3,54 +3,55 @@ package cn.troph.tomon.ui.chat.fragments
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.collections.Event
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
-import cn.troph.tomon.ui.widgets.Avatar
+import cn.troph.tomon.ui.widgets.GuildAvatar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 
-typealias GuildClickListener = (guildId: String?) -> Unit
-
 class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
 
-    class ViewHolder(itemView: View, private val listener: GuildClickListener?) :
+    class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
-        private var text: TextView = itemView.findViewById(R.id.text_name)
-        private var avatar: Avatar = itemView.findViewById(R.id.image_avatar)
+        private var avatar: GuildAvatar = itemView.findViewById(R.id.view_avatar)
+        private var guild: Guild? = null
+
+        init {
+            AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
+                avatar.selecting = AppState.global.channelSelection.value.guildId == guild?.id
+            }
+        }
 
         fun bind(guild: Guild) {
-            text.text = guild.name
+            this.guild = guild
             avatar.url = guild.iconURL
+            avatar.name = guild.name
+            avatar.selecting = AppState.global.channelSelection.value.guildId == guild.id
             itemView.setOnClickListener {
-                listener?.let { it1 -> it1(guild.id) }
+                val old = AppState.global.channelSelection.value
+                AppState.global.channelSelection.value =
+                    ChannelSelection(guildId = guild.id, channelId = old.channelId)
             }
         }
     }
 
-    private var observable: Observable<Event<Guild>> = Observable.create(Client.global.guilds)
-
     init {
-        observable.observeOn(AndroidSchedulers.mainThread()).subscribe { event ->
-            println("guild selector event: $event")
-            notifyDataSetChanged()
-        }
+        Observable.create(Client.global.guilds).observeOn(AndroidSchedulers.mainThread())
+            .subscribe { _ ->
+                notifyDataSetChanged()
+            }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val inflatedView =
             layoutInflater.inflate(R.layout.widget_guild_selector_item, parent, false)
-        return ViewHolder(inflatedView) {
-            val old = AppState.global.channelSelection.value
-            AppState.global.channelSelection.value = ChannelSelection(guildId = it, channelId = old.channelId)
-        }
+        return ViewHolder(inflatedView)
     }
 
     override fun getItemCount(): Int = Client.global.guilds.list.size
