@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 
 open class User(client: Client, data: JsonObject) : Base(client, data) {
@@ -12,9 +13,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         protected set
     var name: String = ""
         protected set
-    var avatar: String = ""
+    var avatar: String? = null
         protected set
-    var avatarURL: String = ""
+    var avatarURL: String? = null
         protected set
 
     init {
@@ -35,10 +36,16 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
             name = data["name"].asString
         }
         if (data.has("avatar")) {
-            avatar = data["avatar"].asString
+            avatar = data["avatar"].optString
+            if (avatar?.isEmpty() != false) {
+                avatar = null
+            }
         }
         if (data.has("avatarURL")) {
-            avatarURL = data["avatarURL"].asString
+            avatarURL = data["avatarURL"].optString
+            if (avatarURL?.isEmpty() != false) {
+                avatarURL = null
+            }
         }
     }
 
