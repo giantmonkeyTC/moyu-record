@@ -31,7 +31,7 @@
         <activity
             android:name=".ui.activities.ChatActivity"
             android:label="ChatActivity"
-            android:theme="@style/AppTheme.FullScreen" />
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

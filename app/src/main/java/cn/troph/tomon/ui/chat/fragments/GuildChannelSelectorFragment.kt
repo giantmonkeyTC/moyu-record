@@ -23,7 +23,6 @@ class GuildChannelSelectorFragment : Fragment() {
             val guild = if (value != null) Client.global.guilds[value] else null
             if (guild != null) {
                 Observable.create(guild).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    val g = it as? Guild
                     val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
                     headerText?.text = guild.name
                 }
