@@ -13,7 +13,7 @@ class ChannelCreateAction(client: Client) : Action<Channel>(client) {
         val obj = data!!.asJsonObject
         val existing = client.channels.has(obj["id"].asString)
         val channel = client.channels.add(obj)
-        if (existing == null && channel != null) {
+        if (!existing && channel != null) {
             client.eventBus.postEvent(ChannelCreateEvent(channel))
             if (channel is GuildChannel) {
                 var changed = false

@@ -16,8 +16,8 @@ class MessageCollection(client: Client, val channel: Channel) :
 
     override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Message? {
         val message = super.add(data, identify ?: {
-            val id = it["id"] as String
-            val nonce = it["nonce"] as String
+            val id = it["id"].asString
+            val nonce = it["nonce"].asString
             if (get("N$nonce") != null) {
                 "N$nonce"
             } else {
@@ -49,7 +49,7 @@ class MessageCollection(client: Client, val channel: Channel) :
     }
 
     private fun updateRange(messages: List<Message>) {
-        if (messages.size > 0) {
+        if (messages.isNotEmpty()) {
             val early = messages[0];
             val late = messages[messages.size - 1];
             if (earliestMessage == null) {

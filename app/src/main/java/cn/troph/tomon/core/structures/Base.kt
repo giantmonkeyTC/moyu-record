@@ -1,15 +1,12 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.Context
 import cn.troph.tomon.core.utils.GsonConflictStrategy
 import cn.troph.tomon.core.utils.merge
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<Base> {
 

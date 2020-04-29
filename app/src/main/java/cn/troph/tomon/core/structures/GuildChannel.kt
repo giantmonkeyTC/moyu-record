@@ -95,9 +95,6 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
     val parent get() : CategoryChannel? = guild?.channels?.get(parentId ?: "") as? CategoryChannel
 
     fun overwritesForMember(member: GuildMember): MemberPermissionOverwrites {
-        if (member == null) {
-            return MemberPermissionOverwrites()
-        }
         var roleOverwrites = mutableListOf<PermissionOverwrites>()
         var memberOverwrites: PermissionOverwrites? = null
         var everyoneOverwrites: PermissionOverwrites? = null
