@@ -16,6 +16,8 @@ import cn.troph.tomon.core.structures.CategoryChannel
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.AppUIEvent
+import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -96,6 +98,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         val old = AppState.global.channelSelection.value
                         AppState.global.channelSelection.value =
                             ChannelSelection(guildId = old.guildId, channelId = channel.id)
+                        AppState.global.eventBus.postEvent(AppUIEvent(AppUIEventType.CHANNEL_DRAWER, false))
                     }
                 }
 

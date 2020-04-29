@@ -16,11 +16,25 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.AppUIEvent
+import cn.troph.tomon.ui.states.AppUIEventType
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
 class ChatActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
+    init {
+        AppState.global.eventBus.observeEventsOnUi().subscribe {
+            val event = it as? AppUIEvent
+            when (event?.type) {
+                AppUIEventType.CHANNEL_DRAWER -> {
+                    setChannelDrawerOpen(event.value as Boolean)
+                }
+                AppUIEventType.MEMBER_DRAWER -> {
+                    setMemberDrawerOpen(event.value as Boolean)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +84,24 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_chat, menu)
         return true
+    }
+
+    private fun setChannelDrawerOpen(open: Boolean) {
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        if (open) {
+            drawerLayout.openDrawer(GravityCompat.START, true)
+        } else {
+            drawerLayout.closeDrawer(GravityCompat.START, true)
+        }
+    }
+
+    private fun setMemberDrawerOpen(open: Boolean) {
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        if (open) {
+            drawerLayout.openDrawer(GravityCompat.END, true)
+        } else {
+            drawerLayout.closeDrawer(GravityCompat.END, true)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
