@@ -16,8 +16,10 @@
     <color name="frameworkSelector">#292929</color>
     <color name="frameworkPanel">#3A3A3A</color>
     <color name="frameworkMember">#292929</color>
+    <color name="frameworkToolbar">#343536</color>
     <color name="guildBackground">#757575</color>
     <color name="guildSelectBackground">#5996b8</color>
     <color name="channelCategoryText">#828282</color>
     <color name="channelSelectBackground">#3A3A3A</color>
+    <color name="inputPanelBackground">#343536</color>
 </resources>
