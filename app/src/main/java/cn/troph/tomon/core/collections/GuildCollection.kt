@@ -13,10 +13,10 @@ class GuildCollection(client: Client) :
     private val sortedList: SortedList<Guild> =
         SortedList(Comparator { o1, o2 -> o1.compareTo(o2) })
 
-    override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Guild? {
+    override fun add(data: JsonObject, identify: CollectionIdentify?): Guild? {
         val ins = super.add(data, identify)
         if (ins != null) {
-            sortedList.add(ins)
+            sortedList.addIfNotExist(ins)
         }
         return ins
     }
@@ -39,6 +39,6 @@ class GuildCollection(client: Client) :
         }
     }
 
-    val list: SortedList.Immutable<Guild> = sortedList.immutable
+    val list get() = sortedList
 
 }

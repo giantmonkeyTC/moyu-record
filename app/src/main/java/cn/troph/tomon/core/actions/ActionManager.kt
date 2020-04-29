@@ -49,6 +49,12 @@ class ActionManager(val client: Client) {
         guildId: String? = null
     ): List<GuildMember>? = GuildMemberFetchAction(client).handle(data, isSync, guildId)
 
+    fun messageFetch(
+        data: JsonElement,
+        gotBeginning: Boolean? = false,
+        channelId: String? = null
+    ): List<Message>? = MessageFetchAction(client).handle(data, gotBeginning, channelId)
+
     fun presenceFetch(
         data: JsonElement,
         guildId: String? = null

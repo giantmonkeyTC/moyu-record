@@ -3,15 +3,22 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
-import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.core.utils.Collection
+import cn.troph.tomon.core.utils.Converter
+import cn.troph.tomon.core.utils.optString
+import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
 
 class Message(client: Client, data: JsonObject) : Base(client, data),
     Comparable<Message> {
 
-    var id: String = ""
+    companion object {
+        fun getNonceId(nonce: String): String = "${nonce}N"
+    }
+
+    // 发送中的message id是空的
+    var id: String? = null
         private set
     var channelId: String = ""
         private set
@@ -101,6 +108,13 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
         patchSelf(data)
     }
 
+    // 排序用的key
+    val sortKey get() = id?.snowflake?.aligned ?: nonceSortKey
+    val nonceSortKey get() = "${nonce?.snowflake?.aligned}N"
+
+    // 唯一确定用的id
+    val nonceId get() = getNonceId(nonce ?: "")
+
     val author: User?
         get() {
             val authorId = this.authorId
@@ -112,7 +126,7 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
     val guild get() : Guild? = if (this.channel is GuildChannel) (this.channel as GuildChannel).guild else null
 
     override fun compareTo(other: Message): Int {
-        return id.snowflake.compareTo(other.id.snowflake)
+        return sortKey.compareTo(other.sortKey)
     }
 
 }

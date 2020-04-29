@@ -8,40 +8,47 @@ class SortedList<T>(
 ) :
     Iterable<T> {
 
-    class Immutable<V>(private val list: List<V>) : Iterable<V> {
-        override fun iterator(): Iterator<V> = list.iterator()
-        operator fun get(index: Int): V = list[index]
-        val size get(): Int = list.size
-    }
-
     private var list: MutableList<T> = l?.toMutableList() ?: mutableListOf()
 
     init {
         list.sortedWith(comparator)
     }
 
-    operator fun get(index: Int): T = list[index]
-    val size: Int = list.size
+    val size: Int get() = list.size
 
-    fun safeGet(index: Int): T? = if (index < 0 || index >= list.size) null else get(index)
+    fun add(element: T) = findIndex(element).let { index ->
+        list.add(if (index < 0) -(index + 1) else index, element)
+    }
 
-    fun add(value: T) {
-        val invertedInsertionPoint = list.binarySearch(value, comparator)
-        if (invertedInsertionPoint < 0) {
-            val actualInsertionPoint = -(invertedInsertionPoint + 1)
-            list.add(actualInsertionPoint, value)
+    fun addIfNotExist(element: T) = findIndex(element).let { index ->
+        if (index < 0) {
+            list.add(-(index + 1), element)
         }
     }
 
-    fun remove(value: T) {
-        val index = list.binarySearch(value, comparator)
-        if (index >= 0 && index < list.size) {
-            list.removeAt(index)
-        }
+    fun remove(element: T) = findIndex(element).let { index ->
+        if (index >= 0) list.removeAt(index)
+    }
+
+    operator fun get(index: Int): T = list[index]
+
+    fun contains(element: T) = findIndex(element).let { index ->
+        index >= 0 && element == list[index] || (findEquals(index + 1, element, 1) || findEquals(
+            index - 1,
+            element,
+            -1
+        ))
     }
 
     override fun iterator(): Iterator<T> = list.iterator()
 
-    val immutable: Immutable<T> = Immutable(list)
+    private fun findIndex(element: T): Int = list.binarySearch(element, comparator)
+
+    private tailrec fun findEquals(index: Int, element: T, step: Int): Boolean = when {
+        index !in 0 until size -> false
+        comparator.compare(element, list[index]) != 0 -> false
+        list[index] == element -> true
+        else -> findEquals(index + step, element, step)
+    }
 
 }

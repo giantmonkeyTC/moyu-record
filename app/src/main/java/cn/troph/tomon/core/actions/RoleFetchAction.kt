@@ -21,7 +21,7 @@ class RoleFetchAction(client: Client) : Action<List<Role>>(client) {
         }
         val guildId: String =
             extras[1] as? String ?: (getGuildId(data!!) ?: "")
-        val guild = (if (guildId == "") null else client.guilds.get(guildId)) ?: return null
+        val guild = (if (guildId == "") null else client.guilds[guildId]) ?: return null
         // 如果同步，移除没有出现过的role
         if (isSync) {
             val keys = guild.roles.keys.asSequence().toMutableSet()

@@ -7,7 +7,7 @@ import com.google.gson.JsonObject
 class ChannelMemberCollection(val channel: GuildChannel) :
     BaseCollection<GuildMember>(channel.client) {
 
-    override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): GuildMember? {
+    override fun add(data: JsonObject, identify: CollectionIdentify?): GuildMember? {
         return null
     }
 

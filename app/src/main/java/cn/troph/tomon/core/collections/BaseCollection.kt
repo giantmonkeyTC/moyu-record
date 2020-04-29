@@ -15,6 +15,8 @@ enum class EventType {
     INIT
 }
 
+typealias CollectionIdentify = (d: JsonObject) -> String?
+
 data class Event<T>(val type: EventType, val obj: T? = null)
 
 open class BaseCollection<T : Base>(val client: Client) :
@@ -27,20 +29,21 @@ open class BaseCollection<T : Base>(val client: Client) :
         emitter?.onNext(Event(EventType.INIT))
     }
 
-    open fun add(data: JsonObject, identify: ((d: JsonObject) -> String)? = null): T? {
+    open fun add(data: JsonObject, identify: CollectionIdentify? = null): T? {
         val id = (if (identify != null) {
             identify(data)
         } else {
             data["id"].optString
         })
-            ?: return null
-        val existing = get(id)
-        if (existing != null) {
-            existing.update(data)
-            return existing
+        if (id != null) {
+            val existing = get(id)
+            if (existing != null) {
+                existing.update(data)
+                return existing
+            }
         }
         val entry = instantiate(data);
-        if (entry != null) {
+        if (id != null && entry != null) {
             put(id, entry)
         }
         return entry
