@@ -4,7 +4,12 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 
-class MessageReaction(client: Client, data: JsonObject, private val messageId: String) :
+class MessageReaction(
+    client: Client,
+    data: JsonObject,
+    private val channelId: String,
+    private val messageId: String
+) :
     Base(client, data) {
 
     data class EmojiData(val id: String? = null, val name: String? = null)
@@ -52,11 +57,19 @@ class MessageReaction(client: Client, data: JsonObject, private val messageId: S
 
     val isChar get() = isChar(emojiData)
 
+    val message get() = (client.channels[channelId] as? TextChannelBase)?.messages?.get(messageId)
+
     companion object {
 
         fun parseEmojiData(data: JsonObject): EmojiData {
-            val id = data["id"].optString
-            val name = data["name"].optString ?: ""
+            var id: String? = null
+            if (data.has("id")) {
+                id = data["id"].optString
+            }
+            var name: String = ""
+            if (data.has("name")) {
+                name = data["name"].optString ?: ""
+            }
             return EmojiData(id, name)
         }
 
