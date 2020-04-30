@@ -8,44 +8,33 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.structures.User
 import com.bumptech.glide.Glide
-import com.github.florent37.shapeofview.shapes.RoundRectView
+import com.github.florent37.shapeofview.shapes.CircleView
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 
 class UserAvatar : FrameLayout {
 
-    private lateinit var clipView: RoundRectView
+    private lateinit var clipView: CircleView
     private lateinit var defaultView: ImageView
     private lateinit var imageView: ImageView
 
-    var url: String? = null
-        set(value) {
-            field = value
-            Glide.with(this).load(url).into(imageView)
-            updateVisibility()
-        }
+    private var disposable: Disposable? = null
 
-    var backgrondColor: Int = Color.WHITE
+    var user: User? = null
         set(value) {
             field = value
-            defaultView.setBackgroundColor(value)
-        }
-
-    var userId: String = "0"
-        set(value) {
-            field = value
-            val number = userId.toLongOrNull() ?: 0L
-            val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
-            val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
-            backgrondColor = color
-        }
-
-    var cornerRadius: Float = 0f
-        set(value) {
-            field = value
-            clipView.bottomLeftRadius = value
-            clipView.bottomRightRadius = value
-            clipView.topLeftRadius = value
-            clipView.topRightRadius = value
+            update()
+            disposable?.dispose()
+            disposable = null
+            if (value != null) {
+                disposable =
+                    Observable.create(user).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        update()
+                    }
+            }
         }
 
     constructor(context: Context) : super(context) {
@@ -71,21 +60,18 @@ class UserAvatar : FrameLayout {
         defaultView = view.findViewById(R.id.image_default)
         imageView = view.findViewById(R.id.image_avatar)
         addView(view)
-        if (attrs != null) {
-            val attributes =
-                context.obtainStyledAttributes(attrs, R.styleable.UserAvatar)
-            val cr = attributes.getDimensionPixelSize(
-                R.styleable.UserAvatar_corner_radius,
-                cornerRadius.toInt()
-            )
-            cornerRadius = cr.toFloat()
-            attributes.recycle()
-        }
     }
 
-    private fun updateVisibility() {
+    private fun update() {
+        val url = user?.avatarURL
         imageView.visibility = if (url != null) View.VISIBLE else View.GONE
         defaultView.visibility = if (url == null) View.VISIBLE else View.GONE
+        Glide.with(this).load(url).into(imageView)
+        val number = user?.id?.toLongOrNull() ?: 0L
+        val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
+        val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
+        defaultView.setBackgroundColor(color)
     }
+
 
 }
