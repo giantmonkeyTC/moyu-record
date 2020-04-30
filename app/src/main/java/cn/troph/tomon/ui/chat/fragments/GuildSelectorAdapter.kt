@@ -11,7 +11,6 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GuildAvatar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 
 class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
 
@@ -22,9 +21,10 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
         private var guild: Guild? = null
 
         init {
-            AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                avatar.selecting = AppState.global.channelSelection.value.guildId == guild?.id
-            }
+            AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    avatar.selecting = AppState.global.channelSelection.value.guildId == guild?.id
+                }
         }
 
         fun bind(guild: Guild) {
@@ -40,7 +40,7 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
     }
 
     init {
-        Observable.create(Client.global.guilds).observeOn(AndroidSchedulers.mainThread())
+        Client.global.guilds.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { _ ->
                 notifyDataSetChanged()
             }
@@ -62,6 +62,5 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
             holder.bind(guild)
         }
     }
-
 
 }

@@ -41,7 +41,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         var channel: GuildChannel? = null
 
         fun bind(channel: GuildChannel) {
-            println("on root bind")
             itemView.isActivated = AppState.global.channelSelection.value.channelId == channel.id
             when (channel.type) {
                 ChannelType.TEXT -> {
@@ -84,7 +83,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             text.text = channel.name
             disposable?.dispose()
             disposable =
-                Observable.create(channel).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                channel.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
                     text.text = channel.name
                 }
 
@@ -109,14 +108,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
     var guildId: String? = null
         set(value) {
             field = value
-            observable = if (value != null) {
-                val channels = Client.global.guilds[value]?.channels
-                if (channels != null) Observable.create(Client.global.guilds[value]?.channels) else null
-            } else {
-                null
-            }
+            val channels = value?.let { Client.global.guilds[value]?.channels }
             disposable?.dispose()
-            disposable = observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+            disposable = channels?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
                 list = updateVisibility()
             }
         }
@@ -128,8 +122,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             field = value
             notifyDataSetChanged()
         }
-
-    private var observable: Observable<Event<GuildChannel>>? = null
 
     init {
         guildId = AppState.global.channelSelection.value.guildId

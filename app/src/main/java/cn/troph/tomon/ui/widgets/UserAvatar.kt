@@ -12,7 +12,6 @@ import cn.troph.tomon.core.structures.User
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.CircleView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
 class UserAvatar : FrameLayout {
@@ -28,12 +27,8 @@ class UserAvatar : FrameLayout {
             field = value
             update()
             disposable?.dispose()
-            disposable = null
-            if (value != null) {
-                disposable =
-                    Observable.create(user).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                        update()
-                    }
+            if (isAttachedToWindow) {
+                listen()
             }
         }
 
@@ -73,5 +68,23 @@ class UserAvatar : FrameLayout {
         defaultView.setBackgroundColor(color)
     }
 
+    private fun listen() {
+        disposable = user?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+            update()
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (disposable == null) {
+            listen()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        disposable?.dispose()
+        disposable = null
+    }
 
 }
