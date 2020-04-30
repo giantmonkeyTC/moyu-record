@@ -20,6 +20,7 @@ class MessageReactionCollection(client: Client, val message: Message) :
 
     override fun instantiate(data: JsonObject): MessageReaction? {
         val id = message.id ?: return null
-        return MessageReaction(client, data, id)
+        val channelId = message.channelId
+        return MessageReaction(client, data, channelId, id)
     }
 }
