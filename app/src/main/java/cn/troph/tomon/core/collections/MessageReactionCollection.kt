@@ -8,7 +8,7 @@ import com.google.gson.JsonObject
 class MessageReactionCollection(client: Client, val message: Message) :
     BaseCollection<MessageReaction>(client) {
 
-    override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): MessageReaction? {
+    override fun add(data: JsonObject, identify: CollectionIdentify?): MessageReaction? {
         val emoji = data["emoji"] as? JsonObject
         return if (emoji == null) {
             null
@@ -19,6 +19,7 @@ class MessageReactionCollection(client: Client, val message: Message) :
     }
 
     override fun instantiate(data: JsonObject): MessageReaction? {
-        return MessageReaction(client, data, message.id)
+        val id = message.id ?: return null
+        return MessageReaction(client, data, id)
     }
 }

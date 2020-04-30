@@ -9,7 +9,7 @@ class DmChannelCollection(client: Client) :
 
     override fun add(
         data: JsonObject,
-        identify: ((d: JsonObject) -> String)?
+        identify: CollectionIdentify?
     ): Channel? {
         return null
     }

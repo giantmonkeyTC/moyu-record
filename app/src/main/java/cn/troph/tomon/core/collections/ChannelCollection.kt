@@ -10,7 +10,7 @@ class ChannelCollection(client: Client) :
 
     override fun add(
         data: JsonObject,
-        identify: ((d: JsonObject) -> String)?
+        identify: CollectionIdentify?
     ): Channel? {
         val channel = super.add(data, identify)
         if (channel is GuildChannel) {

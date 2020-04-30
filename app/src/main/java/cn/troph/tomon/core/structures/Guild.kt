@@ -56,9 +56,15 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
         }
         if (data.has("icon")) {
             icon = data["icon"].optString
+            if (icon?.isEmpty() != false) {
+                icon = null
+            }
         }
         if (data.has("icon_url")) {
             iconURL = data["icon_url"].optString
+            if (iconURL?.isEmpty() != false) {
+                iconURL = null
+            }
         }
         if (data.has("position")) {
             position = data["position"].optInt ?: 0

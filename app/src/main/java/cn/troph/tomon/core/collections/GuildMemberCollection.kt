@@ -10,7 +10,7 @@ class GuildMemberCollection(client: Client, val guild: Guild) :
 
     override fun add(
         data: JsonObject,
-        identify: ((d: JsonObject) -> String)?
+        identify: CollectionIdentify?
     ): GuildMember? {
         val id = data["user"].asJsonObject["id"].asString
         return super.add(data, identify ?: { _ -> id })

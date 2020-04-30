@@ -9,9 +9,9 @@ class PermissionOverwrites(client: Client, data: JsonObject) : Base(client, data
         private set
     var type: PermissionOverwriteType = PermissionOverwriteType.ROLE
         private set
-    var allow = 0
+    var allow: Long = 0
         private set
-    var deny = 0
+    var deny: Long = 0
         private set
 
     init {
@@ -27,10 +27,10 @@ class PermissionOverwrites(client: Client, data: JsonObject) : Base(client, data
             type = PermissionOverwriteType.fromString(value) ?: PermissionOverwriteType.ROLE
         }
         if (data.has("allow")) {
-            allow = data["allow"].asInt
+            allow = data["allow"].asLong
         }
         if (data.has("deny")) {
-            deny = data["deny"].asInt
+            deny = data["deny"].asLong
         }
     }
 
