@@ -1,23 +1,21 @@
 package cn.troph.tomon.ui.widgets
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import cn.troph.tomon.R
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.RoundRectView
 
-class GuildAvatar : FrameLayout {
+class UserAvatar : FrameLayout {
 
     private lateinit var clipView: RoundRectView
+    private lateinit var defaultView: ImageView
     private lateinit var imageView: ImageView
-    private lateinit var nameView: ConstraintLayout
-    private lateinit var textView: TextView
 
     var url: String? = null
         set(value) {
@@ -26,21 +24,28 @@ class GuildAvatar : FrameLayout {
             updateVisibility()
         }
 
-    var name: String? = null
+    var backgrondColor: Int = Color.WHITE
         set(value) {
             field = value
-            textView.text = value
+            defaultView.setBackgroundColor(value)
         }
 
-    var selecting: Boolean = false
+    var userId: String = "0"
         set(value) {
             field = value
-            var radius = if (selecting) 15f else 25f
-            clipView.bottomLeftRadiusDp = radius
-            clipView.bottomRightRadiusDp = radius
-            clipView.topLeftRadiusDp = radius
-            clipView.topRightRadiusDp = radius
-            nameView.setBackgroundResource(if (selecting) R.color.guildSelectBackground else R.color.guildBackground)
+            val number = userId.toLongOrNull() ?: 0L
+            val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
+            val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
+            backgrondColor = color
+        }
+
+    var cornerRadius: Float = 0f
+        set(value) {
+            field = value
+            clipView.bottomLeftRadius = value
+            clipView.bottomRightRadius = value
+            clipView.topLeftRadius = value
+            clipView.topRightRadius = value
         }
 
     constructor(context: Context) : super(context) {
@@ -61,16 +66,26 @@ class GuildAvatar : FrameLayout {
 
     private fun init(context: Context, attrs: AttributeSet?) {
         val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.widget_guild_avatar, null)
+        val view = inflater.inflate(R.layout.widget_user_avatar, null)
         clipView = view.findViewById(R.id.view_clip)
+        defaultView = view.findViewById(R.id.image_default)
         imageView = view.findViewById(R.id.image_avatar)
-        nameView = view.findViewById(R.id.view_name)
-        textView = view.findViewById(R.id.text_name)
         addView(view)
+        if (attrs != null) {
+            val attributes =
+                context.obtainStyledAttributes(attrs, R.styleable.UserAvatar)
+            val cr = attributes.getDimensionPixelSize(
+                R.styleable.UserAvatar_corner_radius,
+                cornerRadius.toInt()
+            )
+            cornerRadius = cr.toFloat()
+            attributes.recycle()
+        }
     }
 
     private fun updateVisibility() {
         imageView.visibility = if (url != null) View.VISIBLE else View.GONE
-        nameView.visibility = if (url == null) View.VISIBLE else View.GONE
+        defaultView.visibility = if (url == null) View.VISIBLE else View.GONE
     }
+
 }
