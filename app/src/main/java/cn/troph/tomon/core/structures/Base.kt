@@ -7,23 +7,21 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 
-open class Base(val client: Client, data: JsonObject) : ObservableOnSubscribe<Base> {
+open class Base(val client: Client, data: JsonObject) {
 
-    private var emitter: ObservableEmitter<Base>? = null
+    val observable: PublishSubject<Base> = PublishSubject.create()
 
     private val data: JsonObject = data
 
     val raw: JsonObject get() = data.deepCopy()
 
-    override fun subscribe(emitter: ObservableEmitter<Base>?) {
-        this.emitter = emitter
-        emitter?.onNext(this)
-    }
-
     fun update(data: JsonObject) {
         patch(data)
-        emitter?.onNext(this)
+        observable.onNext(this)
     }
 
     fun update(data: Map<String, Any?>) {

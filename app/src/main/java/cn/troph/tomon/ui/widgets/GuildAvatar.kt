@@ -13,7 +13,6 @@ import cn.troph.tomon.core.structures.Guild
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.RoundRectView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
 class GuildAvatar : FrameLayout {
@@ -23,19 +22,15 @@ class GuildAvatar : FrameLayout {
     private lateinit var nameView: ConstraintLayout
     private lateinit var textView: TextView
 
-    private var disposable: Disposable? = null
+    var disposable: Disposable? = null
 
     var guild: Guild? = null
         set(value) {
             field = value
             update()
             disposable?.dispose()
-            disposable = null
-            if (value != null) {
-                disposable =
-                    Observable.create(value).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                        update()
-                    }
+            disposable = value?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+                update()
             }
         }
 
