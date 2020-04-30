@@ -41,7 +41,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         var channel: GuildChannel? = null
 
         fun bind(channel: GuildChannel) {
-            println("on root bind")
             itemView.isActivated = AppState.global.channelSelection.value.channelId == channel.id
             when (channel.type) {
                 ChannelType.TEXT -> {

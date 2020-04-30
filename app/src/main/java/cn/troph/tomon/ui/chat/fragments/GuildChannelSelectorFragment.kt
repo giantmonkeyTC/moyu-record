@@ -10,20 +10,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.ui.states.AppState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 
 class GuildChannelSelectorFragment : Fragment() {
+
+    var disposable: Disposable? = null
 
     var guildId: String? = null
         set(value) {
             field = value
-            val guild = if (value != null) Client.global.guilds[value] else null
-            guild?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
-                val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
-                headerText?.text = guild.name
+            update()
+            val guild = guildId?.let { Client.global.guilds[it] }
+            disposable?.dispose()
+            disposable = guild?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+                update()
             }
         }
 
@@ -44,6 +46,12 @@ class GuildChannelSelectorFragment : Fragment() {
         }
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
+    }
+
+    fun update() {
+        val guild = guildId?.let { Client.global.guilds[it] }
+        val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
+        headerText?.text = guild?.name
     }
 
 }

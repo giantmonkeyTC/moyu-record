@@ -27,8 +27,8 @@ class UserAvatar : FrameLayout {
             field = value
             update()
             disposable?.dispose()
-            disposable = value?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
-                update()
+            if (isAttachedToWindow) {
+                listen()
             }
         }
 
@@ -68,12 +68,16 @@ class UserAvatar : FrameLayout {
         defaultView.setBackgroundColor(color)
     }
 
+    private fun listen() {
+        disposable = user?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+            update()
+        }
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (disposable == null) {
-            disposable = user?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
-                update()
-            }
+            listen()
         }
     }
 
