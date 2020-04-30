@@ -41,8 +41,8 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
                 avatar = null
             }
         }
-        if (data.has("avatarURL")) {
-            avatarURL = data["avatarURL"].optString
+        if (data.has("avatar_url")) {
+            avatarURL = data["avatar_url"].optString
             if (avatarURL?.isEmpty() != false) {
                 avatarURL = null
             }
