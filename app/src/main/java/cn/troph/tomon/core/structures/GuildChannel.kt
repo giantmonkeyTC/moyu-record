@@ -4,11 +4,15 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.ChannelMemberCollection
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optString
+import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import java.util.*
+import kotlin.Comparator
 
-open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data) {
+open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data),
+    Comparable<GuildChannel> {
 
     data class MemberPermissionOverwrites(
         val everyone: PermissionOverwrites? = null,
@@ -91,9 +95,6 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
     val parent get() : CategoryChannel? = guild?.channels?.get(parentId ?: "") as? CategoryChannel
 
     fun overwritesForMember(member: GuildMember): MemberPermissionOverwrites {
-        if (member == null) {
-            return MemberPermissionOverwrites()
-        }
         var roleOverwrites = mutableListOf<PermissionOverwrites>()
         var memberOverwrites: PermissionOverwrites? = null
         var everyoneOverwrites: PermissionOverwrites? = null
@@ -141,8 +142,8 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         if (role.permissions.has(Permissions.ADMINISTRATOR)) {
             return Permissions.all()
         }
-        val everyoneOverwrites = permissionOverwrites.get(guild!!.id)
-        val roleOverwrites = permissionOverwrites.get(role.id)
+        val everyoneOverwrites = permissionOverwrites[guild!!.id]
+        val roleOverwrites = permissionOverwrites[role.id]
         return role.permissions
             .minus(everyoneOverwrites?.deny)
             .plus(everyoneOverwrites?.allow)
@@ -166,15 +167,55 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
         client.actions.channelUpdate(JsonParser.parseString("""{"id": id, "permission_overwrites": overwrites}""").asJsonObject)
     }
 
+    val isPrivate: Boolean get() {
+        if (guildId != null) {
+            val everyoneOverwrite = permissionOverwrites[guildId!!]
+            return (everyoneOverwrite?.deny ?: 0L and Permissions.VIEW_CHANNEL) != 0L
+        }
+        return false
+    }
+
     val indent
         get() : Int {
             var indent: Int = 0
             var cursor: GuildChannel? = parent
             while (cursor != null) {
-                cursor = cursor.parent!!
+                cursor = cursor.parent
                 indent++
             }
             return indent
         }
+
+    private fun comparePositionTo(other: GuildChannel): Int {
+        val comparator = Comparator<GuildChannel> { o1, o2 ->
+            o1.position.compareTo(o2.position)
+        }.then(Comparator { o1, o2 ->
+            o1.id.snowflake.compareTo(o2.id.snowflake)
+        })
+        return comparator.compare(this, other)
+    }
+
+    val path: List<GuildChannel> get() {
+        val list = LinkedList<GuildChannel>()
+        var cursor: GuildChannel? = this
+        while (cursor != null) {
+            list.push(cursor)
+            cursor = cursor.parent
+        }
+        return list
+    }
+
+    override fun compareTo(other: GuildChannel): Int {
+        val path = this.path
+        val otherPath = other.path
+        val length = path.size.coerceAtMost(otherPath.size)
+        for (i in 0 until length) {
+            val comp = path[i].comparePositionTo(otherPath[i])
+            if (comp != 0) {
+                return comp
+            }
+        }
+        return path.size.compareTo(otherPath.size)
+    }
 
 }

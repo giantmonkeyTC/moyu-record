@@ -1,12 +1,13 @@
 package cn.troph.tomon.core
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.content.Context
+import android.content.SharedPreferences
 import cn.troph.tomon.core.actions.ActionManager
 import cn.troph.tomon.core.collections.*
 import cn.troph.tomon.core.network.Restful
 import cn.troph.tomon.core.network.socket.Socket
+import cn.troph.tomon.core.network.socket.SocketClientState
 import cn.troph.tomon.core.structures.Me
 import cn.troph.tomon.core.utils.event.RxBus
 import io.reactivex.rxjava3.core.Observable
@@ -39,6 +40,7 @@ class Client {
 
     val token get() = me.token
     val auth get() = "Bearer ${token ?: ""}"
+    val loggedIn get() = socket.state == SocketClientState.OPEN
 
     fun initialize(app: Application) {
         preferences = app.getSharedPreferences("tomon", Context.MODE_PRIVATE)
@@ -49,13 +51,16 @@ class Client {
     }
 
     fun login(
-        emailOrPhone: String? = null,
+        unionId: String? = null,
         password: String? = null
-    ): Observable<Void> {
-        return me.login(emailOrPhone = emailOrPhone, password = password, token = me.token)
-            .flatMap { _ ->
+    ): Observable<Unit> {
+        return me.login(
+            unionId = unionId,
+            password = password,
+            token = if (unionId != null && password != null) null else me.token
+        )
+            .map {
                 socket.open()
-                return@flatMap Observable.empty<Void>()
             }
     }
 

@@ -21,7 +21,7 @@ class EmojiFetchAction(client: Client) : Action<List<GuildEmoji>>(client) {
         }
         val guildId: String =
             extras[1] as? String ?: (getGuildId(data!!) ?: "")
-        val guild = (if (guildId == "") null else client.guilds.get(guildId)) ?: return null
+        val guild = (if (guildId == "") null else client.guilds[guildId]) ?: return null
         // 如果同步，移除没有出现过的emoji
         if (isSync) {
             val keys = guild.roles.keys.asSequence().toMutableSet()
@@ -41,9 +41,9 @@ class EmojiFetchAction(client: Client) : Action<List<GuildEmoji>>(client) {
             }
         }
         if (data!!.isJsonArray) {
-            data!!.asJsonArray.forEach { parse(it.asJsonObject) }
+            data.asJsonArray.forEach { parse(it.asJsonObject) }
         } else {
-            parse(data!!.asJsonObject)
+            parse(data.asJsonObject)
         }
         if (isSync) {
             client.eventBus.postEvent(EmojiSyncEvent(guild))

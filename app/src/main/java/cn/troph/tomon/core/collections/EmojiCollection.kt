@@ -9,7 +9,7 @@ import com.google.gson.JsonObject
 class EmojiCollection(client: Client) :
     BaseCollection<Emoji>(client) {
 
-    override fun add(data: JsonObject, identify: ((d: JsonObject) -> String)?): Emoji? {
+    override fun add(data: JsonObject, identify: CollectionIdentify?): Emoji? {
         val emoji = super.add(data, identify)
         if (emoji is GuildEmoji) {
             emoji.guild?.emojis?.put(emoji.id, emoji)

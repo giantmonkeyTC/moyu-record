@@ -13,14 +13,18 @@ class EntryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        Client.global
-            .login()
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                println("login")
-            }, {
-                gotoLogin()
-            })
+        if (Client.global.loggedIn) {
+            gotoChat()
+        } else {
+            Client.global
+                .login()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    gotoChat()
+                }, {
+                    gotoLogin()
+                })
+        }
     }
 
     private fun gotoLogin() {
@@ -33,10 +37,20 @@ class EntryActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
+        finish()
     }
 
-    private fun gotoRegister() {
-        
+    private fun gotoChat() {
+        val intent = Intent(this, ChatActivity::class.java)
+        startActivity(
+            intent,
+            ActivityOptions.makeCustomAnimation(
+                this,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            ).toBundle()
+        )
+        finish()
     }
 
 }

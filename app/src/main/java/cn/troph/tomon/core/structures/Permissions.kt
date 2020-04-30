@@ -20,8 +20,8 @@ class Permissions {
         return Permissions(value and resolve(b).inv())
     }
 
-    override fun equals(b: Any?): Boolean {
-        return if (b == null) false else value == resolve(b)
+    override fun equals(other: Any?): Boolean {
+        return if (other == null) false else value == resolve(other)
     }
 
     override fun hashCode(): Int {

@@ -11,7 +11,7 @@ class GuildEmojiCollection(client: Client, val guild: Guild) :
     // forbid add
     override fun add(
         data: JsonObject,
-        identify: ((d: JsonObject) -> String)?
+        identify: CollectionIdentify?
     ): GuildEmoji? {
         return null
     }

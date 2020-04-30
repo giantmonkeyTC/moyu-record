@@ -66,18 +66,22 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
     //TODO LOGIN, REGISTER, ETC.
 
     fun login(
-        emailOrPhone: String? = null,
+        unionId: String? = null,
         password: String? = null,
         token: String? = null
     ): Observable<User?> {
         var request = when {
             token?.isNotEmpty() == true -> AuthService.LoginRequest(token = token)
-            Validator.isEmail(emailOrPhone) -> AuthService.LoginRequest(
-                email = emailOrPhone,
+            Validator.isFullName(unionId) -> AuthService.LoginRequest(
+                full_name = unionId,
                 password = password
             )
-            Validator.isPhone(emailOrPhone) -> AuthService.LoginRequest(
-                phone = emailOrPhone,
+            Validator.isEmail(unionId) -> AuthService.LoginRequest(
+                email = unionId,
+                password = password
+            )
+            Validator.isPhone(unionId) -> AuthService.LoginRequest(
+                phone = unionId,
                 password = password
             )
             else -> null

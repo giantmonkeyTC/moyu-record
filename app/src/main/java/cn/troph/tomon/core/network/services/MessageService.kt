@@ -9,9 +9,13 @@ import retrofit2.http.*
 
 
 interface MessageService {
+
     @GET("channels/{channelId}/messages")
     fun getMessages(
         @Path("channelId") channelId: String,
+        @Query("before") before: String? = null,
+        @Query("after") after: String? = null,
+        @Query("limit") limit: Int? = null,
         @Header("Authorization") token: String
     ): Observable<JsonArray>
 

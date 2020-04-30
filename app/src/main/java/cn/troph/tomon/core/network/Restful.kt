@@ -1,17 +1,31 @@
 package cn.troph.tomon.core.network
 
 import cn.troph.tomon.core.network.services.*
+import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import hu.akarnokd.rxjava3.retrofit.*;
 
 class Restful {
+
+    private val client: OkHttpClient by lazy {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        OkHttpClient.Builder().addInterceptor(interceptor).build()
+    }
 
     private val retrofit = Retrofit
         .Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-        .baseUrl(Configs.baseUrl).build()
+        .baseUrl(Configs.baseUrl)
+        .client(client)
+        .build()
+
+    init {
+
+    }
 
     val authService: AuthService = retrofit.create(AuthService::class.java)
     val guildService: GuildService = retrofit.create(GuildService::class.java)
