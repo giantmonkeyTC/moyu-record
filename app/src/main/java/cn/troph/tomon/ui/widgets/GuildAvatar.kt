@@ -9,8 +9,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import cn.troph.tomon.R
+import cn.troph.tomon.core.structures.Guild
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.RoundRectView
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 
 class GuildAvatar : FrameLayout {
 
@@ -19,27 +23,31 @@ class GuildAvatar : FrameLayout {
     private lateinit var nameView: ConstraintLayout
     private lateinit var textView: TextView
 
-    var url: String? = null
-        set(value) {
-            field = value
-            Glide.with(this).load(url).into(imageView)
-            updateVisibility()
-        }
+    private var disposable: Disposable? = null
 
-    var name: String? = null
+    var guild: Guild? = null
         set(value) {
             field = value
-            textView.text = value
+            update()
+            disposable?.dispose()
+            disposable = null
+            if (value != null) {
+                disposable =
+                    Observable.create(value).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                        update()
+                    }
+            }
         }
 
     var selecting: Boolean = false
         set(value) {
             field = value
-            var radius = if (selecting) 15f else 25f
-            clipView.bottomLeftRadiusDp = radius
-            clipView.bottomRightRadiusDp = radius
-            clipView.topLeftRadiusDp = radius
-            clipView.topRightRadiusDp = radius
+            val side = width.coerceAtMost(height)
+            var radius = if (selecting) side * 0.3f else side * 0.5f
+            clipView.bottomLeftRadius = radius
+            clipView.bottomRightRadius = radius
+            clipView.topLeftRadius = radius
+            clipView.topRightRadius = radius
             nameView.setBackgroundResource(if (selecting) R.color.guildSelectBackground else R.color.guildBackground)
         }
 
@@ -69,8 +77,12 @@ class GuildAvatar : FrameLayout {
         addView(view)
     }
 
-    private fun updateVisibility() {
+    private fun update() {
+        val url = guild?.iconURL
         imageView.visibility = if (url != null) View.VISIBLE else View.GONE
         nameView.visibility = if (url == null) View.VISIBLE else View.GONE
+        Glide.with(this).load(url).into(imageView)
+        textView.text = guild?.name
     }
+
 }

@@ -31,14 +31,7 @@ class GuildSelectorFragment : Fragment() {
             adapter = GuildSelectorAdapter()
         }
         val avatar = view.findViewById<UserAvatar>(R.id.view_avatar)
-        avatar.userId = Client.global.me.id
-        avatar.url = Client.global.me.avatarURL
-        println(Client.global.me.avatarURL)
-        Observable.create(Client.global.me).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            avatar.userId = Client.global.me.id
-            avatar.url = Client.global.me.avatarURL
-            println(Client.global.me.avatarURL)
-        }
+        avatar.user = Client.global.me
     }
 
 }

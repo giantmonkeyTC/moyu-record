@@ -29,8 +29,7 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
 
         fun bind(guild: Guild) {
             this.guild = guild
-            avatar.url = guild.iconURL
-            avatar.name = guild.name
+            avatar.guild = guild
             avatar.selecting = AppState.global.channelSelection.value.guildId == guild.id
             itemView.setOnClickListener {
                 val old = AppState.global.channelSelection.value
