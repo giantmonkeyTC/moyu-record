@@ -34,4 +34,5 @@ class Restful {
     val roleService: RoleService = retrofit.create(RoleService::class.java)
     val guildMemberService: GuildMemberService = retrofit.create(GuildMemberService::class.java)
     val guildEmojiService: GuildEmojiService = retrofit.create(GuildEmojiService::class.java)
+    val inviteService: InviteService = retrofit.create(InviteService::class.java)
 }

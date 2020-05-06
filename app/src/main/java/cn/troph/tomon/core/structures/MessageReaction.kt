@@ -55,7 +55,7 @@ class MessageReaction(client: Client, data: JsonObject, private val messageId: S
     companion object {
 
         fun parseEmojiData(data: JsonObject): EmojiData {
-            val id = data["id"].optString
+            val id = data["id"].optString ?: ""
             val name = data["name"].optString ?: ""
             return EmojiData(id, name)
         }
