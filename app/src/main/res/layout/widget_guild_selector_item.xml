@@ -8,33 +8,12 @@
 
     <cn.troph.tomon.ui.widgets.GuildAvatar
         android:id="@+id/view_avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!--    <com.github.florent37.shapeofview.shapes.RoundRectView-->
-    <!--        android:id="@+id/view_avatar"-->
-    <!--        android:layout_width="40dp"-->
-    <!--        android:layout_height="40dp"-->
-    <!--        android:layout_marginStart="20dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:shape_roundRect_bottomLeftRadius="10dp"-->
-    <!--        app:shape_roundRect_bottomRightRadius="10dp"-->
-    <!--        app:shape_roundRect_topLeftRadius="10dp"-->
-    <!--        app:shape_roundRect_topRightRadius="10dp">-->
-
-    <!--        <ImageView-->
-    <!--            android:id="@+id/image_avatar"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:scaleType="centerCrop" />-->
-
-    <!--    </com.github.florent37.shapeofview.shapes.RoundRectView>-->
 
     <TextView
         android:id="@+id/text_name"
