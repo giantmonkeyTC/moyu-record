@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.SortedList
@@ -20,6 +21,8 @@ class MessageCollection(client: Client, val channel: Channel) :
     // 如果是使用nonce作为id，后面会加N作为区分
     private val sortedList: SortedList<String> =
         SortedList(Comparator { o1, o2 -> o1.compareTo(o2) })
+
+    val list get() = sortedList
 
     override fun add(data: JsonObject, identify: CollectionIdentify?): Message? {
         val advancedId = identify ?: {
@@ -117,6 +120,17 @@ class MessageCollection(client: Client, val channel: Channel) :
                 client.actions.messageFetch(it)
             }
         }
+    }
+
+    fun create(content: String): Observable<Message> {
+        return client.rest.messageService.createMessage(
+            channel.id,
+            MessageService.CreateMessageRequest(content),
+            client.auth
+        )
+            .subscribeOn(Schedulers.io()).map {
+                client.actions.messageCreate(it)
+            }
     }
 
 }

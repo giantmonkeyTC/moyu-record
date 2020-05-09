@@ -32,7 +32,7 @@ interface MessageService {
 
     @POST("channels/{channelId}/messages")
     fun createMessage(
-        @Path("channelID") channelId: String, @Body request: CreateMessageRequest, @Header(
+        @Path("channelId") channelId: String, @Body request: CreateMessageRequest, @Header(
             "Authorization"
         ) token: String
     ): Observable<JsonObject>
@@ -50,7 +50,7 @@ interface MessageService {
 
     @DELETE("channels/{channelId}/messages/{messageId}")
     fun deleteMessage(
-        @Path("channelId") channelId: String, @Path("messageId") messageId: String, @Header(
+        @Path("channelId") channelId: String, @Path("messageId") messageId: String?, @Header(
             "Authorization"
         ) token: String
     ): Observable<Void>
@@ -62,12 +62,12 @@ interface MessageService {
     @PATCH("channels/{channelId}/messages/{messageId}")
     fun updateMessage(
         @Path("channelId") channelId: String,
-        @Path("messageId") messageId: String,
+        @Path("messageId") messageId: String?,
         @Body request: UpdateMessageRequest,
         @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonArray>
+    ): Observable<JsonObject>
 
     @PUT("channels/{channelId}/messages/{messageId}/reactions/{identifier}/@me")
     fun addReaction(

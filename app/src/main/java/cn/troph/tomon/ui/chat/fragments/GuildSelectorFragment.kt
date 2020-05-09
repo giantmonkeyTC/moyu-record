@@ -17,9 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_guild.view.*
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
-import cn.troph.tomon.core.Client
 import cn.troph.tomon.ui.widgets.UserAvatar
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 
 class GuildSelectorFragment : Fragment() {
@@ -63,8 +61,6 @@ class GuildSelectorFragment : Fragment() {
                 )
         }
         dialog.show()
-        val avatar = view.findViewById<UserAvatar>(R.id.view_avatar)
-        avatar.user = Client.global.me
     }
 
 }

@@ -55,6 +55,15 @@ class ActionManager(val client: Client) {
         channelId: String? = null
     ): List<Message>? = MessageFetchAction(client).handle(data, gotBeginning, channelId)
 
+    fun messageCreate(
+        data: JsonElement
+    ): Message? = MessageCreateAction(client).handle(data)
+
+    fun messageDelete(data: JsonElement)
+            : Message? = MessageDeleteAction(client).handle(data)
+
+    fun messageUpdate(data: JsonElement): Message? = MessageUpdateAction(client).handle(data)
+
     fun presenceFetch(
         data: JsonElement,
         guildId: String? = null
