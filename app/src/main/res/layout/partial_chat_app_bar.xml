@@ -38,9 +38,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
-
     </com.google.android.material.appbar.AppBarLayout>
-
     <include layout="@layout/partial_chat_panel" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -3,7 +3,11 @@ package cn.troph.tomon.ui.chat.messages
 import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,17 +18,23 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.UserAvatar
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
+import kotlinx.coroutines.runBlocking
+
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -40,10 +50,11 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         private var attachmentImage: ImageView =
             itemView.findViewById(R.id.widget_message_attachment)
         var disposable: Disposable? = null
+        private var reactions: FlexboxLayout = itemView.findViewById(R.id.widget_reactions)
 
-        private fun callPhotoBottomSheet(parent: ViewGroup){
+        private fun callPhotoBottomSheet(parent: ViewGroup) {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val view = layoutInflater.inflate(R.layout.bottom_sheet_image,null)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_image, null)
             val dialog = BottomSheetDialog(parent.context)
             dialog.setContentView(view)
             dialog.show()
@@ -57,10 +68,11 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     view.dialog_message_photo_view.setImageBitmap(resource)
                 }
+
                 override fun onLoadCleared(placeholder: Drawable?) {
                 }
             })
-            view.dialog_message_photo_view.setOnLongClickListener{
+            view.dialog_message_photo_view.setOnLongClickListener {
                 callPhotoBottomSheet(parent)
                 true
             }
@@ -77,7 +89,12 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
             userAvatar.user = message.author
             timestampText.text = timestampConverter(message.timestamp)
             authorNameText.text = message.author?.name ?: ""
-            text.text = message.content ?: ""
+            reactions.removeAllViews()
+
+            if (message.content != null && Assets.regexContent.containsMatchIn(message.content!!)) {
+                text.text = richText(message)
+            } else
+                text.text = message.content
             if (message.attachments.size != 0)
                 for (attachment in message.attachments) {
                     Glide.with(attachmentImage.context).load(attachment.url)
@@ -87,7 +104,12 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                     }
                 }
             else Glide.with(attachmentImage.context).clear(attachmentImage)
-
+            if (message.reactions.size != 0)
+                reactionsBinder(message = message)
+            else {
+                reactions.visibility = View.GONE
+                reactions.removeAllViews()
+            }
             if (if (prevMessage == null) true
                 else
                     message.authorId != prevMessage.authorId ||
@@ -104,22 +126,29 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                 timestampText.visibility = View.GONE
                 authorNameText.visibility = View.GONE
             }
-
             disposable?.dispose()
             disposable =
                 message.observable.observeOn(AndroidSchedulers.mainThread())
-                    .doOnError { error -> println(error) }.subscribe {
-                        text.text = message.content ?: ""
+                    .subscribe {
                         userAvatar.user = message.author
                         timestampText.text = timestampConverter(message.timestamp)
                         authorNameText.text = message.author?.name ?: ""
+                        if (message.content != null && Assets.regexContent.containsMatchIn(message.content!!)) {
+                            text.text = richText(message = message)
+                        } else
+                            text.text = message.content
                         if (message.attachments.size != 0)
                             for (attachment in message.attachments) {
                                 Glide.with(attachmentImage.context).load(attachment.url)
                                     .into(attachmentImage)
                             }
                         else Glide.with(attachmentImage.context).clear(attachmentImage)
-
+                        if (message.reactions.size != 0)
+                            reactionsBinder(message = message)
+                        else {
+                            reactions.visibility = View.GONE
+                            reactions.removeAllViews()
+                        }
                     }
         }
 
@@ -144,20 +173,91 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                 if (timeLocal.minute < 10) "0${timeLocal.minute}" else "${timeLocal.minute}"
             return "$adjective $divide$timeHour:$timeMinute"
         }
+
+        private fun reactionsBinder(message: Message) {
+            for (reaction in message.reactions) {
+                reactions.visibility = View.VISIBLE
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val reaction_view =
+                    layoutInflater.inflate(R.layout.widget_message_reaction, null)
+                val reaction_image =
+                    reaction_view.findViewById<ImageView>(R.id.widget_reaction_image)
+                val reaction_emoji =
+                    reaction_view.findViewById<TextView>(R.id.widget_reaction_emoji)
+                val reaction_count =
+                    reaction_view.findViewById<TextView>(R.id.widget_reaction_count)
+                if (reaction.id.matches(Regex("""^[0-9]+""")))
+
+                    Glide.with(reactions.context).asDrawable()
+                        .load(Assets.emojiURL(reaction.id))
+                        .into(
+                            object : CustomTarget<Drawable>() {
+                                override fun onResourceReady(
+                                    resource: Drawable,
+                                    transition: Transition<in Drawable>?
+                                ) {
+                                    reaction_image.setImageDrawable(resource)
+                                }
+
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                }
+                            })
+                else
+                    reaction_emoji.text = reaction.name
+                reaction_count.text = "${reaction.count}"
+                reactions.addView(reaction_view)
+            }
+        }
+
+        private fun richText(message: Message): SpannableString {
+            val span = SpannableString(message.content)
+            Assets.contentParser(message.content!!).forEach {
+                Glide.with(text.context).asDrawable()
+                    .load(Assets.emojiURL(it.id))
+                    .into(
+                        object : CustomTarget<Drawable>() {
+                            override fun onResourceReady(
+                                resource: Drawable,
+                                transition: Transition<in Drawable>?
+                            ) {
+                                resource.setBounds(
+                                    0,
+                                    0,
+                                    (text.textSize * 2).toInt(),
+                                    (text.textSize * 2).toInt()
+                                )
+                                span.setSpan(
+                                    ImageSpan(resource),
+                                    it.start,
+                                    (it.end + 1),
+                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                                )
+
+                            }
+
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+                        })
+            }
+            return span
+        }
     }
 
     var channelId: String? = null
         set(value) {
             field = value
-            val messages = value?.let { (Client.global.channels[value] as TextChannel).messages }
-            disposable?.dispose()
-            disposable =
-                messages?.observable?.observeOn(AndroidSchedulers.mainThread())
-                    ?.doOnError { error -> println(error) }
-                    ?.subscribe {
-                        list = if (channelId == null) emptyList() else
-                            messages.list.toList()
-                    }
+            if (value != null) {
+                val messages = (Client.global.channels[value] as TextChannel).messages
+                disposable?.dispose()
+                disposable =
+                    messages.observable.observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            runBlocking {
+                                list = messages.list.toList()
+                                list
+                            }
+                        }
+            }
         }
     var disposable: Disposable? = null
     var list: List<String> = listOf()
@@ -169,11 +269,13 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
     init {
         channelId = AppState.global.channelSelection.value.channelId
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe({
                 channelId = it.channelId
                 list = if (channelId == null) emptyList() else
                     (Client.global.channels[channelId!!] as TextChannel).messages.list.toList()
-            }
+            }, { error -> println(error.message) })
+
+
     }
 
     override fun getItemId(position: Int): Long {
@@ -201,7 +303,6 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         }
         view.delete_button.setOnClickListener {
             message.delete().observeOn(AndroidSchedulers.mainThread())
-                .doOnError { error -> println(error) }
                 .subscribe {
                     dialog.dismiss()
                 }

@@ -16,6 +16,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.ui.chat.messages.MessageListAdapter
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -77,6 +78,7 @@ class ChannelPanelFragment : Fragment() {
         val bar_update_message = view.findViewById<LinearLayout>(R.id.bar_update_message)
         val btn_send: ImageView = view.findViewById(R.id.btn_message_send)
         val edit_text: EditText = view.findViewById(R.id.editText)
+        val btn_message_menu: ImageView = view.findViewById(R.id.btn_message_menu)
         val btn_update_text_cancel: TextView = view.findViewById(R.id.btn_update_message_cancel)
         btn_send.setOnClickListener {
 
@@ -98,6 +100,7 @@ class ChannelPanelFragment : Fragment() {
                     edit_text.text = null
                 }
         }
+
         list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = MessageListAdapter().apply { hasStableIds() }
@@ -106,8 +109,9 @@ class ChannelPanelFragment : Fragment() {
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = false)
         }
+        btn_message_menu.setOnClickListener {
 
-
+        }
     }
 
 }
