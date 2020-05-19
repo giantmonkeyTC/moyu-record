@@ -1,12 +1,15 @@
 package cn.troph.tomon.ui.chat.messages
 
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.style.BackgroundColorSpan
 import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
@@ -23,16 +26,15 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.UserAvatar
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
+import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import kotlinx.coroutines.runBlocking
 
 import java.time.LocalDateTime
@@ -91,7 +93,10 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
             authorNameText.text = message.author?.name ?: ""
             reactions.removeAllViews()
 
-            if (message.content != null && Assets.regexContent.containsMatchIn(message.content!!)) {
+            if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
+                    message.content!!
+                ))
+            ) {
                 text.text = richText(message)
             } else
                 text.text = message.content
@@ -133,7 +138,10 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                         userAvatar.user = message.author
                         timestampText.text = timestampConverter(message.timestamp)
                         authorNameText.text = message.author?.name ?: ""
-                        if (message.content != null && Assets.regexContent.containsMatchIn(message.content!!)) {
+                        if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
+                                message.content!!
+                            ))
+                        ) {
                             text.text = richText(message = message)
                         } else
                             text.text = message.content
@@ -163,7 +171,7 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                         1 -> "昨天"
                         2 -> "前天"
                         3, 4, 5, 6 -> "${LocalDateTime.now().dayOfMonth - dateLocal.dayOfMonth}天前"
-                        else -> ""
+                        else -> "${dateLocal.year}/${dateLocal.monthValue}/${dateLocal.dayOfMonth}"
                     }
                 else "${dateLocal.year}/${dateLocal.monthValue}/${dateLocal.dayOfMonth}"
             val divide: String = if (timeLocal.hour - 12 > 0) "下午" else "上午"
@@ -175,6 +183,7 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         }
 
         private fun reactionsBinder(message: Message) {
+            reactions.removeAllViews()
             for (reaction in message.reactions) {
                 reactions.visibility = View.VISIBLE
                 val layoutInflater = LayoutInflater.from(parent.context)
@@ -186,8 +195,28 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                     reaction_view.findViewById<TextView>(R.id.widget_reaction_emoji)
                 val reaction_count =
                     reaction_view.findViewById<TextView>(R.id.widget_reaction_count)
-                if (reaction.id.matches(Regex("""^[0-9]+""")))
+                if (reaction.me) {
+                    reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
+                }
+                reaction_view.widget_reaction_unit.setOnClickListener {
+                    if (reaction.me)
+                        reaction.delete().observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                if (it.count == 0)
+                                    reactions.removeView(reaction_view)
+                            }, { err ->
+                                println(
+                                    err.message
+                                )
+                            })
+                    else
+                        reaction.addReaction().observeOn(AndroidSchedulers.mainThread()).subscribe {
 
+                        }
+
+                }
+
+                if (reaction.id.matches(Regex("""^[0-9]+""")))
                     Glide.with(reactions.context).asDrawable()
                         .load(Assets.emojiURL(reaction.id))
                         .into(
@@ -205,13 +234,27 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                 else
                     reaction_emoji.text = reaction.name
                 reaction_count.text = "${reaction.count}"
+                reaction.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    reaction_count.text = "${reaction.count}"
+                    if (reaction.me) {
+                        reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
+                    } else
+                        reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction)
+
+                }
+                message.reactions.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    if (message.reactions.size == 0)
+                        reactions.visibility = View.GONE
+                }
                 reactions.addView(reaction_view)
             }
         }
 
         private fun richText(message: Message): SpannableString {
-            val span = SpannableString(message.content)
-            Assets.contentParser(message.content!!).forEach {
+
+            val contentSpan = Assets.contentParser(message.content!!)
+            val span = SpannableString(contentSpan.parseContent)
+            contentSpan.contentEmoji.forEach {
                 Glide.with(text.context).asDrawable()
                     .load(Assets.emojiURL(it.id))
                     .into(
@@ -238,6 +281,14 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                             override fun onLoadCleared(placeholder: Drawable?) {
                             }
                         })
+            }
+            contentSpan.contentAtUser.forEach {
+                span.setSpan(
+                    BackgroundColorSpan(Color.parseColor("#5996b8")),
+                    it.start,
+                    (it.end) + 1,
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                )
             }
             return span
         }
@@ -288,6 +339,7 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(parent.context)
         dialog.setContentView(view)
+
         view.delete_button.visibility = if (message.authorId == Client.global.me.id)
             View.VISIBLE
         else
@@ -310,6 +362,13 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         view.edit_button.setOnClickListener {
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = true, message = message)
+            dialog.dismiss()
+        }
+        view.copy_message_button.setOnClickListener {
+            val clipboard =
+                view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip: ClipData = ClipData.newPlainText("copy", message.content)
+            clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }
         viewItem.setBackgroundColor(Color.parseColor("#3A3A3A"))

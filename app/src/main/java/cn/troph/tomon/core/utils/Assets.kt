@@ -1,5 +1,7 @@
 package cn.troph.tomon.core.utils
 
+import cn.troph.tomon.core.Client
+
 object Assets {
     fun emojiURL(id: String, animated: Boolean = false): String {
         return "https://cdn.tomon.co/emojis/$id.${if (animated) "gif" else "png"}"
@@ -13,13 +15,49 @@ object Assets {
         val name: String
     )
 
-    val regexContent: Regex = Regex("""<%[\w\u4e00-\u9fa5]+:[0-9]+>""")
-    fun contentParser(content: String): List<ContentEmoji> {
+    data class ContentAtUser(
+        val start: Int,
+        val end: Int,
+        val name: String
+    )
+
+    data class ContentSpan(
+        val contentAtUser: List<ContentAtUser>,
+        val contentEmoji: List<ContentEmoji>,
+        val parseContent: String
+    )
+
+    val regexEmoji: Regex = Regex("""<%[\w\u4e00-\u9fa5]+:[0-9]+>""")
+    val regexAtUser: Regex = Regex("""<@[0-9]+>""")
+    fun contentParser(content: String): ContentSpan {
         val regexRaw = Regex("""\:""")
-        val listMatches = regexContent.findAll(content, 0).toList()
+        val userNames = mutableListOf<String>()
+        val parserContent =
+            content.replace(
+                regexAtUser
+            ) {
+                val name =
+                    Client.global.users[it.value.substring(2, it.value.length - 1)]?.name ?: ""
+                userNames.add(name)
+                "@$name"
+            }
+        var index = 0
+        val listAtUser = mutableListOf<ContentAtUser>()
+        listAtUser.clear()
+        userNames.forEach {
+            val start = parserContent.indexOf("@${it}", index)
+            index += it.length
+            val contentAtUser = ContentAtUser(
+                start = start,
+                end = start + it.length,
+                name = it
+            )
+            listAtUser.add(contentAtUser)
+        }
+        val emojiListMatches = regexEmoji.findAll(parserContent, 0).toList()
         val listContentEmoji = mutableListOf<ContentEmoji>()
         listContentEmoji.clear()
-        listMatches.forEach { result ->
+        emojiListMatches.forEach { result ->
             val list = regexRaw.split(result.value)
             val contentEmoji = ContentEmoji(
                 start = result.range.first,
@@ -30,9 +68,11 @@ object Assets {
             )
             listContentEmoji.add(contentEmoji)
         }
-        return listContentEmoji
-
-
+        return ContentSpan(
+            contentAtUser = listAtUser,
+            contentEmoji = listContentEmoji,
+            parseContent = parserContent
+        )
     }
 
 }
