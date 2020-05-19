@@ -79,4 +79,14 @@ interface MessageService {
         ) token: String
     ): Observable<JsonArray>
 
+    @DELETE("channels/{channelId}/messages/{messageId}/reactions/{identifier}/@me")
+    fun deleteReaction(
+        @Path("channelId") channelId: String,
+        @Path("messageId") messageId: String,
+        @Path("identifier") identifier: String,
+        @Header(
+            "Authorization"
+        ) token: String
+    ): Observable<Void>
+
 }
