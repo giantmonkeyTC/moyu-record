@@ -23,6 +23,7 @@ import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
@@ -86,52 +87,48 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        val view = findViewById<ConstraintLayout>(R.id.layout_root)
-        val union = findViewById<EditText>(R.id.input_union_id)
-        val password = findViewById<EditText>(R.id.input_password)
-        val button = findViewById<Button>(R.id.button_login)
-        bindProgressButton(button)
-        button.attachTextChangeAnimator()
+        bindProgressButton(button_login)
+        button_login.attachTextChangeAnimator()
 
         viewModel.loginForm.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
             if (loginState.unionIdError != null) {
-                union.error = getString(loginState.unionIdError)
+                input_union_id.error = getString(loginState.unionIdError)
             }
             if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
+                input_password.error = getString(loginState.passwordError)
             }
         })
 
-        button.setOnClickListener {
-            val uid = union.text.toString()
-            val pw = password.text.toString()
+        button_login.setOnClickListener {
+            val uid = input_union_id.text.toString()
+            val pw = input_password.text.toString()
             val valid = viewModel.loginDataValidate(uid, pw)
             if (valid) {
-                button.showProgress {
+                button_login.showProgress {
                     progressColor = getColor(R.color.white)
                 }
                 Client.global.login(
                     unionId = uid,
                     password = pw
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    button.hideProgress(R.string.login_succeed)
+                    button_login.hideProgress(R.string.login_succeed)
                     Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             gotoChat()
                         }
                 }, {
                     val e = it as HttpException
-                    button.hideProgress(if (e.code() >= 500) R.string.auth_server_error else R.string.login_failed)
+                    button_login.hideProgress(if (e.code() >= 500) R.string.auth_server_error else R.string.login_failed)
                     Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            button.hideProgress(R.string.login_button)
+                            button_login.hideProgress(R.string.login_button)
                         }
                 })
             }
 
         }
-        view.setOnClickListener {
+        layout_root.setOnClickListener {
             closeKeyboard()
         }
     }

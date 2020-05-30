@@ -3,13 +3,10 @@ package cn.troph.tomon.ui.activities
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.ui.AppBarConfiguration
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
@@ -19,6 +16,7 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
 class ChatActivity : AppCompatActivity() {
 
@@ -39,10 +37,8 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        val toolbarTitle: TextView = toolbar.findViewById(R.id.text_toolbar_title)
         setSupportActionBar(toolbar)
-        toolbarTitle.text = "TOMON"
+        text_toolbar_title.text = "TOMON"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
 
@@ -59,11 +55,9 @@ class ChatActivity : AppCompatActivity() {
 
     private fun updateToolbar(channel: Channel) {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        val toolbarTitle: TextView = toolbar.findViewById(R.id.text_toolbar_title)
-        val toolbarImage: ImageView = toolbar.findViewById(R.id.image_toolbar_icon)
         if (channel is GuildChannel) {
             var iconId: Int? = null
-            toolbarTitle.text = channel.name
+            text_toolbar_title.text = channel.name
             when (channel.type) {
                 ChannelType.TEXT -> {
                     iconId =
@@ -75,7 +69,7 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
             if (iconId != null) {
-                toolbarImage.setImageResource(iconId)
+                image_toolbar_icon.setImageResource(iconId)
             }
         }
     }

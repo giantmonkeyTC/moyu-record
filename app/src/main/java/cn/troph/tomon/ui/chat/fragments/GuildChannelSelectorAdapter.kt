@@ -31,7 +31,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         const val TYPE_EMPTY = 2
     }
 
-
     class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
@@ -97,7 +96,12 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         val old = AppState.global.channelSelection.value
                         AppState.global.channelSelection.value =
                             ChannelSelection(guildId = old.guildId, channelId = channel.id)
-                        AppState.global.eventBus.postEvent(AppUIEvent(AppUIEventType.CHANNEL_DRAWER, false))
+                        AppState.global.eventBus.postEvent(
+                            AppUIEvent(
+                                AppUIEventType.CHANNEL_DRAWER,
+                                false
+                            )
+                        )
                     }
                 }
 
@@ -110,9 +114,10 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             field = value
             val channels = value?.let { Client.global.guilds[value]?.channels }
             disposable?.dispose()
-            disposable = channels?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
-                list = updateVisibility()
-            }
+            disposable =
+                channels?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
+                    list = updateVisibility()
+                }
         }
 
     var disposable: Disposable? = null
