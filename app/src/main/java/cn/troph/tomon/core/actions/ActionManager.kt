@@ -64,8 +64,8 @@ class ActionManager(val client: Client) {
 
     fun messageUpdate(data: JsonElement): Message? = MessageUpdateAction(client).handle(data)
 
-    fun reactionDelete(data: JsonElement): MessageReaction? =
-        ReactionDeleteAction(client).handle(data)
+    fun reactionRemove(data: JsonElement): MessageReaction? =
+        ReactionRemoveAction(client).handle(data)
 
     fun reactionAdd(data: JsonElement): MessageReaction? =
         ReactionAddAction(client).handle(data)

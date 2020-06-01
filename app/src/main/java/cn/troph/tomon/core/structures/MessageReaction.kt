@@ -3,12 +3,10 @@ package cn.troph.tomon.core.structures
 import androidx.core.text.htmlEncode
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.optString
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.*
 
 class MessageReaction(
     client: Client,
@@ -98,25 +96,23 @@ class MessageReaction(
         }
     }
 
-    fun delete(): Observable<MessageReaction> {
+    fun delete(): Observable<Unit> {
         return client.rest.messageService.deleteReaction(
             channelId = this.channelId,
             messageId = this.messageId,
             identifier = this.identifier,
             token = client.auth
         ).subscribeOn(Schedulers.io()).map {
-            client.actions.reactionDelete(JsonParser.parseString("{\"channel_id\":${this.channelId},\"message_id\":${this.messageId},\"id\":${id},\"name\":${name}}"))
         }
     }
 
-    fun addReaction(): Observable<MessageReaction> {
+    fun addReaction(): Observable<Unit> {
         return client.rest.messageService.addReaction(
             this.channelId,
             this.messageId,
             this.identifier,
             client.auth
         ).subscribeOn(Schedulers.io()).map {
-            client.actions.reactionAdd(JsonParser.parseString("{\"channel_id\":${this.channelId},\"message_id\":${this.messageId},\"id\":${id},\"name\":${name}}"))
         }
     }
 

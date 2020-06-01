@@ -7,7 +7,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
 
-
 interface MessageService {
 
     @GET("channels/{channelId}/messages")
@@ -40,9 +39,9 @@ interface MessageService {
     @Multipart
     @POST("channels/{channelId}/messages")
     fun uploadAttachments(
-        @Path("channelID") channelId: String,
-        @PartMap partMap: Map<String, RequestBody>,
-        @Part vararg files: MultipartBody.Part,
+        @Path("channelId") channelId: String,
+        @PartMap partMap: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part files: MultipartBody.Part,
         @Header(
             "Authorization"
         ) token: String

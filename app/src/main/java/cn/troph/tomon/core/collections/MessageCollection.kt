@@ -9,6 +9,8 @@ import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class MessageCollection(client: Client, val channel: Channel) :
     BaseCollection<Message>(client) {
@@ -131,6 +133,20 @@ class MessageCollection(client: Client, val channel: Channel) :
             .subscribeOn(Schedulers.io()).map {
                 client.actions.messageCreate(it)
             }
+    }
+
+    fun uploadAttachments(
+        partMap: Map<String, RequestBody>,
+        files: MultipartBody.Part
+    ): Observable<Message> {
+        return client.rest.messageService.uploadAttachments(
+            channelId = channel.id,
+            partMap = partMap,
+            files = files,
+            token = client.auth
+        ).subscribeOn(Schedulers.io()).map {
+            client.actions.messageCreate(it)
+        }
     }
 
 }

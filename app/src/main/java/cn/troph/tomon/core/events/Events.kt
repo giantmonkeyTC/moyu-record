@@ -47,7 +47,7 @@ data class MessageCreateEvent(val message: Message) : Event()
 data class MessageDeleteEvent(val message: Message) : Event()
 data class MessageUpdateEvent(val message: Message) : Event()
 
-data class ReactionDeleteEvent(val reaction: MessageReaction) : Event()
+data class ReactionRemoveEvent(val reaction: MessageReaction) : Event()
 data class ReactionAddEvent(val reaction: MessageReaction) : Event()
 
 data class PresenceFetchEvent(val presences: List<Presence>) : Event()

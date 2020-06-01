@@ -45,7 +45,12 @@ class Socket : Observer<SocketEvent> {
         "CHANNEL_CREATE" to handleChannelCreate,
         "CHANNEL_DELETE" to handleChannelDelete,
         "CHANNEL_UPDATE" to handleChannelUpdate,
-        "USER_GUILD_SETTINGS" to handleGuildSettings
+        "USER_GUILD_SETTINGS" to handleGuildSettings,
+        "MESSAGE_CREATE" to handleMessageCreate,
+        "MESSAGE_DELETE" to handleMessageDelete,
+        "MESSAGE_UPDATE" to handleMessageUpdate,
+        "MESSAGE_REACTION_ADD" to handleMessageReactionAdd,
+        "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove
     )
 
     constructor(client: Client) {

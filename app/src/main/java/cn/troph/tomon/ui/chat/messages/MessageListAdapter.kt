@@ -185,6 +185,10 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
         private fun reactionsBinder(message: Message) {
             reactions.removeAllViews()
             for (reaction in message.reactions) {
+                message.reactions.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    if (message.reactions.size == 0)
+                        reactions.visibility = View.GONE
+                }
                 reactions.visibility = View.VISIBLE
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val reaction_view =
@@ -195,6 +199,7 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                     reaction_view.findViewById<TextView>(R.id.widget_reaction_emoji)
                 val reaction_count =
                     reaction_view.findViewById<TextView>(R.id.widget_reaction_count)
+
                 if (reaction.me) {
                     reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
                 }
@@ -202,8 +207,6 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                     if (reaction.me)
                         reaction.delete().observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                if (it.count == 0)
-                                    reactions.removeView(reaction_view)
                             }, { err ->
                                 println(
                                     err.message
@@ -211,7 +214,6 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                             })
                     else
                         reaction.addReaction().observeOn(AndroidSchedulers.mainThread()).subscribe {
-
                         }
 
                 }
@@ -240,11 +242,6 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                         reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
                     } else
                         reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction)
-
-                }
-                message.reactions.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    if (message.reactions.size == 0)
-                        reactions.visibility = View.GONE
                 }
                 reactions.addView(reaction_view)
             }
@@ -325,8 +322,6 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>()
                 list = if (channelId == null) emptyList() else
                     (Client.global.channels[channelId!!] as TextChannel).messages.list.toList()
             }, { error -> println(error.message) })
-
-
     }
 
     override fun getItemId(position: Int): Long {
