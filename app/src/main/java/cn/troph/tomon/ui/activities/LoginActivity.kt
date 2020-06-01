@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -26,6 +27,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLHandshakeException
 
 data class LoginForm(
     val unionIdError: Int? = null,
@@ -118,8 +120,9 @@ class LoginActivity : AppCompatActivity() {
                             gotoChat()
                         }
                 }, {
-                    val e = it as HttpException
-                    button_login.hideProgress(if (e.code() >= 500) R.string.auth_server_error else R.string.login_failed)
+                    if (it is HttpException) {
+                        button_login.hideProgress(if (it.code() >= 500) R.string.auth_server_error else R.string.login_failed)
+                    }
                     Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             button_login.hideProgress(R.string.login_button)

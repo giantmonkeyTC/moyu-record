@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottom_sheet_message"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/frameworkSelectorDark"
+    android:orientation="vertical"
+    >
+
+    <Button
+        android:id="@+id/copy_message_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/frameworkSelectorDark"
+        android:text="复制文字"
+
+        android:textColor="@color/white"/>
+
+    <Button
+        android:id="@+id/quote_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="引用"
+        android:background="@color/frameworkSelectorDark"
+        android:textColor="@color/white"/>
+    <Button
+        android:id="@+id/edit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="编辑"
+        android:background="@color/frameworkSelectorDark"
+        android:textColor="@color/white"/>
+    <Button
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="删除"
+        android:background="@color/frameworkSelectorDark"
+        android:textColor="@color/white"/>
+    <Button
+        android:id="@+id/share_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="分享"
+        android:background="@color/frameworkSelectorDark"
+        android:textColor="@color/white"/>
+
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/frameworkSelectorDark"
+        android:text="取消"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

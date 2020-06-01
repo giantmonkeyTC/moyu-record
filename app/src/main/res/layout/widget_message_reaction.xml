@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/widget_message_reaction"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="5dp"
+    android:paddingBottom="5dp"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/widget_reaction_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_message_reaction">
+
+        <ImageView
+            android:id="@+id/widget_reaction_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="3dp"
+            app:layout_constraintStart_toStartOf="@id/widget_reaction_unit"
+            app:layout_constraintTop_toTopOf="@+id/widget_reaction_unit" />
+
+        <TextView
+            android:id="@+id/widget_reaction_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="3dp"
+            android:textSize="10dp"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintStart_toStartOf="@id/widget_reaction_unit"
+            app:layout_constraintTop_toTopOf="@+id/widget_reaction_unit" />
+        <TextView
+            android:id="@+id/widget_reaction_count"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:paddingEnd="10dp"
+            app:layout_constraintStart_toEndOf="@id/widget_reaction_image"
+            app:layout_constraintTop_toTopOf="@id/widget_reaction_unit" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

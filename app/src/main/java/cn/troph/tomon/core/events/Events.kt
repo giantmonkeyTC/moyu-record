@@ -47,7 +47,10 @@ data class MessageCreateEvent(val message: Message) : Event()
 data class MessageDeleteEvent(val message: Message) : Event()
 data class MessageUpdateEvent(val message: Message) : Event()
 
+data class ReactionRemoveEvent(val reaction: MessageReaction) : Event()
+data class ReactionAddEvent(val reaction: MessageReaction) : Event()
+
 data class PresenceFetchEvent(val presences: List<Presence>) : Event()
 data class PresenceUpdateEvent(val presence: Presence) : Event()
 
-data class GuildSettingsUpdateEvent(val settings: GuildSettings): Event()
+data class GuildSettingsUpdateEvent(val settings: GuildSettings) : Event()

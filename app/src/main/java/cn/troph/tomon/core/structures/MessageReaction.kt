@@ -1,8 +1,12 @@
 package cn.troph.tomon.core.structures
 
+import androidx.core.text.htmlEncode
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MessageReaction(
     client: Client,
@@ -57,6 +61,12 @@ class MessageReaction(
 
     val isChar get() = isChar(emojiData)
 
+    val identifier
+        get() : String = if (id.matches(Regex("""^[0-9]+""")))
+            "placeholder:${id}"
+        else
+            name!!.htmlEncode()
+
     val message get() = (client.channels[channelId] as? TextChannelBase)?.messages?.get(messageId)
 
     companion object {
@@ -85,5 +95,26 @@ class MessageReaction(
             }
         }
     }
+
+    fun delete(): Observable<Unit> {
+        return client.rest.messageService.deleteReaction(
+            channelId = this.channelId,
+            messageId = this.messageId,
+            identifier = this.identifier,
+            token = client.auth
+        ).subscribeOn(Schedulers.io()).map {
+        }
+    }
+
+    fun addReaction(): Observable<Unit> {
+        return client.rest.messageService.addReaction(
+            this.channelId,
+            this.messageId,
+            this.identifier,
+            client.auth
+        ).subscribeOn(Schedulers.io()).map {
+        }
+    }
+
 
 }

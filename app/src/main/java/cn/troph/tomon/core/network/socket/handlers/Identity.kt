@@ -1,14 +1,17 @@
 package cn.troph.tomon.core.network.socket.handlers
 
+import android.util.Log
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.Handler
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
+import com.orhanobut.logger.Logger
 
 val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     val data = packet.asJsonObject["d"].asJsonObject
     // data pre-processing
+    Logger.d(data)
     data["guilds"].asJsonArray.forEach { ele ->
         val guild = ele.asJsonObject
         if (guild["system_channel_id"].optString == "0") {

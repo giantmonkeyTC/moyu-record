@@ -7,7 +7,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
 
-
 interface MessageService {
 
     @GET("channels/{channelId}/messages")
@@ -32,7 +31,7 @@ interface MessageService {
 
     @POST("channels/{channelId}/messages")
     fun createMessage(
-        @Path("channelID") channelId: String, @Body request: CreateMessageRequest, @Header(
+        @Path("channelId") channelId: String, @Body request: CreateMessageRequest, @Header(
             "Authorization"
         ) token: String
     ): Observable<JsonObject>
@@ -40,9 +39,9 @@ interface MessageService {
     @Multipart
     @POST("channels/{channelId}/messages")
     fun uploadAttachments(
-        @Path("channelID") channelId: String,
-        @PartMap partMap: Map<String, RequestBody>,
-        @Part vararg files: MultipartBody.Part,
+        @Path("channelId") channelId: String,
+        @PartMap partMap: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part files: MultipartBody.Part,
         @Header(
             "Authorization"
         ) token: String
@@ -50,7 +49,7 @@ interface MessageService {
 
     @DELETE("channels/{channelId}/messages/{messageId}")
     fun deleteMessage(
-        @Path("channelId") channelId: String, @Path("messageId") messageId: String, @Header(
+        @Path("channelId") channelId: String, @Path("messageId") messageId: String?, @Header(
             "Authorization"
         ) token: String
     ): Observable<Void>
@@ -62,12 +61,12 @@ interface MessageService {
     @PATCH("channels/{channelId}/messages/{messageId}")
     fun updateMessage(
         @Path("channelId") channelId: String,
-        @Path("messageId") messageId: String,
+        @Path("messageId") messageId: String?,
         @Body request: UpdateMessageRequest,
         @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonArray>
+    ): Observable<JsonObject>
 
     @PUT("channels/{channelId}/messages/{messageId}/reactions/{identifier}/@me")
     fun addReaction(
@@ -78,5 +77,15 @@ interface MessageService {
             "Authorization"
         ) token: String
     ): Observable<JsonArray>
+
+    @DELETE("channels/{channelId}/messages/{messageId}/reactions/{identifier}/@me")
+    fun deleteReaction(
+        @Path("channelId") channelId: String,
+        @Path("messageId") messageId: String,
+        @Path("identifier") identifier: String,
+        @Header(
+            "Authorization"
+        ) token: String
+    ): Observable<Void>
 
 }

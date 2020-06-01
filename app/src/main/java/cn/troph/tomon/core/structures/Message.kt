@@ -3,11 +3,15 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
+import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.JsonObject
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.time.LocalDateTime
 
 class Message(client: Client, data: JsonObject) : Base(client, data),
@@ -57,7 +61,7 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
             type = MessageType.fromInt(value) ?: MessageType.DEFAULT
         }
         if (data.has("author") && !data["author"].isJsonNull) {
-            val author = client.users.add(data)
+            val author = client.users.add(data["author"].asJsonObject)
             authorId = author?.id
         }
         if (data.has("content")) {
@@ -128,5 +132,27 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
     override fun compareTo(other: Message): Int {
         return sortKey.compareTo(other.sortKey)
     }
+
+    fun delete(): Observable<Message> {
+        return client.rest.messageService.deleteMessage(this.channelId, this.id, client.auth)
+            .doOnError { error -> println(error) }.subscribeOn(Schedulers.io()).map {
+                client.actions.messageDelete(this.raw)
+            }
+    }
+
+    fun update(content: String): Observable<Message> {
+        return client.rest.messageService.updateMessage(
+            this.channelId,
+            this.id,
+            MessageService.UpdateMessageRequest(content),
+            client.auth
+        ).subscribeOn(Schedulers.io()).map {
+            client.actions.messageUpdate(it)
+        }
+    }
+
+
+
+
 
 }

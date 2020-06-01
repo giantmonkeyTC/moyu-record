@@ -16,7 +16,11 @@ class ChannelFetchAction(client: Client) : Action<List<Channel>>(client) {
         val isSync: Boolean = (extras[0] as? Boolean) ?: true
         val getGuildId = { el: JsonElement ->
             if (el.isJsonArray) {
-                el.asJsonArray.get(0)?.asJsonObject?.get("guild_id")?.optString
+                if (el.asJsonArray.size() > 0) {
+                    el.asJsonArray.get(0)?.asJsonObject?.get("guild_id")?.optString
+                } else {
+                    ""
+                }
             } else {
                 el.asJsonObject["guild_id"].optString
             }

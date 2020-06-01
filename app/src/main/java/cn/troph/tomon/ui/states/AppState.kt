@@ -1,8 +1,11 @@
 package cn.troph.tomon.ui.states
 
+import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.event.RxBus
 
 data class ChannelSelection(val guildId: String? = null, val channelId: String? = null)
+
+data class UpdateEnabled(val flag: Boolean = false, val message:Message? = null)
 
 data class AppUIEvent(val type: AppUIEventType, val value: Any? = null)
 
@@ -24,6 +27,7 @@ class AppState {
     val eventBus: RxBus = RxBus()
     val channelSelection: Variable<ChannelSelection> = Variable(ChannelSelection())
     val channelCollapses: Variable<Map<String, Boolean>> = Variable(mapOf())
+    val updateEnabled: Variable<UpdateEnabled> = Variable(UpdateEnabled())
 
     fun channelIsCollapsed(channelId: String): Boolean {
         return channelCollapses.value[channelId] ?: false

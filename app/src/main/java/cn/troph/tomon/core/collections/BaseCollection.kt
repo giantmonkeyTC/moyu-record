@@ -38,7 +38,7 @@ open class BaseCollection<T : Base>(val client: Client) :
                 return existing
             }
         }
-        val entry = instantiate(data);
+        val entry = instantiate(data)
         if (id != null && entry != null) {
             put(id, entry)
         }
