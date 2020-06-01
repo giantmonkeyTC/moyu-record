@@ -23,13 +23,15 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
-class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
+class GuildChannelSelectorAdapter(private val guildChannelList: MutableList<GuildChannel>) :
+    RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
 
     companion object {
         const val TYPE_CHANNEL = 0
         const val TYPE_CATEGORY = 1
         const val TYPE_EMPTY = 2
     }
+
 
     class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -241,8 +243,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val id = list[position]
-        val channel = Client.global.channels[id] as? GuildChannel
+        val channel = guildChannelList[position]
         if (channel != null) {
             holder.bind(channel)
         } else {

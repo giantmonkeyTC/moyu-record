@@ -37,7 +37,7 @@ class GuildSelectorFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = GuildSelectorAdapter()
         }
-        btn_guild_fab.setOnClickListener{
+        btn_guild_fab.setOnClickListener {
             callBottomSheet()
         }
     }

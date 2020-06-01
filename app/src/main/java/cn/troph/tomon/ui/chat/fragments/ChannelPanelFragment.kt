@@ -92,7 +92,6 @@ class ChannelPanelFragment : Fragment() {
     ): View? {
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                Logger.d(it.message?.content)
                 message = it.message
                 updateEnabled = it.flag
             }
