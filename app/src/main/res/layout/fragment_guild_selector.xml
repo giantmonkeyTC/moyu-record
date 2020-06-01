@@ -32,7 +32,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
+<View
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="3dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:id="@+id/line_sp"
+    app:layout_constraintTop_toBottomOf="@id/view_avatar"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@android:color/darker_gray"
+    />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/view_guilds"
         android:layout_width="match_parent"
@@ -40,6 +50,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btn_guild_fab"
-        app:layout_constraintTop_toBottomOf="@id/view_avatar" />
+        app:layout_constraintTop_toBottomOf="@id/line_sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
