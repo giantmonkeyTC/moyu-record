@@ -11,7 +11,6 @@ import com.orhanobut.logger.Logger
 val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     val data = packet.asJsonObject["d"].asJsonObject
     // data pre-processing
-    Logger.d(data)
     data["guilds"].asJsonArray.forEach { ele ->
         val guild = ele.asJsonObject
         if (guild["system_channel_id"].optString == "0") {

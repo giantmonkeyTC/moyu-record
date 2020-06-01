@@ -12,6 +12,10 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
+fun <T> MutableLiveData<T>.notifyObserver() {
+    this.value = this.value
+}
+
 class MessageViewModel : ViewModel() {
     private val messageLiveData = MutableLiveData<MutableList<Message>>()
 
@@ -24,7 +28,17 @@ class MessageViewModel : ViewModel() {
         channel.messages.fetch().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 Consumer {
+//                    for (item in it) {
+//                        item.observable.observeOn(AndroidSchedulers.mainThread()).subscribe(
+//                            Consumer {
+//                                //messageLiveData.notifyObserver()
+//                            }
+//                        )
+//                    }
                     messageLiveData.value = it.toMutableList()
+
                 })
     }
+
+
 }

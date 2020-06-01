@@ -29,9 +29,11 @@ import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
+import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
@@ -90,6 +92,7 @@ class ChannelPanelFragment : Fragment() {
     ): View? {
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
+                Logger.d(it.message?.content)
                 message = it.message
                 updateEnabled = it.flag
             }
@@ -109,6 +112,8 @@ class ChannelPanelFragment : Fragment() {
                     ?: ""] as TextChannel).messages.create(editText.text.toString())
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
+                        msgViewModel.getMessageLiveData().value?.add(it)
+                        msgViewModel.getMessageLiveData().notifyObserver()
                         editText.text = null
                     }
             else
@@ -129,6 +134,7 @@ class ChannelPanelFragment : Fragment() {
                     msgListAdapter = MessageAdapter(it)
                     view_messages.layoutManager = LinearLayoutManager(view.context)
                     view_messages.adapter = msgListAdapter
+                    view_messages.scrollToPosition(msgListAdapter.itemCount - 1)
                 }
             })
         view_messages.addOnScrollListener(MessageListOnScrollListener())
@@ -138,7 +144,7 @@ class ChannelPanelFragment : Fragment() {
         }
         btn_message_menu.setOnClickListener {
             val openAlbumIntent = Intent(Intent.ACTION_GET_CONTENT)
-            openAlbumIntent.setType("image/*")
+            openAlbumIntent.type = "image/*"
             startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
         btn_message_menu.setOnLongClickListener {
@@ -151,7 +157,7 @@ class ChannelPanelFragment : Fragment() {
                 )
             val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (takePhotoIntent.resolveActivityInfo(
-                    requireActivity().getPackageManager(),
+                    requireActivity().packageManager,
                     PackageManager.MATCH_DEFAULT_ONLY
                 ) != null
             ) {
@@ -205,7 +211,7 @@ class ChannelPanelFragment : Fragment() {
                 val requestBody =
                     "{\"content\":null,\"nonce\":\"1227791868142817280\"}".toRequestBody()
                 val map = mutableMapOf<String, RequestBody>()
-                map.put("payload_json", requestBody)
+                map["payload_json"] = requestBody
                 val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
                 (Client.global.channels[channelId!!] as TextChannel).messages.uploadAttachments(
                     partMap = map,

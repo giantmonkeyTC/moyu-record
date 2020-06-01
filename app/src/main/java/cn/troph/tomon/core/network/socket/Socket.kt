@@ -6,6 +6,7 @@ import cn.troph.tomon.core.network.socket.handlers.*
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -77,7 +78,7 @@ class Socket : Observer<SocketEvent> {
     val state get() = _socketClient.state
 
     private fun heartbeat() {
-        println("heartbeat")
+        Logger.d("heartbeat")
         send(GatewayOp.HEARTBEAT)
         _heartbeatTimerTask = _heartbeatTimer.schedule(_heartbeatInterval) {
             heartbeat()
