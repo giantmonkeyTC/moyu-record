@@ -40,13 +40,6 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) : Recycler
         }
     }
 
-    init {
-        Client.global.guilds.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe { _ ->
-                notifyDataSetChanged()
-            }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val inflatedView =
