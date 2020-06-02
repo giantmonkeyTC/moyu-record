@@ -28,16 +28,18 @@ class MessageViewModel : ViewModel() {
         channel.messages.fetch().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 Consumer {
-//                    for (item in it) {
-//                        item.observable.observeOn(AndroidSchedulers.mainThread()).subscribe(
-//                            Consumer {
-//                                //messageLiveData.notifyObserver()
-//                            }
-//                        )
-//                    }
                     messageLiveData.value = it.toMutableList()
-
                 })
+        channel.messages.observable.observeOn(AndroidSchedulers.mainThread()).subscribe(
+            Consumer {
+                it.obj?.let {
+                    messageLiveData.value?.add(it)
+                    messageLiveData.notifyObserver()
+                }
+
+            }
+        )
+
     }
 
 

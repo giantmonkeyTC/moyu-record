@@ -47,7 +47,7 @@ open class BaseCollection<T : Base>(val client: Client) :
 
     override operator fun set(key: String, value: T): T? {
         val entry = super.set(key, value)
-        observable.onNext(Event(EventType.SET, entry))
+        observable.onNext(Event(EventType.SET, value))
         return entry
     }
 
