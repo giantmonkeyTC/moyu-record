@@ -38,9 +38,11 @@ class GuildSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
-            mAdapter = GuildSelectorAdapter(it)
-            view_guilds.layoutManager = LinearLayoutManager(view.context)
-            view_guilds.adapter = mAdapter
+            it?.let {
+                mAdapter = GuildSelectorAdapter(it)
+                view_guilds.layoutManager = LinearLayoutManager(view.context)
+                view_guilds.adapter = mAdapter
+            }
         })
         mGuildVM.loadGuildList()
         btn_guild_fab.setOnClickListener {
