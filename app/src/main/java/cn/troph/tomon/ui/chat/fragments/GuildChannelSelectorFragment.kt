@@ -6,22 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.ui.chat.viewmodel.GuildChannelViewModel
 import cn.troph.tomon.ui.states.AppState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 
 class GuildChannelSelectorFragment : Fragment() {
-
-    private val mGuildChannelViewModel: GuildChannelViewModel by viewModels()
-    private lateinit var mGuildChannelAdapter: GuildChannelSelectorAdapter
 
     var disposable: Disposable? = null
 
@@ -46,19 +39,13 @@ class GuildChannelSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mGuildChannelViewModel.getChannelLiveData().observe(viewLifecycleOwner, Observer {
-            view_guild_channels.layoutManager = LinearLayoutManager(view.context)
-            mGuildChannelAdapter = GuildChannelSelectorAdapter(it)
-            view_guild_channels.adapter = mGuildChannelAdapter
-        })
+        val list = view.findViewById<RecyclerView>(R.id.view_guild_channels)
+        list.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
+        }
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                guildId = it.guildId
-                guildId?.let {
-                    mGuildChannelViewModel.loadGuildChannel(it)
-                }
-
-            }
+            .subscribe { guildId = it.guildId }
     }
 
     fun update() {

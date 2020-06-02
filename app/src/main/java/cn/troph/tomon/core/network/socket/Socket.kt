@@ -78,7 +78,7 @@ class Socket : Observer<SocketEvent> {
     val state get() = _socketClient.state
 
     private fun heartbeat() {
-        Logger.d("heartbeat")
+        println("heartbeat")
         send(GatewayOp.HEARTBEAT)
         _heartbeatTimerTask = _heartbeatTimer.schedule(_heartbeatInterval) {
             heartbeat()
