@@ -34,7 +34,10 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
 import com.orhanobut.logger.Logger
+import com.vanniktech.emoji.EmojiPopup
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.kotlin.toObservable
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -146,6 +149,15 @@ class ChannelPanelFragment : Fragment() {
             openAlbumIntent.type = "image/*"
             startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
+
+
+
+        emoji_tv.setOnClickListener {
+            val emojiPopup = EmojiPopup.Builder.fromRootView(coordinatorLayout).build(editText)
+            if (emojiPopup.isShowing) emojiPopup.dismiss() else emojiPopup.toggle()
+        }
+
+
         btn_message_menu.setOnLongClickListener {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED

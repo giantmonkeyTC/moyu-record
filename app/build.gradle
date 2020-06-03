@@ -84,4 +84,6 @@ dependencies {
 // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha10"
     implementation 'com.orhanobut:logger:2.2.0'
+    implementation 'com.vanniktech:emoji-ios:0.6.0'
+    implementation 'com.vanniktech:emoji:0.6.0'
 }
