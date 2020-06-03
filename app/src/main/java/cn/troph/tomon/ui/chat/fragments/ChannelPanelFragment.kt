@@ -26,18 +26,17 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
+import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
-import cn.troph.tomon.ui.chat.messages.MessageListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
-import com.orhanobut.logger.Logger
 import com.vanniktech.emoji.EmojiPopup
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
-import io.reactivex.rxjava3.kotlin.toObservable
+import kotlinx.android.synthetic.main.emoji_layout.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -53,6 +52,8 @@ import java.io.FileOutputStream
 class ChannelPanelFragment : Fragment() {
 
     private val msgViewModel: MessageViewModel by viewModels()
+    private val mEmojiList = mutableListOf<CustomGuildEmoji>()
+    private val mEmojiAdapter = EmojiAdapter(mEmojiList)
 
     companion object {
         private const val REQUEST_SYSTEM_CAMERA = 1
@@ -107,6 +108,9 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
         btn_message_send.setOnClickListener {
 
             if (!AppState.global.updateEnabled.value.flag)
@@ -195,6 +199,21 @@ class ChannelPanelFragment : Fragment() {
                 //TODO Unable to start system camera application
             }
             true
+        }
+    }
+
+    private fun loadEmoji() {
+        emoji_rr.layoutManager = LinearLayoutManager(activity)
+        emoji_rr.adapter = mEmojiAdapter
+        for (item in Client.global.guilds) {
+            mEmojiList.add(
+                CustomGuildEmoji(
+                    item.id,
+                    name = item.name,
+                    isBuildIn = false,
+                    emojiList = item.emojis.values.toMutableList()
+                )
+            )
         }
     }
 
