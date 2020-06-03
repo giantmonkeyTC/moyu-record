@@ -102,9 +102,13 @@
                     android:background="@drawable/ic_channel_text" />
             </LinearLayout>
 
-            <include
-                layout="@layout/emoji_layout"
-                android:visibility="gone" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/emoji_rr"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

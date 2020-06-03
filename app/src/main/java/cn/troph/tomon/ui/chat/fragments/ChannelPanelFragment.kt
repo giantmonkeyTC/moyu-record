@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -34,9 +35,8 @@ import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
-import com.vanniktech.emoji.EmojiPopup
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.emoji_layout.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -108,9 +108,6 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
         btn_message_send.setOnClickListener {
 
             if (!AppState.global.updateEnabled.value.flag)
@@ -154,11 +151,12 @@ class ChannelPanelFragment : Fragment() {
             startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
 
-
-
         emoji_tv.setOnClickListener {
-            val emojiPopup = EmojiPopup.Builder.fromRootView(coordinatorLayout).build(editText)
-            if (emojiPopup.isShowing) emojiPopup.dismiss() else emojiPopup.toggle()
+            if (emoji_rr.isVisible) emoji_rr.visibility =
+                View.GONE else {
+                emoji_rr.visibility = View.VISIBLE
+                loadEmoji()
+            }
         }
 
 
@@ -205,7 +203,8 @@ class ChannelPanelFragment : Fragment() {
     private fun loadEmoji() {
         emoji_rr.layoutManager = LinearLayoutManager(activity)
         emoji_rr.adapter = mEmojiAdapter
-        for (item in Client.global.guilds) {
+
+        for (item in Client.global.guilds.list) {
             mEmojiList.add(
                 CustomGuildEmoji(
                     item.id,
@@ -215,6 +214,7 @@ class ChannelPanelFragment : Fragment() {
                 )
             )
         }
+        mEmojiAdapter.notifyDataSetChanged()
     }
 
     private fun storeImage(): File? {

@@ -2,6 +2,7 @@ package cn.troph.tomon.core.network.socket
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
@@ -129,6 +130,7 @@ class SocketClient() : WebSocketListener(),
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         try {
+            Logger.d(text)
             val data = Gson().fromJson(text, JsonElement::class.java)
             _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))
         } catch (e: Exception) {
