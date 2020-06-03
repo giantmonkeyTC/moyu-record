@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.Restful
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -22,6 +25,9 @@ import io.reactivex.rxjava3.core.Observable
 
 class GuildSelectorFragment : Fragment() {
 
+    private val mGuildVM: GuildViewModel by viewModels()
+    private lateinit var mAdapter: GuildSelectorAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,12 +37,14 @@ class GuildSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val list = view.findViewById<RecyclerView>(R.id.view_guilds)
-        list.apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
-            adapter = GuildSelectorAdapter()
-        }
+        mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
+            it?.let {
+                mAdapter = GuildSelectorAdapter(it)
+                view_guilds.layoutManager = LinearLayoutManager(view.context)
+                view_guilds.adapter = mAdapter
+            }
+        })
+        mGuildVM.loadGuildList()
         btn_guild_fab.setOnClickListener {
             callBottomSheet()
         }

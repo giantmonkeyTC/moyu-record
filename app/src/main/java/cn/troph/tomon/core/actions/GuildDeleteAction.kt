@@ -11,9 +11,10 @@ class GuildDeleteAction(client: Client) : Action<Guild>(client) {
         val obj = data!!.asJsonObject
         val guild = client.guilds.get(obj["id"].asString)
         if (guild != null) {
-            guild.channels.forEach { channel ->
-                client.channels.remove(channel.id)
-            }
+//            guild.channels.forEach { channel ->
+//                client.channels.remove(channel.id)
+//            }
+            guild.channels.clear()
             client.guilds.remove(guild.id)
             client.eventBus.postEvent(GuildDeleteEvent(guild = guild))
         }

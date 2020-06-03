@@ -10,9 +10,10 @@ import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GuildAvatar
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 
-class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
+class GuildSelectorAdapter(private val guildList: MutableList<Guild>) : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -39,13 +40,6 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
         }
     }
 
-    init {
-        Client.global.guilds.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe { _ ->
-                notifyDataSetChanged()
-            }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val inflatedView =
@@ -53,14 +47,16 @@ class GuildSelectorAdapter : RecyclerView.Adapter<GuildSelectorAdapter.ViewHolde
         return ViewHolder(inflatedView)
     }
 
-    override fun getItemCount(): Int = Client.global.guilds.list.size
+    override fun getItemCount(): Int = guildList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val list = Client.global.guilds.list
-        val guild = if (position >= 0 && position < list.size) list[position] else null
-        if (guild != null) {
-            holder.bind(guild)
-        }
+//        val list = Client.global.guilds.list
+//        val guild = if (position >= 0 && position < list.size) list[position] else null
+//
+//        if (guild != null) {
+//            holder.bind(guild)
+//        }
+        holder.bind(guildList[position])
     }
 
 }
