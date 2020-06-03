@@ -15,6 +15,7 @@ class ChannelMemberCollection(val channel: GuildChannel) :
         set(member.id, member)
     }
 
+
 //    fun list(): List<String> {
 //        val members = values.toMutableList()
 //        val list = channel.guild!!.roles.list().filter { it.hoist }

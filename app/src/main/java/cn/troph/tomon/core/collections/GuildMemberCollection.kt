@@ -3,7 +3,9 @@ package cn.troph.tomon.core.collections
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildMember
+import cn.troph.tomon.core.structures.User
 import com.google.gson.JsonObject
+import io.reactivex.rxjava3.core.Observable
 
 class GuildMemberCollection(client: Client, val guild: Guild) :
     BaseCollection<GuildMember>(client) {
@@ -19,5 +21,6 @@ class GuildMemberCollection(client: Client, val guild: Guild) :
     override fun instantiate(data: JsonObject): GuildMember? {
         return GuildMember(client, data)
     }
+
 
 }
