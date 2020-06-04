@@ -104,6 +104,6 @@ dependencies {
     implementation 'com.facebook.litho:litho-sections-widget:0.36.0'
     compileOnly 'com.facebook.litho:litho-sections-annotations:0.36.0'
     implementation 'com.facebook.fbjni:fbjni:0.0.2'
-
+    implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.2@aar'
     kapt 'com.facebook.litho:litho-sections-processor:0.36.0'
 }

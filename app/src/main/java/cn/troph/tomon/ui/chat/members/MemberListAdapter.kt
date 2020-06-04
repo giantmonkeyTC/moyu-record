@@ -15,14 +15,19 @@ import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
+import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 
 class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
-    RecyclerView.Adapter<MemberListAdapter.ViewHolder>() {
+    RecyclerView.Adapter<MemberListAdapter.ViewHolder>(),
+    StickyRecyclerHeadersAdapter<MemberListAdapter.HeaderViewHolder> {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -77,8 +82,28 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val msg = memberList[position]
         bind(holder.itemView, memberList[position])
 
+    }
+
+    override fun getHeaderId(position: Int): Long {
+        return -1
+    }
+
+    override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
+        val view = LayoutInflater.from(parent!!.context)
+            .inflate(R.layout.widget_message_reaction, parent, false)
+        return HeaderViewHolder(view)
+    }
+
+    private fun bindHeader(itemView: View) {
+        itemView.widget_reaction_emoji.text = "123456"
+        itemView.widget_reaction_count.text = "121312352356"
+    }
+
+    override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
+        if (p0 != null) {
+            bindHeader(p0.itemView)
+        }
     }
 }
