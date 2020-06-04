@@ -1,7 +1,9 @@
 package cn.troph.tomon.core.collections
 
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.core.structures.GuildMember
+import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.JsonObject
 
 class ChannelMemberCollection(val channel: GuildChannel) :
@@ -14,6 +16,27 @@ class ChannelMemberCollection(val channel: GuildChannel) :
     fun add(member: GuildMember) {
         set(member.id, member)
     }
+
+    fun sortedMemberList(): List<GuildMember> {
+        val roles = channel.guild?.roles?.list()?.toMutableList()
+        val sortedMemberList = mutableListOf<GuildMember>()
+        val tempMemberList = channel.members.toMutableList()
+        if (roles != null) {
+            for (role in roles) {
+                tempMemberList.forEach {
+                    if (it.hasRole(role)) {
+                        sortedMemberList.add(it)
+                    }
+                }
+                sortedMemberList.forEach {
+                    if (tempMemberList.contains(it))
+                        tempMemberList.remove(it)
+                }
+            }
+        }
+        return sortedMemberList.toList()
+    }
+
 
 //    fun list(): List<String> {
 //        val members = values.toMutableList()
