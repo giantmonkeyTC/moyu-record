@@ -159,13 +159,15 @@ class ChannelPanelFragment : Fragment() {
         }
 
         emoji_tv.setOnClickListener {
-            if (emoji_rr.isVisible) emoji_rr.visibility =
-                View.GONE else {
+            if (emoji_rr.isVisible) {
+                emoji_rr.visibility =
+                    View.GONE
+                editText.requestFocus()
+            } else {
                 emoji_rr.visibility = View.VISIBLE
                 loadEmoji()
             }
         }
-
 
         btn_message_menu.setOnLongClickListener {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)

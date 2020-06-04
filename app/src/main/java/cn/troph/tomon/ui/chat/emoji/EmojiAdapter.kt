@@ -39,9 +39,11 @@ class EmojiAdapter(
                 )
                 iv.setOnClickListener {
                     emojiClickListener.onEmojiSelected(
-                        ":${emoji.emojiList[holder.itemView.item_holder_emoji.indexOfChild(
+                        "<%${emoji.emojiList[holder.itemView.item_holder_emoji.indexOfChild(
                             it
-                        )].name}:"
+                        )].name}:${emoji.emojiList[holder.itemView.item_holder_emoji.indexOfChild(
+                            it
+                        )].id}>"
                     )
                 }
                 Glide.with(iv).load(item.url).placeholder(R.drawable.emoji_recent)
