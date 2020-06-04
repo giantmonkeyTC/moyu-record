@@ -84,7 +84,7 @@
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatEditText
+            <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
                 android:layout_marginVertical="20dp"
                 android:layout_width="0dp"

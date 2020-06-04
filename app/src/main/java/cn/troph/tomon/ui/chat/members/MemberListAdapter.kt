@@ -47,7 +47,7 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
         }
         itemView.member_avatar.user = member.user
         itemView.widget_member_name_text.text = member.displayName
-        itemView.widget_member_name_text.setTextColor((member.roles.color!!.color or 0xFF000000.toInt()))
+        //itemView.widget_member_name_text.setTextColor((member.roles.color!!.color or 0xFF000000.toInt()))
     }
 
     private fun callMemberDetail(parent: ViewGroup, member: GuildMember) {

@@ -7,5 +7,6 @@ data class CustomGuildEmoji(
     val name: String = "",
     val code:String = "",
     val isBuildIn: Boolean = false,
-    val emojiList: MutableList<GuildEmoji> = mutableListOf()
+    val emojiList: MutableList<GuildEmoji> = mutableListOf(),
+    val systemEmojiList:MutableList<Int> = mutableListOf()
 )
