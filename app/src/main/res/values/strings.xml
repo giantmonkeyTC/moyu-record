@@ -13,5 +13,7 @@
     <string name="login_failed">账号或密码错误</string>
     <string name="updateMessage">编辑信息中</string>
     <string name="cancel"><u>取消</u></string>
+    <string name="emoji">^.^</string>
+    <string name="emoji_guild_name">群组名称</string>
 
 </resources>

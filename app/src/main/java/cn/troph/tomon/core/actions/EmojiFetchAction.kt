@@ -7,6 +7,7 @@ import cn.troph.tomon.core.structures.GuildEmoji
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.orhanobut.logger.Logger
 
 class EmojiFetchAction(client: Client) : Action<List<GuildEmoji>>(client) {
 
@@ -35,8 +36,8 @@ class EmojiFetchAction(client: Client) : Action<List<GuildEmoji>>(client) {
         }
         val emojis = mutableListOf<GuildEmoji>()
         val parse = { obj: JsonObject ->
-            val emoji = guild.emojis.add(obj)
-            if (emoji != null) {
+            val emoji = client.emojis.add(obj)
+            if (emoji is GuildEmoji) {
                 emojis.add(emoji)
             }
         }

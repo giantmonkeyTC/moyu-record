@@ -13,6 +13,7 @@ class GuildEmojiCollection(client: Client, val guild: Guild) :
         data: JsonObject,
         identify: CollectionIdentify?
     ): GuildEmoji? {
+
         return null
     }
 }

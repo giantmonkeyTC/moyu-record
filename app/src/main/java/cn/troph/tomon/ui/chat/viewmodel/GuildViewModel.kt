@@ -41,7 +41,7 @@ class GuildViewModel : ViewModel() {
                             val result = guildListLiveData.value?.removeIf {
                                 it.id == g.id
                             }
-                            if(result==true)guildListLiveData.notifyObserver()
+                            if (result == true) guildListLiveData.notifyObserver()
                         }
                     }
                 }

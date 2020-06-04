@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -26,8 +27,10 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
+import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
+import cn.troph.tomon.ui.chat.emoji.onEmojiClickListener
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
-import cn.troph.tomon.ui.chat.messages.MessageListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
@@ -50,6 +53,14 @@ import java.io.FileOutputStream
 class ChannelPanelFragment : Fragment() {
 
     private val msgViewModel: MessageViewModel by viewModels()
+    private val mEmojiList = mutableListOf<CustomGuildEmoji>()
+    private val mEmojiAdapter =
+        EmojiAdapter(mEmojiList, emojiClickListener = object : onEmojiClickListener {
+            override fun onEmojiSelected(emojiCode: String) {
+                editText.requestFocus()
+                editText.text?.append(emojiCode)
+            }
+        })
 
     companion object {
         private const val REQUEST_SYSTEM_CAMERA = 1
@@ -146,6 +157,18 @@ class ChannelPanelFragment : Fragment() {
             openAlbumIntent.type = "image/*"
             startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
+
+        emoji_tv.setOnClickListener {
+            if (emoji_rr.isVisible) {
+                emoji_rr.visibility =
+                    View.GONE
+                editText.requestFocus()
+            } else {
+                emoji_rr.visibility = View.VISIBLE
+                loadEmoji()
+            }
+        }
+
         btn_message_menu.setOnLongClickListener {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED
@@ -184,6 +207,23 @@ class ChannelPanelFragment : Fragment() {
             }
             true
         }
+    }
+
+    private fun loadEmoji() {
+        emoji_rr.layoutManager = LinearLayoutManager(activity)
+        emoji_rr.adapter = mEmojiAdapter
+
+        for (item in Client.global.guilds.list) {
+            mEmojiList.add(
+                CustomGuildEmoji(
+                    item.id,
+                    name = item.name,
+                    isBuildIn = false,
+                    emojiList = item.emojis.values.toMutableList()
+                )
+            )
+        }
+        mEmojiAdapter.notifyDataSetChanged()
     }
 
     private fun storeImage(): File? {
