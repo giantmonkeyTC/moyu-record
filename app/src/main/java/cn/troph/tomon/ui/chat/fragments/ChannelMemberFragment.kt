@@ -54,6 +54,9 @@ class ChannelMemberFragment : Fragment() {
                 mAdapter = MemberListAdapter(it)
                 view_members.layoutManager = LinearLayoutManager(view.context)
                 view_members.adapter = mAdapter
+                if (view_members.itemDecorationCount > 0) {
+                    view_members.removeItemDecorationAt(0)
+                }
                 view_members.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
             }
         })

@@ -104,12 +104,10 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
+
         if (p0 != null) {
             bindHeader(p0.itemView, memberList[p1])
         }
     }
 
-    private fun getHeader() {
-
-    }
 }
