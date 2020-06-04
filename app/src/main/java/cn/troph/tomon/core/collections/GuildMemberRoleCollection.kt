@@ -12,7 +12,7 @@ class GuildMemberRoleCollection(private val member: GuildMember) {
     private val filtered
         get() :Collection<Role> {
             val everyone = guild?.roles?.everyone
-            var roles = guild?.roles?.filter { role: Role -> !member.rawRoles.contains(role.id) }
+            var roles = guild?.roles?.filter { role: Role -> member.rawRoles.contains(role.id) }
             if (everyone != null) {
                 roles?.set(everyone.id, everyone)
             }
