@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import kotlinx.android.synthetic.main.widget_message_reaction.view.*
+import kotlinx.android.synthetic.main.widget_role_list_header.view.*
 
 class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     RecyclerView.Adapter<MemberListAdapter.ViewHolder>(),
@@ -62,7 +63,6 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
                     member.displayName
                 )
             }
-        member.roles
         view.widget_member_name_detail_text.text =
             TextUtils.concat(displaynameSpan, discriminatorSpan)
         rolesBinder(itemView = view, member = member)
@@ -72,38 +72,40 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     private fun rolesBinder(itemView: View, member: GuildMember) {
+        itemView.member_detail_roles.removeAllViews()
         for (role in member.roles.sequence) {
             val layoutInflater = LayoutInflater.from(itemView.context)
             val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
             role_view.role_name.text = role.name
             itemView.member_detail_roles.addView(role_view)
         }
-
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         bind(holder.itemView, memberList[position])
-
     }
 
     override fun getHeaderId(position: Int): Long {
-        return -1
+        return memberList[position].roles.highest!!.id.toLong()
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
         val view = LayoutInflater.from(parent!!.context)
-            .inflate(R.layout.widget_message_reaction, parent, false)
+            .inflate(R.layout.widget_role_list_header, parent, false)
         return HeaderViewHolder(view)
     }
 
-    private fun bindHeader(itemView: View) {
-        itemView.widget_reaction_emoji.text = "123456"
-        itemView.widget_reaction_count.text = "121312352356"
+    private fun bindHeader(itemView: View, member: GuildMember) {
+        itemView.widget_role_list_header_text.text = member.roles.highest!!.name
     }
 
     override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
         if (p0 != null) {
-            bindHeader(p0.itemView)
+            bindHeader(p0.itemView, memberList[p1])
         }
+    }
+
+    private fun getHeader() {
+
     }
 }

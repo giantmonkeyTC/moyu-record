@@ -22,9 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
+            android:text="频道成员"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:text="频道成员"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,12 +32,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
     <androidx.recyclerview.widget.RecyclerView
 
         android:id="@+id/view_members"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layout_members_header" />
 

@@ -10,10 +10,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
 import cn.troph.tomon.ui.chat.viewmodel.MemberViewModel
 import cn.troph.tomon.ui.states.AppState
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_member.*
 
@@ -32,6 +34,7 @@ class ChannelMemberFragment : Fragment() {
                 }
             }
         }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,6 +54,7 @@ class ChannelMemberFragment : Fragment() {
                 mAdapter = MemberListAdapter(it)
                 view_members.layoutManager = LinearLayoutManager(view.context)
                 view_members.adapter = mAdapter
+                view_members.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
             }
         })
     }
