@@ -47,7 +47,10 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
         }
         itemView.member_avatar.user = member.user
         itemView.widget_member_name_text.text = member.displayName
-        //itemView.widget_member_name_text.setTextColor((member.roles.color!!.color or 0xFF000000.toInt()))
+        itemView.widget_member_name_text.setTextColor(
+            (if (member.roles.color == null)
+                0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+        )
     }
 
     private fun callMemberDetail(parent: ViewGroup, member: GuildMember) {
@@ -59,7 +62,8 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
         val displaynameSpan: SpannableString =
             spannable {
                 color(
-                    (member.roles.color!!.color or 0xFF000000.toInt()),
+                    (if (member.roles.color == null)
+                        0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()),
                     member.displayName
                 )
             }
@@ -86,7 +90,7 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     override fun getHeaderId(position: Int): Long {
-        return memberList[position].roles.highest!!.id.toLong()
+        return memberList[position].roles.highest!!.index.toLong()
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
@@ -100,12 +104,10 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
+
         if (p0 != null) {
             bindHeader(p0.itemView, memberList[p1])
         }
     }
 
-    private fun getHeader() {
-
-    }
 }
