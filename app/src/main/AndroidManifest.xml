@@ -43,6 +43,7 @@
         <activity
             android:name=".ui.activities.ChatActivity"
             android:label="ChatActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/AppTheme.NoActionBar"
              />
         <activity

@@ -13,6 +13,5 @@ class TomonApplication : Application() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
         Client.global.initialize(this)
-        EmojiManager.install(IosEmojiProvider())
     }
 }

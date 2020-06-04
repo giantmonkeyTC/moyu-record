@@ -36,7 +36,6 @@ import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
-import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
