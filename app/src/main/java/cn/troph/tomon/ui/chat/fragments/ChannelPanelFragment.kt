@@ -29,6 +29,7 @@ import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
 import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
+import cn.troph.tomon.ui.chat.emoji.onEmojiClickListener
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
@@ -53,7 +54,13 @@ class ChannelPanelFragment : Fragment() {
 
     private val msgViewModel: MessageViewModel by viewModels()
     private val mEmojiList = mutableListOf<CustomGuildEmoji>()
-    private val mEmojiAdapter = EmojiAdapter(mEmojiList)
+    private val mEmojiAdapter =
+        EmojiAdapter(mEmojiList, emojiClickListener = object : onEmojiClickListener {
+            override fun onEmojiSelected(emojiCode: String) {
+                editText.requestFocus()
+                editText.text?.append(emojiCode)
+            }
+        })
 
     companion object {
         private const val REQUEST_SYSTEM_CAMERA = 1

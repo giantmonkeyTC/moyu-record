@@ -9,9 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import com.bumptech.glide.Glide
 import com.nex3z.flowlayout.FlowLayout
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.emoji_item.view.*
 
-class EmojiAdapter(private val emojiList: MutableList<CustomGuildEmoji>) :
+class EmojiAdapter(
+    private val emojiList: MutableList<CustomGuildEmoji>,
+    private val emojiClickListener: onEmojiClickListener
+) :
     RecyclerView.Adapter<EmojiAdapter.EmojiViewHolder>() {
     class EmojiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
@@ -33,8 +37,12 @@ class EmojiAdapter(private val emojiList: MutableList<CustomGuildEmoji>) :
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 )
-                holder.itemView.item_holder_emoji.setOnClickListener {
-                    Toast.makeText(holder.itemView.context,emoji.emojiList[holder.itemView.item_holder_emoji.indexOfChild(it)].name,Toast.LENGTH_SHORT).show()
+                iv.setOnClickListener {
+                    emojiClickListener.onEmojiSelected(
+                        ":${emoji.emojiList[holder.itemView.item_holder_emoji.indexOfChild(
+                            it
+                        )].name}:"
+                    )
                 }
                 Glide.with(iv).load(item.url).placeholder(R.drawable.emoji_recent)
                     .into(iv)
@@ -48,4 +56,9 @@ class EmojiAdapter(private val emojiList: MutableList<CustomGuildEmoji>) :
             LayoutInflater.from(parent.context).inflate(R.layout.emoji_item, parent, false)
         )
     }
+}
+
+
+interface onEmojiClickListener {
+    fun onEmojiSelected(emojiCode: String)
 }
