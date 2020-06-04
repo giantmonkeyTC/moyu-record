@@ -30,16 +30,6 @@ class MessageViewModel : ViewModel() {
                 Consumer {
                     messageLiveData.value = it.toMutableList()
                 })
-        channel.messages.observable.observeOn(AndroidSchedulers.mainThread()).subscribe(
-            Consumer {
-                it.obj?.let {
-                    messageLiveData.value?.add(it)
-                    messageLiveData.notifyObserver()
-                }
-
-            }
-        )
-
     }
 
 
