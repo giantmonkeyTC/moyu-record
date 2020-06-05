@@ -59,7 +59,7 @@ class ChannelPanelFragment : Fragment() {
 
 
     private val mSectionDataManager = SectionDataManager()
-    private val mGridLayoutManager = GridLayoutManager(requireContext(), 8)
+    private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
     private val mEmojiList = mutableListOf<CustomGuildEmoji>()
     private val mEmojiClickListener = object : OnEmojiClickListener {
@@ -176,12 +176,12 @@ class ChannelPanelFragment : Fragment() {
         }
 
         emoji_tv.setOnClickListener {
-            if (emoji_rr.isVisible) {
-                emoji_rr.visibility =
+            if (section_header_layout.isVisible) {
+                section_header_layout.visibility =
                     View.GONE
                 editText.requestFocus()
             } else {
-                emoji_rr.visibility = View.VISIBLE
+                section_header_layout.visibility = View.VISIBLE
                 loadEmoji()
             }
         }
@@ -227,6 +227,7 @@ class ChannelPanelFragment : Fragment() {
     }
 
     private fun loadEmoji() {
+        mGridLayoutManager = GridLayoutManager(requireContext(), 8)
         val positionManager: PositionManager = mSectionDataManager
         mGridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -240,6 +241,8 @@ class ChannelPanelFragment : Fragment() {
 
         emoji_rr.layoutManager = mGridLayoutManager
         for (item in Client.global.guilds.list) {
+            if (item.emojis.values.toMutableList().size == 0)
+                continue
             val sectionData = CustomGuildEmoji(
                 item.id,
                 name = item.name,
@@ -268,13 +271,9 @@ class ChannelPanelFragment : Fragment() {
                 mEmojiClickListener
             ), 1
         )
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiSymbol(),
-                mEmojiClickListener
-            ), 1
-        )
+
         emoji_rr.adapter = mSectionDataManager.adapter
+        section_header_layout.attachTo(emoji_rr, mSectionDataManager)
     }
 
     private fun storeImage(): File? {

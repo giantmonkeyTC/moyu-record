@@ -109,13 +109,19 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/emoji_rr"
+        <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
+            android:id="@+id/section_header_layout"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edit_pannel_view" />
+            app:layout_constraintTop_toBottomOf="@id/edit_pannel_view">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/emoji_rr"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
