@@ -46,11 +46,17 @@ class EmojiAdapter(
                     it.imageview_emoji.visibility = View.GONE
                     it.textview_emoji.text =
                         String(Character.toChars(emojiSectionObj.systemEmojiList[position]))
+                    it.textview_emoji.setOnClickListener {
+                        emojiClickListener.onSystemEmojiSelected(emojiSectionObj.systemEmojiList[holder.sectionAdapterPosition])
+                    }
                 } else {
                     it.textview_emoji?.visibility = View.GONE
                     it.imageview_emoji?.visibility = View.VISIBLE
                     Glide.with(it.context).load(emojiSectionObj.emojiList[position].url)
                         .into(it.imageview_emoji)
+                    it.imageview_emoji.setOnClickListener {
+                        emojiClickListener.onEmojiSelected("<%${emojiSectionObj.emojiList[holder.sectionAdapterPosition].name}:${emojiSectionObj.emojiList[holder.sectionAdapterPosition].id}>")
+                    }
                 }
             }
         }

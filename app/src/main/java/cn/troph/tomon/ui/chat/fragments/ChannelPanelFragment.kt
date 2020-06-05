@@ -61,7 +61,6 @@ class ChannelPanelFragment : Fragment() {
     private val mSectionDataManager = SectionDataManager()
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
-    private val mEmojiList = mutableListOf<CustomGuildEmoji>()
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.requestFocus()
