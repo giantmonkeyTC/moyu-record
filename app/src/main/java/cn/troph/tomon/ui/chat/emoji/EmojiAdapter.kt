@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import cn.troph.tomon.R
+import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
+import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 
 
@@ -37,7 +39,21 @@ class EmojiAdapter(
     }
 
     override fun onBindItemViewHolder(holder: EmojiItemViewHolder?, position: Int) {
-
+        holder?.let {
+            it.itemView?.let {
+                if (emojiSectionObj.isBuildIn) {
+                    it.textview_emoji.visibility = View.VISIBLE
+                    it.imageview_emoji.visibility = View.GONE
+                    it.textview_emoji.text =
+                        String(Character.toChars(emojiSectionObj.systemEmojiList[position]))
+                } else {
+                    it.textview_emoji?.visibility = View.GONE
+                    it.imageview_emoji?.visibility = View.VISIBLE
+                    Glide.with(it.context).load(emojiSectionObj.emojiList[position].url)
+                        .into(it.imageview_emoji)
+                }
+            }
+        }
     }
 
     class EmojiItemViewHolder(itemView: View) : BaseSectionAdapter.ItemViewHolder(itemView)
