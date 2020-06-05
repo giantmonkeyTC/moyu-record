@@ -111,4 +111,5 @@ dependencies {
 
     implementation "androidx.emoji:emoji-bundled:1.0.0"
     implementation "androidx.emoji:emoji:1.0.0"
+    implementation 'com.cruxlab:sectionedrecyclerview:1.0.2'
 }

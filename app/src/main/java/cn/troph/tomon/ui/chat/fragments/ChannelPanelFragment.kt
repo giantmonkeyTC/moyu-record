@@ -19,10 +19,10 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -33,13 +33,15 @@ import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
 import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
 import cn.troph.tomon.ui.chat.emoji.SystemEmoji
-import cn.troph.tomon.ui.chat.emoji.onEmojiClickListener
+import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
+import com.cruxlab.sectionedrecyclerview.lib.PositionManager
+import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
@@ -55,15 +57,21 @@ import java.io.FileOutputStream
 
 class ChannelPanelFragment : Fragment() {
 
+
+    private val mSectionDataManager = SectionDataManager()
+    private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
-    private val mEmojiList = mutableListOf<CustomGuildEmoji>()
-    private val mEmojiAdapter =
-        EmojiAdapter(mEmojiList, emojiClickListener = object : onEmojiClickListener {
-            override fun onEmojiSelected(emojiCode: String) {
-                editText.requestFocus()
-                editText.text?.append(emojiCode)
-            }
-        })
+    private val mEmojiClickListener = object : OnEmojiClickListener {
+        override fun onEmojiSelected(emojiCode: String) {
+            editText.requestFocus()
+            editText.text?.append(emojiCode)
+        }
+
+        override fun onSystemEmojiSelected(unicode: Int) {
+            editText.requestFocus()
+            editText.text?.append(String(Character.toChars(unicode)))
+        }
+    }
 
     companion object {
         private const val REQUEST_SYSTEM_CAMERA = 1
@@ -167,12 +175,12 @@ class ChannelPanelFragment : Fragment() {
         }
 
         emoji_tv.setOnClickListener {
-            if (emoji_rr.isVisible) {
-                emoji_rr.visibility =
+            if (section_header_layout.isVisible) {
+                section_header_layout.visibility =
                     View.GONE
                 editText.requestFocus()
             } else {
-                emoji_rr.visibility = View.VISIBLE
+                section_header_layout.visibility = View.VISIBLE
                 loadEmoji()
             }
         }
@@ -218,25 +226,53 @@ class ChannelPanelFragment : Fragment() {
     }
 
     private fun loadEmoji() {
-        emoji_rr.layoutManager = LinearLayoutManager(activity)
-        emoji_rr.adapter = mEmojiAdapter
+        mGridLayoutManager = GridLayoutManager(requireContext(), 8)
+        val positionManager: PositionManager = mSectionDataManager
+        mGridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                if (positionManager.isHeader(position)) {
+                    return mGridLayoutManager.spanCount
+                } else {
+                    return 1
+                }
+            }
+        }
 
+        emoji_rr.layoutManager = mGridLayoutManager
         for (item in Client.global.guilds.list) {
-            mEmojiList.add(
-                CustomGuildEmoji(
-                    item.id,
-                    name = item.name,
-                    isBuildIn = false,
-                    emojiList = item.emojis.values.toMutableList()
-                )
+            if (item.emojis.values.toMutableList().size == 0)
+                continue
+            val sectionData = CustomGuildEmoji(
+                item.id,
+                name = item.name,
+                isBuildIn = false,
+                emojiList = item.emojis.values.toMutableList()
             )
+            val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
+            mSectionDataManager.addSection(sectionAdapter, 1)
         }
         val systemEmoji = SystemEmoji()
-        mEmojiList.add(systemEmoji.getSystemEmojiEmoticons())
-        mEmojiList.add(systemEmoji.getSystemEmojiDingbats())
-        mEmojiList.add(systemEmoji.getSystemEmojiTransport())
-        mEmojiList.add(systemEmoji.getSystemEmojiSymbol())
-        mEmojiAdapter.notifyDataSetChanged()
+        mSectionDataManager.addSection(
+            EmojiAdapter(
+                systemEmoji.getSystemEmojiEmoticons(),
+                mEmojiClickListener
+            ), 1
+        )
+        mSectionDataManager.addSection(
+            EmojiAdapter(
+                systemEmoji.getSystemEmojiDingbats(),
+                mEmojiClickListener
+            ), 1
+        )
+        mSectionDataManager.addSection(
+            EmojiAdapter(
+                systemEmoji.getSystemEmojiTransport(),
+                mEmojiClickListener
+            ), 1
+        )
+
+        emoji_rr.adapter = mSectionDataManager.adapter
+        section_header_layout.attachTo(emoji_rr, mSectionDataManager)
     }
 
     private fun storeImage(): File? {

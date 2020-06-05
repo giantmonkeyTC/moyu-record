@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/darker_gray">
 
     <TextView
         android:id="@+id/guid_name_emoji"
@@ -13,17 +14,5 @@
         android:text="@string/emoji_guild_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <com.nex3z.flowlayout.FlowLayout
-        android:id="@+id/item_holder_emoji"
-        app:flChildSpacing="7dp"
-        app:flChildSpacingForLastRow="align"
-        app:flRowSpacing="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guid_name_emoji" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
