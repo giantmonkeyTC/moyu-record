@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -30,10 +31,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
-import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
-import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
-import cn.troph.tomon.ui.chat.emoji.SystemEmoji
-import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
+import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
@@ -46,18 +44,17 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.FileOutputStream
 
 class ChannelPanelFragment : Fragment() {
 
-
+    private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private val mSectionDataManager = SectionDataManager()
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
@@ -178,9 +175,14 @@ class ChannelPanelFragment : Fragment() {
             if (section_header_layout.isVisible) {
                 section_header_layout.visibility =
                     View.GONE
+                bottom_emoji_rr.visibility = View.GONE
                 editText.requestFocus()
             } else {
                 section_header_layout.visibility = View.VISIBLE
+                bottom_emoji_rr.visibility = View.VISIBLE
+                activity?.let {
+                    hideKeyboard(it)
+                }
                 loadEmoji()
             }
         }
@@ -226,6 +228,7 @@ class ChannelPanelFragment : Fragment() {
     }
 
     private fun loadEmoji() {
+        val guildIcon = mutableListOf<String>()
         mGridLayoutManager = GridLayoutManager(requireContext(), 8)
         val positionManager: PositionManager = mSectionDataManager
         mGridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -248,6 +251,10 @@ class ChannelPanelFragment : Fragment() {
                 isBuildIn = false,
                 emojiList = item.emojis.values.toMutableList()
             )
+            item.iconURL?.let {
+                guildIcon.add(it)
+            }
+
             val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
@@ -273,6 +280,29 @@ class ChannelPanelFragment : Fragment() {
 
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)
+
+        mBottomEmojiAdapter = BottomEmojiAdapter(
+            guildIcon,
+            onBottomGuildSelectedListener = object : OnBottomGuildSelectedListener {
+                override fun onGuildSelected(position: Int) {
+                }
+            })
+        bottom_emoji_rr.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        bottom_emoji_rr.adapter = mBottomEmojiAdapter
+
+    }
+
+    private fun hideKeyboard(activity: Activity) {
+        val imm: InputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun storeImage(): File? {
