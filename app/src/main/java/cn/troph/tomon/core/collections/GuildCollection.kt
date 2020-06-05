@@ -43,7 +43,6 @@ class GuildCollection(client: Client) :
 
     fun join(code: String): Observable<Guild?> {
         return client.rest.inviteService.join(code, client.auth).subscribeOn(Schedulers.io()).map {
-            println(it)
             client.actions.guildCreate(it)
         }
     }

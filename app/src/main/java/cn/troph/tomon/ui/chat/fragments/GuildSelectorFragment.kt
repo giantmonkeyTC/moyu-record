@@ -4,24 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.network.Restful
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
-import cn.troph.tomon.ui.states.AppState
-import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.bottom_sheet_guild.view.*
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
-import cn.troph.tomon.ui.widgets.UserAvatar
-import io.reactivex.rxjava3.core.Observable
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
 class GuildSelectorFragment : Fragment() {
 
@@ -46,29 +42,72 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         btn_guild_fab.setOnClickListener {
-            callBottomSheet()
+            callJoinGuildBottomSheet()
         }
     }
 
-    private fun callBottomSheet() {
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_guild, null)
-        val dialog = BottomSheetDialog(this.requireContext())
+    private fun callJoinGuildBottomSheet() {
+        val layoutInflater = LayoutInflater.from(requireContext())
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_join_guild, null)
+        val textField = view.findViewById<EditText>(R.id.bs_textfield)
+        val dialog = BottomSheetDialog(requireContext())
         dialog.setContentView(view)
-        view.cancel_button.setOnClickListener {
-            dialog.dismiss()
-        }
-        view.join_guild_button.setOnClickListener {
-            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/FQmCup"))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { guild ->
-                        if (guild == null)
-                            println("joined guild") else
-                            println(guild.name)
-                    }, { error -> println(error) }, { println("done") }
-                )
+        view.cancel.setOnClickListener { dialog.dismiss() }
+        view.confirm.setOnClickListener {
+            if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))){
+                if (textField.text.toString().contains(Url.inviteUrl)) {
+                    Client.global.guilds.join(Url.parseInviteCode(textField.text.toString()))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            { guild ->
+                                if (guild == null)
+                                    println("joined guild") else
+                                    println(guild.name)
+                                dialog.dismiss()
+                            }, { error -> println(error) }, { }
+                        )
+                } else
+                    Client.global.guilds.join(textField.text.toString())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            { guild ->
+                                if (guild == null)
+                                    println("joined guild") else
+                                    println(guild.name)
+                                dialog.dismiss()
+                            }, { error -> println(error) }, { }
+                        )
+            }
+
+
+
         }
         dialog.show()
     }
+
+//    class JoinGuildDialog : DialogFragment() {
+//        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//            val inflater = requireActivity().layoutInflater
+//            val view = inflater.inflate(R.layout.bottom_sheet_join_guild, null)
+//            val dialog = Dialog(requireActivity())
+//            dialog.setContentView(view)
+//            dialog.setCanceledOnTouchOutside(true)
+//            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            return dialog
+//        }
+//
+//
+//    }
+
+//            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/FQmCup"))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(
+//                    { guild ->
+//                        if (guild == null)
+//                            println("joined guild") else
+//                            println(guild.name)
+//                    }, { error -> println(error) }, { println("done") }
+//                )
+
 
 }
