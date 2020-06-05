@@ -21,6 +21,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_guild.view.*
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import cn.troph.tomon.ui.widgets.UserAvatar
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import io.reactivex.rxjava3.core.Observable
 
 class GuildSelectorFragment : Fragment() {
@@ -46,29 +48,22 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         btn_guild_fab.setOnClickListener {
-            callBottomSheet()
+            MaterialDialog(requireContext(), BottomSheet()).show {
+                cornerRadius(16f)
+            }
         }
     }
 
-    private fun callBottomSheet() {
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_guild, null)
-        val dialog = BottomSheetDialog(this.requireContext())
-        dialog.setContentView(view)
-        view.cancel_button.setOnClickListener {
-            dialog.dismiss()
-        }
-        view.join_guild_button.setOnClickListener {
-            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/FQmCup"))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { guild ->
-                        if (guild == null)
-                            println("joined guild") else
-                            println(guild.name)
-                    }, { error -> println(error) }, { println("done") }
-                )
-        }
-        dialog.show()
-    }
+
+//            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/FQmCup"))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(
+//                    { guild ->
+//                        if (guild == null)
+//                            println("joined guild") else
+//                            println(guild.name)
+//                    }, { error -> println(error) }, { println("done") }
+//                )
+
 
 }
