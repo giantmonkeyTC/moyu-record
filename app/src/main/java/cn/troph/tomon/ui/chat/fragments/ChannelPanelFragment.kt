@@ -17,6 +17,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
+import androidx.emoji.bundled.BundledEmojiCompatConfig
+import androidx.emoji.text.EmojiCompat
+import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -29,6 +32,7 @@ import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
 import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
+import cn.troph.tomon.ui.chat.emoji.SystemEmoji
 import cn.troph.tomon.ui.chat.emoji.onEmojiClickListener
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
@@ -94,6 +98,11 @@ class ChannelPanelFragment : Fragment() {
     private var imageUri: Uri? = null
     private var imagePath: String? = null
     private lateinit var msgListAdapter: MessageAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EmojiCompat.init(BundledEmojiCompatConfig(requireContext()))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -222,6 +231,11 @@ class ChannelPanelFragment : Fragment() {
                 )
             )
         }
+        val systemEmoji = SystemEmoji()
+        mEmojiList.add(systemEmoji.getSystemEmojiEmoticons())
+        mEmojiList.add(systemEmoji.getSystemEmojiDingbats())
+        mEmojiList.add(systemEmoji.getSystemEmojiTransport())
+        mEmojiList.add(systemEmoji.getSystemEmojiSymbol())
         mEmojiAdapter.notifyDataSetChanged()
     }
 
