@@ -129,7 +129,9 @@ class ChannelPanelFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btn_message_send.setOnClickListener {
-
+            if(channelId==null){
+                return@setOnClickListener
+            }
             if (!AppState.global.updateEnabled.value.flag)
                 (Client.global.channels[channelId
                     ?: ""] as TextChannel).messages.create(editText.text.toString())

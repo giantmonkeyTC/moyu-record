@@ -112,8 +112,4 @@ class ChatActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 }
