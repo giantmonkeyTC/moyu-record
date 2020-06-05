@@ -19,7 +19,6 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.emoji.text.FontRequestEmojiCompatConfig
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -33,13 +32,14 @@ import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.emoji.CustomGuildEmoji
 import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
 import cn.troph.tomon.ui.chat.emoji.SystemEmoji
-import cn.troph.tomon.ui.chat.emoji.onEmojiClickListener
+import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
+import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
@@ -55,13 +55,20 @@ import java.io.FileOutputStream
 
 class ChannelPanelFragment : Fragment() {
 
+
+    private val mSectionDataManager = SectionDataManager()
     private val msgViewModel: MessageViewModel by viewModels()
     private val mEmojiList = mutableListOf<CustomGuildEmoji>()
     private val mEmojiAdapter =
-        EmojiAdapter(mEmojiList, emojiClickListener = object : onEmojiClickListener {
+        EmojiAdapter(mEmojiList, emojiClickListener = object : OnEmojiClickListener {
             override fun onEmojiSelected(emojiCode: String) {
                 editText.requestFocus()
                 editText.text?.append(emojiCode)
+            }
+
+            override fun onSystemEmojiSelected(unicode: Int) {
+                editText.requestFocus()
+                editText.text?.append(String(Character.toChars(unicode)))
             }
         })
 

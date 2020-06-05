@@ -19,8 +19,6 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
-import kotlinx.android.synthetic.main.widget_message_item.view.*
-import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import kotlinx.android.synthetic.main.widget_role_list_header.view.*
 
 class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
@@ -43,7 +41,6 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     private fun bind(itemView: View, member: GuildMember) {
         itemView.setOnClickListener {
             callMemberDetail(parent = itemView as ViewGroup, member = member)
-
         }
         itemView.member_avatar.user = member.user
         itemView.widget_member_name_text.text = member.displayName
