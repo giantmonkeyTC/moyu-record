@@ -62,7 +62,7 @@ class GuildSelectorFragment : Fragment() {
                         .subscribe(
                             { guild ->
                                 if (guild != null) {
-                                    if (Client.global.guilds[guild.id] != null) {、
+                                    if (Client.global.guilds[guild.id] != null) {
                                         println("joined guild")
                                     } else {
                                         println(guild.name)
