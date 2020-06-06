@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -54,16 +55,21 @@ class GuildSelectorFragment : Fragment() {
         dialog.setContentView(view)
         view.cancel.setOnClickListener { dialog.dismiss() }
         view.confirm.setOnClickListener {
-            if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))){
+            if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))) {
                 if (textField.text.toString().contains(Url.inviteUrl)) {
                     Client.global.guilds.join(Url.parseInviteCode(textField.text.toString()))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             { guild ->
-                                if (guild == null)
-                                    println("joined guild") else
-                                    println(guild.name)
-                                dialog.dismiss()
+                                if (guild != null) {
+                                    if (Client.global.guilds[guild.id] != null) {、
+                                        println("joined guild")
+                                    } else {
+                                        println(guild.name)
+                                        dialog.dismiss()
+                                    }
+                                }
+
                             }, { error -> println(error) }, { }
                         )
                 } else
@@ -71,14 +77,17 @@ class GuildSelectorFragment : Fragment() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             { guild ->
-                                if (guild == null)
-                                    println("joined guild") else
-                                    println(guild.name)
-                                dialog.dismiss()
+                                if (guild != null) {
+                                    if (Client.global.guilds[guild.id] != null) {
+                                        println("joined guild")
+                                    } else {
+                                        println(guild.name)
+                                        dialog.dismiss()
+                                    }
+                                }
                             }, { error -> println(error) }, { }
                         )
             }
-
 
 
         }
