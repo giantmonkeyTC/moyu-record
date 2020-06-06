@@ -15,7 +15,7 @@ class SystemEmoji {
         for (i in 0x2702..0x27B0) {
             list.add(i)
         }
-        return CustomGuildEmoji(name = "DingBats", isBuildIn = true, systemEmojiList = list)
+        return CustomGuildEmoji(name = "Symbol", isBuildIn = true, systemEmojiList = list)
     }
 
     fun getSystemEmojiTransport(): CustomGuildEmoji {

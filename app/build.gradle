@@ -108,8 +108,9 @@ dependencies {
     implementation 'com.facebook.fbjni:fbjni:0.0.2'
     implementation 'com.timehop.stickyheadersrecyclerview:library:0.4.2@aar'
     kapt 'com.facebook.litho:litho-sections-processor:0.36.0'
-
+    implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation "androidx.emoji:emoji-bundled:1.0.0"
     implementation "androidx.emoji:emoji:1.0.0"
     implementation 'com.cruxlab:sectionedrecyclerview:1.0.2'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import cn.troph.tomon.R
 import cn.troph.tomon.core.structures.Guild
@@ -76,7 +77,12 @@ class GuildAvatar : FrameLayout {
         val url = guild?.iconURL
         imageView.visibility = if (url != null) View.VISIBLE else View.GONE
         nameView.visibility = if (url == null) View.VISIBLE else View.GONE
-        Glide.with(this).load(url).into(imageView)
+        (context as AppCompatActivity)?.let {
+            if (!it.isFinishing && !it.isDestroyed) {
+                Glide.with(it).load(url).into(imageView)
+            }
+
+        }
         textView.text = guild?.name
     }
 

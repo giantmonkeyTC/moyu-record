@@ -14,6 +14,7 @@ import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import com.bumptech.glide.Glide
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 

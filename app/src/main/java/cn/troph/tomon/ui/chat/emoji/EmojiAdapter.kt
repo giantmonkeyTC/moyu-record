@@ -3,12 +3,15 @@ package cn.troph.tomon.ui.chat.emoji
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
+import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
 
 
 class EmojiAdapter(
@@ -31,7 +34,7 @@ class EmojiAdapter(
     }
 
     override fun onBindHeaderViewHolder(holder: EmojiHeaderViewHolder?) {
-        holder?.itemView?.guid_name_emoji?.text = emojiSectionObj.name
+        holder?.itemView?.guid_name_emoji?.text = "#${emojiSectionObj.name}#"
     }
 
     override fun getItemCount(): Int {
@@ -64,6 +67,38 @@ class EmojiAdapter(
 
     class EmojiItemViewHolder(itemView: View) : BaseSectionAdapter.ItemViewHolder(itemView)
     class EmojiHeaderViewHolder(itemView: View) : BaseSectionAdapter.HeaderViewHolder(itemView)
+}
+
+
+class BottomEmojiAdapter(
+    private val urlList: MutableList<String>,
+    private val onBottomGuildSelectedListener: OnBottomGuildSelectedListener
+) :
+    RecyclerView.Adapter<BottomEmojiAdapter.BottomEmojiVH>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BottomEmojiVH {
+        return BottomEmojiVH(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_bottom_emoji_icon, parent, false)
+        )
+    }
+
+    override fun onBindViewHolder(holder: BottomEmojiVH, position: Int) {
+        Glide.with(holder.itemView).load(urlList[position]).into(holder.itemView.bottom_emoji_iv)
+        holder.itemView.setOnClickListener {
+            onBottomGuildSelectedListener.onGuildSelected(holder.adapterPosition)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return urlList.size
+    }
+
+    class BottomEmojiVH(itemView: View) : RecyclerView.ViewHolder(itemView)
+}
+
+interface OnBottomGuildSelectedListener {
+    fun onGuildSelected(position: Int)
 }
 
 

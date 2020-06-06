@@ -120,8 +120,15 @@
                 android:id="@+id/emoji_rr"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-        </com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout>
 
+        </com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/section_header_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/bottom_emoji_rr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
