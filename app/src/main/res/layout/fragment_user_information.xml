@@ -27,7 +27,7 @@
         app:layout_constraintTop_toBottomOf="@id/user_info_avatar" />
 
     <TextView
-        android:id="@+id/user_info_attr1"
+        android:id="@+id/user_info_nick"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@id/user_info_name" />
 
     <TextView
-        android:id="@+id/user_info_attr2"
+        android:id="@+id/user_info_phone"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="40dp"
@@ -48,10 +48,10 @@
         android:paddingStart="20dp"
         android:text="12354"
         android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/user_info_attr1" />
+        app:layout_constraintTop_toBottomOf="@id/user_info_nick" />
 
     <TextView
-        android:id="@+id/user_info_attr3"
+        android:id="@+id/user_info_email"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="40dp"
@@ -60,7 +60,7 @@
         android:paddingStart="20dp"
         android:text="12354"
         android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/user_info_attr2" />
+        app:layout_constraintTop_toBottomOf="@id/user_info_phone" />
 
     <TextView
         android:layout_marginEnd="40dp"
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:text="登出"
         android:textSize="25sp"
-        android:textColor="@color/design_default_color_error"
+        android:textColor="#FA8072"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

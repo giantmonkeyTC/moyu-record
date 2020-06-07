@@ -94,4 +94,8 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
         return Observable.error(Exception("invalid parameter"))
     }
 
+    fun logout(): Unit? {
+        return client.actions.userLogout()
+    }
+
 }

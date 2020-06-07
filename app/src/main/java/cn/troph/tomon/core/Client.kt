@@ -64,4 +64,8 @@ class Client {
             }
     }
 
+    fun logout(): Unit? {
+        return me.logout()
+    }
+
 }

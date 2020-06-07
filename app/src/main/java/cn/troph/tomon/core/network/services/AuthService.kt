@@ -18,7 +18,7 @@ interface AuthService {
     @POST("auth/login")
     fun login(
         @Body request: LoginRequest
-    ): Observable<JsonObject>;
+    ): Observable<JsonObject>
 
     data class RegisterRequest(
         val username: String?,
@@ -31,6 +31,6 @@ interface AuthService {
     @POST("auth/register")
     fun register(
         @Body request: RegisterRequest
-    ): Observable<JsonObject>;
+    ): Observable<JsonObject>
 
 }

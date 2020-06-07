@@ -42,6 +42,9 @@ class GuildSelectorFragment : Fragment() {
             }
         })
         mGuildVM.loadGuildList()
+        view_avatar.setOnClickListener {
+
+        }
         btn_guild_fab.setOnClickListener {
             callJoinGuildBottomSheet()
         }
@@ -56,40 +59,24 @@ class GuildSelectorFragment : Fragment() {
         view.cancel.setOnClickListener { dialog.dismiss() }
         view.confirm.setOnClickListener {
             if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))) {
-                if (textField.text.toString().contains(Url.inviteUrl)) {
-                    Client.global.guilds.join(Url.parseInviteCode(textField.text.toString()))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            { guild ->
-                                if (guild != null) {
-                                    if (Client.global.guilds[guild.id] != null) {
-                                        println("joined guild")
-                                    } else {
-                                        println(guild.name)
-                                        dialog.dismiss()
-                                    }
+                Client.global.guilds.join(
+                    if (textField.text.toString().contains(Url.inviteUrl))
+                        Url.parseInviteCode(textField.text.toString())
+                    else textField.text.toString()
+                )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        { guild ->
+                            if (guild != null) {
+                                if (Client.global.guilds[guild.id] != null) {
+                                    println("joined guild")
+                                } else {
+                                    dialog.dismiss()
                                 }
-
-                            }, { error -> println(error) }, { }
-                        )
-                } else
-                    Client.global.guilds.join(textField.text.toString())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            { guild ->
-                                if (guild != null) {
-                                    if (Client.global.guilds[guild.id] != null) {
-                                        println("joined guild")
-                                    } else {
-                                        println(guild.name)
-                                        dialog.dismiss()
-                                    }
-                                }
-                            }, { error -> println(error) }, { }
-                        )
+                            }
+                        }, { error -> println(error) }, { }
+                    )
             }
-
-
         }
         dialog.show()
     }
