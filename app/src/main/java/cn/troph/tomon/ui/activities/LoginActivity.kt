@@ -4,13 +4,9 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -27,7 +23,6 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLHandshakeException
 
 data class LoginForm(
     val unionIdError: Int? = null,
@@ -95,16 +90,16 @@ class LoginActivity : AppCompatActivity() {
         viewModel.loginForm.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
             if (loginState.unionIdError != null) {
-                input_union_id.error = getString(loginState.unionIdError)
+                register_input_user_name.error = getString(loginState.unionIdError)
             }
             if (loginState.passwordError != null) {
-                input_password.error = getString(loginState.passwordError)
+                register_input_union_id.error = getString(loginState.passwordError)
             }
         })
 
         button_login.setOnClickListener {
-            val uid = input_union_id.text.toString()
-            val pw = input_password.text.toString()
+            val uid = register_input_user_name.text.toString()
+            val pw = register_input_union_id.text.toString()
             val valid = viewModel.loginDataValidate(uid, pw)
             if (valid) {
                 button_login.showProgress {

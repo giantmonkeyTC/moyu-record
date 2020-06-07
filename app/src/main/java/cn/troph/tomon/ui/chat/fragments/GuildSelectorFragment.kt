@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,7 +44,8 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         view_avatar.setOnClickListener {
-
+            val user_info_bottomsheet = UserInfoFragment()
+            user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
         }
         btn_guild_fab.setOnClickListener {
             callJoinGuildBottomSheet()

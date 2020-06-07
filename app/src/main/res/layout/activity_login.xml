@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/input_union_id"
+            android:id="@+id/register_input_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/input_password"
+            android:id="@+id/register_input_union_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -47,7 +47,7 @@
             android:theme="@style/AppTheme.EditText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/input_union_id" />
+            app:layout_constraintTop_toBottomOf="@+id/register_input_user_name" />
 
         <Button
             android:id="@+id/button_login"
@@ -62,7 +62,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/input_password" />
+            app:layout_constraintTop_toBottomOf="@+id/register_input_union_id" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
