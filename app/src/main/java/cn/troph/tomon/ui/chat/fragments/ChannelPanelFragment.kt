@@ -163,7 +163,6 @@ class ChannelPanelFragment : Fragment() {
                     requireActivity(),
                     onBottomSheetSelect = object : OnBottomSheetSelect {
                         override fun onItemSelected(index: Int) {
-                            mBottomSheet.dismiss(true)
                             val intent = Intent(requireContext(), FilePickerActivity::class.java)
                             val builder = Configurations.Builder()
                             when (index) {
@@ -314,7 +313,7 @@ class ChannelPanelFragment : Fragment() {
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            Logger.d(it.attachments.length)
+            //Client.global.eventBus.postEvent(MessageCreateEvent(it))
         }
     }
 
