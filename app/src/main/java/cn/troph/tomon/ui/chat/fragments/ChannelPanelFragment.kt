@@ -183,7 +183,10 @@ class ChannelPanelFragment : Fragment() {
                             when (index) {
                                 0 -> {
                                     builder.setCheckPermission(true).setShowImages(true)
-                                        .setMaxSelection(1).enableImageCapture(true)
+                                        .setShowVideos(false).setShowFiles(false)
+                                        .setShowAudios(false)
+                                        .setSingleChoiceMode(true).setSingleClickSelection(true)
+                                        .enableImageCapture(true)
                                     intent.putExtra(
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
@@ -202,7 +205,9 @@ class ChannelPanelFragment : Fragment() {
                                 }
                                 2 -> {
                                     builder.setCheckPermission(true).setShowFiles(true)
-                                        .setMaxSelection(1)
+                                        .setSingleChoiceMode(true).setSingleClickSelection(true)
+                                        .setShowImages(false).setShowVideos(false)
+                                        .setShowAudios(false)
                                     intent.putExtra(
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
