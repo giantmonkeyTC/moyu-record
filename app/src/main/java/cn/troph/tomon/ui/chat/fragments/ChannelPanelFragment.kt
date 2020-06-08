@@ -1,22 +1,15 @@
 package cn.troph.tomon.ui.chat.fragments
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -31,6 +24,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
@@ -38,8 +32,13 @@ import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.alibaba.sdk.android.oss.common.utils.IOUtils
+import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.jaiselrahman.filepicker.activity.FilePickerActivity
+import com.jaiselrahman.filepicker.config.Configurations
+import com.jaiselrahman.filepicker.model.MediaFile
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
@@ -52,12 +51,17 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val FILE_REQUEST_CODE_IMAGE = 321
+const val FILE_REQUEST_CODE_VIDEO = 322
+const val FILE_REQUEST_CODE_FILE = 323
+
 class ChannelPanelFragment : Fragment() {
 
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private val mSectionDataManager = SectionDataManager()
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
+    private lateinit var mBottomSheet: FileBottomSheetFragment
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.requestFocus()
@@ -129,7 +133,7 @@ class ChannelPanelFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btn_message_send.setOnClickListener {
-            if(channelId==null){
+            if (channelId == null) {
                 return@setOnClickListener
             }
             if (!AppState.global.updateEnabled.value.flag)
@@ -168,9 +172,51 @@ class ChannelPanelFragment : Fragment() {
                 UpdateEnabled(flag = false)
         }
         btn_message_menu.setOnClickListener {
-            val openAlbumIntent = Intent(Intent.ACTION_GET_CONTENT)
-            openAlbumIntent.type = "image/*"
-            startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
+            mBottomSheet =
+                FileBottomSheetFragment(
+                    requireActivity(),
+                    onBottomSheetSelect = object : OnBottomSheetSelect {
+                        override fun onItemSelected(index: Int) {
+                            mBottomSheet.dismiss(true)
+                            val intent = Intent(requireContext(), FilePickerActivity::class.java)
+                            val builder = Configurations.Builder()
+                            when (index) {
+                                0 -> {
+                                    builder.setCheckPermission(true).setShowImages(true)
+                                        .setMaxSelection(1).enableImageCapture(true)
+                                    intent.putExtra(
+                                        FilePickerActivity.CONFIGS,
+                                        builder.build()
+                                    )
+                                    startActivityForResult(intent, FILE_REQUEST_CODE_IMAGE)
+                                }
+                                1 -> {
+                                    builder.setCheckPermission(true).setShowVideos(true)
+                                        .setShowImages(false).setShowFiles(false)
+                                        .setMaxSelection(1).enableVideoCapture(false)
+                                    intent.putExtra(
+                                        FilePickerActivity.CONFIGS,
+                                        builder.build()
+                                    )
+                                    startActivityForResult(intent, FILE_REQUEST_CODE_VIDEO)
+                                }
+                                2 -> {
+                                    builder.setCheckPermission(true).setShowFiles(true)
+                                        .setMaxSelection(1)
+                                    intent.putExtra(
+                                        FilePickerActivity.CONFIGS,
+                                        builder.build()
+                                    )
+                                    startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
+                                }
+                            }
+
+                        }
+                    }).also(BottomSheet::show)
+
+//            val openAlbumIntent = Intent(Intent.ACTION_GET_CONTENT)
+//            openAlbumIntent.type = "image/*"
+//            startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
 
         emoji_tv.setOnClickListener {
@@ -189,43 +235,46 @@ class ChannelPanelFragment : Fragment() {
             }
         }
 
-        btn_message_menu.setOnLongClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_DENIED
-            )
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION
-                )
-            val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (takePhotoIntent.resolveActivityInfo(
-                    requireActivity().packageManager,
-                    PackageManager.MATCH_DEFAULT_ONLY
-                ) != null
-            ) {
-                val imageFile: File? = storeImage()
-                if (imageFile != null) {
-                    imageUri = try {
-                        FileProvider.getUriForFile(
-                            requireContext(),
-                            "cn.troph.tomon.fileprovider",
-                            imageFile
-                        )
-                    } catch (e: IllegalArgumentException) {
-                        Log.e(
-                            "File Selector",
-                            "The selected file can't be shared: $imageFile"
-                        )
-                        null
-                    }
-                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-                    startActivityForResult(takePhotoIntent, REQUEST_SYSTEM_CAMERA)
-                }
 
-            } else {
-                //TODO Unable to start system camera application
-            }
+        btn_message_menu.setOnLongClickListener {
+
             true
+//            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+//                == PackageManager.PERMISSION_DENIED
+//            )
+//                ActivityCompat.requestPermissions(
+//                    requireActivity(),
+//                    arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION
+//                )
+//            val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            if (takePhotoIntent.resolveActivityInfo(
+//                    requireActivity().packageManager,
+//                    PackageManager.MATCH_DEFAULT_ONLY
+//                ) != null
+//            ) {
+//                val imageFile: File? = storeImage()
+//                if (imageFile != null) {
+//                    imageUri = try {
+//                        FileProvider.getUriForFile(
+//                            requireContext(),
+//                            "cn.troph.tomon.fileprovider",
+//                            imageFile
+//                        )
+//                    } catch (e: IllegalArgumentException) {
+//                        Log.e(
+//                            "File Selector",
+//                            "The selected file can't be shared: $imageFile"
+//                        )
+//                        null
+//                    }
+//                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+//                    startActivityForResult(takePhotoIntent, REQUEST_SYSTEM_CAMERA)
+//                }
+//
+//            } else {
+//                //TODO Unable to start system camera application
+//            }
+//            true
         }
     }
 
@@ -321,7 +370,56 @@ class ChannelPanelFragment : Fragment() {
         return imageFile
     }
 
+    private fun uploadFile(file: File) {
+        val requestFile = file.asRequestBody()
+        val requestBody =
+            "{\"content\":null,\"nonce\":\"${SnowFlakesGenerator(1).nextId()}\"}".toRequestBody()
+        val map = mutableMapOf<String, RequestBody>()
+        map["payload_json"] = requestBody
+        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
+        (Client.global.channels[channelId!!] as TextChannel).messages.uploadAttachments(
+            partMap = map,
+            files = body
+        ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            Logger.d(it.attachments.length)
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == FILE_REQUEST_CODE_IMAGE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
+                    for (item in it) {
+                        uploadFile(File(item.path))
+                    }
+                }
+            }
+            return
+        }
+
+        if (requestCode == FILE_REQUEST_CODE_VIDEO && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
+                    for (item in it) {
+                        uploadFile(File(item.path))
+                    }
+                }
+            }
+            return
+        }
+
+        if (requestCode == FILE_REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
+                    for (item in it) {
+                        uploadFile(File(item.path))
+                    }
+                }
+            }
+            return
+        }
+
+
         if (requestCode == REQUEST_SYSTEM_CAMERA && resultCode == Activity.RESULT_OK) {
             MediaScannerConnection
                 .scanFile(requireContext(), arrayOf(imageUri?.path), null, null)
