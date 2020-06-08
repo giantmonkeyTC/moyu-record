@@ -2,10 +2,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
 import android.content.Intent
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +28,6 @@ import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
-import com.alibaba.sdk.android.oss.common.utils.IOUtils
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
@@ -40,19 +36,14 @@ import com.jaiselrahman.filepicker.config.Configurations
 import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
-const val FILE_REQUEST_CODE_IMAGE = 321
-const val FILE_REQUEST_CODE_VIDEO = 322
 const val FILE_REQUEST_CODE_FILE = 323
 
 class ChannelPanelFragment : Fragment() {
@@ -72,12 +63,6 @@ class ChannelPanelFragment : Fragment() {
             editText.requestFocus()
             editText.text?.append(String(Character.toChars(unicode)))
         }
-    }
-
-    companion object {
-        private const val REQUEST_SYSTEM_CAMERA = 1
-        private const val REQUEST_SYSTEM_ALBUM = 2
-        private const val REQUEST_CAMERA_PERMISSION = 3
     }
 
     private var channelId: String? = null
@@ -104,8 +89,6 @@ class ChannelPanelFragment : Fragment() {
             }
         }
     private var message: Message? = null
-    private var imageUri: Uri? = null
-    private var imagePath: String? = null
     private lateinit var msgListAdapter: MessageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -191,17 +174,16 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
-                                    startActivityForResult(intent, FILE_REQUEST_CODE_IMAGE)
                                 }
                                 1 -> {
                                     builder.setCheckPermission(true).setShowVideos(true)
                                         .setShowImages(false).setShowFiles(false)
+                                        .setShowAudios(false)
                                         .setMaxSelection(1).enableVideoCapture(false)
                                     intent.putExtra(
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
-                                    startActivityForResult(intent, FILE_REQUEST_CODE_VIDEO)
                                 }
                                 2 -> {
                                     builder.setCheckPermission(true).setShowFiles(true)
@@ -212,16 +194,11 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
-                                    startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
                                 }
                             }
-
+                            startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
                         }
                     }).also(BottomSheet::show)
-
-//            val openAlbumIntent = Intent(Intent.ACTION_GET_CONTENT)
-//            openAlbumIntent.type = "image/*"
-//            startActivityForResult(openAlbumIntent, REQUEST_SYSTEM_ALBUM)
         }
 
         emoji_tv.setOnClickListener {
@@ -232,54 +209,24 @@ class ChannelPanelFragment : Fragment() {
                 editText.requestFocus()
             } else {
                 section_header_layout.visibility = View.VISIBLE
-                bottom_emoji_rr.visibility = View.VISIBLE
+                bottom_emoji_rr.visibility = View.GONE
                 activity?.let {
                     hideKeyboard(it)
                 }
                 loadEmoji()
             }
         }
-
-
-        btn_message_menu.setOnLongClickListener {
-
-            true
-//            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-//                == PackageManager.PERMISSION_DENIED
-//            )
-//                ActivityCompat.requestPermissions(
-//                    requireActivity(),
-//                    arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION
-//                )
-//            val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//            if (takePhotoIntent.resolveActivityInfo(
-//                    requireActivity().packageManager,
-//                    PackageManager.MATCH_DEFAULT_ONLY
-//                ) != null
-//            ) {
-//                val imageFile: File? = storeImage()
-//                if (imageFile != null) {
-//                    imageUri = try {
-//                        FileProvider.getUriForFile(
-//                            requireContext(),
-//                            "cn.troph.tomon.fileprovider",
-//                            imageFile
-//                        )
-//                    } catch (e: IllegalArgumentException) {
-//                        Log.e(
-//                            "File Selector",
-//                            "The selected file can't be shared: $imageFile"
-//                        )
-//                        null
-//                    }
-//                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-//                    startActivityForResult(takePhotoIntent, REQUEST_SYSTEM_CAMERA)
-//                }
-//
-//            } else {
-//                //TODO Unable to start system camera application
-//            }
-//            true
+        channelId?.let {
+            val channel = Client.global.channels[it] as TextChannel
+            channel.messages.observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    it?.let {
+                        it.obj?.let {
+                            msgViewModel.getMessageLiveData().value?.add(it)
+                            msgViewModel.getMessageLiveData().notifyObserver()
+                        }
+                    }
+                })
         }
     }
 
@@ -361,20 +308,6 @@ class ChannelPanelFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun storeImage(): File? {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val fileName = "${timeStamp}_"
-        val storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        var imageFile: File? = null
-        try {
-            imageFile = File.createTempFile(fileName, ".jpg", storageDir)
-            imagePath = imageFile.path
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return imageFile
-    }
-
     private fun uploadFile(file: File) {
         val requestFile = file.asRequestBody()
         val requestBody =
@@ -391,89 +324,12 @@ class ChannelPanelFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == FILE_REQUEST_CODE_IMAGE && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
-                    for (item in it) {
-                        uploadFile(File(item.path))
-                    }
-                }
-            }
-            return
-        }
-
-        if (requestCode == FILE_REQUEST_CODE_VIDEO && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
-                    for (item in it) {
-                        uploadFile(File(item.path))
-                    }
-                }
-            }
-            return
-        }
-
         if (requestCode == FILE_REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
             data?.let {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
                     for (item in it) {
                         uploadFile(File(item.path))
                     }
-                }
-            }
-            return
-        }
-
-
-        if (requestCode == REQUEST_SYSTEM_CAMERA && resultCode == Activity.RESULT_OK) {
-            MediaScannerConnection
-                .scanFile(requireContext(), arrayOf(imageUri?.path), null, null)
-            val file = File(imagePath)
-            if (file != null) {
-                val requestFile = file.asRequestBody()
-                val requestBody =
-                    "{\"content\":null,\"nonce\":\"1227791868142817280\"}".toRequestBody()
-                val map = mutableMapOf<String, RequestBody>()
-                map["payload_json"] = requestBody
-                val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-                (Client.global.channels[channelId!!] as TextChannel).messages.uploadAttachments(
-                    partMap = map,
-                    files = body
-                ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    println(it.attachments.length)
-                }
-            }
-        } else if (requestCode == REQUEST_SYSTEM_ALBUM && resultCode == Activity.RESULT_OK) {
-            val imageUri: Uri = data?.data!!
-            val file = createTempFile(
-                "123456",//TODO CHANGE TO SNOWFLAKE
-                ".jpg",
-                activity?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            )
-            val outputStream = FileOutputStream(file)
-            try {
-                outputStream.write(
-                    IOUtils.readStreamAsBytesArray(
-                        requireActivity().contentResolver.openInputStream(
-                            imageUri
-                        )
-                    )
-                )
-            } catch (e: IOException) {
-                println(e)
-            }
-            if (file != null) {
-                val requestFile = file.asRequestBody()
-                val requestBody =
-                    "{\"content\":null,\"nonce\":\"1227791868142817280\"}".toRequestBody()
-                val map = mutableMapOf<String, RequestBody>()
-                map.put("payload_json", requestBody)
-                val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-                (Client.global.channels[channelId!!] as TextChannel).messages.uploadAttachments(
-                    partMap = map,
-                    files = body
-                ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    file.delete()
                 }
             }
         }
