@@ -18,10 +18,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.collections.EventType
+import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
+import cn.troph.tomon.core.utils.event.EventBus
+import cn.troph.tomon.core.utils.event.observeEvent
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
@@ -124,8 +129,6 @@ class ChannelPanelFragment : Fragment() {
                     ?: ""] as TextChannel).messages.create(editText.text.toString())
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
-                        msgViewModel.getMessageLiveData().value?.add(it)
-                        msgViewModel.getMessageLiveData().notifyObserver()
                         editText.text = null
                     }
             else
@@ -216,18 +219,10 @@ class ChannelPanelFragment : Fragment() {
                 loadEmoji()
             }
         }
-        channelId?.let {
-            val channel = Client.global.channels[it] as TextChannel
-            channel.messages.observable.observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
-                    it?.let {
-                        it.obj?.let {
-                            msgViewModel.getMessageLiveData().value?.add(it)
-                            msgViewModel.getMessageLiveData().notifyObserver()
-                        }
-                    }
-                })
-        }
+        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            msgViewModel.getMessageLiveData().value?.add(it.message)
+            msgViewModel.getMessageLiveData().notifyObserver()
+        })
     }
 
     private fun loadEmoji() {
