@@ -94,7 +94,8 @@ class ChannelPanelFragment : Fragment() {
             }
         }
     private var message: Message? = null
-    private lateinit var msgListAdapter: MessageAdapter
+    private val mMsgList = mutableListOf<Message>()
+    private val msgListAdapter: MessageAdapter = MessageAdapter(mMsgList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,12 +144,13 @@ class ChannelPanelFragment : Fragment() {
                         editText.text = null
                     }
         }
+        view_messages.layoutManager = LinearLayoutManager(requireContext())
+        view_messages.adapter = msgListAdapter
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
-                    msgListAdapter = MessageAdapter(it)
-                    view_messages.layoutManager = LinearLayoutManager(view.context)
-                    view_messages.adapter = msgListAdapter
+                    mMsgList.addAll(it)
+                    msgListAdapter.notifyDataSetChanged()
                     view_messages.scrollToPosition(msgListAdapter.itemCount - 1)
                 }
             })
@@ -219,8 +221,8 @@ class ChannelPanelFragment : Fragment() {
             }
         }
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
-            msgViewModel.getMessageLiveData().value?.add(it.message)
-            msgViewModel.getMessageLiveData().notifyObserver()
+            mMsgList.add(it.message)
+            msgListAdapter.notifyDataSetChanged()
         })
     }
 
