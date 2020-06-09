@@ -18,9 +18,14 @@ fun <T> MutableLiveData<T>.notifyObserver() {
 
 class MessageViewModel : ViewModel() {
     private val messageLiveData = MutableLiveData<MutableList<Message>>()
+    private val messageMoreLiveData = MutableLiveData<MutableList<Message>>()
 
     fun getMessageLiveData(): MutableLiveData<MutableList<Message>> {
         return messageLiveData
+    }
+
+    fun getMessageMoreLiveData(): MutableLiveData<MutableList<Message>> {
+        return messageMoreLiveData
     }
 
     fun loadTextChannelMessage(channelId: String) {
@@ -32,5 +37,15 @@ class MessageViewModel : ViewModel() {
                 })
     }
 
+    fun loadOldMessage(channelId: String, beforeId: String) {
+        val channel = Client.global.channels[channelId] as TextChannel
+        channel.messages.fetch(beforeId = beforeId).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                Consumer {
+                    messageMoreLiveData.value = it.toMutableList()
+                }
+            )
+    }
 
 }
+

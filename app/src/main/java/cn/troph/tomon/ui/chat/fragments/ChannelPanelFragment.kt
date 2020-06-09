@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -149,6 +150,7 @@ class ChannelPanelFragment : Fragment() {
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
+                    mMsgList.clear()
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
                     view_messages.scrollToPosition(msgListAdapter.itemCount - 1)
@@ -224,6 +226,26 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.add(it.message)
             msgListAdapter.notifyDataSetChanged()
         })
+        msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
+            swipe_refresh_ll.isRefreshing = false
+            if (it.size == 0) {
+                Toast.makeText(requireContext(), "没有更多消息了", Toast.LENGTH_SHORT).show()
+                return@Observer
+            }
+            Logger.d("old head:${mMsgList[0].timestamp} newHead:${it[0].timestamp}")
+            mMsgList.addAll(0, it)
+            msgListAdapter.notifyDataSetChanged()
+        })
+        swipeToRefreshSetup()
+    }
+
+
+    private fun swipeToRefreshSetup() {
+        swipe_refresh_ll.setOnRefreshListener {
+            channelId?.let {
+                msgViewModel.loadOldMessage(it,mMsgList[0].id!!)
+            }
+        }
     }
 
     private fun loadEmoji() {

@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.EnvironmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -113,7 +114,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
-                }else{
+                } else {
                     holder.itemView.message_avatar_file.visibility = View.GONE
                 }
 
@@ -122,7 +123,11 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                     holder.itemView.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
-                            Logger.d(holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath)
+                            Toast.makeText(
+                                holder.itemView.context,
+                                "文件保存至:${holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             PRDownloader.download(
                                 file.url,
                                 holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath,
@@ -130,11 +135,19 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                             )
                                 .build().start(object : OnDownloadListener {
                                     override fun onDownloadComplete() {
-                                        Logger.d("Down complete")
+                                        Toast.makeText(
+                                            holder.itemView.context,
+                                            "下载完成",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
 
                                     override fun onError(error: Error?) {
-                                        Logger.d(error.toString())
+                                        Toast.makeText(
+                                            holder.itemView.context,
+                                            "下载失败:${error?.serverErrorMessage}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 })
                             break
@@ -147,7 +160,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
-                }else{
+                } else {
                     holder.itemView.message_avatar_image.visibility = View.GONE
                 }
 
