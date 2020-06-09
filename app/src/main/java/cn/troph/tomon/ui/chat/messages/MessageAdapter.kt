@@ -30,6 +30,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
+import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
@@ -39,22 +40,48 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        return MessageViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.widget_message_item, parent, false)
-        )
+        if (viewType == 0) {
+            return MessageViewHolder(
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.widget_message_item, parent, false)
+            )
+        } else {
+            return MessageViewHolder(
+                LayoutInflater.from(parent.context).inflate(R.layout.item_chat_file, parent, false)
+            )
+        }
+
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (messageList[position].attachments.size == 0) {//normal msg
+            return 0
+        } else {// file
+            return 1
+        }
+
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val msg = messageList[position]
-        holder.view.setOnLongClickListener {
-            callBottomSheet(it, msg)
-            true
+        val viewtype = getItemViewType(position)
+        when (viewtype) {
+            0 -> {
+                val msg = messageList[position]
+                holder.view.setOnLongClickListener {
+                    callBottomSheet(it, msg)
+                    true
+                }
+                if (position > 1) {
+                    bind(holder.itemView, msg, messageList[position - 1])
+                } else {
+                    bind(holder.itemView, msg)
+                }
+            }
+            1 -> {
+
+            }
         }
-        if (position > 1) {
-            bind(holder.itemView, msg, messageList[position - 1])
-        } else {
-            bind(holder.itemView, msg)
-        }
+
     }
 
     private fun bind(itemView: View, message: Message, prevMessage: Message? = null) {
