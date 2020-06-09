@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Dialog
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,19 +20,19 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         bottomSheet.setContentView(view)
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
+        val extraSpace = view.findViewById<View>(R.id.extraSpace)
         bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
+        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_EXPANDED -> {
                         showView(appBarLayout, getActionBarSize())
-                        hideAppBar(profileLayout)
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
                         hideAppBar(appBarLayout)
-                        showView(profileLayout, getActionBarSize())
                     }
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         dismiss()
@@ -43,7 +44,6 @@ class UserInfoFragment : BottomSheetDialogFragment() {
 
             }
         })
-
         hideAppBar(appBarLayout);
         return bottomSheet
     }
