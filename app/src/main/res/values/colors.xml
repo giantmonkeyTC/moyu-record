@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#423981</color>
+
+
+    <color name="primary">#424242</color>
     <color name="primaryLight">#7A74A6</color>
     <color name="primaryLighter">#B3B0CD</color>
-    <color name="primaryDark">#2E285A</color>
+    <color name="primaryDark">#1b1b1b</color>
     <color name="primaryDarker">#1A1734</color>
-    <color name="accent">#D81B60</color>
+    <color name="accent">#6d6d6d</color>
     <color name="activityBackground">#242424</color>
     <color name="actionBarBackground">#1E1E1E</color>
     <color name="actionBarText">#FFFFFF</color>

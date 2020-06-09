@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
 enum class SocketClientState(val value: Int) {
@@ -85,7 +86,11 @@ class SocketClient() : WebSocketListener(),
         _state = SocketClientState.CONNECTING
         _url = url
         val request = Request.Builder().url(url).build()
-        _webSocket = OkHttpClient().newWebSocket(request, this)
+        val client = OkHttpClient.Builder()
+        client.writeTimeout(30, TimeUnit.SECONDS)
+        client.readTimeout(30, TimeUnit.SECONDS)
+        client.connectTimeout(30, TimeUnit.SECONDS)
+        _webSocket = client.build().newWebSocket(request, this)
         _emitter?.onNext(SocketEvent(SocketEventType.CONNECTING))
     }
 
