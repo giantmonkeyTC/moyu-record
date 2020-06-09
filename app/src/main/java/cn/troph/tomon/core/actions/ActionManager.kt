@@ -11,6 +11,7 @@ class ActionManager(val client: Client) {
     fun userLogin(data: JsonObject): User? = UserLoginAction(client).handle(data)
     fun userLogout(): Unit? = UserLogoutAction(client).handle(null)
     fun userUpdate(data: JsonObject): User? = UserUpdateAction(client).handle(data)
+    fun userRegister(data: JsonObject):User? = UserRegisterAction(client).handle(data)
 
     fun guildFetch(data: JsonArray, isSync: Boolean = true): List<Guild>? =
         GuildFetchAction(client).handle(data, isSync)
