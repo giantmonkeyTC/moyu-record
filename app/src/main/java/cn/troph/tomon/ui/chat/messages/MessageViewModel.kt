@@ -30,7 +30,7 @@ class MessageViewModel : ViewModel() {
 
     fun loadTextChannelMessage(channelId: String) {
         val channel = Client.global.channels[channelId] as TextChannel
-        channel.messages.fetch().subscribeOn(Schedulers.io())
+        channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 Consumer {
                     messageLiveData.value = it.toMutableList()
@@ -39,7 +39,8 @@ class MessageViewModel : ViewModel() {
 
     fun loadOldMessage(channelId: String, beforeId: String) {
         val channel = Client.global.channels[channelId] as TextChannel
-        channel.messages.fetch(beforeId = beforeId).observeOn(AndroidSchedulers.mainThread())
+        channel.messages.fetch(beforeId = beforeId, limit = 50)
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 Consumer {
                     messageMoreLiveData.value = it.toMutableList()

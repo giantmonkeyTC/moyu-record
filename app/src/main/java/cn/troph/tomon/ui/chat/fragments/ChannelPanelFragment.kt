@@ -243,7 +243,7 @@ class ChannelPanelFragment : Fragment() {
     private fun swipeToRefreshSetup() {
         swipe_refresh_ll.setOnRefreshListener {
             channelId?.let {
-                msgViewModel.loadOldMessage(it,mMsgList[0].id!!)
+                msgViewModel.loadOldMessage(it, mMsgList[0].id!!)
             }
         }
     }
