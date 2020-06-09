@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
@@ -16,21 +17,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.EnvironmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
+import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.orhanobut.logger.Logger
+import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
+import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
@@ -40,31 +47,54 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        if (viewType == 0) {
-            return MessageViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.widget_message_item, parent, false)
-            )
-        } else {
-            return MessageViewHolder(
-                LayoutInflater.from(parent.context).inflate(R.layout.item_chat_file, parent, false)
-            )
-        }
+        when (viewType) {
+            0 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.widget_message_item, parent, false)
+                )
+            }
+            1 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_chat_file, parent, false)
+                )
+            }
+            else -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_chat_image, parent, false)
+                )
+            }
 
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
         if (messageList[position].attachments.size == 0) {//normal msg
             return 0
-        } else {// file
-            return 1
         }
+        var type = 0
+        for (item in messageList[position].attachments.values) {
+            if (isImage(item.fileName)) {
+                type = 2
+            } else {
+                type = 1
+            }
+            break
+        }
+        return type
+    }
 
+    private fun isImage(name: String): Boolean {
+        return name.endsWith("jpg", true) || name.endsWith("bmp", true) || name.endsWith(
+            "gif",
+            true
+        ) || name.endsWith("png", true) || name.endsWith("jpeg", true)
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val viewtype = getItemViewType(position)
-        when (viewtype) {
+        when (getItemViewType(position)) {
             0 -> {
                 val msg = messageList[position]
                 holder.view.setOnLongClickListener {
@@ -78,7 +108,40 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 }
             }
             1 -> {
-
+                for (item in messageList[position].attachments.values) {
+                    holder.itemView.textView.text = item.fileName
+                    holder.itemView.setOnClickListener {
+                        val msg = messageList[holder.adapterPosition]
+                        for (file in msg.attachments.values) {
+                            PRDownloader.download(
+                                file.url,
+                                holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath,
+                                file.fileName
+                            )
+                                .build()
+                            break
+                        }
+                    }
+                    break
+                }
+            }
+            2 -> {
+                for (item in messageList[position].attachments.values) {
+                    Glide.with(holder.itemView).load(item.url).into(holder.itemView.chat_iv)
+                    holder.itemView.setOnClickListener {
+                        val msg = messageList[holder.adapterPosition]
+                        for (image in msg.attachments.values) {
+                            StfalconImageViewer.Builder<MessageAttachment>(
+                                holder.itemView.context,
+                                mutableListOf(image)
+                            ) { view, images ->
+                                Glide.with(view).load(images.url).into(view)
+                            }.show()
+                            break
+                        }
+                    }
+                    break
+                }
             }
         }
 
