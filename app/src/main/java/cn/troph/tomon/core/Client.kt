@@ -64,6 +64,24 @@ class Client {
             }
     }
 
+    fun register(
+        username: String? = null,
+        unionId: String? = null,
+        code: String? = null,
+        password: String? = null,
+        invite: String? = null
+    ): Observable<Unit> {
+        return me.register(
+            unionId = unionId,
+            password = password,
+            code = code,
+            invite = invite,
+            username = username
+        ).map {
+
+        }
+    }
+
     fun logout(): Unit? {
         return me.logout()
     }

@@ -94,6 +94,48 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
         return Observable.error(Exception("invalid parameter"))
     }
 
+    fun register(
+        username: String? = null,
+        unionId: String? = null,
+        code: String? = null,
+        password: String? = null,
+        invite: String? = null
+    ): Observable<User> {
+        var request = when {
+            Validator.isPhone(unionId) -> AuthService.RegisterRequest(
+                username = username,
+                phone = unionId,
+                code = code,
+                password = password,
+                email = null,
+                invite = invite
+            )
+            Validator.isEmail(unionId) -> AuthService.RegisterRequest(
+                username = username,
+                email = unionId,
+                code = code,
+                password = password,
+                phone = null,
+                invite = invite
+            )
+            unionId == null && username != null -> AuthService.RegisterRequest(
+                username = username,
+                phone = null,
+                code = code,
+                password = password,
+                email = null,
+                invite = invite
+            )
+            else -> null
+        }
+        if (request != null) {
+            return client.rest.authService.register(request).subscribeOn(Schedulers.io()).map {
+                return@map client.actions.userRegister(data = it)
+            }
+        }
+        return Observable.error(Exception("invalid parameter"))
+    }
+
     fun logout(): Unit? {
         return client.actions.userLogout()
     }
