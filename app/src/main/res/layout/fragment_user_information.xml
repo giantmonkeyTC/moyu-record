@@ -1,75 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <cn.troph.tomon.ui.widgets.UserAvatar
-        android:id="@+id/user_info_avatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-
-        android:id="@+id/user_info_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="12345"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_info_avatar" />
-
-    <TextView
-        android:id="@+id/user_info_nick"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="20dp"
-        android:background="@color/channelSelectBackground"
-        android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:text="12354"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/user_info_name" />
+        android:layout_height="?attr/actionBarSize"/>
 
-    <TextView
-        android:id="@+id/user_info_phone"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profile_layout"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="40dp"
-        android:background="@color/channelSelectBackground"
-        android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:text="12354"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/user_info_nick" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        >
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/user_info_avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="50dp" />
 
-    <TextView
-        android:id="@+id/user_info_email"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="40dp"
-        android:background="@color/channelSelectBackground"
-        android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:text="12354"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/user_info_phone" />
+        <TextView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_info_avatar"
+            android:id="@+id/user_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="12345"
+            android:textColor="@color/white"
+            android:textSize="30sp" />
 
-    <TextView
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="登出"
-        android:textSize="25sp"
-        android:textColor="#FA8072"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/user_info_name"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/user_info_nick"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/channelSelectBackground"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:text="12354"
+            android:textColor="@color/white" />
+
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/user_info_nick"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/user_info_phone"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="40dp"
+            android:background="@color/channelSelectBackground"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:text="12354"
+            android:textColor="@color/white" />
+
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/user_info_phone"
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/user_info_email"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="40dp"
+            android:background="@color/channelSelectBackground"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:text="12354"
+            android:textColor="@color/white" />
+
+        <TextView
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="40dp"
+            android:text="登出"
+            android:textColor="#FA8072"
+            android:textSize="25sp" />
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
