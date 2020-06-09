@@ -110,6 +110,13 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 }
             }
             1 -> {
+                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                    holder.itemView.message_avatar_file.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_file.user = messageList[position].author
+                }else{
+                    holder.itemView.message_avatar_file.visibility = View.GONE
+                }
+
                 for (item in messageList[position].attachments.values) {
                     holder.itemView.textView.text = item.fileName
                     holder.itemView.setOnClickListener {
@@ -121,7 +128,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                                 holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath,
                                 file.fileName
                             )
-                                .build().start(object :OnDownloadListener{
+                                .build().start(object : OnDownloadListener {
                                     override fun onDownloadComplete() {
                                         Logger.d("Down complete")
                                     }
@@ -137,6 +144,13 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 }
             }
             2 -> {
+                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                    holder.itemView.message_avatar_image.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_image.user = messageList[position].author
+                }else{
+                    holder.itemView.message_avatar_image.visibility = View.GONE
+                }
+
                 for (item in messageList[position].attachments.values) {
                     Glide.with(holder.itemView).load(item.url).into(holder.itemView.chat_iv)
                     holder.itemView.setOnClickListener {
