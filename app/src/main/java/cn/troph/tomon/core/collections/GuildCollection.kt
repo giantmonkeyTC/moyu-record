@@ -47,4 +47,10 @@ class GuildCollection(client: Client) :
         }
     }
 
+    fun fetchInvite(code: String): Observable<JsonObject> {
+        return client.rest.inviteService.fetch(code, client.auth).subscribeOn(Schedulers.io()).map {
+            it
+        }
+    }
+
 }

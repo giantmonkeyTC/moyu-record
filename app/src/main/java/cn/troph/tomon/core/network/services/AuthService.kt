@@ -25,7 +25,8 @@ interface AuthService {
         val email: String?,
         val phone: String?,
         val code: String?,
-        val password: String?
+        val password: String?,
+        val invite: String
     )
 
     @POST("auth/register")
