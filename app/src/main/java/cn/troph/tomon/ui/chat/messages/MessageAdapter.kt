@@ -29,6 +29,8 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.downloader.Error
+import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.orhanobut.logger.Logger
@@ -113,12 +115,21 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                     holder.itemView.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
+                            Logger.d(holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath)
                             PRDownloader.download(
                                 file.url,
                                 holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath,
                                 file.fileName
                             )
-                                .build()
+                                .build().start(object :OnDownloadListener{
+                                    override fun onDownloadComplete() {
+                                        Logger.d("Down complete")
+                                    }
+
+                                    override fun onError(error: Error?) {
+                                        Logger.d(error.toString())
+                                    }
+                                })
                             break
                         }
                     }
