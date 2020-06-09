@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <cn.troph.tomon.ui.widgets.UserAvatar
+        android:layout_marginVertical="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/message_avatar_file"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="16dp" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="30dp"
@@ -13,7 +23,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/message_avatar_file"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_file" />
 
