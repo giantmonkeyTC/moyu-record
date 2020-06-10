@@ -2,6 +2,7 @@ package cn.troph.tomon.core.network.services
 
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -33,5 +34,15 @@ interface AuthService {
     fun register(
         @Body request: RegisterRequest
     ): Observable<JsonObject>
+
+    data class VerifyRequest(
+        val phone: String?,
+        val type: String?
+    )
+
+    @POST("auth/verification")
+    fun verify(
+        @Body request: VerifyRequest
+    ): Observable<Response<Void>>
 
 }
