@@ -19,24 +19,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.collections.EventType
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
-import cn.troph.tomon.core.utils.event.EventBus
-import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
-import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
 import com.jaiselrahman.filepicker.model.MediaFile
@@ -151,12 +148,24 @@ class ChannelPanelFragment : Fragment() {
             Observer<MutableList<Message>?> {
                 it?.let {
                     mMsgList.clear()
+                    mMsgList.add(Message(Client.global, JsonObject()))
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
                     view_messages.scrollToPosition(msgListAdapter.itemCount - 1)
                 }
             })
-        view_messages.addOnScrollListener(MessageListOnScrollListener())
+        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+//                if (recyclerView.childCount == 0) {
+//                    return
+//                } else if (recyclerView.getChildAt(0)
+//                        .top == 0
+//                ) {
+//                    loadOlderMsg()
+//                }
+            }
+        })
         btn_update_message_cancel.setOnClickListener {
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = false)
@@ -227,25 +236,23 @@ class ChannelPanelFragment : Fragment() {
             msgListAdapter.notifyDataSetChanged()
         })
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
-            swipe_refresh_ll.isRefreshing = false
             if (it.size == 0) {
                 Toast.makeText(requireContext(), "没有更多消息了", Toast.LENGTH_SHORT).show()
                 return@Observer
             }
             Logger.d("old head:${mMsgList[0].timestamp} newHead:${it[0].timestamp}")
-            mMsgList.addAll(0, it)
+            mMsgList.addAll(1, it)
             msgListAdapter.notifyDataSetChanged()
         })
-        swipeToRefreshSetup()
     }
 
 
-    private fun swipeToRefreshSetup() {
-        swipe_refresh_ll.setOnRefreshListener {
-            channelId?.let {
-                msgViewModel.loadOldMessage(it, mMsgList[0].id!!)
-            }
+    private fun loadOlderMsg() {
+
+        channelId?.let {
+            msgViewModel.loadOldMessage(it, mMsgList[1].id!!)
         }
+
     }
 
     private fun loadEmoji() {
@@ -361,7 +368,6 @@ class MessageListOnScrollListener :
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
-
     }
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

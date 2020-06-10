@@ -39,6 +39,7 @@ import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
+import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
@@ -63,10 +64,16 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                         .inflate(R.layout.item_chat_file, parent, false)
                 )
             }
-            else -> {
+            2 -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_chat_image, parent, false)
+                )
+            }
+            else -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.header_loading_view, parent, false)
                 )
             }
 
@@ -74,6 +81,9 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
     }
 
     override fun getItemViewType(position: Int): Int {
+        if (position == 0) {
+            return 3
+        }
         if (messageList[position].attachments.size == 0) {//normal msg
             return 0
         }

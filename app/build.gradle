@@ -131,6 +131,8 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0' // for circularImageView
     implementation 'com.mindorks.android:prdownloader:0.6.0'
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.1'
+    implementation 'com.bignerdranch.android:simple-item-decoration:1.0.0'
+    implementation 'com.airbnb.android:lottie:3.4.1'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
