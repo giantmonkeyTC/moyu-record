@@ -64,6 +64,7 @@ class Socket : Observer<SocketEvent> {
     }
 
     fun close(code: Int = 1000, reason: String? = null) {
+        stopHeartbeat()
         _socketClient.close()
     }
 

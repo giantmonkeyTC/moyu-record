@@ -14,6 +14,7 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
         client.preferences.edit {
             remove("token")
         }
+        client.socket.close()
         client.eventBus.postEvent(UserLogoutEvent())
         return null
     }

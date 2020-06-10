@@ -21,12 +21,7 @@ class GuildViewModel : ViewModel() {
     }
 
     fun loadGuildList() {
-        Client.global.guilds.fetch(false).observeOn(AndroidSchedulers.mainThread()).subscribe(
-            Consumer {
-                it?.let {
-                    guildListLiveData.value = it.toMutableList()
-                }
-            })
+        guildListLiveData.value = Client.global.guilds.toMutableList()
         Client.global.guilds.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
                 it?.let {
