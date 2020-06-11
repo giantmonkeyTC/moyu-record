@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -260,11 +261,13 @@ class ChannelPanelFragment : Fragment() {
             msgListAdapter.notifyItemRemoved(0)
             swipe_refresh_ll.isRefreshing = false
             if (it.size == 0) {
-                Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT).show()
+                val toast = Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT)
+                toast.setGravity(Gravity.TOP, 0, 200)
+                toast.show()
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
-                msgListAdapter.notifyDataSetChanged()
+                msgListAdapter.notifyItemRangeInserted(0, it.size)
             }
 
         })
