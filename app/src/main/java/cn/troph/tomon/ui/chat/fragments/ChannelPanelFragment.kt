@@ -97,6 +97,7 @@ class ChannelPanelFragment : Fragment() {
                 bar_update_message.visibility = View.GONE
             }
         }
+
     private var message: Message? = null
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
     private val mMsgList = mutableListOf<Message>()
@@ -285,14 +286,13 @@ class ChannelPanelFragment : Fragment() {
                 mMsgList.addAll(0, it)
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
             }
-
         })
     }
 
     private fun loadEmoji() {
         val guildIcon = mutableListOf<String>()
         mSectionDataManager = SectionDataManager()
-        mGridLayoutManager = GridLayoutManager(requireContext(), 6)
+        mGridLayoutManager = GridLayoutManager(requireContext(), 7)
         val positionManager: PositionManager = mSectionDataManager
         mGridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
