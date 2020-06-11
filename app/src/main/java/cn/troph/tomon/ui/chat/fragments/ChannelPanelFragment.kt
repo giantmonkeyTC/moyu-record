@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
@@ -152,6 +153,14 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = msgListAdapter
+        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(-1)) {
+                    Logger.d("at top")
+                }
+            }
+        })
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
