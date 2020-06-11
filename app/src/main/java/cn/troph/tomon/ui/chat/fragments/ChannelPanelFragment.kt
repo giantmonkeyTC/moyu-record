@@ -126,8 +126,6 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         editText.setOnClickListener {
             if (it.hasFocus()) {
                 if (section_header_layout.isVisible) {
