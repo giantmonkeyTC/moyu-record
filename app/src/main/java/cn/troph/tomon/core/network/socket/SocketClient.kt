@@ -6,6 +6,7 @@ import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
+import java.lang.Error
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -24,13 +25,15 @@ enum class SocketEventType {
     CLOSED,
     SEND,
     RECEIVE,
+    ERROR,
 }
 
 data class SocketEvent(
     val type: SocketEventType,
     val data: JsonElement? = null,
     val code: Int = 0,
-    val reason: String? = null
+    val reason: String? = null,
+    val error: Throwable? = null
 )
 
 fun retryDelay(times: Int): Long {
@@ -61,12 +64,14 @@ class SocketClient() : WebSocketListener(),
 
     fun open(url: String) {
         if (_state == SocketClientState.CLOSED) {
-            connect(url);
+            connect(url)
         }
     }
 
     fun close(code: Int = 1000, reason: String? = null) {
         _webSocket?.close(code, reason)
+        _webSocket = null;
+        _state = SocketClientState.CLOSED
     }
 
     fun send(data: JsonElement) {
@@ -138,13 +143,13 @@ class SocketClient() : WebSocketListener(),
             val data = Gson().fromJson(text, JsonElement::class.java)
             _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))
         } catch (e: Exception) {
-            _emitter?.onError(e)
+            _emitter?.onNext(SocketEvent(SocketEventType.ERROR, error = e))
         }
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
         super.onFailure(webSocket, t, response)
-        _emitter?.onError(t)
+        _emitter?.onNext(SocketEvent(SocketEventType.ERROR, error = t))
     }
 
 }

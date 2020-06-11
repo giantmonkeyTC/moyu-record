@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Me
 import cn.troph.tomon.ui.activities.LoginActivity
 import cn.troph.tomon.ui.chat.viewmodel.UserInfoViewModel
 import com.google.android.material.appbar.AppBarLayout
