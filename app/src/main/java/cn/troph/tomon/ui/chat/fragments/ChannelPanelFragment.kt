@@ -54,9 +54,9 @@ import java.io.File
 const val FILE_REQUEST_CODE_FILE = 323
 
 class ChannelPanelFragment : Fragment() {
-    private var isEmojiOpen = false
+
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
-    private val mSectionDataManager = SectionDataManager()
+    private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
     private lateinit var mBottomSheet: FileBottomSheetFragment
@@ -64,13 +64,13 @@ class ChannelPanelFragment : Fragment() {
     private val mHandler = Handler()
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
-            editText.requestFocus()
             editText.text?.append(emojiCode)
+            editText.clearFocus()
         }
 
         override fun onSystemEmojiSelected(unicode: Int) {
-            editText.requestFocus()
             editText.text?.append(String(Character.toChars(unicode)))
+            editText.clearFocus()
         }
     }
 
@@ -126,8 +126,8 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        editText.setOnClickListener {
-            if (it.hasFocus()) {
+        editText.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
                 if (section_header_layout.isVisible) {
                     section_header_layout.visibility =
                         View.GONE
@@ -256,7 +256,6 @@ class ChannelPanelFragment : Fragment() {
                 section_header_layout.visibility =
                     View.GONE
                 bottom_emoji_rr.visibility = View.GONE
-                editText.requestFocus()
             } else {
                 section_header_layout.visibility = View.VISIBLE
                 bottom_emoji_rr.visibility = View.GONE
@@ -292,7 +291,8 @@ class ChannelPanelFragment : Fragment() {
 
     private fun loadEmoji() {
         val guildIcon = mutableListOf<String>()
-        mGridLayoutManager = GridLayoutManager(requireContext(), 8)
+        mSectionDataManager = SectionDataManager()
+        mGridLayoutManager = GridLayoutManager(requireContext(), 6)
         val positionManager: PositionManager = mSectionDataManager
         mGridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -303,8 +303,8 @@ class ChannelPanelFragment : Fragment() {
                 }
             }
         }
-
         emoji_rr.layoutManager = mGridLayoutManager
+
         for (item in Client.global.guilds.list) {
             if (item.emojis.values.toMutableList().size == 0)
                 continue

@@ -69,29 +69,29 @@
 
             <ImageView
                 android:id="@+id/btn_message_menu"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginVertical="20dp"
                 android:background="@drawable/ic_guild_fab_pattern"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/emoji_tv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginVertical="20dp"
                 android:background="@android:color/transparent"
-                android:text="@string/emoji"
-                android:textColor="@color/white"
+                android:src="@drawable/c0c3206ae3d2e57c390c901d292464de"
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
                 android:layout_width="0dp"
+                android:layout_marginHorizontal="8dp"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="20dp"
                 android:background="@null"
@@ -105,8 +105,8 @@
 
             <ImageView
                 android:id="@+id/btn_message_send"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginVertical="20dp"
                 android:background="@drawable/ic_channel_text"
