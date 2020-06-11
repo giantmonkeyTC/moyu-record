@@ -14,7 +14,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.time.LocalDateTime
 
-class Message(client: Client, data: JsonObject) : Base(client, data),
+open class Message(client: Client, data: JsonObject) : Base(client, data),
     Comparable<Message> {
 
     companion object {
@@ -152,3 +152,5 @@ class Message(client: Client, data: JsonObject) : Base(client, data),
     }
 
 }
+
+class HeaderMessage(client: Client, obj: JsonObject) : Message(client, obj)

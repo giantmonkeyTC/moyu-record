@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.chat.fragments
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
@@ -44,6 +46,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.notifyAll
 import java.io.File
 
 const val FILE_REQUEST_CODE_FILE = 323
@@ -55,6 +58,8 @@ class ChannelPanelFragment : Fragment() {
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val msgViewModel: MessageViewModel by viewModels()
     private lateinit var mBottomSheet: FileBottomSheetFragment
+    private lateinit var mLayoutManager: LinearLayoutManager
+    private val mHandler = Handler()
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.requestFocus()
@@ -91,6 +96,7 @@ class ChannelPanelFragment : Fragment() {
             }
         }
     private var message: Message? = null
+    private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
     private val mMsgList = mutableListOf<Message>()
     private val msgListAdapter: MessageAdapter = MessageAdapter(mMsgList)
 
@@ -141,17 +147,16 @@ class ChannelPanelFragment : Fragment() {
                         editText.text = null
                     }
         }
-
-        view_messages.layoutManager = LinearLayoutManager(requireContext())
+        mLayoutManager = LinearLayoutManager(requireContext())
+        mLayoutManager.stackFromEnd = true
+        view_messages.layoutManager = mLayoutManager
         view_messages.adapter = msgListAdapter
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
                     mMsgList.clear()
-                    mMsgList.add(Message(Client.global, JsonObject()))
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
-                    view_messages.smoothScrollToPosition(msgListAdapter.itemCount-1)
                 }
             })
 
@@ -159,14 +164,19 @@ class ChannelPanelFragment : Fragment() {
         swipe_refresh_ll.setDistanceToTriggerSync(1)
         swipe_refresh_ll.setProgressViewEndTarget(false, 0)
         swipe_refresh_ll.setOnRefreshListener {
-            channelId?.let {
-                val cId = it
-                if (mMsgList.size >= 1) {
-                    mMsgList[1].id?.let {
-                        msgViewModel.loadOldMessage(cId, it)
+            mMsgList.add(0, mHeaderMsg)
+            msgListAdapter.notifyItemInserted(0)
+            mHandler.postDelayed(Runnable {
+                channelId?.let {
+                    val cId = it
+                    if (mMsgList.size >= 1) {
+                        mMsgList[1].id?.let {
+                            msgViewModel.loadOldMessage(cId, it)
+                        }
                     }
                 }
-            }
+            }, 1500)
+
         }
 
         //消息更新
@@ -246,15 +256,17 @@ class ChannelPanelFragment : Fragment() {
 
         //加载更老的消息
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
+            mMsgList.removeAt(0)
+            msgListAdapter.notifyItemRemoved(0)
             swipe_refresh_ll.isRefreshing = false
             if (it.size == 0) {
-                view_messages.smoothScrollToPosition(1)
                 Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT).show()
                 return@Observer
+            } else {
+                mMsgList.addAll(0, it)
+                msgListAdapter.notifyDataSetChanged()
             }
-            mMsgList.addAll(1, it)
-            msgListAdapter.notifyDataSetChanged()
-            view_messages.smoothScrollToPosition(it.size)
+
         })
     }
 

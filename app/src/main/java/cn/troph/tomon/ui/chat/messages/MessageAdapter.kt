@@ -22,6 +22,7 @@ import androidx.core.os.EnvironmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
@@ -81,7 +82,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (position == 0) {
+        if (messageList[position] is HeaderMessage) {
             return 3
         }
         if (messageList[position].attachments.size == 0) {//normal msg

@@ -9,8 +9,8 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_ll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/layout_input"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout">
 
         <androidx.recyclerview.widget.RecyclerView
