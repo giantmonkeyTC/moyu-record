@@ -16,7 +16,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
@@ -142,6 +141,7 @@ class ChannelPanelFragment : Fragment() {
                         editText.text = null
                     }
         }
+
         view_messages.layoutManager = LinearLayoutManager(requireContext())
         view_messages.adapter = msgListAdapter
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
@@ -151,25 +151,31 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.add(Message(Client.global, JsonObject()))
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
-                    view_messages.scrollToPosition(msgListAdapter.itemCount - 1)
+                    view_messages.smoothScrollToPosition(msgListAdapter.itemCount-1)
                 }
             })
-        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-//                if (recyclerView.childCount == 0) {
-//                    return
-//                } else if (recyclerView.getChildAt(0)
-//                        .top == 0
-//                ) {
-//                    loadOlderMsg()
-//                }
+
+        //加载更多消息
+        swipe_refresh_ll.setDistanceToTriggerSync(1)
+        swipe_refresh_ll.setProgressViewEndTarget(false, 0)
+        swipe_refresh_ll.setOnRefreshListener {
+            channelId?.let {
+                val cId = it
+                if (mMsgList.size >= 1) {
+                    mMsgList[1].id?.let {
+                        msgViewModel.loadOldMessage(cId, it)
+                    }
+                }
             }
-        })
+        }
+
+        //消息更新
         btn_update_message_cancel.setOnClickListener {
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = false)
         }
+
+        //选择文件事件
         btn_message_menu.setOnClickListener {
             mBottomSheet =
                 FileBottomSheetFragment(
@@ -216,6 +222,7 @@ class ChannelPanelFragment : Fragment() {
                     }).also(BottomSheet::show)
         }
 
+        //表情事件
         emoji_tv.setOnClickListener {
             if (section_header_layout.isVisible) {
                 section_header_layout.visibility =
@@ -231,28 +238,24 @@ class ChannelPanelFragment : Fragment() {
                 loadEmoji()
             }
         }
+        //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
             mMsgList.add(it.message)
             msgListAdapter.notifyDataSetChanged()
         })
+
+        //加载更老的消息
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
+            swipe_refresh_ll.isRefreshing = false
             if (it.size == 0) {
-                Toast.makeText(requireContext(), "没有更多消息了", Toast.LENGTH_SHORT).show()
+                view_messages.smoothScrollToPosition(1)
+                Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT).show()
                 return@Observer
             }
-            Logger.d("old head:${mMsgList[0].timestamp} newHead:${it[0].timestamp}")
             mMsgList.addAll(1, it)
             msgListAdapter.notifyDataSetChanged()
+            view_messages.smoothScrollToPosition(it.size)
         })
-    }
-
-
-    private fun loadOlderMsg() {
-
-        channelId?.let {
-            msgViewModel.loadOldMessage(it, mMsgList[1].id!!)
-        }
-
     }
 
     private fun loadEmoji() {
@@ -344,7 +347,7 @@ class ChannelPanelFragment : Fragment() {
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            //Client.global.eventBus.postEvent(MessageCreateEvent(it))
+
         }
     }
 
@@ -359,32 +362,4 @@ class ChannelPanelFragment : Fragment() {
             }
         }
     }
-
-
-}
-
-class MessageListOnScrollListener :
-    RecyclerView.OnScrollListener() {
-
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        super.onScrolled(recyclerView, dx, dy)
-    }
-
-    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-        super.onScrollStateChanged(recyclerView, newState)
-        if (newState == 2 && canScrollUp(recyclerView)) {
-
-        }
-    }
-
-    /** return true if the list can't go up */
-    fun canScrollUp(recyclerView: RecyclerView): Boolean {
-        return !recyclerView.canScrollVertically(-1)
-    }
-
-    /** return true if the list can't go down */
-    fun canScrollDown(recyclerView: RecyclerView): Boolean {
-        return !recyclerView.canScrollVertically(1)
-    }
-
 }
