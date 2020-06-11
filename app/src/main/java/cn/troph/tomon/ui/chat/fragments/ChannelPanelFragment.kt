@@ -54,7 +54,7 @@ import java.io.File
 const val FILE_REQUEST_CODE_FILE = 323
 
 class ChannelPanelFragment : Fragment() {
-
+    private var isEmojiOpen = false
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private val mSectionDataManager = SectionDataManager()
     private lateinit var mGridLayoutManager: GridLayoutManager
@@ -126,6 +126,17 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        editText.setOnClickListener {
+            if (it.hasFocus()) {
+                if (section_header_layout.isVisible) {
+                    section_header_layout.visibility =
+                        View.GONE
+                    bottom_emoji_rr.visibility = View.GONE
+                }
+            }
+        }
         btn_message_send.setOnClickListener {
             if (channelId == null) {
                 return@setOnClickListener
@@ -185,8 +196,7 @@ class ChannelPanelFragment : Fragment() {
                         }
                     }
                 }
-            }, 1500)
-
+            }, 1000)
         }
 
         //消息更新
