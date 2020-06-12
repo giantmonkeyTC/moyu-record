@@ -240,9 +240,9 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 return@setOnClickListener
             }
         }
-        for (i in indexEnd + 1 until 21) {
-            vh.itemView.flow_reaction_ll[i].visibility = View.GONE
-        }
+//        for (i in indexEnd + 1 until 21) {
+//            vh.itemView.flow_reaction_ll[i].visibility = View.GONE
+//        }
     }
 
     private fun bind(itemView: View, message: Message, prevMessage: Message? = null) {

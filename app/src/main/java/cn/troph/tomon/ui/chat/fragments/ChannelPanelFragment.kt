@@ -299,9 +299,7 @@ class ChannelPanelFragment : Fragment() {
                 it.reaction.message?.let {
                     if (it.id == value.id) {
                         indexToReplace = index
-
                         value.reactions.remove(removeReac.id)
-
                     }
                 }
             }
