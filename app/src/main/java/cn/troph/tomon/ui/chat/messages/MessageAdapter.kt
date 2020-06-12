@@ -7,7 +7,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.opengl.Visibility
 import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
@@ -20,7 +19,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.os.EnvironmentCompat
 import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -41,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
@@ -199,7 +198,11 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 showReaction(holder, messageList[position])
             }
         }
-
+        messageList[position].reactions.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                Consumer {
+                    notifyItemChanged(holder.adapterPosition)
+                })
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
@@ -207,7 +210,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
         var indexEnd = 0
         for ((index, value) in msg.reactions.withIndex()) {
             vh.itemView.flow_reaction_ll.visibility = View.VISIBLE
-            val ll = vh.itemView.flow_reaction_ll.get(index) as LinearLayout
+            val ll = vh.itemView.flow_reaction_ll[index] as LinearLayout
             val text = ll.getChildAt(1) as TextView
             val image = ll.getChildAt(0) as ImageView
             if (value.isChar) {
@@ -218,6 +221,24 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 text.text = value.count.toString()
             }
             indexEnd = index
+            ll.setOnClickListener {
+                val msg = messageList[vh.adapterPosition]
+                val reactionIndex = vh.itemView.flow_reaction_ll.indexOfChild(it)
+                val reaction = msg.reactions.withIndex().elementAt(reactionIndex)
+                if (reaction.value.me) {
+                    reaction.value.delete().observeOn(AndroidSchedulers.mainThread()).subscribe(
+                        Consumer {
+
+                        })
+                } else {
+                    reaction.value.addReaction().observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            Consumer {
+
+                            })
+                }
+                return@setOnClickListener
+            }
         }
         for (i in indexEnd + 1 until 21) {
             vh.itemView.flow_reaction_ll[i].visibility = View.GONE

@@ -509,6 +509,12 @@
             android:layout_height="20dp"
             android:layout_weight="1"
             android:src="@drawable/emoji_ios_category_smileysandpeople" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
     </LinearLayout>
 
 </com.nex3z.flowlayout.FlowLayout>

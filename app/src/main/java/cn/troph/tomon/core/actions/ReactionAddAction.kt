@@ -6,6 +6,7 @@ import cn.troph.tomon.core.events.ReactionAddEvent
 import cn.troph.tomon.core.structures.MessageReaction
 import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.JsonElement
+import com.orhanobut.logger.Logger
 
 class ReactionAddAction(client: Client) : Action<MessageReaction>(client) {
     override fun handle(data: JsonElement?, vararg extras: Any?): MessageReaction? {
@@ -14,10 +15,15 @@ class ReactionAddAction(client: Client) : Action<MessageReaction>(client) {
         val message = channel.messages[obj["message_id"].asString]
         if (message != null) {
             val emoji = obj["emoji"].asJsonObject
-            val identifier: String =
+            var identifier: String =
                 if (message!!.reactions.has(emoji["id"].asString)) emoji["id"].asString else "_${emoji["name"].asString}"
+            if (emoji["id"].asString == "0") {
+                identifier = "_${emoji["name"]}"
+            } else {
+                identifier = "${emoji["id"]}"
+            }
             val reaction =
-                message!!.reactions[identifier]
+                message.reactions[identifier]
             if (reaction != null) {
                 reaction.update("count", reaction.count + 1)
                 reaction.update("me", true)

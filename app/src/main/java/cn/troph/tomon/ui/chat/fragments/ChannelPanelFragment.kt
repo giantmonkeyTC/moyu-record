@@ -22,6 +22,9 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageUpdateEvent
+import cn.troph.tomon.core.events.ReactionAddEvent
+import cn.troph.tomon.core.events.ReactionRemoveEvent
 import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
@@ -36,6 +39,7 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -271,6 +275,41 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.add(it.message)
             msgListAdapter.notifyDataSetChanged()
         })
+        //Reaction add
+        Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
+            var indexToReplace = 0
+            val newReac = it.reaction
+            Logger.d("${newReac.id} ${newReac.name} ${it.reaction.identifier} ${it.reaction.isChar}")
+            //Logger.d("${newReac.emoji?.id} ${newReac.emoji?.name} ${newReac.emoji?.url}")
+            for ((index, value) in mMsgList.withIndex()) {
+                it.reaction.message?.let {
+                    if (it.id == value.id) {
+                        indexToReplace = index
+                        value.reactions.put(newReac.id, newReac)
+                    }
+                }
+            }
+            msgListAdapter.notifyItemChanged(indexToReplace)
+        })
+        //Reaction remove
+        Client.global.eventBus.observeEventOnUi<ReactionRemoveEvent>().subscribe(Consumer {
+            var indexToReplace = 0
+            val removeReac = it.reaction
+            for ((index, value) in mMsgList.withIndex()) {
+                it.reaction.message?.let {
+                    if (it.id == value.id) {
+                        indexToReplace = index
+
+                        value.reactions.remove(removeReac.identifier)
+
+                    }
+                }
+            }
+            it.reaction.message?.let {
+                msgListAdapter.notifyItemChanged(indexToReplace)
+            }
+        })
+
 
         //加载更老的消息
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {

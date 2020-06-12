@@ -5,6 +5,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -78,13 +79,13 @@ class MessageReaction(
             }
             var name: String = ""
             if (data.has("name")) {
-                name = data["name"].optString ?: ""
+                name = data["name"].asString
             }
             return EmojiData(id, name)
         }
 
         private fun isChar(data: EmojiData): Boolean {
-            return data.id == null
+            return data.id == null || data.id=="0"
         }
 
         fun getKey(data: EmojiData): String {
