@@ -282,7 +282,7 @@ class ChannelPanelFragment : Fragment() {
             Logger.d("${newReac.id} ${newReac.name} ${it.reaction.identifier} ${it.reaction.isChar}")
             //Logger.d("${newReac.emoji?.id} ${newReac.emoji?.name} ${newReac.emoji?.url}")
             for ((index, value) in mMsgList.withIndex()) {
-                it.reaction.message?.let {
+                newReac.message?.let {
                     if (it.id == value.id) {
                         indexToReplace = index
                         value.reactions.put(newReac.id, newReac)
@@ -300,7 +300,7 @@ class ChannelPanelFragment : Fragment() {
                     if (it.id == value.id) {
                         indexToReplace = index
 
-                        value.reactions.remove(removeReac.identifier)
+                        value.reactions.remove(removeReac.id)
 
                     }
                 }
