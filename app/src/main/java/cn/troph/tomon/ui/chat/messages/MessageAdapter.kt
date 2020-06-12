@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.opengl.Visibility
 import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
@@ -16,9 +17,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.os.EnvironmentCompat
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -43,6 +46,7 @@ import kotlinx.android.synthetic.main.dialog_photo_view.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
+import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
@@ -120,6 +124,7 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 } else {
                     bind(holder.itemView, msg)
                 }
+                showReaction(holder, msg)
             }
             1 -> {
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
@@ -191,16 +196,38 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                     }
                     break
                 }
+                showReaction(holder, messageList[position])
             }
         }
 
+    }
+
+    private fun showReaction(vh: MessageViewHolder, msg: Message) {
+        vh.itemView.flow_reaction_ll.visibility = View.GONE
+        var indexEnd = 0
+        for ((index, value) in msg.reactions.withIndex()) {
+            vh.itemView.flow_reaction_ll.visibility = View.VISIBLE
+            val ll = vh.itemView.flow_reaction_ll.get(index) as LinearLayout
+            val text = ll.getChildAt(1) as TextView
+            val image = ll.getChildAt(0) as ImageView
+            if (value.isChar) {
+                image.visibility = View.GONE
+                text.text = "${value.name} ${value.count}"
+            } else {
+                Glide.with(image).load(value.emoji?.url).into(image)
+                text.text = value.count.toString()
+            }
+            indexEnd = index
+        }
+        for (i in indexEnd + 1 until 21) {
+            vh.itemView.flow_reaction_ll[i].visibility = View.GONE
+        }
     }
 
     private fun bind(itemView: View, message: Message, prevMessage: Message? = null) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
         itemView.widget_message_author_name_text.text = message.author?.name ?: ""
-        itemView.widget_reactions.removeAllViews()
 
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
                 message.content!!
@@ -218,12 +245,6 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 }
             }
         else Glide.with(itemView.context).clear(itemView.widget_message_attachment)
-        if (message.reactions.size != 0)
-            reactionsBinder(message = message, itemView = itemView)
-        else {
-            itemView.widget_reactions.visibility = View.GONE
-            itemView.widget_reactions.removeAllViews()
-        }
         if (if (prevMessage == null) true
             else
                 message.authorId != prevMessage.authorId ||
