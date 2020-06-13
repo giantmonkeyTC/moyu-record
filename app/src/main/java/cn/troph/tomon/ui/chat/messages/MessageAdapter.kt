@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.get
+import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -207,11 +208,14 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
         vh.itemView.flow_reaction_ll.visibility = View.GONE
-        var indexEnd = 0
+        for (i in 0 until vh.itemView.flow_reaction_ll.childCount - 1) {
+            vh.itemView.flow_reaction_ll[i].visibility = View.GONE
+        }
         for ((index, value) in msg.reactions.withIndex()) {
             vh.itemView.flow_reaction_ll.visibility = View.VISIBLE
+            vh.itemView.flow_reaction_ll[index].visibility = View.VISIBLE
             val ll = vh.itemView.flow_reaction_ll[index] as LinearLayout
-            val text = ll.getChildAt(1) as TextView
+            val text = ll.getChildAt(1) as EmojiTextView
             val image = ll.getChildAt(0) as ImageView
             if (value.isChar) {
                 image.visibility = View.GONE
@@ -220,7 +224,6 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 Glide.with(image).load(value.emoji?.url).into(image)
                 text.text = value.count.toString()
             }
-            indexEnd = index
             ll.setOnClickListener {
                 val msg = messageList[vh.adapterPosition]
                 val reactionIndex = vh.itemView.flow_reaction_ll.indexOfChild(it)
@@ -240,9 +243,6 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 return@setOnClickListener
             }
         }
-//        for (i in indexEnd + 1 until 21) {
-//            vh.itemView.flow_reaction_ll[i].visibility = View.GONE
-//        }
     }
 
     private fun bind(itemView: View, message: Message, prevMessage: Message? = null) {

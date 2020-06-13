@@ -109,7 +109,6 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        EmojiCompat.init(BundledEmojiCompatConfig(requireContext()))
     }
 
     override fun onCreateView(
@@ -171,7 +170,6 @@ class ChannelPanelFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!recyclerView.canScrollVertically(-1)) {
-                    Logger.d("at top")
                 }
             }
         })
@@ -279,8 +277,6 @@ class ChannelPanelFragment : Fragment() {
         Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
             var indexToReplace = 0
             val newReac = it.reaction
-            Logger.d("${newReac.id} ${newReac.name} ${it.reaction.identifier} ${it.reaction.isChar}")
-            //Logger.d("${newReac.emoji?.id} ${newReac.emoji?.name} ${newReac.emoji?.url}")
             for ((index, value) in mMsgList.withIndex()) {
                 newReac.message?.let {
                     if (it.id == value.id) {
@@ -296,16 +292,14 @@ class ChannelPanelFragment : Fragment() {
             var indexToReplace = 0
             val removeReac = it.reaction
             for ((index, value) in mMsgList.withIndex()) {
-                it.reaction.message?.let {
+                removeReac.message?.let {
                     if (it.id == value.id) {
                         indexToReplace = index
                         value.reactions.remove(removeReac.id)
                     }
                 }
             }
-            it.reaction.message?.let {
-                msgListAdapter.notifyItemChanged(indexToReplace)
-            }
+            msgListAdapter.notifyItemChanged(indexToReplace)
         })
 
 
