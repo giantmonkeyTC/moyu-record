@@ -27,4 +27,7 @@
     <string name="emoji_et_hint">输入消息</string>
     <string name="emoji_guild_name">群组名称</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

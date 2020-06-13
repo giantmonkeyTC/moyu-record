@@ -34,6 +34,7 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
+import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
@@ -105,11 +106,13 @@ class ChannelPanelFragment : Fragment() {
     private var message: Message? = null
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
     private val mMsgList = mutableListOf<Message>()
-    private val msgListAdapter: MessageAdapter = MessageAdapter(mMsgList)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val msgListAdapter: MessageAdapter =
+        MessageAdapter(mMsgList, object : ReactionSelectorListener {
+            override fun OnReactionAddClicked() {
+                val bs = ReactionFragment()
+                bs.show(childFragmentManager, "reaction")
+            }
+        })
 
     override fun onCreateView(
         inflater: LayoutInflater,

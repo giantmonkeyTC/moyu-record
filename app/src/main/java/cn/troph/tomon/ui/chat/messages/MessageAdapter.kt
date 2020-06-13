@@ -52,7 +52,10 @@ import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class MessageAdapter(private val messageList: MutableList<Message>) :
+class MessageAdapter(
+    private val messageList: MutableList<Message>,
+    private val reactionSelectorListener: ReactionSelectorListener
+) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -242,6 +245,9 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
                 }
                 return@setOnClickListener
             }
+        }
+        vh.itemView.flow_reaction_ll[vh.itemView.flow_reaction_ll.childCount - 1].setOnClickListener {
+            reactionSelectorListener.OnReactionAddClicked()
         }
     }
 
@@ -495,4 +501,8 @@ class MessageAdapter(private val messageList: MutableList<Message>) :
     }
 
     class MessageViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+}
+
+interface ReactionSelectorListener {
+    fun OnReactionAddClicked()
 }
