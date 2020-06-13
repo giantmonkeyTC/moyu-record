@@ -5,6 +5,7 @@ import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.*
 
 interface MessageService {
@@ -76,7 +77,7 @@ interface MessageService {
         @Header(
             "Authorization"
         ) token: String
-    ): Observable<JsonArray>
+    ): Observable<Response<Unit>>
 
     @DELETE("channels/{channelId}/messages/{messageId}/reactions/{identifier}/@me")
     fun deleteReaction(

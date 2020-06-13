@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.emoji
 
 import android.os.Bundle
+import android.os.Message
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,10 @@ import cn.troph.tomon.core.Client
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.orhanobut.logger.Logger
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_reaction.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,6 +29,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class ReactionFragment : BottomSheetDialogFragment() {
 
+    lateinit var mMessage: cn.troph.tomon.core.structures.Message
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var mSectionDataManager: SectionDataManager
@@ -35,6 +41,10 @@ class ReactionFragment : BottomSheetDialogFragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+    }
+
+    fun setMessage(msg: cn.troph.tomon.core.structures.Message) {
+        mMessage = msg
     }
 
     override fun onCreateView(
@@ -53,11 +63,31 @@ class ReactionFragment : BottomSheetDialogFragment() {
     private fun loadEmoji() {
         val emojiClickListener = object : OnEmojiClickListener {
             override fun onEmojiSelected(emojiCode: String) {
-
+                Client.global.rest.messageService.addReaction(
+                    mMessage.channelId,
+                    mMessage.id!!,
+                    emojiCode,
+                    Client.global.auth
+                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ _ -> Logger.d("success") },
+                        { throwable ->
+                            Logger.d(throwable.message)
+                        })
+                dismiss()
             }
 
             override fun onSystemEmojiSelected(unicode: Int) {
-
+                Client.global.rest.messageService.addReaction(
+                    mMessage.channelId,
+                    mMessage.id!!,
+                    String(Character.toChars(unicode)),
+                    Client.global.auth
+                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ _ -> Logger.d("success") },
+                        { throwable ->
+                            Logger.d(throwable.message)
+                        })
+                dismiss()
             }
         }
         val guildIcon = mutableListOf<String>()

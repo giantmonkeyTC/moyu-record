@@ -108,9 +108,10 @@ class ChannelPanelFragment : Fragment() {
     private val mMsgList = mutableListOf<Message>()
     private val msgListAdapter: MessageAdapter =
         MessageAdapter(mMsgList, object : ReactionSelectorListener {
-            override fun OnReactionAddClicked() {
+            override fun OnReactionAddClicked(msg: Message) {
                 val bs = ReactionFragment()
                 bs.show(childFragmentManager, "reaction")
+                bs.setMessage(msg)
             }
         })
 

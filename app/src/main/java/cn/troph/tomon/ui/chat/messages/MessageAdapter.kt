@@ -119,7 +119,7 @@ class MessageAdapter(
             0 -> {
                 val msg = messageList[position]
                 holder.view.setOnLongClickListener {
-                    callBottomSheet(it, msg)
+                    callBottomSheet(it, messageList[holder.adapterPosition])
                     true
                 }
                 if (position > 1) {
@@ -136,7 +136,10 @@ class MessageAdapter(
                 } else {
                     holder.itemView.message_avatar_file.visibility = View.GONE
                 }
-
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(it, messageList[holder.adapterPosition])
+                    true
+                }
                 for (item in messageList[position].attachments.values) {
                     holder.itemView.textView.text = item.fileName
                     holder.itemView.setOnClickListener {
@@ -182,10 +185,13 @@ class MessageAdapter(
                 } else {
                     holder.itemView.message_avatar_image.visibility = View.GONE
                 }
-
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(it, messageList[holder.adapterPosition])
+                    true
+                }
                 for (item in messageList[position].attachments.values) {
                     Glide.with(holder.itemView).load(item.url).into(holder.itemView.chat_iv)
-                    holder.itemView.setOnClickListener {
+                    holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {
                             StfalconImageViewer.Builder<MessageAttachment>(
@@ -202,11 +208,6 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
         }
-        messageList[position].reactions.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                Consumer {
-                    notifyItemChanged(holder.adapterPosition)
-                })
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
@@ -220,6 +221,8 @@ class MessageAdapter(
             val ll = vh.itemView.flow_reaction_ll[index] as LinearLayout
             val text = ll.getChildAt(1) as EmojiTextView
             val image = ll.getChildAt(0) as ImageView
+
+
             if (value.isChar) {
                 image.visibility = View.GONE
                 text.text = "${value.name} ${value.count}"
@@ -247,7 +250,7 @@ class MessageAdapter(
             }
         }
         vh.itemView.flow_reaction_ll[vh.itemView.flow_reaction_ll.childCount - 1].setOnClickListener {
-            reactionSelectorListener.OnReactionAddClicked()
+            reactionSelectorListener.OnReactionAddClicked(messageList[vh.adapterPosition])
         }
     }
 
@@ -504,5 +507,5 @@ class MessageAdapter(
 }
 
 interface ReactionSelectorListener {
-    fun OnReactionAddClicked()
+    fun OnReactionAddClicked(msg: Message)
 }
