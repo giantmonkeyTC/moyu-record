@@ -222,7 +222,13 @@ class MessageAdapter(
             val ll = vh.itemView.flow_reaction_ll[index] as LinearLayout
             val text = ll.getChildAt(1) as EmojiTextView
             val image = ll.getChildAt(0) as ImageView
-
+            if (value.me) {
+                ll.background =
+                    vh.itemView.resources.getDrawable(R.drawable.round_corner_reaction_me, null)
+            } else {
+                ll.background =
+                    vh.itemView.resources.getDrawable(R.drawable.round_corner_reaction, null)
+            }
 
             if (value.isChar) {
                 image.visibility = View.GONE
