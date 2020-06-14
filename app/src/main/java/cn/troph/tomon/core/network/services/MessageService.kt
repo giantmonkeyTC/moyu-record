@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.network.services
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
@@ -53,7 +54,7 @@ interface MessageService {
         @Path("channelId") channelId: String, @Path("messageId") messageId: String?, @Header(
             "Authorization"
         ) token: String
-    ): Observable<Void>
+    ): Observable<Response<Unit>>
 
     data class UpdateMessageRequest(
         val content: String

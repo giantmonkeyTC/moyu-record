@@ -9,6 +9,7 @@ import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
 import com.google.gson.JsonObject
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -137,6 +138,7 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         return client.rest.messageService.deleteMessage(this.channelId, this.id, client.auth)
             .doOnError { error -> println(error) }.subscribeOn(Schedulers.io()).map {
                 client.actions.messageDelete(this.raw)
+                this
             }
     }
 

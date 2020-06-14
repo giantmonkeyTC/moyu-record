@@ -41,6 +41,7 @@ import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
@@ -119,7 +120,7 @@ class MessageAdapter(
             0 -> {
                 val msg = messageList[position]
                 holder.view.setOnLongClickListener {
-                    callBottomSheet(it, messageList[holder.adapterPosition])
+                    callBottomSheet(holder)
                     true
                 }
                 if (position > 1) {
@@ -137,7 +138,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(it, messageList[holder.adapterPosition])
+                    callBottomSheet(holder)
                     true
                 }
                 for (item in messageList[position].attachments.values) {
@@ -186,7 +187,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_image.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(it, messageList[holder.adapterPosition])
+                    callBottomSheet(holder)
                     true
                 }
                 for (item in messageList[position].attachments.values) {
@@ -460,46 +461,52 @@ class MessageAdapter(
         return "$adjective $divide$timeHour:$timeMinute"
     }
 
-    private fun callBottomSheet(viewItem: View, message: Message) {
-        val layoutInflater = LayoutInflater.from(viewItem.context)
+    private fun callBottomSheet(viewHolder: MessageViewHolder) {
+        val layoutInflater = LayoutInflater.from(viewHolder.itemView.context)
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
-        val dialog = BottomSheetDialog(viewItem.context)
+        val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
 
-        view.delete_button.visibility = if (message.authorId == Client.global.me.id)
-            View.VISIBLE
-        else
-            View.GONE
+        view.delete_button.visibility =
+            if (messageList[viewHolder.adapterPosition].authorId == Client.global.me.id)
+                View.VISIBLE
+            else
+                View.GONE
 
-        view.edit_button.visibility = if (message.authorId == Client.global.me.id)
-            View.VISIBLE
-        else
-            View.GONE
+        view.edit_button.visibility =
+            if (messageList[viewHolder.adapterPosition].authorId == Client.global.me.id)
+                View.VISIBLE
+            else
+                View.GONE
 
         view.cancel_button.setOnClickListener {
             dialog.dismiss()
         }
         view.delete_button.setOnClickListener {
-            message.delete().observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    dialog.dismiss()
+            messageList[viewHolder.adapterPosition].delete().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).doOnError {
+                    Logger.d(it.message)
                 }
+                .subscribe(Consumer {
+                    dialog.dismiss()
+                })
         }
         view.edit_button.setOnClickListener {
             AppState.global.updateEnabled.value =
-                UpdateEnabled(flag = true, message = message)
+                UpdateEnabled(flag = true, message = messageList[viewHolder.adapterPosition])
             dialog.dismiss()
         }
         view.copy_message_button.setOnClickListener {
             val clipboard =
                 view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip: ClipData = ClipData.newPlainText("copy", message.content)
+            val clip: ClipData =
+                ClipData.newPlainText("copy", messageList[viewHolder.adapterPosition].content)
             clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }
-        viewItem.setBackgroundColor(Color.parseColor("#3A3A3A"))
+        viewHolder.itemView.setBackgroundColor(Color.parseColor("#3A3A3A"))
         dialog.show()
-        dialog.setOnDismissListener { viewItem.setBackgroundColor(Color.parseColor("#242424")) }
+        dialog.setOnDismissListener { viewHolder.itemView.setBackgroundColor(Color.parseColor("#242424")) }
 
     }
 

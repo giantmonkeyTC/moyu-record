@@ -21,10 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.MessageCreateEvent
-import cn.troph.tomon.core.events.MessageUpdateEvent
-import cn.troph.tomon.core.events.ReactionAddEvent
-import cn.troph.tomon.core.events.ReactionRemoveEvent
+import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
@@ -304,6 +301,19 @@ class ChannelPanelFragment : Fragment() {
                 }
             }
             msgListAdapter.notifyItemChanged(indexToReplace)
+        })
+
+        //delete messsage
+        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer {
+            var removeIndex = 0
+            for ((index, value) in mMsgList.withIndex()) {
+                if (value.id == it.message.id) {
+                    removeIndex = index
+                    break
+                }
+            }
+            mMsgList.removeAt(removeIndex)
+            msgListAdapter.notifyItemRemoved(removeIndex)
         })
 
 

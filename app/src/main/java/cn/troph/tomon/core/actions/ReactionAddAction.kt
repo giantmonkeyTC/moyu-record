@@ -11,7 +11,6 @@ import com.orhanobut.logger.Logger
 class ReactionAddAction(client: Client) : Action<MessageReaction>(client) {
     override fun handle(data: JsonElement?, vararg extras: Any?): MessageReaction? {
         val obj = data!!.asJsonObject
-        Logger.d(obj.toString())
         val channel = client.channels[obj["channel_id"].asString] as TextChannel
         val message = channel.messages[obj["message_id"].asString]
         if (message != null) {
