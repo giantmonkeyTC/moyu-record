@@ -1,12 +1,10 @@
 package cn.troph.tomon.core.actions
 
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.MessageUpdateEvent
 import cn.troph.tomon.core.events.ReactionAddEvent
 import cn.troph.tomon.core.structures.MessageReaction
 import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.JsonElement
-import com.orhanobut.logger.Logger
 
 class ReactionAddAction(client: Client) : Action<MessageReaction>(client) {
     override fun handle(data: JsonElement?, vararg extras: Any?): MessageReaction? {

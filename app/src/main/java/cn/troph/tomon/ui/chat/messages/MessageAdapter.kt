@@ -482,6 +482,7 @@ class MessageAdapter(
         view.cancel_button.setOnClickListener {
             dialog.dismiss()
         }
+
         view.delete_button.setOnClickListener {
             messageList[viewHolder.adapterPosition].delete().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).doOnError {
@@ -491,11 +492,13 @@ class MessageAdapter(
                     dialog.dismiss()
                 })
         }
+
         view.edit_button.setOnClickListener {
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = true, message = messageList[viewHolder.adapterPosition])
             dialog.dismiss()
         }
+
         view.copy_message_button.setOnClickListener {
             val clipboard =
                 view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -504,10 +507,12 @@ class MessageAdapter(
             clipboard.setPrimaryClip(clip)
             dialog.dismiss()
         }
-        viewHolder.itemView.setBackgroundColor(Color.parseColor("#3A3A3A"))
-        dialog.show()
-        dialog.setOnDismissListener { viewHolder.itemView.setBackgroundColor(Color.parseColor("#242424")) }
 
+        viewHolder.itemView.setBackgroundColor(Color.parseColor("#3A3A3A"))
+
+        dialog.show()
+
+        dialog.setOnDismissListener { viewHolder.itemView.setBackgroundColor(Color.parseColor("#242424")) }
     }
 
     class MessageViewHolder(val view: View) : RecyclerView.ViewHolder(view)

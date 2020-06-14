@@ -161,6 +161,12 @@ class ChannelPanelFragment : Fragment() {
                         AppState.global.updateEnabled.value =
                             UpdateEnabled(flag = false)
                         editText.text = null
+                        for ((index, value) in mMsgList.withIndex()) {
+                            if (value.id == it.id) {
+                                msgListAdapter.notifyItemChanged(index)
+                                break
+                            }
+                        }
                     }
         }
         mLayoutManager = LinearLayoutManager(requireContext())
