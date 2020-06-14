@@ -63,10 +63,11 @@ class ReactionFragment : BottomSheetDialogFragment() {
     private fun loadEmoji() {
         val emojiClickListener = object : OnEmojiClickListener {
             override fun onEmojiSelected(emojiCode: String) {
+                val modifyedEmoji = emojiCode.removePrefix("<%").removeSuffix(">")
                 Client.global.rest.messageService.addReaction(
                     mMessage.channelId,
                     mMessage.id!!,
-                    emojiCode,
+                    modifyedEmoji,
                     Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ -> Logger.d("success") },

@@ -85,7 +85,6 @@ class MessageReaction(
         }
 
         private fun isChar(data: EmojiData): Boolean {
-            Logger.d("${data.id}")
             return data.id == null || data.id == "0"
         }
 
