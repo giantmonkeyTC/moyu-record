@@ -277,8 +277,9 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            val indexInsert = mMsgList.size - 1
             mMsgList.add(it.message)
-            msgListAdapter.notifyDataSetChanged()
+            msgListAdapter.notifyItemInserted(indexInsert)
         })
         //Reaction add
         Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
