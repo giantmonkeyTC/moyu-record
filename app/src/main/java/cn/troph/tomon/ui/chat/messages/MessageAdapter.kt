@@ -467,6 +467,9 @@ class MessageAdapter(
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
 
+
+        view.reaction_message_button.visibility =
+            if (viewType == 0 || viewType == 2) View.VISIBLE else View.GONE
         view.copy_message_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
 
         view.delete_button.visibility =
@@ -480,6 +483,11 @@ class MessageAdapter(
                 View.VISIBLE
             else
                 View.GONE
+
+        view.reaction_message_button.setOnClickListener {
+            dialog.dismiss()
+            reactionSelectorListener.OnReactionAddClicked(messageList[viewHolder.adapterPosition])
+        }
 
         view.cancel_button.setOnClickListener {
             dialog.dismiss()

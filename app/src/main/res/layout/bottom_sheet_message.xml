@@ -4,8 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/frameworkSelectorDark"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/reaction_message_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/frameworkSelectorDark"
+        android:text="添加反应"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/copy_message_button"
@@ -15,40 +23,43 @@
         android:background="@color/frameworkSelectorDark"
         android:text="复制文字"
 
-        android:textColor="@color/white"/>
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/quote_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="引用"
         android:background="@color/frameworkSelectorDark"
-        android:textColor="@color/white"/>
+        android:text="引用"
+        android:textColor="@color/white" />
+
     <Button
         android:id="@+id/edit_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="编辑"
         android:background="@color/frameworkSelectorDark"
-        android:textColor="@color/white"/>
+        android:text="编辑"
+        android:textColor="@color/white" />
+
     <Button
         android:id="@+id/delete_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="删除"
         android:background="@color/frameworkSelectorDark"
-        android:textColor="@color/white"/>
+        android:text="删除"
+        android:textColor="@color/white" />
+
     <Button
         android:id="@+id/share_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="分享"
         android:background="@color/frameworkSelectorDark"
-        android:textColor="@color/white"/>
+        android:text="分享"
+        android:textColor="@color/white" />
 
 
     <Button
