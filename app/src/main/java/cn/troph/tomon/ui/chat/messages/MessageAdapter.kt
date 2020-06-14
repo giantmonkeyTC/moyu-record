@@ -119,7 +119,7 @@ class MessageAdapter(
         when (getItemViewType(position)) {
             0 -> {
                 val msg = messageList[position]
-                holder.view.setOnLongClickListener {
+                holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 0)
                     true
                 }
@@ -186,7 +186,7 @@ class MessageAdapter(
                 } else {
                     holder.itemView.message_avatar_image.visibility = View.GONE
                 }
-                holder.itemView.setOnLongClickListener {
+                holder.itemView.chat_iv.setOnLongClickListener {
                     callBottomSheet(holder, 2)
                     true
                 }
