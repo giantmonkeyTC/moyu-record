@@ -120,7 +120,7 @@ class MessageAdapter(
             0 -> {
                 val msg = messageList[position]
                 holder.view.setOnLongClickListener {
-                    callBottomSheet(holder)
+                    callBottomSheet(holder, 0)
                     true
                 }
                 if (position > 1) {
@@ -135,10 +135,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
                 } else {
-                    holder.itemView.message_avatar_file.visibility = View.GONE
+                    holder.itemView.message_avatar_file.visibility = View.INVISIBLE
                 }
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder)
+                    callBottomSheet(holder, 1)
                     true
                 }
                 for (item in messageList[position].attachments.values) {
@@ -187,7 +187,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_image.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder)
+                    callBottomSheet(holder, 2)
                     true
                 }
                 for (item in messageList[position].attachments.values) {
@@ -232,9 +232,9 @@ class MessageAdapter(
                 text.text = value.count.toString()
             }
             ll.setOnClickListener {
-                val msg = messageList[vh.adapterPosition]
+                val msg1 = messageList[vh.adapterPosition]
                 val reactionIndex = vh.itemView.flow_reaction_ll.indexOfChild(it)
-                val reaction = msg.reactions.withIndex().elementAt(reactionIndex)
+                val reaction = msg1.reactions.withIndex().elementAt(reactionIndex)
                 if (reaction.value.me) {
                     reaction.value.delete().observeOn(AndroidSchedulers.mainThread()).subscribe(
                         Consumer {
@@ -461,11 +461,13 @@ class MessageAdapter(
         return "$adjective $divide$timeHour:$timeMinute"
     }
 
-    private fun callBottomSheet(viewHolder: MessageViewHolder) {
+    private fun callBottomSheet(viewHolder: MessageViewHolder, viewType: Int) {
         val layoutInflater = LayoutInflater.from(viewHolder.itemView.context)
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
+
+        view.copy_message_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
 
         view.delete_button.visibility =
             if (messageList[viewHolder.adapterPosition].authorId == Client.global.me.id)
@@ -474,7 +476,7 @@ class MessageAdapter(
                 View.GONE
 
         view.edit_button.visibility =
-            if (messageList[viewHolder.adapterPosition].authorId == Client.global.me.id)
+            if (messageList[viewHolder.adapterPosition].authorId == Client.global.me.id && viewType == 0)
                 View.VISIBLE
             else
                 View.GONE
@@ -498,6 +500,8 @@ class MessageAdapter(
                 UpdateEnabled(flag = true, message = messageList[viewHolder.adapterPosition])
             dialog.dismiss()
         }
+
+
 
         view.copy_message_button.setOnClickListener {
             val clipboard =
