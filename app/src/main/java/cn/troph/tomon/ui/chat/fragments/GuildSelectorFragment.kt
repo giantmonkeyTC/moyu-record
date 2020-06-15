@@ -15,6 +15,8 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
@@ -43,6 +45,13 @@ class GuildSelectorFragment : Fragment() {
             }
         })
         mGuildVM.loadGuildList()
+        view_avatar.user = Client.global.me
+        view_avatar.setOnLongClickListener {
+            println(Client.global.dmChannels)
+            AppState.global.channelSelection.value =
+                ChannelSelection(guildId = "@me", channelId = null)
+            true
+        }
         view_avatar.setOnClickListener {
             val user_info_bottomsheet = UserInfoFragment()
             user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
@@ -66,51 +75,26 @@ class GuildSelectorFragment : Fragment() {
                         Url.parseInviteCode(textField.text.toString())
                     else textField.text.toString()
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-
-
-//                    if (it != null) {
-//                        val guildRaw = it["guild"].asJsonObject
-//                        val inviterRaw = it["inviter"].asJsonObject
-//                        val guild = GuildInvite(
-//                            id = guildRaw["id"].asString,
-//                            name = guildRaw["name"].asString,
-//                            memberCount = guildRaw["member_count"].asInt,
-//                            icon = guildRaw["icon"].asString,
-//                            iconUrl = guildRaw["icon_url"].asString
-//                        )
-//                        val inviter = Inviter(
-//                            id = inviterRaw["id"].asString,
-//                            username = inviterRaw["username"].asString,
-//                            discriminator = inviterRaw["discriminator"].asString,
-//                            avatar = inviterRaw["avatar"].asString,
-//                            avatarUrl = inviterRaw["avatar_url"].asString,
-//                            name = inviterRaw["name"].asString
-//                        )
-//                        val invite = Invite(
-//                            code = it["code"].asString,
-//                            guild = guild,
-//                            inviter = inviter,
-//                            joined = it["joined"].asBoolean
-//                        )
-//                        if (invite.joined) {
-//                            textField.setText("")
-//
-//                        } else {
-//                            Client.global.guilds.join(
-//                                if (textField.text.toString().contains(Url.inviteUrl))
-//                                    Url.parseInviteCode(textField.text.toString())
-//                                else textField.text.toString()
-//                            )
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe(
-//                                    { guild ->
-//                                        if (guild != null) {
-//                                            dialog.dismiss()
-//                                        }
-//                                    }, { error -> println(error) }, { }
-//                                )
-//                        }
-//                    }
+                    if (it != null) {
+                        val invite = it
+                        if (invite.joined) {
+                            textField.setText("")
+                        } else {
+                            Client.global.guilds.join(
+                                if (textField.text.toString().contains(Url.inviteUrl))
+                                    Url.parseInviteCode(textField.text.toString())
+                                else textField.text.toString()
+                            )
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                    { guild ->
+                                        if (guild != null) {
+                                            dialog.dismiss()
+                                        }
+                                    }, { error -> println(error) }, { }
+                                )
+                        }
+                    }
                 }
 
             }

@@ -70,7 +70,7 @@ class SocketClient() : WebSocketListener(),
 
     fun close(code: Int = 1000, reason: String? = null) {
         _webSocket?.close(code, reason)
-        _webSocket = null;
+        _webSocket = null
         _state = SocketClientState.CLOSED
     }
 
