@@ -70,9 +70,9 @@ class ReactionFragment : BottomSheetDialogFragment() {
                     modifyedEmoji,
                     Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ -> Logger.d("success") },
-                        { throwable ->
-                            Logger.d(throwable.message)
+                    .subscribe({ _ -> },
+                        { _ ->
+
                         })
                 dismiss()
             }
