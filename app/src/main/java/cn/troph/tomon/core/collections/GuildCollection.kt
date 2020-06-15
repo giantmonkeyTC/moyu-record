@@ -3,6 +3,7 @@ package cn.troph.tomon.core.collections
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.SortedList
+import cn.troph.tomon.ui.chat.fragments.Invite
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -47,10 +48,8 @@ class GuildCollection(client: Client) :
         }
     }
 
-    fun fetchInvite(code: String): Observable<JsonObject> {
-        return client.rest.inviteService.fetch(code, client.auth).subscribeOn(Schedulers.io()).map {
-            it
-        }
+    fun fetchInvite(code: String): Observable<Invite> {
+        return client.rest.inviteService.fetch(code, client.auth).subscribeOn(Schedulers.io())
     }
 
 }
