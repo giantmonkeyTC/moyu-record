@@ -43,6 +43,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
         mGuildVM.loadGuildList()
+        view_avatar.user = Client.global.me
         view_avatar.setOnClickListener {
             val user_info_bottomsheet = UserInfoFragment()
             user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
@@ -92,7 +93,7 @@ class GuildSelectorFragment : Fragment() {
                         )
                         if (invite.joined) {
                             textField.setText("")
-                            
+
                         } else {
                             Client.global.guilds.join(
                                 if (textField.text.toString().contains(Url.inviteUrl))
