@@ -16,6 +16,7 @@ import cn.troph.tomon.ui.states.AppState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import androidx.lifecycle.Observer
+import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 import java.util.*
 
 class GuildChannelSelectorFragment : Fragment() {
@@ -44,20 +45,6 @@ class GuildChannelSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val list = view.findViewById<RecyclerView>(R.id.view_guild_channels)
-        if (guildId == "@me")
-            mDmchannelVM.getChannelLiveData().observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    val mAdapter = DmChannelSelectorAdapter(it)
-                    list.layoutManager = LinearLayoutManager(view.context)
-                    list.adapter = mAdapter
-                }
-            })
-        else
-            list.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
-            }
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
     }
@@ -65,10 +52,24 @@ class GuildChannelSelectorFragment : Fragment() {
     fun update() {
         val guild = guildId?.let { Client.global.guilds[it] }
         val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
-        if (guildId == "@me")
+        if (guildId == "@me") {
+            mDmchannelVM.getChannelLiveData().observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    val mAdapter = DmChannelSelectorAdapter(it)
+                    view_guild_channels.layoutManager = LinearLayoutManager(view?.context)
+                    view_guild_channels.adapter = mAdapter
+                }
+            })
             headerText?.text = "私聊"
-        else
+        } else {
             headerText?.text = guild?.name
+            view_guild_channels.apply {
+                val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
+                layoutManager = LinearLayoutManager(context)
+                adapter = guildChannelAdapter
+            }
+        }
+
     }
 
 }

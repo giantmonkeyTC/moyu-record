@@ -22,10 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
-import cn.troph.tomon.core.structures.HeaderMessage
-import cn.troph.tomon.core.structures.Message
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -85,7 +82,9 @@ class ChannelPanelFragment : Fragment() {
             field = value
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
-                if (channel is TextChannelBase) {
+                if (channel is DmChannel) {
+                    msgViewModel.loadDmChannelMessage(value)
+                } else if (channel is TextChannelBase) {
                     msgViewModel.loadTextChannelMessage(value)
                 }
             }

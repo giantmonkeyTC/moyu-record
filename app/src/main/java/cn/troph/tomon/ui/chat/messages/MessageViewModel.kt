@@ -2,8 +2,10 @@ package cn.troph.tomon.ui.chat.messages
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.Event
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import com.orhanobut.logger.Logger
@@ -37,15 +39,42 @@ class MessageViewModel : ViewModel() {
                 })
     }
 
+    fun loadDmChannelMessage(channelId: String) {
+        val channel = Client.global.channels[channelId] as DmChannel
+        channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                messageLiveData.value = it.toMutableList()
+            }
+    }
+
     fun loadOldMessage(channelId: String, beforeId: String) {
-        val channel = Client.global.channels[channelId] as TextChannel
-        channel.messages.fetch(beforeId = beforeId, limit = 50)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                Consumer {
-                    messageMoreLiveData.value = it.toMutableList()
-                }
-            )
+        val channel = Client.global.channels[channelId]
+        if (channel != null) {
+            when (channel.type) {
+                ChannelType.DM -> (channel as DmChannel).messages.fetch(
+                    beforeId = beforeId,
+                    limit = 50
+                )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        Consumer {
+                            messageMoreLiveData.value = it.toMutableList()
+                        }
+                    )
+                ChannelType.TEXT -> (channel as TextChannel).messages.fetch(
+                    beforeId = beforeId,
+                    limit = 50
+                )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                        Consumer {
+                            messageMoreLiveData.value = it.toMutableList()
+                        }
+                    )
+
+            }
+        }
+
     }
 
 }

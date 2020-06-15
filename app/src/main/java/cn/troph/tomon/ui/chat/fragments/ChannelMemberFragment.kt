@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
@@ -29,7 +30,7 @@ class ChannelMemberFragment : Fragment() {
             field = value
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
-                if (channel is TextChannelBase) {
+                if (channel is TextChannelBase && channel !is DmChannel) {
                     mMemberVM.loadMemberList(value)
                 }
             }
