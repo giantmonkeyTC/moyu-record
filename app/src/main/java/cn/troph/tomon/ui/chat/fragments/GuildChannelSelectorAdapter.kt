@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.collections.Event
 import cn.troph.tomon.core.structures.CategoryChannel
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.core.structures.TextChannelBase
@@ -20,7 +19,6 @@ import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {

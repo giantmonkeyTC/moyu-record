@@ -15,6 +15,8 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
@@ -44,6 +46,12 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
+        view_avatar.setOnLongClickListener {
+            println(Client.global.dmChannels)
+            AppState.global.channelSelection.value =
+                ChannelSelection(guildId = "@me", channelId = null)
+            true
+        }
         view_avatar.setOnClickListener {
             val user_info_bottomsheet = UserInfoFragment()
             user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
