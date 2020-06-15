@@ -27,8 +27,10 @@ import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
+import cn.troph.tomon.ui.chat.messages.INVITE_LINK
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
@@ -45,6 +47,7 @@ import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -277,6 +280,18 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            it.message.content?.let {
+                if (it.contains(INVITE_LINK, true)) {
+                    Client.global.guilds.fetchInvite(
+                        Url.parseInviteCode(it)
+                    ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            Consumer {
+                                Logger.d(Gson().toJson(it))
+                            })
+                }
+            }
+
             val indexInsert = mMsgList.size - 1
             mMsgList.add(it.message)
             msgListAdapter.notifyItemInserted(indexInsert)

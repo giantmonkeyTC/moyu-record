@@ -66,49 +66,51 @@ class GuildSelectorFragment : Fragment() {
                         Url.parseInviteCode(textField.text.toString())
                     else textField.text.toString()
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    if (it != null) {
-                        val guildRaw = it["guild"].asJsonObject
-                        val inviterRaw = it["inviter"].asJsonObject
-                        val guild = GuildInvite(
-                            id = guildRaw["id"].asString,
-                            name = guildRaw["name"].asString,
-                            memberCount = guildRaw["member_count"].asInt,
-                            icon = guildRaw["icon"].asString,
-                            iconUrl = guildRaw["icon_url"].asString
-                        )
-                        val inviter = Inviter(
-                            id = inviterRaw["id"].asString,
-                            username = inviterRaw["username"].asString,
-                            discriminator = inviterRaw["discriminator"].asString,
-                            avatar = inviterRaw["avatar"].asString,
-                            avatarUrl = inviterRaw["avatar_url"].asString,
-                            name = inviterRaw["name"].asString
-                        )
-                        val invite = Invite(
-                            code = it["code"].asString,
-                            guild = guild,
-                            inviter = inviter,
-                            joined = it["joined"].asBoolean
-                        )
-                        if (invite.joined) {
-                            textField.setText("")
-                            
-                        } else {
-                            Client.global.guilds.join(
-                                if (textField.text.toString().contains(Url.inviteUrl))
-                                    Url.parseInviteCode(textField.text.toString())
-                                else textField.text.toString()
-                            )
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    { guild ->
-                                        if (guild != null) {
-                                            dialog.dismiss()
-                                        }
-                                    }, { error -> println(error) }, { }
-                                )
-                        }
-                    }
+
+
+//                    if (it != null) {
+//                        val guildRaw = it["guild"].asJsonObject
+//                        val inviterRaw = it["inviter"].asJsonObject
+//                        val guild = GuildInvite(
+//                            id = guildRaw["id"].asString,
+//                            name = guildRaw["name"].asString,
+//                            memberCount = guildRaw["member_count"].asInt,
+//                            icon = guildRaw["icon"].asString,
+//                            iconUrl = guildRaw["icon_url"].asString
+//                        )
+//                        val inviter = Inviter(
+//                            id = inviterRaw["id"].asString,
+//                            username = inviterRaw["username"].asString,
+//                            discriminator = inviterRaw["discriminator"].asString,
+//                            avatar = inviterRaw["avatar"].asString,
+//                            avatarUrl = inviterRaw["avatar_url"].asString,
+//                            name = inviterRaw["name"].asString
+//                        )
+//                        val invite = Invite(
+//                            code = it["code"].asString,
+//                            guild = guild,
+//                            inviter = inviter,
+//                            joined = it["joined"].asBoolean
+//                        )
+//                        if (invite.joined) {
+//                            textField.setText("")
+//
+//                        } else {
+//                            Client.global.guilds.join(
+//                                if (textField.text.toString().contains(Url.inviteUrl))
+//                                    Url.parseInviteCode(textField.text.toString())
+//                                else textField.text.toString()
+//                            )
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe(
+//                                    { guild ->
+//                                        if (guild != null) {
+//                                            dialog.dismiss()
+//                                        }
+//                                    }, { error -> println(error) }, { }
+//                                )
+//                        }
+//                    }
                 }
 
             }

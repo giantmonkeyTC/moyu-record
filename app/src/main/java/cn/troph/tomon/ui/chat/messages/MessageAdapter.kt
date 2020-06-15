@@ -47,11 +47,14 @@ import kotlinx.android.synthetic.main.dialog_photo_view.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
+import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
+
+const val INVITE_LINK = "https://beta.tomon.co/invite/"
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
@@ -79,6 +82,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_chat_image, parent, false)
                 )
             }
+            4 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_invite_link, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -94,7 +103,13 @@ class MessageAdapter(
             return 3
         }
         if (messageList[position].attachments.size == 0) {//normal msg
-            return 0
+            messageList[position].content?.let {
+                if (it.contains(INVITE_LINK, true)) {
+                    return 4
+                } else {
+                    return 0
+                }
+            }
         }
         var type = 0
         for (item in messageList[position].attachments.values) {
@@ -207,6 +222,10 @@ class MessageAdapter(
                     break
                 }
                 showReaction(holder, messageList[position])
+            }
+            4 -> {
+                holder.itemView.link_tv.text = messageList[position].content
+                holder.itemView.invite_guild_name.text = messageList[position].guild?.name
             }
         }
     }

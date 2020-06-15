@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.network.services
 
+import cn.troph.tomon.ui.chat.fragments.Invite
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
@@ -18,5 +19,5 @@ interface InviteService {
     fun fetch(
         @Path("code") code: String,
         @Header("Authorization") token: String
-    ): Observable<JsonObject>
+    ): Observable<Invite>
 }
