@@ -225,10 +225,23 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
+                showReaction(holder, messageList[position])
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder, 4)
+                    if (messageList[position].authorId == Client.global.me.id) {
+                        callBottomSheet(holder, 4)
+                    }
                     true
                 }
+                holder.itemView.setOnClickListener {
+                    Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe(
+                            Consumer {
+                                notifyItemChanged(holder.adapterPosition)
+                            })
+                }
+
+
                 messageList[position].content?.let {
                     Client.global.guilds.fetchInvite(Url.parseInviteCode(it))
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
@@ -239,14 +252,7 @@ class MessageAdapter(
                                 holder.itemView.invite_guild_name.text = it.guild.name
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
-                                holder.itemView.setOnClickListener {
-                                    Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                                            Consumer {
-                                                notifyItemChanged(holder.adapterPosition)
-                                            })
-                                }
+
                             })
                 }
             }
@@ -514,6 +520,11 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
+
+        view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
+
+        view.share_button.visibility =
+            if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
 
 
         view.reaction_message_button.visibility =

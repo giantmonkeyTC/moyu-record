@@ -277,50 +277,60 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
-            val indexInsert = mMsgList.size - 1
-            mMsgList.add(it.message)
-            msgListAdapter.notifyItemInserted(indexInsert)
+            if (it.message.channelId == channelId) {
+                val indexInsert = mMsgList.size - 1
+                mMsgList.add(it.message)
+                msgListAdapter.notifyItemInserted(indexInsert)
+            }
         })
         //Reaction add
         Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
-            var indexToReplace = 0
-            val newReac = it.reaction
-            for ((index, value) in mMsgList.withIndex()) {
-                newReac.message?.let {
-                    if (it.id == value.id) {
-                        indexToReplace = index
-                        value.reactions.put(newReac.id, newReac)
+            if (it.reaction.message?.channelId == channelId) {
+                var indexToReplace = 0
+                val newReac = it.reaction
+                for ((index, value) in mMsgList.withIndex()) {
+                    newReac.message?.let {
+                        if (it.id == value.id) {
+                            indexToReplace = index
+                            value.reactions.put(newReac.id, newReac)
+                        }
                     }
                 }
+                msgListAdapter.notifyItemChanged(indexToReplace)
             }
-            msgListAdapter.notifyItemChanged(indexToReplace)
         })
         //Reaction remove
         Client.global.eventBus.observeEventOnUi<ReactionRemoveEvent>().subscribe(Consumer {
-            var indexToReplace = 0
-            val removeReac = it.reaction
-            for ((index, value) in mMsgList.withIndex()) {
-                removeReac.message?.let {
-                    if (it.id == value.id) {
-                        indexToReplace = index
-                        value.reactions.remove(removeReac.id)
+            if (it.reaction.message?.channelId == channelId) {
+                var indexToReplace = 0
+                val removeReac = it.reaction
+                for ((index, value) in mMsgList.withIndex()) {
+                    removeReac.message?.let {
+                        if (it.id == value.id) {
+                            indexToReplace = index
+                            value.reactions.remove(removeReac.id)
+                        }
                     }
                 }
+                msgListAdapter.notifyItemChanged(indexToReplace)
             }
-            msgListAdapter.notifyItemChanged(indexToReplace)
+
         })
 
         //delete messsage
         Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer {
-            var removeIndex = 0
-            for ((index, value) in mMsgList.withIndex()) {
-                if (value.id == it.message.id) {
-                    removeIndex = index
-                    break
+            if (it.message.channelId == channelId) {
+                var removeIndex = 0
+                for ((index, value) in mMsgList.withIndex()) {
+                    if (value.id == it.message.id) {
+                        removeIndex = index
+                        break
+                    }
                 }
+                mMsgList.removeAt(removeIndex)
+                msgListAdapter.notifyItemRemoved(removeIndex)
             }
-            mMsgList.removeAt(removeIndex)
-            msgListAdapter.notifyItemRemoved(removeIndex)
+
         })
 
 
