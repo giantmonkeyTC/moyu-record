@@ -8,6 +8,7 @@ import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
+import cn.troph.tomon.ui.chat.fragments.Invite
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

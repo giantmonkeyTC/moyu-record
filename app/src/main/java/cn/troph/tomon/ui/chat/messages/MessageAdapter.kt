@@ -28,6 +28,7 @@ import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.bumptech.glide.Glide
@@ -102,14 +103,14 @@ class MessageAdapter(
         if (messageList[position] is HeaderMessage) {
             return 3
         }
+        messageList[position].content?.let {
+            if (it.contains(INVITE_LINK) && messageList[position].attachments.size == 0)
+                return 4
+            else
+                return@let
+        }
         if (messageList[position].attachments.size == 0) {//normal msg
-            messageList[position].content?.let {
-                if (it.contains(INVITE_LINK, true)) {
-                    return 4
-                } else {
-                    return 0
-                }
-            }
+            return 0
         }
         var type = 0
         for (item in messageList[position].attachments.values) {
@@ -224,8 +225,30 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
-                holder.itemView.link_tv.text = messageList[position].content
-                holder.itemView.invite_guild_name.text = messageList[position].guild?.name
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(holder, 4)
+                    true
+                }
+                messageList[position].content?.let {
+                    Client.global.guilds.fetchInvite(Url.parseInviteCode(it))
+                        .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                            Consumer {
+                                holder.itemView.link_tv.text =
+                                    messageList[holder.adapterPosition].content
+                                holder.itemView.invite_guild_name.text = it.guild.name
+                                holder.itemView.joined_cover.visibility =
+                                    if (it.joined) View.VISIBLE else View.GONE
+                                holder.itemView.setOnClickListener {
+                                    Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread()).subscribe(
+                                            Consumer {
+                                                notifyItemChanged(holder.adapterPosition)
+                                            })
+                                }
+                            })
+                }
             }
         }
     }

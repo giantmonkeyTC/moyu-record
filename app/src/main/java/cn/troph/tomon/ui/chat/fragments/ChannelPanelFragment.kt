@@ -22,10 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
-import cn.troph.tomon.core.structures.HeaderMessage
-import cn.troph.tomon.core.structures.Message
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -280,18 +277,6 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
-            it.message.content?.let {
-                if (it.contains(INVITE_LINK, true)) {
-                    Client.global.guilds.fetchInvite(
-                        Url.parseInviteCode(it)
-                    ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                            Consumer {
-                                Logger.d(Gson().toJson(it))
-                            })
-                }
-            }
-
             val indexInsert = mMsgList.size - 1
             mMsgList.add(it.message)
             msgListAdapter.notifyItemInserted(indexInsert)

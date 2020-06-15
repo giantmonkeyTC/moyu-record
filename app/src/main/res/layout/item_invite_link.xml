@@ -59,10 +59,11 @@
         app:layout_constraintTop_toBottomOf="@id/invite_msg" />
 
     <ImageView
+        android:id="@+id/joined_cover"
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/joined"
+        android:src="@drawable/ic_joined"
         app:layout_constraintBottom_toBottomOf="@id/join_image"
         app:layout_constraintEnd_toEndOf="@id/join_image"
         app:layout_constraintStart_toStartOf="@id/join_image"
