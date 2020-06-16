@@ -148,7 +148,7 @@ class ChannelPanelFragment : Fragment() {
             }
             if (!AppState.global.updateEnabled.value.flag)
                 (Client.global.channels[channelId
-                    ?: ""] as TextChannel).messages.create(editText.text.toString())
+                    ?: ""] as TextChannelBase).messages.create(editText.text.toString())
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
                         editText.text = null
@@ -439,7 +439,7 @@ class ChannelPanelFragment : Fragment() {
         val map = mutableMapOf<String, RequestBody>()
         map["payload_json"] = requestBody
         val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-        (Client.global.channels[channelId!!] as TextChannel).messages.uploadAttachments(
+        (Client.global.channels[channelId!!] as TextChannelBase).messages.uploadAttachments(
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe {
