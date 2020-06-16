@@ -162,7 +162,7 @@ data class Inviter(
     val discriminator: String,
     val avatar: String,
     val name: String,
-    val avatarUrl: String
+    val avatar_url: String
 )
 
 data class Invite(

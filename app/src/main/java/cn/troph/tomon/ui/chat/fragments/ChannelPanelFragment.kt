@@ -23,6 +23,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -31,6 +32,7 @@ import cn.troph.tomon.ui.chat.messages.INVITE_LINK
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
@@ -174,6 +176,7 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
+        view_messages.addItemDecoration(SpacesItemDecoration(DensityUtil.dip2px(requireContext(),5f)))
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

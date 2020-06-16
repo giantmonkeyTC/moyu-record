@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:paddingHorizontal="16dp"
     android:layout_height="wrap_content">
 
     <cn.troph.tomon.ui.widgets.UserAvatar
-        android:layout_marginVertical="16dp"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -14,17 +15,29 @@
         android:id="@+id/message_avatar_file"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="16dp" />
+        />
+
+    <TextView
+        android:id="@+id/user_name_file"
+        app:layout_constraintStart_toEndOf="@id/message_avatar_file"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/white" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="16dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/message_avatar_file"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_file"
+        app:layout_constraintTop_toBottomOf="@id/user_name_file"
         app:srcCompat="@drawable/ic_file" />
 
     <TextView
@@ -34,7 +47,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_marginStart="16dp"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:textColor="@color/white"
         android:text="file name"
         app:layout_constraintBottom_toBottomOf="@id/imageView"
