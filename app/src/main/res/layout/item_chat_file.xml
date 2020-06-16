@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <cn.troph.tomon.ui.widgets.UserAvatar
-        android:layout_marginVertical="16dp"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

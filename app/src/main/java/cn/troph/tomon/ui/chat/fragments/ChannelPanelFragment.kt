@@ -23,6 +23,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -175,7 +176,14 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
-        view_messages.addItemDecoration(SpacesItemDecoration(50))
+        view_messages.addItemDecoration(
+            SpacesItemDecoration(
+                DensityUtil.dip2px(
+                    requireContext(),
+                    10f
+                )
+            )
+        )
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
