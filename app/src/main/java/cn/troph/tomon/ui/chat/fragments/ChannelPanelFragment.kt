@@ -176,14 +176,7 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
-        view_messages.addItemDecoration(
-            SpacesItemDecoration(
-                DensityUtil.dip2px(
-                    requireContext(),
-                    10f
-                )
-            )
-        )
+        view_messages.addItemDecoration(SpacesItemDecoration(DensityUtil.dip2px(requireContext(),5f)))
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

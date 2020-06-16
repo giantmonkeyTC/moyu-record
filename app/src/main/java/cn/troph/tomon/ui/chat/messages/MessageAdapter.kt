@@ -149,8 +149,11 @@ class MessageAdapter(
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
+                    holder.itemView.user_name_file.text = messageList[position].author?.name
+                    holder.itemView.user_name_file.visibility = View.VISIBLE
                 } else {
                     holder.itemView.message_avatar_file.visibility = View.INVISIBLE
+                    holder.itemView.user_name_file.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 1)
@@ -322,15 +325,6 @@ class MessageAdapter(
             itemView.widget_message_text.text = richText(message, itemView)
         } else
             itemView.widget_message_text.text = message.content
-        if (message.attachments.size != 0)
-            for (attachment in message.attachments) {
-                Glide.with(itemView.context).load(attachment.url)
-                    .into(itemView.widget_message_attachment)
-                itemView.widget_message_attachment.setOnClickListener {
-                    callPhotoView(itemView as ViewGroup, itemView, attachment.url)
-                }
-            }
-        else Glide.with(itemView.context).clear(itemView.widget_message_attachment)
         if (if (prevMessage == null) true
             else
                 message.authorId != prevMessage.authorId ||
@@ -346,71 +340,6 @@ class MessageAdapter(
             itemView.message_avatar.visibility = View.GONE
             itemView.widget_message_timestamp_text.visibility = View.GONE
             itemView.widget_message_author_name_text.visibility = View.GONE
-        }
-    }
-
-    private fun reactionsBinder(message: Message, itemView: View) {
-        itemView.widget_reactions.removeAllViews()
-        for (reaction in message.reactions) {
-            message.reactions.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                if (message.reactions.size == 0)
-                    itemView.widget_reactions.visibility = View.GONE
-            }
-            itemView.widget_reactions.visibility = View.VISIBLE
-            val layoutInflater = LayoutInflater.from(itemView.context)
-            val reaction_view =
-                layoutInflater.inflate(R.layout.widget_message_reaction, null)
-            val reaction_image =
-                reaction_view.findViewById<ImageView>(R.id.widget_reaction_image)
-            val reaction_emoji =
-                reaction_view.findViewById<TextView>(R.id.widget_reaction_emoji)
-            val reaction_count =
-                reaction_view.findViewById<TextView>(R.id.widget_reaction_count)
-
-            if (reaction.me) {
-                reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
-            }
-            reaction_view.widget_reaction_unit.setOnClickListener {
-                if (reaction.me)
-                    reaction.delete().observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                        }, { err ->
-                            println(
-                                err.message
-                            )
-                        })
-                else
-                    reaction.addReaction().observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    }
-
-            }
-
-            if (reaction.id.matches(Regex("""^[0-9]+""")))
-                Glide.with(itemView.context).asDrawable()
-                    .load(Assets.emojiURL(reaction.id))
-                    .into(
-                        object : CustomTarget<Drawable>() {
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                transition: Transition<in Drawable>?
-                            ) {
-                                reaction_image.setImageDrawable(resource)
-                            }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                            }
-                        })
-            else
-                reaction_emoji.text = reaction.name
-            reaction_count.text = "${reaction.count}"
-            reaction.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                reaction_count.text = "${reaction.count}"
-                if (reaction.me) {
-                    reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction_me)
-                } else
-                    reaction_view.widget_reaction_unit.setBackgroundResource(R.drawable.shape_message_reaction)
-            }
-            itemView.widget_reactions.addView(reaction_view)
         }
     }
 
