@@ -20,14 +20,12 @@ import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 import java.util.*
 
 class GuildChannelSelectorFragment : Fragment() {
-    private val mDmchannelVM: DmChannelViewModel by viewModels()
     var disposable: Disposable? = null
 
     var guildId: String? = null
         set(value) {
             field = value
             update()
-            mDmchannelVM.loadDmChannel()
             val guild = guildId?.let { Client.global.guilds[it] }
             disposable?.dispose()
             disposable = guild?.observable?.observeOn(AndroidSchedulers.mainThread())?.subscribe {
@@ -47,29 +45,19 @@ class GuildChannelSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
+        view_guild_channels.apply {
+            val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
+            layoutManager = LinearLayoutManager(context)
+            adapter = guildChannelAdapter
+        }
     }
 
     fun update() {
-        val guild = guildId?.let { Client.global.guilds[it] }
-        val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
-        if (guildId == "@me") {
-            mDmchannelVM.getChannelLiveData().observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    val mAdapter = DmChannelSelectorAdapter(it)
-                    view_guild_channels.layoutManager = LinearLayoutManager(view?.context)
-                    view_guild_channels.adapter = mAdapter
-                }
-            })
-            headerText?.text = "私聊"
-        } else {
+        if (guildId != "@me") {
+            val guild = guildId?.let { Client.global.guilds[it] }
+            val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
             headerText?.text = guild?.name
-            view_guild_channels.apply {
-                val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
-                layoutManager = LinearLayoutManager(context)
-                adapter = guildChannelAdapter
-            }
         }
-
     }
 
 }

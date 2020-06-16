@@ -2,8 +2,10 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Url
@@ -27,6 +30,7 @@ class GuildSelectorFragment : Fragment() {
 
     private val mGuildVM: GuildViewModel by viewModels()
     private lateinit var mAdapter: GuildSelectorAdapter
+    val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +44,16 @@ class GuildSelectorFragment : Fragment() {
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let {
                 mAdapter = GuildSelectorAdapter(it)
+                mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener{
+                    override fun onItemClick(view: View?, position: Int) {
+                        val transaction =
+                            requireActivity().supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fragment_guild_channels, guildChannelFragment)
+                                addToBackStack(null)
+                            }
+                        transaction.commit()
+                    }
+                })
                 view_guilds.layoutManager = LinearLayoutManager(view.context)
                 view_guilds.adapter = mAdapter
             }
@@ -47,9 +61,14 @@ class GuildSelectorFragment : Fragment() {
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
         view_avatar.setOnLongClickListener {
-            println(Client.global.dmChannels)
             AppState.global.channelSelection.value =
                 ChannelSelection(guildId = "@me", channelId = null)
+            val dmChannelFragment: Fragment = DmChannelSelectorFragment()
+            val transaction = requireActivity().supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_guild_channels, dmChannelFragment)
+                addToBackStack(null)
+            }
+            transaction.commit()
             true
         }
         view_avatar.setOnClickListener {
