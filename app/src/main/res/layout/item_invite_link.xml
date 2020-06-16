@@ -32,7 +32,7 @@
         app:riv_corner_radius="3dp"
         android:layout_marginHorizontal="10dp"
         android:layout_marginVertical="10dp"
-        android:src="@drawable/emoji_button_ic"
+        android:src="@drawable/user_avatar_placeholder"
         app:layout_constraintBottom_toBottomOf="@id/join_image"
         app:layout_constraintStart_toStartOf="@id/join_image"
         app:layout_constraintTop_toTopOf="@id/join_image" />
