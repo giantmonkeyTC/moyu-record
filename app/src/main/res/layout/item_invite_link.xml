@@ -2,8 +2,38 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:paddingHorizontal="16dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp">
+
+    <LinearLayout
+        android:id="@+id/user_info_box_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:id="@+id/message_avatar_invite"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <TextView
+            android:id="@+id/widget_message_author_name_text_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/widget_message_timestamp_text_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/channelCategoryText" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/link_tv"
@@ -11,13 +41,13 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/user_info_box_link" />
 
     <ImageView
-        android:layout_marginTop="10dp"
         android:id="@+id/join_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:src="@drawable/join"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,14 +58,14 @@
         android:id="@+id/user_avatar_invite"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:scaleType="centerCrop"
-        app:riv_corner_radius="3dp"
         android:layout_marginHorizontal="10dp"
         android:layout_marginVertical="10dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/user_avatar_placeholder"
         app:layout_constraintBottom_toBottomOf="@id/join_image"
         app:layout_constraintStart_toStartOf="@id/join_image"
-        app:layout_constraintTop_toTopOf="@id/join_image" />
+        app:layout_constraintTop_toTopOf="@id/join_image"
+        app:riv_corner_radius="3dp" />
 
     <TextView
         android:id="@+id/invite_msg"
@@ -43,8 +73,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="邀请您加入"
-        android:textSize="16sp"
         android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@id/user_avatar_invite"
         app:layout_constraintTop_toTopOf="@id/user_avatar_invite" />
 
@@ -53,29 +83,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:textSize="20sp"
-        android:textColor="@color/white"
         android:text="邀请您加入"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintStart_toEndOf="@id/user_avatar_invite"
         app:layout_constraintTop_toBottomOf="@id/invite_msg" />
 
     <ImageView
         android:id="@+id/joined_cover"
-        android:adjustViewBounds="true"
-        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:adjustViewBounds="true"
         android:src="@drawable/ic_joined"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/join_image"
         app:layout_constraintEnd_toEndOf="@id/join_image"
         app:layout_constraintStart_toStartOf="@id/join_image"
-        app:layout_constraintTop_toTopOf="@id/join_image"/>
+        app:layout_constraintTop_toTopOf="@id/join_image" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        app:layout_constraintTop_toBottomOf="@id/join_image"
         android:id="@+id/reaction_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/join_image">
+
         <include
             layout="@layout/item_reaction_view"
             app:layout_constraintBottom_toBottomOf="parent"

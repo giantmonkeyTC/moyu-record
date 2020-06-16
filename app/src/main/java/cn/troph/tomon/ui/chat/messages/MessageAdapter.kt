@@ -258,6 +258,10 @@ class MessageAdapter(
                                     if (it.joined) View.VISIBLE else View.GONE
                             })
                 }
+                holder.itemView.message_avatar_invite.user = messageList[position].author
+                holder.itemView.widget_message_author_name_text_invite.text =
+                    messageList[position].author?.name
+                holder.view.widget_message_timestamp_text_invite.text = timestampConverter(messageList[position].timestamp)
                 showReaction(holder, messageList[position])
             }
         }

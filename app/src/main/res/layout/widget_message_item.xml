@@ -31,8 +31,6 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
             android:textColor="@color/channelCategoryText" />
-
-
     </LinearLayout>
 
     <TextView
