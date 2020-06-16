@@ -147,18 +147,21 @@ class MessageAdapter(
             }
             1 -> {
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
-                    holder.itemView.message_avatar_file.visibility = View.VISIBLE
+                    holder.itemView.user_info_box_link_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
-                    holder.itemView.user_name_file.text = messageList[position].author?.name
-                    holder.itemView.user_name_file.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_file.text =
+                        messageList[position].author?.name
+                    holder.itemView.widget_message_timestamp_text_file.text =
+                        timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.message_avatar_file.visibility = View.INVISIBLE
-                    holder.itemView.user_name_file.visibility = View.GONE
+                    holder.itemView.user_info_box_link_file.visibility = View.GONE
                 }
+
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 1)
                     true
                 }
+                showReaction(holder,messageList[position])
                 for (item in messageList[position].attachments.values) {
                     holder.itemView.textView.text = item.fileName
                     holder.itemView.setOnClickListener {
@@ -199,11 +202,18 @@ class MessageAdapter(
             }
             2 -> {
                 if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
-                    holder.itemView.message_avatar_image.visibility = View.VISIBLE
+                    holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
+                    holder.itemView.widget_message_author_name_text_image.text =
+                        messageList[position].author?.name
+                    holder.itemView.widget_message_timestamp_text_image.text =
+                        timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.message_avatar_image.visibility = View.GONE
+                    holder.itemView.user_info_box_link_image.visibility = View.GONE
                 }
+
+
+
                 holder.itemView.chat_iv.setOnLongClickListener {
                     callBottomSheet(holder, 2)
                     true
@@ -227,11 +237,18 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
-
+                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.user = messageList[position].author
+                    holder.itemView.widget_message_author_name_text_invite.text =
+                        messageList[position].author?.name
+                    holder.itemView.widget_message_timestamp_text_invite.text =
+                        timestampConverter(messageList[position].timestamp)
+                } else {
+                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                }
                 holder.itemView.setOnLongClickListener {
-                    if (messageList[holder.adapterPosition].authorId == Client.global.me.id) {
-                        callBottomSheet(holder, 4)
-                    }
+                    callBottomSheet(holder, 4)
                     true
                 }
 
@@ -261,7 +278,8 @@ class MessageAdapter(
                 holder.itemView.message_avatar_invite.user = messageList[position].author
                 holder.itemView.widget_message_author_name_text_invite.text =
                     messageList[position].author?.name
-                holder.view.widget_message_timestamp_text_invite.text = timestampConverter(messageList[position].timestamp)
+                holder.view.widget_message_timestamp_text_invite.text =
+                    timestampConverter(messageList[position].timestamp)
                 showReaction(holder, messageList[position])
             }
         }
@@ -459,10 +477,8 @@ class MessageAdapter(
 
         view.share_button.visibility =
             if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
-
-
         view.reaction_message_button.visibility =
-            if (viewType == 0 || viewType == 2) View.VISIBLE else View.GONE
+            if (viewType == 0 || viewType == 2 || viewType == 1 || viewType == 4) View.VISIBLE else View.GONE
         view.copy_message_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
 
         view.delete_button.visibility =

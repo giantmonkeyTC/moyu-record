@@ -2,41 +2,68 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:paddingHorizontal="16dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp">
 
-    <cn.troph.tomon.ui.widgets.UserAvatar
-        android:id="@+id/message_avatar_image"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:visibility="gone"
+    <LinearLayout
+        android:id="@+id/user_info_box_link_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:id="@+id/message_avatar_image"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <TextView
+            android:id="@+id/widget_message_author_name_text_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/widget_message_timestamp_text_image"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/channelCategoryText" />
+    </LinearLayout>
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/chat_iv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
         android:layout_marginBottom="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:adjustViewBounds="true"
         app:layout_constraintBottom_toTopOf="@id/reaction_container"
-        app:layout_constraintStart_toEndOf="@id/message_avatar_image"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/user_info_box_link_image"
+        app:layout_constraintTop_toBottomOf="@id/user_info_box_link_image"
         app:riv_corner_radius="10dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        app:layout_constraintTop_toBottomOf="@id/chat_iv"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/reaction_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/user_info_box_link_image"
+        android:layout_marginStart="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_iv">
 
         <include
             layout="@layout/item_reaction_view"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/chat_iv"
-            app:layout_constraintStart_toStartOf="@id/chat_iv"
-            app:layout_constraintTop_toBottomOf="@id/chat_iv" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
