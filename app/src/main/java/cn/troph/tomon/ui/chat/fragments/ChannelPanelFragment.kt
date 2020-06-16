@@ -31,6 +31,7 @@ import cn.troph.tomon.ui.chat.messages.INVITE_LINK
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
@@ -174,6 +175,7 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
+        view_messages.addItemDecoration(SpacesItemDecoration(50))
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

@@ -45,7 +45,6 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.dialog_photo_view.view.*
-import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
@@ -225,13 +224,14 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
-                showReaction(holder, messageList[position])
+
                 holder.itemView.setOnLongClickListener {
-                    if (messageList[position].authorId == Client.global.me.id) {
+                    if (messageList[holder.adapterPosition].authorId == Client.global.me.id) {
                         callBottomSheet(holder, 4)
                     }
                     true
                 }
+
                 holder.itemView.setOnClickListener {
                     Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
                         .subscribeOn(Schedulers.io())
@@ -241,20 +241,21 @@ class MessageAdapter(
                             })
                 }
 
-
                 messageList[position].content?.let {
+                    holder.itemView.link_tv.text = it
                     Client.global.guilds.fetchInvite(Url.parseInviteCode(it))
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             Consumer {
-                                holder.itemView.link_tv.text =
-                                    messageList[holder.adapterPosition].content
+                                Glide.with(holder.itemView).load(it.inviter.avatar_url)
+                                    .placeholder(R.drawable.user_avatar_placeholder)
+                                    .into(holder.itemView.user_avatar_invite)
                                 holder.itemView.invite_guild_name.text = it.guild.name
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
-
                             })
                 }
+                showReaction(holder, messageList[position])
             }
         }
     }
