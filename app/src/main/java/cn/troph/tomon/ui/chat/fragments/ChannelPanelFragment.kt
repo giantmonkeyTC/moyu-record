@@ -214,15 +214,16 @@ class ChannelPanelFragment : Fragment() {
                 if (!recyclerView.canScrollVertically(1)) {
                     if (channelId != null)
                         (Client.global.channels[channelId!!] as TextChannel).apply {
-                            val lastMessageId = messages.list[messages.size - 1]
-                            val lastMessage = messages[lastMessageId.substring(2)]
-                            patch(JsonObject().apply {
-                                addProperty("ack_message_id", lastMessageId)
-                            })
-                            if (lastMessage != null) {
-                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                            if (messages.list.size != 0) {
+                                val lastMessageId = messages.list[messages.size - 1]
+                                val lastMessage = messages[lastMessageId.substring(2)]
+                                patch(JsonObject().apply {
+                                    addProperty("ack_message_id", lastMessageId)
+                                })
+                                if (lastMessage != null) {
+                                    client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                }
                             }
-
                         }
                 }
             }
