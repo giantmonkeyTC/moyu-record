@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -144,19 +145,25 @@ class ChannelPanelFragment : Fragment() {
                 }
             }
         }
+        var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
+            if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
+                return@setOnClickListener
+            }
+            longLastClickTime = SystemClock.elapsedRealtime()
             if (channelId == null) {
                 return@setOnClickListener
             }
-            if (!AppState.global.updateEnabled.value.flag)
+            val textToSend = editText.text.toString()
+            editText.text = null
+            if (!AppState.global.updateEnabled.value.flag) {
                 (Client.global.channels[channelId
-                    ?: ""] as TextChannelBase).messages.create(editText.text.toString())
+                    ?: ""] as TextChannelBase).messages.create(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
-                        editText.text = null
                     }
-            else
-                message!!.update(editText.text.toString())
+            } else {
+                message!!.update(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error ->
                         println(
                             error
@@ -164,7 +171,6 @@ class ChannelPanelFragment : Fragment() {
                     }.subscribe {
                         AppState.global.updateEnabled.value =
                             UpdateEnabled(flag = false)
-                        editText.text = null
                         for ((index, value) in mMsgList.withIndex()) {
                             if (value.id == it.id) {
                                 msgListAdapter.notifyItemChanged(index)
@@ -172,11 +178,20 @@ class ChannelPanelFragment : Fragment() {
                             }
                         }
                     }
+            }
+
         }
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
-        view_messages.addItemDecoration(SpacesItemDecoration(DensityUtil.dip2px(requireContext(),5f)))
+        view_messages.addItemDecoration(
+            SpacesItemDecoration(
+                DensityUtil.dip2px(
+                    requireContext(),
+                    5f
+                )
+            )
+        )
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -283,9 +298,8 @@ class ChannelPanelFragment : Fragment() {
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
             if (it.message.channelId == channelId) {
-                val indexInsert = mMsgList.size - 1
                 mMsgList.add(it.message)
-                msgListAdapter.notifyItemInserted(indexInsert)
+                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
             }
         })
         //Reaction add
