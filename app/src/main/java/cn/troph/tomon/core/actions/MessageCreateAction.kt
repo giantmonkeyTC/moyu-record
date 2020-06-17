@@ -6,6 +6,7 @@ import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 
 class MessageCreateAction(client: Client) : Action<Message>(client) {
     override fun handle(data: JsonElement?, vararg extras: Any?): Message? {
@@ -14,6 +15,9 @@ class MessageCreateAction(client: Client) : Action<Message>(client) {
         val existing = channel.messages.has(obj["id"].asString)
         val message = channel.messages.add(obj)
         if (!existing && message != null) {
+            channel.patch(JsonObject().apply {
+                addProperty("last_message_id", message.id)
+            })
             client.eventBus.postEvent(MessageCreateEvent(message = message))
         }
         return message

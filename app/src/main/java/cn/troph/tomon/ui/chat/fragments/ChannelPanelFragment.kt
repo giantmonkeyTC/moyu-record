@@ -196,7 +196,15 @@ class ChannelPanelFragment : Fragment() {
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(-1)) {
+                if (!recyclerView.canScrollVertically(1)) {
+                    if (channelId != null)
+                        (Client.global.channels[channelId!!] as TextChannel).apply {
+                            val lastMessageId = messages.list[messages.size - 1]
+                            patch(JsonObject().apply {
+                                addProperty("ack_message_id", lastMessageId)
+                            })
+
+                        }
                 }
             }
         })
