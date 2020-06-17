@@ -87,10 +87,10 @@ class ChannelPanelFragment : Fragment() {
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
                     msgViewModel.loadDmChannelMessage(value)
-                } else if (channel is TextChannelBase) {
+                } else if (channel is TextChannel) {
                     val count = mMsgList.size
                     mMsgList.clear()
-                    msgListAdapter.notifyItemRangeRemoved(0,count)
+                    msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
                 }
             }
