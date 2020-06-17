@@ -17,7 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.get
 import androidx.emoji.widget.EmojiTextView
@@ -50,9 +49,9 @@ import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
-import kotlinx.android.synthetic.main.widget_message_reaction.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
 
@@ -146,7 +145,11 @@ class MessageAdapter(
                 showReaction(holder, msg)
             }
             1 -> {
-                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                if (position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                        messageList[position].timestamp,
+                        messageList[position - 1].timestamp
+                    )
+                ) {
                     holder.itemView.user_info_box_link_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
@@ -201,7 +204,11 @@ class MessageAdapter(
                 }
             }
             2 -> {
-                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                        messageList[position].timestamp,
+                        messageList[position - 1].timestamp
+                    )
+                ) {
                     holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_image.text =
@@ -237,7 +244,11 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
-                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId) {
+                if (position - 1 >= 0 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                        messageList[position].timestamp,
+                        messageList[position - 1].timestamp
+                    )
+                ) {
                     holder.itemView.user_info_box_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
@@ -400,6 +411,11 @@ class MessageAdapter(
         dialog.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
 
+    }
+
+    private fun isMoreThanFiveMins(fromDate: LocalDateTime, toDate: LocalDateTime): Boolean {
+        val min = ChronoUnit.MINUTES.between(fromDate, toDate)
+        return min > 5
     }
 
     private fun richText(message: Message, itemView: View): SpannableString {
