@@ -161,6 +161,7 @@ class ChannelPanelFragment : Fragment() {
                     ?: ""] as TextChannelBase).messages.create(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
+                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }
             } else {
                 message!!.update(textToSend)
@@ -177,6 +178,7 @@ class ChannelPanelFragment : Fragment() {
                                 break
                             }
                         }
+                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }
             }
 
@@ -193,13 +195,6 @@ class ChannelPanelFragment : Fragment() {
             )
         )
         view_messages.adapter = msgListAdapter
-        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(-1)) {
-                }
-            }
-        })
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
@@ -235,6 +230,7 @@ class ChannelPanelFragment : Fragment() {
 
         //选择文件事件
         btn_message_menu.setOnClickListener {
+            hideKeyboard(requireActivity())
             mBottomSheet =
                 FileBottomSheetFragment(
                     requireActivity(),

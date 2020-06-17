@@ -234,7 +234,7 @@ class MessageAdapter(
                                 holder.itemView.context,
                                 mutableListOf(image)
                             ) { view, images ->
-                                Glide.with(view).load(images.url).into(view)
+                                Glide.with(view).load(images.url).placeholder(R.drawable.loadinglogo).into(view)
                             }.show()
                             break
                         }
