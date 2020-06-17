@@ -1,16 +1,19 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.SystemClock
+import android.net.Uri
+import android.os.*
+import android.os.FileUtils.copy
+import android.provider.OpenableColumns
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -24,6 +27,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.Url
@@ -36,6 +40,7 @@ import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
+import com.alibaba.sdk.android.oss.common.utils.IOUtils
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
@@ -55,6 +60,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.notifyAll
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 const val FILE_REQUEST_CODE_FILE = 323
 
@@ -472,15 +479,45 @@ class ChannelPanelFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
             data?.let {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
                     for (item in it) {
-                        uploadFile(File(item.path))
+                        Logger.d(item.uri)
+                        val parcelFileDescriptor =
+                            requireContext().contentResolver.openFileDescriptor(item.uri, "r", null)
+
+                        parcelFileDescriptor?.let {
+                            val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+                            val file =
+                                File(
+                                    requireContext().cacheDir,
+                                    requireContext().contentResolver.getFileName(item.uri)
+                                )
+                            val outputStream = FileOutputStream(file)
+                            org.apache.commons.io.IOUtils.copy(inputStream, outputStream)
+                            uploadFile(file)
+                        }
                     }
                 }
             }
         }
     }
+}
+
+fun ContentResolver.getFileName(fileUri: Uri): String {
+
+    var name = ""
+    val returnCursor = this.query(fileUri, null, null, null, null)
+    if (returnCursor != null) {
+        val nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        returnCursor.moveToFirst()
+        name = returnCursor.getString(nameIndex)
+        returnCursor.close()
+    }
+
+    return name
 }

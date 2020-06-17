@@ -132,6 +132,8 @@ dependencies {
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.1'
     implementation 'com.bignerdranch.android:simple-item-decoration:1.0.0'
     implementation 'com.airbnb.android:lottie:3.4.1'
+    implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
+
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

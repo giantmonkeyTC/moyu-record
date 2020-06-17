@@ -10,6 +10,7 @@
 
 
     <application
+        android:requestLegacyExternalStorage="true"
         android:name=".TomonApplication"
         android:allowBackup="true"
         android:icon="@drawable/app_logo_sqr"
