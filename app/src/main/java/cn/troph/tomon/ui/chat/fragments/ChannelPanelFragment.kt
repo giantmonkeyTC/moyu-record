@@ -67,6 +67,7 @@ class ChannelPanelFragment : Fragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
+
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.text?.append(emojiCode)
@@ -87,7 +88,10 @@ class ChannelPanelFragment : Fragment() {
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
                     msgViewModel.loadDmChannelMessage(value)
-                } else if (channel is TextChannelBase) {
+                } else if (channel is TextChannel) {
+                    val count = mMsgList.size
+                    mMsgList.clear()
+                    msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
                 }
             }
@@ -136,6 +140,15 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                loading_text_view.visibility = View.VISIBLE
+                loading_text_view.playAnimation()
+            } else {
+                loading_text_view.visibility = View.GONE
+                loading_text_view.cancelAnimation()
+            }
+        })
         editText.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
                 if (section_header_layout.isVisible) {
@@ -161,6 +174,7 @@ class ChannelPanelFragment : Fragment() {
                     ?: ""] as TextChannelBase).messages.create(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
                     .subscribe {
+                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }
             } else {
                 message!!.update(textToSend)
@@ -177,6 +191,7 @@ class ChannelPanelFragment : Fragment() {
                                 break
                             }
                         }
+                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }
             }
 
@@ -218,7 +233,6 @@ class ChannelPanelFragment : Fragment() {
             })
 
         //加载更多消息
-        swipe_refresh_ll.setDistanceToTriggerSync(1)
         swipe_refresh_ll.setProgressViewEndTarget(false, 0)
         swipe_refresh_ll.setOnRefreshListener {
             mMsgList.add(0, mHeaderMsg)
@@ -243,6 +257,7 @@ class ChannelPanelFragment : Fragment() {
 
         //选择文件事件
         btn_message_menu.setOnClickListener {
+            hideKeyboard(requireActivity())
             mBottomSheet =
                 FileBottomSheetFragment(
                     requireActivity(),

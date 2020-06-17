@@ -15,12 +15,21 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/view_messages"
-            android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading_text_view"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"
+        app:layout_constraintEnd_toEndOf="@id/swipe_refresh_ll"
+        app:layout_constraintStart_toStartOf="@id/swipe_refresh_ll"
+        app:layout_constraintTop_toTopOf="@id/swipe_refresh_ll"
+        app:lottie_fileName="7972-loading.json"
+        app:lottie_loop="true" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_input"
@@ -91,8 +100,8 @@
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
                 android:layout_width="0dp"
-                android:layout_marginHorizontal="8dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
                 android:layout_marginVertical="20dp"
                 android:background="@null"
                 android:hint="@string/emoji_et_hint"

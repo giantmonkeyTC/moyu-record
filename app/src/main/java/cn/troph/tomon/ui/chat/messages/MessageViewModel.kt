@@ -22,6 +22,8 @@ class MessageViewModel : ViewModel() {
     private val messageLiveData = MutableLiveData<MutableList<Message>>()
     private val messageMoreLiveData = MutableLiveData<MutableList<Message>>()
 
+    val messageLoadingLiveData = MutableLiveData<Boolean>()
+
     fun getMessageLiveData(): MutableLiveData<MutableList<Message>> {
         return messageLiveData
     }
@@ -31,18 +33,22 @@ class MessageViewModel : ViewModel() {
     }
 
     fun loadTextChannelMessage(channelId: String) {
+        messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as TextChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 Consumer {
+                    messageLoadingLiveData.value = false
                     messageLiveData.value = it.toMutableList()
                 })
     }
 
     fun loadDmChannelMessage(channelId: String) {
+        messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                messageLoadingLiveData.value = false
                 messageLiveData.value = it.toMutableList()
             }
     }

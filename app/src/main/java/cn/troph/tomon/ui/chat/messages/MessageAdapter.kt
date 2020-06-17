@@ -234,7 +234,8 @@ class MessageAdapter(
                                 holder.itemView.context,
                                 mutableListOf(image)
                             ) { view, images ->
-                                Glide.with(view).load(images.url).into(view)
+                                Glide.with(view).load(images.url)
+                                    .placeholder(R.drawable.loadinglogo).into(view)
                             }.show()
                             break
                         }
@@ -267,8 +268,11 @@ class MessageAdapter(
                     Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                            Consumer {
+                            {
                                 notifyItemChanged(holder.adapterPosition)
+                            }, {
+                                Toast.makeText(holder.itemView.context, "加入失败", Toast.LENGTH_SHORT)
+                                    .show()
                             })
                 }
 
@@ -277,13 +281,16 @@ class MessageAdapter(
                     Client.global.guilds.fetchInvite(Url.parseInviteCode(it))
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                            Consumer {
+                            {
                                 Glide.with(holder.itemView).load(it.inviter.avatar_url)
                                     .placeholder(R.drawable.user_avatar_placeholder)
                                     .into(holder.itemView.user_avatar_invite)
                                 holder.itemView.invite_guild_name.text = it.guild.name
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
+                            }, {
+                                holder.itemView.invite_guild_name.text = "无效邀请"
+                                holder.itemView.joined_cover.visibility = View.GONE
                             })
                 }
                 holder.itemView.message_avatar_invite.user = messageList[position].author
