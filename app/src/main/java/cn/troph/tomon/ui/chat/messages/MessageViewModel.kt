@@ -44,9 +44,11 @@ class MessageViewModel : ViewModel() {
     }
 
     fun loadDmChannelMessage(channelId: String) {
+        messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                messageLoadingLiveData.value = false
                 messageLiveData.value = it.toMutableList()
             }
     }
