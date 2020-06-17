@@ -1,10 +1,8 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.graphics.Outline
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Toast
@@ -44,7 +42,7 @@ class GuildSelectorFragment : Fragment() {
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let {
                 mAdapter = GuildSelectorAdapter(it)
-                mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener{
+                mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {
                     override fun onItemClick(view: View?, position: Int) {
                         val transaction =
                             requireActivity().supportFragmentManager.beginTransaction().apply {
