@@ -268,8 +268,11 @@ class MessageAdapter(
                     Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                            Consumer {
+                            {
                                 notifyItemChanged(holder.adapterPosition)
+                            }, {
+                                Toast.makeText(holder.itemView.context, "加入失败", Toast.LENGTH_SHORT)
+                                    .show()
                             })
                 }
 
