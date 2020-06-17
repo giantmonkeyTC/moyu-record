@@ -16,6 +16,10 @@ import cn.troph.tomon.ui.states.AppState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import androidx.lifecycle.Observer
+import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.event.observeEventOnUi
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 import java.util.*
 
@@ -45,8 +49,8 @@ class GuildChannelSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
+        val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
         view_guild_channels.apply {
-            val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
             layoutManager = LinearLayoutManager(context)
             adapter = guildChannelAdapter
         }

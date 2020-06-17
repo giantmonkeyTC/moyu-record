@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.graphics.Color
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -11,15 +12,20 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.CategoryChannel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Consumer
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
 
@@ -76,13 +82,37 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             lp.marginStart = px.toInt()
             val newLp = ConstraintLayout.LayoutParams(lp)
             image.layoutParams = newLp
-
+            if (channel is TextChannel) {
+                if (channel.unread) {
+                    text.setTextColor(Color.BLUE)
+                } else
+                    text.setTextColor(Color.WHITE)
+            }
             text.text = channel.name
             disposable?.dispose()
             disposable =
                 channel.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
                     text.text = channel.name
                 }
+            Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+                if (channel is TextChannel) {
+                    if (channel.unread) {
+                        text.setTextColor(Color.BLUE)
+                    } else
+                        text.setTextColor(Color.WHITE)
+                }
+
+            })
+            Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
+                if (channel is TextChannel) {
+                    if (channel.unread) {
+                        text.setTextColor(Color.BLUE)
+                    } else
+                        text.setTextColor(Color.WHITE)
+                }
+
+            })
+
 
             itemView.setOnClickListener {
                 when (channel.type) {
