@@ -67,6 +67,7 @@ class ChannelPanelFragment : Fragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
+
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.text?.append(emojiCode)
@@ -217,7 +218,6 @@ class ChannelPanelFragment : Fragment() {
             })
 
         //加载更多消息
-        swipe_refresh_ll.setDistanceToTriggerSync(1)
         swipe_refresh_ll.setProgressViewEndTarget(false, 0)
         swipe_refresh_ll.setOnRefreshListener {
             mMsgList.add(0, mHeaderMsg)
