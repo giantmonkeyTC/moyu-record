@@ -21,6 +21,14 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading_text_view"
+        app:layout_constraintTop_toTopOf="@id/swipe_refresh_ll"
+        app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"
+        android:layout_width="match_parent"
+        app:lottie_fileName="text_loading.json"
+        app:lottie_loop="true"
+        android:layout_height="0dp"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_input"

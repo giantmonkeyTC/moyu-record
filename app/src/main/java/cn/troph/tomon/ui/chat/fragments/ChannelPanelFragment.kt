@@ -136,6 +136,15 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                loading_text_view.visibility = View.VISIBLE
+                loading_text_view.playAnimation()
+            } else {
+                loading_text_view.visibility = View.GONE
+                loading_text_view.cancelAnimation()
+            }
+        })
         editText.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
                 if (section_header_layout.isVisible) {
