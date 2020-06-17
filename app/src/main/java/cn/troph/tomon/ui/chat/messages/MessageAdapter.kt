@@ -161,7 +161,7 @@ class MessageAdapter(
                     callBottomSheet(holder, 1)
                     true
                 }
-                showReaction(holder,messageList[position])
+                showReaction(holder, messageList[position])
                 for (item in messageList[position].attachments.values) {
                     holder.itemView.textView.text = item.fileName
                     holder.itemView.setOnClickListener {
@@ -473,10 +473,13 @@ class MessageAdapter(
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
 
-        view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
+        view.quote_button.visibility = View.GONE
+        //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
 
-        view.share_button.visibility =
-            if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
+        view.share_button.visibility = View.GONE
+
+//        view.share_button.visibility =
+//            if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
         view.reaction_message_button.visibility =
             if (viewType == 0 || viewType == 2 || viewType == 1 || viewType == 4) View.VISIBLE else View.GONE
         view.copy_message_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
