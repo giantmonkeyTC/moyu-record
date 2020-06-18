@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
-import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
+import cn.troph.tomon.core.events.ChannelSyncEvent
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
@@ -57,10 +57,6 @@ class GuildSelectorFragment : Fragment() {
                 })
                 view_guilds.layoutManager = LinearLayoutManager(view.context)
                 view_guilds.adapter = mAdapter
-                it.forEach { guild ->
-                    guild.updateUnread()
-                    mAdapter.notifyItemChanged(list.indexOf(guild))
-                }
             }
         })
         mGuildVM.loadGuildList()
@@ -130,10 +126,6 @@ class GuildSelectorFragment : Fragment() {
                     )
 
             })
-        view_avatar.setOnLongClickListener {
-            callJoinGuildBottomSheet()
-            true
-        }
         view_avatar.setOnClickListener {
             val user_info_bottomsheet = UserInfoFragment()
             user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
