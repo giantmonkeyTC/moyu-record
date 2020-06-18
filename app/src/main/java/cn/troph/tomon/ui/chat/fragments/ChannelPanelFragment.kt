@@ -67,6 +67,7 @@ const val FILE_REQUEST_CODE_FILE = 323
 
 class ChannelPanelFragment : Fragment() {
 
+    private val mEmojiMap = HashMap<Int, Int>()
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
@@ -323,7 +324,7 @@ class ChannelPanelFragment : Fragment() {
                 bottom_emoji_rr.visibility = View.GONE
             } else {
                 section_header_layout.visibility = View.VISIBLE
-                bottom_emoji_rr.visibility = View.GONE
+                bottom_emoji_rr.visibility = View.VISIBLE
                 activity?.let {
                     hideKeyboard(it)
                 }
@@ -406,7 +407,7 @@ class ChannelPanelFragment : Fragment() {
     }
 
     private fun loadEmoji() {
-        val guildIcon = mutableListOf<String>()
+        val guildIcon = mutableListOf<GuildIcon>()
         mSectionDataManager = SectionDataManager()
         mGridLayoutManager = GridLayoutManager(requireContext(), 7)
         val positionManager: PositionManager = mSectionDataManager
@@ -431,31 +432,38 @@ class ChannelPanelFragment : Fragment() {
                 emojiList = item.emojis.values.toMutableList()
             )
             item.iconURL?.let {
-                guildIcon.add(it)
+                guildIcon.add(GuildIcon(it, item.name))
             }
 
             val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
+
         val systemEmoji = SystemEmoji()
+
         mSectionDataManager.addSection(
             EmojiAdapter(
                 systemEmoji.getSystemEmojiEmoticons(),
                 mEmojiClickListener
             ), 1
         )
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1f600))))
+
         mSectionDataManager.addSection(
             EmojiAdapter(
                 systemEmoji.getSystemEmojiDingbats(),
                 mEmojiClickListener
             ), 1
         )
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x2716))))
+
         mSectionDataManager.addSection(
             EmojiAdapter(
                 systemEmoji.getSystemEmojiTransport(),
                 mEmojiClickListener
             ), 1
         )
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1f682))))
 
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)
@@ -464,6 +472,12 @@ class ChannelPanelFragment : Fragment() {
             guildIcon,
             onBottomGuildSelectedListener = object : OnBottomGuildSelectedListener {
                 override fun onGuildSelected(position: Int) {
+                    mGridLayoutManager.scrollToPosition(
+                        mSectionDataManager.calcAdapterPos(
+                            position,
+                            0
+                        )
+                    )
                 }
             })
         bottom_emoji_rr.layoutManager =

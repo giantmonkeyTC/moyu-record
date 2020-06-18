@@ -124,6 +124,7 @@ dependencies {
     implementation 'com.bignerdranch.android:simple-item-decoration:1.0.0'
     implementation 'com.airbnb.android:lottie:3.4.1'
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
+    implementation 'com.github.aamirwahid5:CircleTextView:1.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

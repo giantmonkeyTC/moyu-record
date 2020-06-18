@@ -12,6 +12,7 @@ import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
+import java.text.CharacterIterator
 
 
 class EmojiAdapter(
@@ -71,7 +72,7 @@ class EmojiAdapter(
 
 
 class BottomEmojiAdapter(
-    private val urlList: MutableList<String>,
+    private val urlList: MutableList<GuildIcon>,
     private val onBottomGuildSelectedListener: OnBottomGuildSelectedListener
 ) :
     RecyclerView.Adapter<BottomEmojiAdapter.BottomEmojiVH>() {
@@ -84,7 +85,18 @@ class BottomEmojiAdapter(
     }
 
     override fun onBindViewHolder(holder: BottomEmojiVH, position: Int) {
-        Glide.with(holder.itemView).load(urlList[position]).into(holder.itemView.bottom_emoji_iv)
+        if (urlList[position].url != null) {
+            holder.itemView.bottom_emoji_iv.visibility = View.VISIBLE
+            holder.itemView.ctv.visibility = View.GONE
+            Glide.with(holder.itemView).load(urlList[position].url)
+                .into(holder.itemView.bottom_emoji_iv)
+
+        } else {
+            holder.itemView.bottom_emoji_iv.visibility = View.GONE
+            holder.itemView.ctv.visibility = View.VISIBLE
+            holder.itemView.ctv.text = urlList[position].text
+        }
+
         holder.itemView.setOnClickListener {
             onBottomGuildSelectedListener.onGuildSelected(holder.adapterPosition)
         }
@@ -96,6 +108,8 @@ class BottomEmojiAdapter(
 
     class BottomEmojiVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
+
+data class GuildIcon(val url: String?, val text: String?)
 
 interface OnBottomGuildSelectedListener {
     fun onGuildSelected(position: Int)
