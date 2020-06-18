@@ -94,7 +94,7 @@ class BottomEmojiAdapter(
         } else {
             holder.itemView.bottom_emoji_iv.visibility = View.GONE
             holder.itemView.ctv.visibility = View.VISIBLE
-            holder.itemView.ctv.setCustomText(urlList[position].text)
+            holder.itemView.ctv.text = urlList[position].text!![0].toString()
         }
 
         holder.itemView.setOnClickListener {

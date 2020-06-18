@@ -137,13 +137,21 @@
 
         </com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout>
 
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/primaryDark"
+            app:layout_constraintTop_toBottomOf="@id/section_header_layout" />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/bottom_emoji_rr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/section_header_layout" />
+            app:layout_constraintTop_toBottomOf="@id/line" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
