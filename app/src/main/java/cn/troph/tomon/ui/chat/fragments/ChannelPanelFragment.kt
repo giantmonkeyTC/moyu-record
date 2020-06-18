@@ -220,7 +220,7 @@ class ChannelPanelFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!recyclerView.canScrollVertically(1)) {
-                    if (channelId != null)
+                    if (channelId != null && Client.global.channels[channelId!!] is TextChannel)
                         (Client.global.channels[channelId!!] as TextChannel).apply {
                             if (messages.list.size != 0) {
                                 val lastMessageId = messages.list[messages.size - 1]
@@ -229,7 +229,11 @@ class ChannelPanelFragment : Fragment() {
                                     addProperty("ack_message_id", lastMessageId)
                                 })
                                 if (lastMessage != null) {
-                                    client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                    lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                        }
+
                                 }
                             }
                         }

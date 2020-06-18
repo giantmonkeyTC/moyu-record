@@ -5,11 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.Guild
+import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GuildAvatar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
+import kotlinx.android.synthetic.main.widget_guild_selector_item.view.*
+import kotlinx.coroutines.flow.channelFlow
 
 
 class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
@@ -37,13 +45,31 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
         fun bind(guild: Guild) {
             this.guild = guild
             avatar.guild = guild
+            if (guild.channels.find { channel ->
+                    if (channel is TextChannel) {
+                        if (channel.unread)
+                            return@find true
+                    }
+                    return@find false
+                } == null)
+                itemView.guild_unread_message_notification.visibility = View.GONE
             avatar.selecting = AppState.global.channelSelection.value.guildId == guild.id
-
-//            itemView.setOnClickListener {
-//                val old = AppState.global.channelSelection.value
-//                AppState.global.channelSelection.value =
-//                    ChannelSelection(guildId = guild.id, channelId = old.channelId)
-//            }
+            Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+                if (it.message.guild == guild) {
+                    itemView.guild_unread_message_notification.visibility = View.VISIBLE
+                }
+            })
+            Client.global.eventBus.observeEventOnUi<MessageReadEvent>()
+                .subscribe(Consumer { event ->
+                    if (guild.channels.find { channel ->
+                            if (channel is TextChannel) {
+                                if (channel.unread)
+                                    return@find true
+                            }
+                            return@find false
+                        } == null)
+                        itemView.guild_unread_message_notification.visibility = View.GONE
+                })
         }
     }
 

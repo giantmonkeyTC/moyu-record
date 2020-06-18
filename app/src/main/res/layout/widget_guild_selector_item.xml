@@ -15,6 +15,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/guild_unread_message_notification"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/shape_message_notification_outline"
+        android:src="@drawable/shape_message_notification"
+        android:outlineProvider="bounds"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintBottom_toBottomOf="@id/view_avatar"
+        app:layout_constraintEnd_toEndOf="@id/view_avatar"
+        />
+
     <TextView
         android:id="@+id/text_name"
         android:layout_width="0dp"

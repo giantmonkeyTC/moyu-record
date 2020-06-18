@@ -90,4 +90,12 @@ interface MessageService {
         ) token: String
     ): Observable<Void>
 
+    @POST("channels/{channelId}/messages/{messageId}/ack")
+    fun ackMessage(
+        @Path("channelId") channelId: String,
+        @Path("messageId") messageId: String?,
+        @Header("Authorization")
+        token: String
+    ): Observable<Void>
+
 }

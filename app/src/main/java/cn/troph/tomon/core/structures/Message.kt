@@ -154,6 +154,16 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         }
     }
 
+    fun ack(): Observable<String> {
+        return client.rest.messageService.ackMessage(
+            this.channelId,
+            this.id,
+            client.auth
+        ).subscribeOn(Schedulers.io()).map {
+            this.id
+        }
+    }
+
 }
 
 class HeaderMessage(client: Client, obj: JsonObject) : Message(client, obj)
