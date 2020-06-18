@@ -1,23 +1,18 @@
 package cn.troph.tomon.ui.chat.fragments
 
-import android.graphics.Outline
+
 import android.os.Bundle
 import android.view.*
-import android.widget.AdapterView
 import android.widget.EditText
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
-import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
@@ -26,10 +21,8 @@ import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
-import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
-import kotlinx.android.synthetic.main.widget_guild_selector_item.view.*
 
 class GuildSelectorFragment : Fragment() {
 
@@ -119,6 +112,12 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
         }
+        var totalUnread = 0
+        for (item in Client.global.dmChannels) {
+            totalUnread += item.unReadCount
+        }
+        dm_read_count.visibility = View.VISIBLE
+        dm_read_count.text = totalUnread.toString()
     }
 
     private fun callJoinGuildBottomSheet() {
