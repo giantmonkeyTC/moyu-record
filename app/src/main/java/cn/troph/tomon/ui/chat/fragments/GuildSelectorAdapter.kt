@@ -45,6 +45,14 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
         fun bind(guild: Guild) {
             this.guild = guild
             avatar.guild = guild
+            if (guild.channels.find { channel ->
+                    if (channel is TextChannel) {
+                        if (channel.unread)
+                            return@find true
+                    }
+                    return@find false
+                } == null)
+                itemView.guild_unread_message_notification.visibility = View.GONE
             avatar.selecting = AppState.global.channelSelection.value.guildId == guild.id
             Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
                 if (it.message.guild == guild) {
@@ -61,7 +69,6 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
                             return@find false
                         } == null)
                         itemView.guild_unread_message_notification.visibility = View.GONE
-
                 })
         }
     }

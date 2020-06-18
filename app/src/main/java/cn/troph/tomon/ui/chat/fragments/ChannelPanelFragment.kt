@@ -228,7 +228,11 @@ class ChannelPanelFragment : Fragment() {
                                     addProperty("ack_message_id", lastMessageId)
                                 })
                                 if (lastMessage != null) {
-                                    client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                    lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                        }
+
                                 }
                             }
                         }
