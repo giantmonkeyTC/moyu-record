@@ -59,6 +59,14 @@ class GuildSelectorFragment : Fragment() {
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
         view_avatar.setOnLongClickListener {
+            callJoinGuildBottomSheet()
+            true
+        }
+        view_avatar.setOnClickListener {
+            val user_info_bottomsheet = UserInfoFragment()
+            user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
+        }
+        btn_dm_channel_entry.setOnClickListener {
             AppState.global.channelSelection.value =
                 ChannelSelection(guildId = "@me", channelId = null)
             val dmChannelFragment: Fragment = DmChannelSelectorFragment()
@@ -67,14 +75,6 @@ class GuildSelectorFragment : Fragment() {
                 addToBackStack(null)
             }
             transaction.commit()
-            true
-        }
-        view_avatar.setOnClickListener {
-            val user_info_bottomsheet = UserInfoFragment()
-            user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
-        }
-        btn_guild_fab.setOnClickListener {
-            callJoinGuildBottomSheet()
         }
     }
 

@@ -7,7 +7,7 @@
 
 
     <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_guild_fab"
+        android:id="@+id/btn_dm_channel_entry"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="13dp"
@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@id/btn_guild_fab"
+        app:layout_constraintBottom_toTopOf="@id/btn_dm_channel_entry"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
