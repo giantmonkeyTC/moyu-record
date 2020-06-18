@@ -369,7 +369,7 @@ class MessageAdapter(
                 message.content!!
             ))
         ) {
-            richText(message, itemView, holder)
+            richText(message, itemView)
         } else
             itemView.widget_message_text.text = message.content
         if (if (prevMessage == null) true
@@ -409,8 +409,7 @@ class MessageAdapter(
 
     private fun richText(
         message: Message,
-        itemView: View,
-        holder: MessageViewHolder
+        itemView: View
     ) {
 
         val contentSpan = Assets.contentParser(message.content!!)
