@@ -448,7 +448,7 @@ class ChannelPanelFragment : Fragment() {
                 mEmojiClickListener
             ), 1
         )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1f600))))
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1F601))))
 
         mSectionDataManager.addSection(
             EmojiAdapter(
@@ -456,7 +456,7 @@ class ChannelPanelFragment : Fragment() {
                 mEmojiClickListener
             ), 1
         )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x2716))))
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x2702))))
 
         mSectionDataManager.addSection(
             EmojiAdapter(
@@ -464,7 +464,7 @@ class ChannelPanelFragment : Fragment() {
                 mEmojiClickListener
             ), 1
         )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1f682))))
+        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1F680))))
 
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)
