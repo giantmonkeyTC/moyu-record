@@ -19,6 +19,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/dm_read_count"
+        android:visibility="gone"
+        android:padding="2dp"
+        android:textColor="@android:color/holo_red_light"
+        app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
+        app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry"
+        app:layout_constraintBottom_toBottomOf="@id/btn_dm_channel_entry"
+        android:background="@drawable/shape_guild_mention_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <View
         android:layout_width="38dp"
         android:layout_height="38dp"

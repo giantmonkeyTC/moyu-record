@@ -14,7 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -22,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
 class GuildSelectorFragment : Fragment() {
