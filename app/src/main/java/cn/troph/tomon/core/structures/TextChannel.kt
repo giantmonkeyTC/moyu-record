@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 
 class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data), TextChannelBase {
 
+    var mention: Int = 0
     var topic: String? = null
         private set
     override var lastMessageId: String? = null
@@ -27,6 +28,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
     override val unread get() = getUnread()
     override val messageNotifications get() = getMessageNotifications()
     override val muted get() = getMuted()
+
 
     init {
         patchSelf(data)
