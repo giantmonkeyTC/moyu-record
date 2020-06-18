@@ -11,6 +11,7 @@ import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,7 @@ import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -138,9 +140,9 @@ class MessageAdapter(
                     true
                 }
                 if (position > 1) {
-                    bind(holder.itemView, msg, messageList[position - 1])
+                    bind(holder.itemView, msg, messageList[position - 1], holder)
                 } else {
-                    bind(holder.itemView, msg)
+                    bind(holder.itemView, msg, holder = holder)
                 }
                 showReaction(holder, msg)
             }
@@ -353,7 +355,12 @@ class MessageAdapter(
         }
     }
 
-    private fun bind(itemView: View, message: Message, prevMessage: Message? = null) {
+    private fun bind(
+        itemView: View,
+        message: Message,
+        prevMessage: Message? = null,
+        holder: MessageViewHolder
+    ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
         itemView.widget_message_author_name_text.text = message.author?.name ?: ""
@@ -362,7 +369,7 @@ class MessageAdapter(
                 message.content!!
             ))
         ) {
-            itemView.widget_message_text.text = richText(message, itemView)
+            richText(message, itemView, holder)
         } else
             itemView.widget_message_text.text = message.content
         if (if (prevMessage == null) true
@@ -395,40 +402,21 @@ class MessageAdapter(
         dialog.show()
     }
 
-    private fun callPhotoView(parent: ViewGroup, viewItem: View, url: String) {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.dialog_photo_view, null)
-        val dialog = AlertDialog.Builder(parent.context).create()
-        Glide.with(viewItem.context).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                view.dialog_message_photo_view.setImageBitmap(resource)
-            }
-
-            override fun onLoadCleared(placeholder: Drawable?) {
-            }
-        })
-        view.dialog_message_photo_view.setOnLongClickListener {
-            callPhotoBottomSheet(parent)
-            true
-        }
-        view.dialog_message_photo_view.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.setView(view)
-        dialog.getWindow()?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.show()
-
-    }
-
     private fun isMoreThanFiveMins(fromDate: LocalDateTime, toDate: LocalDateTime): Boolean {
         val min = ChronoUnit.MINUTES.between(fromDate, toDate)
         return min > 5
     }
 
-    private fun richText(message: Message, itemView: View): SpannableString {
+    private fun richText(
+        message: Message,
+        itemView: View,
+        holder: MessageViewHolder
+    ) {
 
         val contentSpan = Assets.contentParser(message.content!!)
+
         val span = SpannableString(contentSpan.parseContent)
+
         contentSpan.contentEmoji.forEach {
             Glide.with(itemView.context).asDrawable()
                 .load(Assets.emojiURL(it.id))
@@ -450,7 +438,7 @@ class MessageAdapter(
                                 (it.end + 1),
                                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                             )
-
+                            itemView.widget_message_text.text = span
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {
@@ -459,13 +447,13 @@ class MessageAdapter(
         }
         contentSpan.contentAtUser.forEach {
             span.setSpan(
-                BackgroundColorSpan(Color.parseColor("#5996b8")),
+                ForegroundColorSpan(Color.parseColor("#5996b8")),
                 it.start,
                 (it.end) + 1,
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
+            itemView.widget_message_text.text = span
         }
-        return span
     }
 
     private fun timestampConverter(timestamp: LocalDateTime): String {
