@@ -74,7 +74,9 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
 
     private fun rolesBinder(itemView: View, member: GuildMember) {
         itemView.member_detail_roles.removeAllViews()
-        for (role in member.roles.sequence) {
+        member.roles.sequence.forEach explicit@{ role ->
+            if (role.isEveryone)
+                return@explicit
             val layoutInflater = LayoutInflater.from(itemView.context)
             val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
             role_view.role_name.text = role.name
