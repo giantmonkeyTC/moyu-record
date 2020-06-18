@@ -50,14 +50,15 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
         patchSelf(data)
     }
 
-    fun updateMention(): Int {
+    fun updateMention(): Boolean {
+        val old = mention
         mention = channels.fold(0, { acc, element ->
             if (element is TextChannel) {
                 acc + element.mention
             } else
                 acc
         })
-        return mention
+        return old != mention
     }
 
     fun updateUnread(): Boolean {
