@@ -8,14 +8,28 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/bottom_emoji_iv"
+        android:visibility="gone"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:civ_border_width="2dp"
+        app:civ_border_width="1dp"
         app:civ_border_color="@color/white"
         />
+
+    <androidx.emoji.widget.EmojiTextView
+        android:id="@+id/ctv"
+        android:visibility="gone"
+        android:background="@drawable/circle_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:gravity="center" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
