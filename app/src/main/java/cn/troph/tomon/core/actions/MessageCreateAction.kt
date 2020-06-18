@@ -22,6 +22,7 @@ class MessageCreateAction(client: Client) : Action<Message>(client) {
             message = channel.messages.add(obj)
             if (!existing && message != null) {
                 if (message.mentions.contains(client.me.id)) {
+                    channel.mention += 1
                     client.eventBus.postEvent(MessageAtMeEvent(message = message))
                 }
                 channel.patch(JsonObject().apply {

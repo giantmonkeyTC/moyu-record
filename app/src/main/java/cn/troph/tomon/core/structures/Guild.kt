@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.structures
 
+import android.text.BoringLayout
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.collections.GuildChannelCollection
@@ -37,14 +38,37 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     var defaultMessageNotifications: MessageNotificationsType =
         MessageNotificationsType.ONLY_MENTION
         private set
-
     val channels: GuildChannelCollection = GuildChannelCollection(client, this)
     val members: GuildMemberCollection = GuildMemberCollection(client, this)
     val roles: RoleCollection = RoleCollection(client, this)
     val emojis: GuildEmojiCollection = GuildEmojiCollection(client, this)
+    var unread = false
+    var mention: Int = 0
+
 
     init {
         patchSelf(data)
+    }
+
+    fun updateMention(): Int {
+        mention = channels.fold(0, { acc, element ->
+            if (element is TextChannel) {
+                acc + element.mention
+            } else
+                acc
+        })
+        return mention
+    }
+
+    fun updateUnread(): Boolean {
+        unread = channels.find { channel ->
+            if (channel is TextChannel) {
+                if (channel.unread)
+                    return@find true
+            }
+            return@find false
+        } != null
+        return unread
     }
 
     private fun patchSelf(data: JsonObject) {

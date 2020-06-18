@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
@@ -27,6 +29,7 @@ import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
+import kotlinx.android.synthetic.main.widget_guild_selector_item.view.*
 
 class GuildSelectorFragment : Fragment() {
 
@@ -44,7 +47,7 @@ class GuildSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
-            it?.let {
+            it?.let { list ->
                 mAdapter = GuildSelectorAdapter(it)
                 mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {
                     override fun onItemClick(view: View?, position: Int) {
@@ -62,6 +65,42 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
+        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
+            .subscribe(Consumer { event ->
+                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+                    if (event.message.guild!!.updateUnread()) {
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
+                        )
+                    }
+                }
+            })
+        Client.global.eventBus.observeEventOnUi<MessageReadEvent>()
+            .subscribe(Consumer { event ->
+                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+                    if (!event.message.guild!!.updateUnread())
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
+                        )
+                }
+            })
+        Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
+            if (event.message.guild != null) {
+                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
+                    if (event.message.guild!!.updateMention() != 0)
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
+                        )
+                }
+            }
+
+        })
         view_avatar.setOnLongClickListener {
             callJoinGuildBottomSheet()
             true
