@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.CategoryChannel
@@ -84,9 +85,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             image.layoutParams = newLp
             if (channel is TextChannel) {
                 if (channel.unread) {
-                    text.setTextColor(Color.BLUE)
+                    text.setTextColor(Color.parseColor("#E2E2E2"))
                 } else
-                    text.setTextColor(Color.WHITE)
+                    text.setTextColor(Color.parseColor("#969696"))
             }
             text.text = channel.name
             disposable?.dispose()
@@ -97,18 +98,22 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
                     if (channel.unread) {
-                        text.setTextColor(Color.BLUE)
+                        text.setTextColor(Color.parseColor("#E2E2E2"))
                     } else
-                        text.setTextColor(Color.WHITE)
+                        text.setTextColor(Color.parseColor("#969696"))
                 }
 
+            })
+            Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
+                if (channel is TextChannel && it.message.channel == channel)
+                    text.setTextColor(Color.RED)
             })
             Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
                     if (channel.unread) {
-                        text.setTextColor(Color.BLUE)
+                        text.setTextColor(Color.parseColor("#E2E2E2"))
                     } else
-                        text.setTextColor(Color.WHITE)
+                        text.setTextColor(Color.parseColor("#969696"))
                 }
 
             })
