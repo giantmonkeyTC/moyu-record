@@ -48,6 +48,8 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
         }
         itemView.dmchannel_user_avatar.user = dmChannel.recipient
         itemView.text_name.text = dmChannel.recipient?.discriminator
+        itemView.dm_user_unread_tv.visibility = if (dmChannel.unReadCount>0 && dmChannel.unread) View.VISIBLE else View.GONE
+        itemView.dm_user_unread_tv.text = dmChannel.unReadCount.toString()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

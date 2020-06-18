@@ -43,6 +43,7 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
         }
 
         fun bind(guild: Guild) {
+
             this.guild = guild
             avatar.guild = guild
             if (guild.mention != 0) {

@@ -51,5 +51,7 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
         patchSelf(data)
     }
 
+    var unReadCount = 0
+
     val recipient get() = client.users[recipientId]
 }
