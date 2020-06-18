@@ -16,6 +16,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Url
@@ -86,20 +87,33 @@ class GuildSelectorFragment : Fragment() {
                                 event.message.guild!!
                             )
                         )
-                }
-            })
-        Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
-            if (event.message.guild != null) {
-                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
-                    if (event.message.guild!!.updateMention() != 0)
+                    if (event.message.guild!!.updateMention())
                         mAdapter.notifyItemChanged(
                             mGuildVM.getGuildListLiveData().value!!.indexOf(
                                 event.message.guild!!
                             )
                         )
                 }
+            })
+        Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
+                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
+                    if (event.message.guild!!.updateMention())
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
+                        )
+                }
+        })
+        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer { event ->
+            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
+                if (event.message.guild!!.updateMention())
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
             }
-
         })
         view_avatar.setOnLongClickListener {
             callJoinGuildBottomSheet()

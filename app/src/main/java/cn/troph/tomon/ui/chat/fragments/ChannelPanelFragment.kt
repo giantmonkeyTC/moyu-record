@@ -230,6 +230,7 @@ class ChannelPanelFragment : Fragment() {
                                 if (lastMessage != null) {
                                     lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
                                         .subscribe {
+                                            this.mention = 0
                                             client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
                                         }
 
