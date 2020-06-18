@@ -67,7 +67,6 @@ const val FILE_REQUEST_CODE_FILE = 323
 
 class ChannelPanelFragment : Fragment() {
 
-    private val mEmojiMap = HashMap<Int, Int>()
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
@@ -250,6 +249,7 @@ class ChannelPanelFragment : Fragment() {
             })
 
         //加载更多消息
+        swipe_refresh_ll.setDistanceToTriggerSync(10)
         swipe_refresh_ll.setProgressViewEndTarget(false, 0)
         swipe_refresh_ll.setOnRefreshListener {
             mMsgList.add(0, mHeaderMsg)
