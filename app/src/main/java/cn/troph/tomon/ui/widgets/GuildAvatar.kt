@@ -39,7 +39,7 @@ class GuildAvatar : FrameLayout {
         set(value) {
             field = value
             val side = width.coerceAtMost(height)
-            var radius = if (selecting) side * 0.3f else side * 0.5f
+            var radius = if (selecting) 8f else 30f
             clipView.bottomLeftRadius = radius
             clipView.bottomRightRadius = radius
             clipView.topLeftRadius = radius

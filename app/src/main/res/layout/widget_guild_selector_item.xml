@@ -19,14 +19,29 @@
         android:id="@+id/guild_unread_message_notification"
         android:layout_width="10dp"
         android:layout_height="10dp"
-        android:background="@drawable/shape_message_notification_outline"
-        android:src="@drawable/shape_message_notification"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/shape_message_notification"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintStart_toStartOf="@id/view_avatar"
+        app:layout_constraintTop_toTopOf="@id/view_avatar" />
+
+    <TextView
+        android:id="@+id/guild_unread_mention_notification"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="34dp"
+        android:background="@drawable/shape_guild_mention_notification"
+        android:gravity="center"
         android:outlineProvider="bounds"
         android:paddingHorizontal="2dp"
         android:paddingVertical="2dp"
-        app:layout_constraintBottom_toBottomOf="@id/view_avatar"
-        app:layout_constraintEnd_toEndOf="@id/view_avatar"
-        />
+        android:textColor="#D67677"
+        android:textSize="10sp"
+        app:layout_constraintStart_toStartOf="@id/view_avatar"
+        app:layout_constraintTop_toTopOf="@id/view_avatar" />
 
     <TextView
         android:id="@+id/text_name"
