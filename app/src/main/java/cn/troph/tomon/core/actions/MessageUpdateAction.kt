@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.actions
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageUpdateEvent
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
@@ -13,6 +14,10 @@ class MessageUpdateAction(client: Client) : Action<Message>(client) {
         val message = channel.messages[obj["id"].asString]
         if (message != null) {
             message.update(obj)
+            if (message.mentions.contains(client.me.id)) {
+                channel.mention += 1
+                client.eventBus.postEvent(MessageAtMeEvent(message = message))
+            }
             client.eventBus.postEvent(MessageUpdateEvent(message = message))
         }
         return message

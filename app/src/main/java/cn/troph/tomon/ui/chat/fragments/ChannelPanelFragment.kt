@@ -233,34 +233,30 @@ class ChannelPanelFragment : Fragment() {
                                             .subscribe {
                                                 this.mention = 0
                                             }
-                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                            }
-
-                                    }
-                                }
-                            }
-                        }
-                        if (Client.global.channels[channelId!!] is DmChannel) {
-                            (Client.global.channels[channelId!!] as DmChannel).apply {
-                                if (messages.list.size != 0) {
-                                    val lastMessageId = messages.list[messages.size - 1]
-                                    val lastMessage = messages[lastMessageId.substring(2)]
-                                    patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
-                                    })
-                                    if (lastMessage != null) {
-                                        lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe {
-                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                            }
-
+                                        client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
                                     }
                                 }
                             }
                         }
                     }
+                    if (Client.global.channels[channelId!!] is DmChannel) {
+                        (Client.global.channels[channelId!!] as DmChannel).apply {
+                            if (messages.list.size != 0) {
+                                val lastMessageId = messages.list[messages.size - 1]
+                                val lastMessage = messages[lastMessageId.substring(2)]
+                                patch(JsonObject().apply {
+                                    addProperty("ack_message_id", lastMessageId)
+                                })
+                                if (lastMessage != null) {
+                                    lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                        }
 
-
+                                }
+                            }
+                        }
+                    }
                 }
             }
         })
