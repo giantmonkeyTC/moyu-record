@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.actions
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
@@ -15,6 +16,9 @@ class MessageCreateAction(client: Client) : Action<Message>(client) {
         val existing = channel.messages.has(obj["id"].asString)
         val message = channel.messages.add(obj)
         if (!existing && message != null) {
+            if (message.mentions.contains(client.me.id)) {
+                client.eventBus.postEvent(MessageAtMeEvent(message = message))
+            }
             channel.patch(JsonObject().apply {
                 addProperty("last_message_id", message.id)
             })
