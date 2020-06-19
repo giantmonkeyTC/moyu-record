@@ -43,7 +43,6 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
         }
 
         fun bind(guild: Guild) {
-
             this.guild = guild
             avatar.guild = guild
             if (guild.mention != 0) {
@@ -89,7 +88,9 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
             val position = holder.layoutPosition
             mOnItemClickListener.onItemClick(holder.itemView, position)
         }
-        holder.bind(guildList[position])
+            holder.bind(guildList[position])
+
+
     }
 
 }
