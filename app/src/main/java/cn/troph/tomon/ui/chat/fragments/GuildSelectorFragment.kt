@@ -10,16 +10,19 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
+import cn.troph.tomon.core.events.ChannelSyncEvent
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
@@ -30,6 +33,7 @@ class GuildSelectorFragment : Fragment() {
     private val mGuildVM: GuildViewModel by viewModels()
     private lateinit var mAdapter: GuildSelectorAdapter
     val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
+    private var totalUnread = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +63,11 @@ class GuildSelectorFragment : Fragment() {
         })
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
+        Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>()
+            .subscribe(Consumer { event ->
+                event.guild?.updateUnread()
+                mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(event.guild)!!)
+            })
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
             .subscribe(Consumer { event ->
                 if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
@@ -68,6 +77,14 @@ class GuildSelectorFragment : Fragment() {
                                 event.message.guild!!
                             )
                         )
+                    }
+                }
+                if (event.message.guild == null || event.message.guild?.id == "@me") {
+                    for ((index, value) in Client.global.dmChannels.withIndex()) {
+                        if (value.id == event.message.channelId) {
+                            totalUnread++
+                            updateRedDot(totalUnread)
+                        }
                     }
                 }
             })
@@ -87,18 +104,16 @@ class GuildSelectorFragment : Fragment() {
                             )
                         )
                 }
+                if (event.message.guild == null || event.message.guild?.id == "@me") {
+                    for ((index, value) in Client.global.dmChannels.withIndex()) {
+                        if (value.id == event.message.channelId) {
+                            totalUnread -= value.unReadCount
+                            updateRedDot(totalUnread)
+                        }
+                    }
+                }
             })
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
-                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
-                    if (event.message.guild!!.updateMention())
-                        mAdapter.notifyItemChanged(
-                            mGuildVM.getGuildListLiveData().value!!.indexOf(
-                                event.message.guild!!
-                            )
-                        )
-                }
-        })
-        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
                 if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
@@ -108,10 +123,27 @@ class GuildSelectorFragment : Fragment() {
                     )
             }
         })
-        view_avatar.setOnLongClickListener {
-            callJoinGuildBottomSheet()
-            true
-        }
+        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer { event ->
+            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+                if (event.message.guild!!.updateUnread()) {
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
+                }
+            }
+        })
+        Client.global.eventBus.observeEventOnUi<MessageUpdateEvent>().subscribe(
+            Consumer { event ->
+                if (event.message.guild!!.updateMention())
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
+
+            })
         view_avatar.setOnClickListener {
             val user_info_bottomsheet = UserInfoFragment()
             user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
@@ -126,12 +158,24 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
         }
-        var totalUnread = 0
         for (item in Client.global.dmChannels) {
             totalUnread += item.unReadCount
         }
-        dm_read_count.visibility = View.VISIBLE
-        dm_read_count.text = totalUnread.toString()
+        updateRedDot(totalUnread)
+    }
+
+    private fun updateRedDot(number: Int) {
+        Logger.d("${number}")
+        if (number > 99) {
+            dm_read_count.visibility = View.VISIBLE
+            dm_read_count.text = "..."
+        }
+        if (number > 0) {
+            dm_read_count.visibility = View.VISIBLE
+            dm_read_count.text = number.toString()
+        } else {
+            dm_read_count.visibility = View.GONE
+        }
     }
 
     private fun callJoinGuildBottomSheet() {
@@ -174,32 +218,6 @@ class GuildSelectorFragment : Fragment() {
         }
         dialog.show()
     }
-
-//    class JoinGuildDialog : DialogFragment() {
-//        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//            val inflater = requireActivity().layoutInflater
-//            val view = inflater.inflate(R.layout.bottom_sheet_join_guild, null)
-//            val dialog = Dialog(requireActivity())
-//            dialog.setContentView(view)
-//            dialog.setCanceledOnTouchOutside(true)
-//            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//            return dialog
-//        }
-//
-//
-//    }
-
-//            Client.global.guilds.join(Url.parseInviteCode("https://beta.tomon.co/invite/FQmCup"))
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(
-//                    { guild ->
-//                        if (guild == null)
-//                            println("joined guild") else
-//                            println(guild.name)
-//                    }, { error -> println(error) }, { println("done") }
-//                )
-
-
 }
 
 data class GuildInvite(

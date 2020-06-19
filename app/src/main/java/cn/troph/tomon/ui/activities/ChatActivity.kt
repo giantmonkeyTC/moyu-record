@@ -10,8 +10,10 @@ import androidx.drawerlayout.widget.DrawerLayout
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
