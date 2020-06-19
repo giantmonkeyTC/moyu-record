@@ -66,6 +66,7 @@ class GuildSelectorFragment : Fragment() {
         Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>()
             .subscribe(Consumer { event ->
                 event.guild?.updateUnread()
+                event.guild?.updateMention()
                 mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(event.guild)!!)
             })
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()

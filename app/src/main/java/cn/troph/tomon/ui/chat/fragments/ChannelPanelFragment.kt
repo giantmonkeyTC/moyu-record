@@ -227,11 +227,12 @@ class ChannelPanelFragment : Fragment() {
                                     val lastMessage = messages[lastMessageId.substring(2)]
                                     patch(JsonObject().apply {
                                         addProperty("ack_message_id", lastMessageId)
+                                        addProperty("last_message_id", lastMessageId)
                                     })
+                                    this.mention = 0
                                     if (lastMessage != null) {
                                         lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
                                             .subscribe {
-                                                this.mention = 0
                                             }
                                         client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
                                     }

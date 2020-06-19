@@ -15,10 +15,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
-import cn.troph.tomon.core.structures.CategoryChannel
-import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.structures.TextChannelBase
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
@@ -27,6 +24,7 @@ import cn.troph.tomon.ui.states.ChannelSelection
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
+import kotlinx.android.synthetic.main.widget_guild_channel_selector_item.view.*
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
 
@@ -86,9 +84,19 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             if (channel is TextChannel) {
                 if (channel.unread) {
                     text.setTextColor(Color.parseColor("#E2E2E2"))
-                } else
+                } else {
                     text.setTextColor(Color.parseColor("#969696"))
+                }
+                if (channel.mention != 0) {
+                    itemView.channel_unread_mention_notification.text = channel.mention.toString()
+                    itemView.channel_unread_mention_notification.visibility = View.VISIBLE
+                } else {
+                    itemView.channel_unread_mention_notification.visibility = View.GONE
+                }
+            } else if (channel is VoiceChannel) {
+                itemView.channel_unread_mention_notification.visibility = View.GONE
             }
+
             text.text = channel.name
             disposable?.dispose()
             disposable =
@@ -105,15 +113,21 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
 
             })
             Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
-                if (channel is TextChannel && it.message.channel == channel)
-                    text.setTextColor(Color.RED)
+                if (channel is TextChannel && it.message.channel == channel) {
+                    itemView.channel_unread_mention_notification.text = channel.mention.toString()
+                    itemView.channel_unread_mention_notification.visibility = View.VISIBLE
+                }
+
             })
             Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
                     if (channel.unread) {
                         text.setTextColor(Color.parseColor("#E2E2E2"))
-                    } else
+                    } else {
                         text.setTextColor(Color.parseColor("#969696"))
+                        itemView.channel_unread_mention_notification.visibility = View.GONE
+                    }
+
                 }
 
             })
