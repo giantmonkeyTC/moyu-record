@@ -16,13 +16,13 @@ import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.events.ChannelSyncEvent
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
@@ -145,9 +145,17 @@ class GuildSelectorFragment : Fragment() {
                     )
 
             })
+
+        Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
+            if (it.channel is DmChannel) {
+                totalUnread += it.channel.unReadCount
+                updateRedDot(totalUnread)
+            }
+        })
+
         view_avatar.setOnClickListener {
-            val user_info_bottomsheet = UserInfoFragment()
-            user_info_bottomsheet.show(parentFragmentManager, user_info_bottomsheet.tag)
+            val userInfoBottomsheet = UserInfoFragment()
+            userInfoBottomsheet.show(parentFragmentManager, userInfoBottomsheet.tag)
         }
         btn_dm_channel_entry.setOnClickListener {
             AppState.global.channelSelection.value =

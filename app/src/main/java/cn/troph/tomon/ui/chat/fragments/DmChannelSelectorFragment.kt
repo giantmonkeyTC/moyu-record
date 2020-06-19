@@ -11,13 +11,17 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.ChannelCreateEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.DmChannelViewModel
+import com.orhanobut.logger.Logger
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_dmchannel_selector.*
 
 
@@ -63,6 +67,13 @@ class DmChannelSelectorFragment : Fragment() {
             }
         })
 
+        Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
+            if (it.channel is DmChannel) {
+                mDMchannelList.add(it.channel)
+                mDMchennelAdapter.notifyItemInserted(mDMchannelList.size - 1)
+            }
+        })
+
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
             if (it.message.guild == null || it.message.guild?.id == "@me") {
                 for ((index, value) in mDMchannelList.withIndex()) {
@@ -72,6 +83,7 @@ class DmChannelSelectorFragment : Fragment() {
                     }
                 }
             }
+
         })
 
     }
