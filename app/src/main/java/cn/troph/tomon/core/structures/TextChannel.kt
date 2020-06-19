@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.collections.MessageCollection
 import cn.troph.tomon.core.utils.Collection
+import cn.troph.tomon.core.utils.optInt
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
@@ -21,6 +22,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
         private set
     var defaultMessageNotifications: MessageNotificationsType = MessageNotificationsType.DEFAULT
         private set
+    var unreadMention: Int = 0
 
     override val messages: MessageCollection = MessageCollection(client, this)
     override val typings: Collection<LocalDateTime> = Collection()
@@ -49,6 +51,10 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
             val value = data["default_message_notifications"].asInt
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.DEFAULT
+        }
+        if (data.has("unread_count")) {
+            unreadMention = data["unread_count"].optInt!!
+            mention = unreadMention
         }
     }
 

@@ -47,10 +47,12 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
             this.guild = guild
             avatar.guild = guild
             if (guild.mention != 0) {
-                itemView.guild_unread_mention_notification.text = guild.mention.toString()
+                if (guild.mention > 99)
+                    itemView.guild_unread_mention_notification.text = "···"
+                else
+                    itemView.guild_unread_mention_notification.text = guild.mention.toString()
                 itemView.guild_unread_mention_notification.visibility = View.VISIBLE
-            }
-            else
+            } else
                 itemView.guild_unread_mention_notification.visibility = View.GONE
             if (guild.unread)
                 itemView.guild_unread_message_notification.visibility = View.VISIBLE
