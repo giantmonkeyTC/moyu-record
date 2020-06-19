@@ -18,6 +18,22 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
+        android:id="@+id/channel_unread_mention_notification"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/shape_guild_mention_notification"
+        android:gravity="center"
+        android:outlineProvider="bounds"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        android:textColor="#D67677"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/text_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
