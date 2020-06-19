@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.utils.event.observeEventOnUi
