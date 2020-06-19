@@ -166,7 +166,6 @@ class GuildSelectorFragment : Fragment() {
     }
 
     private fun updateRedDot(number: Int) {
-        Logger.d("${number}")
         if (number > 99) {
             dm_read_count.visibility = View.VISIBLE
             dm_read_count.text = "..."

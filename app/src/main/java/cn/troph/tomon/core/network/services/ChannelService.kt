@@ -1,11 +1,17 @@
 package cn.troph.tomon.core.network.services
 
+import cn.troph.tomon.core.structures.DmChannel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
 interface ChannelService {
+
+    @GET("users/@me/channels")
+    fun getDmChannels(
+        @Header("Authorization") token: String
+    ): Observable<MutableList<DmChannel>>
 
     @GET("guilds/{id}/channels")
     fun getGuildChannels(

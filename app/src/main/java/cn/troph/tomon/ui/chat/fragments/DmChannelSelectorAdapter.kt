@@ -11,6 +11,8 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
+import com.google.gson.Gson
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.widget_dmchannel_item.view.*
 
 class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>) :

@@ -32,7 +32,6 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
     override val muted get() = getMuted()
 
     private fun patchSelf(data: JsonObject) {
-        Logger.d(data.toString())
         if (data.has("recipients")) {
             val recipients = data["recipients"].asJsonArray
             if (recipients.size() > 0) {
