@@ -34,18 +34,6 @@
             layout="@layout/shimmer_placeholder"/>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-<!--    <com.airbnb.lottie.LottieAnimationView-->
-<!--        android:id="@+id/loading_text_view"-->
-<!--        android:layout_width="100dp"-->
-<!--        android:layout_height="100dp"-->
-<!--        android:visibility="gone"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"-->
-<!--        app:layout_constraintEnd_toEndOf="@id/swipe_refresh_ll"-->
-<!--        app:layout_constraintStart_toStartOf="@id/swipe_refresh_ll"-->
-<!--        app:layout_constraintTop_toTopOf="@id/swipe_refresh_ll"-->
-<!--        app:lottie_fileName="7972-loading.json"-->
-<!--        app:lottie_loop="true" />-->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_input"
         android:layout_width="match_parent"

@@ -151,11 +151,7 @@ class ChannelPanelFragment : Fragment() {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
                 shimmer_view_container.startShimmer()
-//                loading_text_view.visibility = View.VISIBLE
-//                loading_text_view.playAnimation()
             } else {
-//                loading_text_view.visibility = View.GONE
-//                loading_text_view.cancelAnimation()
                 shimmer_view_container.visibility = View.GONE
                 shimmer_view_container.stopShimmer()
             }
