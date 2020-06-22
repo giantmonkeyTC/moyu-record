@@ -47,6 +47,8 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.github.guilhe.keyboardevents.KeyboardState
+import com.github.guilhe.keyboardevents.KeyboardStateLiveData
 
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
@@ -154,6 +156,13 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        KeyboardStateLiveData.state.observe(viewLifecycleOwner, Observer {
+            if (it.name == KeyboardState.OPEN.toString()) {
+                Logger.d("keyboard open")
+            } else if (it.name == KeyboardState.CLOSED.toString()) {
+                Logger.d("keyboard close")
+            }
+        })
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
@@ -170,6 +179,8 @@ class ChannelPanelFragment : Fragment() {
                         View.GONE
                     bottom_emoji_rr.visibility = View.GONE
                 }
+            } else {
+                hideKeyboard(requireActivity())
             }
         }
         var longLastClickTime = 0L
