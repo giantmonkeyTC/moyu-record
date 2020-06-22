@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import cn.troph.tomon.R
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -17,7 +18,6 @@ import kotlinx.android.synthetic.main.fragment_channel_panel.*
 class EntryOptionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.requestFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_entry_option)
         button_login_route.setOnClickListener {
             gotoLogin()
