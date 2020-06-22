@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
+import android.app.backup.SharedPreferencesBackupHelper
 import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
@@ -14,6 +15,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.edit
 import androidx.core.view.isVisible
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -39,6 +41,7 @@ import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.states.UpdateEnabled
 
 import com.arthurivanets.bottomsheets.BottomSheet
@@ -64,6 +67,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 const val FILE_REQUEST_CODE_FILE = 323
+const val LAST_CHANNEL_ID = "last_channel_id"
 
 class ChannelPanelFragment : Fragment() {
 
@@ -100,6 +104,9 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.clear()
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
+                }
+                Client.global.preferences.edit {
+                    putString(LAST_CHANNEL_ID, channelId)
                 }
             }
         }
@@ -282,10 +289,14 @@ class ChannelPanelFragment : Fragment() {
             mHandler.postDelayed(Runnable {
                 channelId?.let {
                     val cId = it
-                    if (mMsgList.size >= 1) {
+                    if (mMsgList.size > 1) {
                         mMsgList[1].id?.let {
                             msgViewModel.loadOldMessage(cId, it)
                         }
+                    } else {
+                        mMsgList.clear()
+                        msgListAdapter.notifyDataSetChanged()
+                        swipe_refresh_ll.isRefreshing = false
                     }
                 }
             }, 1000)
@@ -433,6 +444,23 @@ class ChannelPanelFragment : Fragment() {
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
             }
         })
+
+        val lastChannelID = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+        if (lastChannelID == null) {
+            for (guild in Client.global.guilds) {
+                for ((index, value) in guild.channels.withIndex()) {
+                    if (index == 0) {
+                        AppState.global.channelSelection.value =
+                            ChannelSelection(guild.id, value.id)
+                        break
+                    }
+                }
+                break
+            }
+
+        } else {
+            AppState.global.channelSelection.value = ChannelSelection(null, lastChannelID)
+        }
     }
 
     private fun loadEmoji() {

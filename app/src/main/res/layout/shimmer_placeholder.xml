@@ -17,4 +17,12 @@
         layout="@layout/item_shimmer"/>
     <include
         layout="@layout/item_shimmer"/>
+    <include
+        layout="@layout/item_shimmer"/>
+    <include
+        layout="@layout/item_shimmer"/>
+    <include
+        layout="@layout/item_shimmer"/>
+    <include
+        layout="@layout/item_shimmer"/>
 </LinearLayout>

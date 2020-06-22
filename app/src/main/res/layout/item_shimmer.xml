@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <View
         android:id="@+id/tv"
-        android:background="@color/accent"
+        android:background="@drawable/round_corner_shimmer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,6 +19,8 @@
         app:layout_constraintBottom_toBottomOf="@id/tv"
         app:layout_constraintStart_toEndOf="@id/tv"
         app:layout_constraintEnd_toEndOf="parent"
+        android:divider="@drawable/ll_divider"
+        android:showDividers="middle"
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="0dp">
@@ -29,11 +31,16 @@
             android:layout_marginEnd="10dp"
             android:layout_height="wrap_content"/>
         <View
-            android:layout_marginVertical="5dp"
             android:layout_weight="1"
             android:background="@color/accent"
             android:layout_width="match_parent"
             android:layout_marginEnd="100dp"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_weight="1"
+            android:background="@color/accent"
+            android:layout_width="match_parent"
+            android:layout_marginEnd="55dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
