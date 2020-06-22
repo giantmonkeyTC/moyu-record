@@ -289,10 +289,14 @@ class ChannelPanelFragment : Fragment() {
             mHandler.postDelayed(Runnable {
                 channelId?.let {
                     val cId = it
-                    if (mMsgList.size >= 1) {
+                    if (mMsgList.size > 1) {
                         mMsgList[1].id?.let {
                             msgViewModel.loadOldMessage(cId, it)
                         }
+                    } else {
+                        mMsgList.clear()
+                        msgListAdapter.notifyDataSetChanged()
+                        swipe_refresh_ll.isRefreshing = false
                     }
                 }
             }, 1000)
@@ -442,7 +446,19 @@ class ChannelPanelFragment : Fragment() {
         })
 
         val lastChannelID = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
-        lastChannelID?.let {
+        if (lastChannelID == null) {
+            for (guild in Client.global.guilds) {
+                for ((index, value) in guild.channels.withIndex()) {
+                    if (index == 0) {
+                        AppState.global.channelSelection.value =
+                            ChannelSelection(guild.id, value.id)
+                        break
+                    }
+                }
+                break
+            }
+
+        } else {
             AppState.global.channelSelection.value = ChannelSelection(null, lastChannelID)
         }
     }
