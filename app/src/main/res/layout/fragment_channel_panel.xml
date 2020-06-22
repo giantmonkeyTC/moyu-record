@@ -23,7 +23,7 @@
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"
         app:layout_constraintEnd_toEndOf="@id/swipe_refresh_ll"
         app:layout_constraintStart_toStartOf="@id/swipe_refresh_ll"
@@ -34,7 +34,6 @@
             android:overScrollMode="always"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
             <include layout="@layout/shimmer_placeholder" />
         </ScrollView>
     </com.facebook.shimmer.ShimmerFrameLayout>
