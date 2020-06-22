@@ -11,16 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:visibility="gone"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/image_default"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFFFFF"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_avatar_default"
         tools:srcCompat="@tools:sample/avatars" />
 
 </com.github.florent37.shapeofview.shapes.CircleView>

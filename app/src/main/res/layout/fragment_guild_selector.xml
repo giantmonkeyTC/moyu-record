@@ -22,7 +22,9 @@
     <TextView
         android:id="@+id/dm_read_count"
         android:visibility="gone"
-        android:padding="2dp"
+        android:paddingVertical="3dp"
+        android:paddingHorizontal="5dp"
+        android:textSize="12sp"
         android:textColor="@android:color/holo_red_light"
         app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
         app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry"

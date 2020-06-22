@@ -17,7 +17,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 class UserAvatar : FrameLayout {
 
     private lateinit var clipView: CircleView
-    private lateinit var defaultView: ImageView
     private lateinit var imageView: ImageView
 
     private var disposable: Disposable? = null
@@ -52,20 +51,17 @@ class UserAvatar : FrameLayout {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.widget_user_avatar, null)
         clipView = view.findViewById(R.id.view_clip)
-        defaultView = view.findViewById(R.id.image_default)
         imageView = view.findViewById(R.id.image_avatar)
         addView(view)
     }
 
     private fun update() {
         val url = user?.avatarURL
-        imageView.visibility = if (url != null) View.VISIBLE else View.GONE
-        defaultView.visibility = if (url == null) View.VISIBLE else View.GONE
-        Glide.with(this).load(url).into(imageView)
+        Glide.with(this).load(url).placeholder(R.drawable.ic_avatar_default).into(imageView)
         val number = user?.id?.toLongOrNull() ?: 0L
         val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
         val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
-        defaultView.setBackgroundColor(color)
+        imageView.setBackgroundColor(color)
     }
 
     private fun listen() {

@@ -34,13 +34,14 @@
         android:id="@+id/dm_user_unread_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dp"
+        android:textSize="12sp"
+        android:paddingVertical="3dp"
+        android:paddingHorizontal="5dp"
         android:background="@drawable/shape_guild_mention_notification"
         android:textColor="@android:color/holo_red_light"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/dmchannel_user_avatar"
-        app:layout_constraintEnd_toEndOf="@id/dmchannel_user_avatar"
-        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar" />
+        app:layout_constraintEnd_toEndOf="@id/dmchannel_user_avatar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
