@@ -36,7 +36,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.RegisterActivity" />
+        <activity android:name=".ui.activities.RegisterActivity"
+            android:label="@string/register_button"/>
+        <activity android:name=".ui.activities.EntryOptionActivity"
+            android:label="EntryOptionActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".ui.activities.LoginActivity"
             android:label="@string/login_title" />

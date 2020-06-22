@@ -3,32 +3,22 @@ package cn.troph.tomon.ui.activities
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import cn.troph.tomon.R
-import cn.troph.tomon.core.Client
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.activity_entry_option.*
 
-class EntryActivity : AppCompatActivity() {
-
+class EntryOptionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_entry)
-        if (Client.global.loggedIn) {
-            gotoChat()
-        } else {
-            Client.global
-                .login()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    gotoChat()
-                }, {
-                    gotoEntryOption()
-                })
-        }
+        setContentView(R.layout.activity_entry_option)
+        button_login_route.setOnClickListener { gotoLogin() }
+        button_register_route.setOnClickListener { gotoRegister() }
     }
 
-    private fun gotoEntryOption() {
-        val intent = Intent(this, EntryOptionActivity::class.java)
+
+    private fun gotoLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(
@@ -40,8 +30,8 @@ class EntryActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun gotoChat() {
-        val intent = Intent(this, ChatActivity::class.java)
+    private fun gotoRegister() {
+        val intent = Intent(this, RegisterActivity::class.java)
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(
@@ -52,5 +42,4 @@ class EntryActivity : AppCompatActivity() {
         )
         finish()
     }
-
 }
