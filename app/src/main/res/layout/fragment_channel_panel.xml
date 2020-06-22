@@ -23,7 +23,7 @@
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"
         app:layout_constraintEnd_toEndOf="@id/swipe_refresh_ll"
         app:layout_constraintStart_toStartOf="@id/swipe_refresh_ll"
