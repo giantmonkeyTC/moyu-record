@@ -8,6 +8,10 @@
     <string name="login_password_hint">密码</string>
     <string name="login_button">登录</string>
 
+    <string name="welcome">欢迎来到TOMON</string>
+    <string name="slogan">類はTOMONを呼ぶ</string>
+
+
     <string name="register_invite_code">邀请码</string>
     <string name="register_confirmation_code">验证码</string>
     <string name="register_button">注册</string>

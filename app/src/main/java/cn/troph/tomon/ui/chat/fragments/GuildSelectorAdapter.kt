@@ -63,9 +63,14 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val inflatedView =
-            layoutInflater.inflate(R.layout.widget_guild_selector_item, parent, false)
-        return ViewHolder(inflatedView)
+        return ViewHolder(
+            layoutInflater.inflate(
+                R.layout.widget_guild_selector_item,
+                parent,
+                false
+            )
+        )
+
     }
 
     override fun getItemCount(): Int = guildList.size
@@ -88,7 +93,7 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
             val position = holder.layoutPosition
             mOnItemClickListener.onItemClick(holder.itemView, position)
         }
-            holder.bind(guildList[position])
+        holder.bind(guildList[position])
 
 
     }
