@@ -49,7 +49,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     if (channel.isPrivate) {
                         image.setImageResource(R.drawable.ic_channel_text_lock)
                     } else {
-                        image.setImageResource(R.drawable.ic_channel_text)
+                        image.setImageResource(R.drawable.ic_channel_text_unlock)
                     }
                 }
                 ChannelType.VOICE -> {

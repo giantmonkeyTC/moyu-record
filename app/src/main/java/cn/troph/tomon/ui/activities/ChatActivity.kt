@@ -64,7 +64,7 @@ class ChatActivity : AppCompatActivity() {
             when (channel.type) {
                 ChannelType.TEXT -> {
                     iconId =
-                        if (channel.isPrivate) R.drawable.ic_channel_text_lock else R.drawable.ic_channel_text
+                        if (channel.isPrivate) R.drawable.ic_channel_text_lock else R.drawable.ic_channel_text_unlock
                 }
                 ChannelType.VOICE -> {
                     iconId =
