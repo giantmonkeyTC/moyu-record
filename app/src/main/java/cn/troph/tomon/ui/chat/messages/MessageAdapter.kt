@@ -156,6 +156,9 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
+                    if (messageList[position].author == null) {
+                        holder.itemView.widget_message_author_name_text_file.text = "T🐱"
+                    }
                     holder.itemView.widget_message_timestamp_text_file.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
@@ -206,15 +209,20 @@ class MessageAdapter(
                 }
             }
             2 -> {
-                if (position == 1 || (position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                if ((position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
                         messageList[position].timestamp,
                         messageList[position - 1].timestamp
-                    ))
+                    )) || position == 0 || position == 1
                 ) {
                     holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
+
                     holder.itemView.widget_message_author_name_text_image.text =
                         messageList[position].author?.name
+                    if (messageList[position].author == null) {
+                        holder.itemView.widget_message_author_name_text_image.text = "T🐱"
+                    }
+
                     holder.itemView.widget_message_timestamp_text_image.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
@@ -256,6 +264,9 @@ class MessageAdapter(
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
+                    if (messageList[position].author == null) {
+                        holder.itemView.widget_message_author_name_text_invite.text = "T🐱"
+                    }
                     holder.itemView.widget_message_timestamp_text_invite.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
@@ -363,7 +374,7 @@ class MessageAdapter(
     ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
-        itemView.widget_message_author_name_text.text = message.author?.name ?: ""
+        itemView.widget_message_author_name_text.text = message.author?.name ?: "T🐱"
 
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
                 message.content!!
