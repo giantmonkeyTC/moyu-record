@@ -19,17 +19,20 @@
             android:layout_height="match_parent" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/loading_text_view"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
+        app:shimmer_auto_start="true"
         app:layout_constraintBottom_toBottomOf="@id/swipe_refresh_ll"
         app:layout_constraintEnd_toEndOf="@id/swipe_refresh_ll"
         app:layout_constraintStart_toStartOf="@id/swipe_refresh_ll"
         app:layout_constraintTop_toTopOf="@id/swipe_refresh_ll"
-        app:lottie_fileName="7972-loading.json"
-        app:lottie_loop="true" />
+        >
+        <include
+            layout="@layout/shimmer_placeholder"/>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_input"

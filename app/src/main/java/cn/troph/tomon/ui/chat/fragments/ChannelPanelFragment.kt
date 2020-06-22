@@ -149,11 +149,11 @@ class ChannelPanelFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
-                loading_text_view.visibility = View.VISIBLE
-                loading_text_view.playAnimation()
+                shimmer_view_container.visibility = View.VISIBLE
+                shimmer_view_container.startShimmer()
             } else {
-                loading_text_view.visibility = View.GONE
-                loading_text_view.cancelAnimation()
+                shimmer_view_container.visibility = View.GONE
+                shimmer_view_container.stopShimmer()
             }
         })
         editText.setOnFocusChangeListener { v, hasFocus ->
