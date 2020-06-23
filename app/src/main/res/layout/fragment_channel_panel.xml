@@ -141,6 +141,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/emoji_rr"
+                android:background="#313131"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
