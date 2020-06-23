@@ -157,11 +157,6 @@ class ChannelPanelFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         KeyboardStateLiveData.state.observe(viewLifecycleOwner, Observer {
-            if (it.name == KeyboardState.OPEN.toString()) {
-                Logger.d("keyboard open")
-            } else if (it.name == KeyboardState.CLOSED.toString()) {
-                Logger.d("keyboard close")
-            }
         })
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
