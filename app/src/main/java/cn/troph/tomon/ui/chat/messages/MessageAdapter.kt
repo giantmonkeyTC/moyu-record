@@ -32,6 +32,7 @@ import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -236,7 +237,7 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    Glide.with(holder.itemView).load(item.url+"?x-oss-process=image/resize,p_20").placeholder(R.drawable.loadinglogo).into(holder.itemView.chat_iv)
+                    Glide.with(holder.itemView).load(item.url+"?x-oss-process=image/resize,p_20").placeholder(R.drawable.loadinglogo).transition(DrawableTransitionOptions.withCrossFade(500)).into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {
