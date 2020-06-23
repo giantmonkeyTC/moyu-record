@@ -87,7 +87,7 @@ class ChatActivity : AppCompatActivity() {
         if (ev?.action == MotionEvent.ACTION_UP) {
             val view = this.currentFocus
 
-            if(isShouldHideInput(view,ev)){
+            if (isShouldHideInput(view, ev)) {
                 hideKeyboard(this)
             }
         }
@@ -95,16 +95,19 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
-    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent):Boolean {
-        if(view !=null && (view is EditText || view is EmojiEditText)){
-            val l = arrayOf(0,0)
+    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
+        if(view?.id == R.id.btn_message_send){
+            return false
+        }
+        if (view != null && (view is EditText || view is EmojiEditText)) {
+            val l = arrayOf(0, 0)
             val left = l[0]
             val top = l[1]
-            val bottom = top+view.height
-            val right = left+view.width
-            if(motionEvent.x>left && motionEvent.x<right && motionEvent.y>top && motionEvent.y<bottom){
+            val bottom = top + view.height
+            val right = left + view.width
+            if (motionEvent.x > left && motionEvent.x < right && motionEvent.y > top && motionEvent.y < bottom) {
                 return false
-            }else{
+            } else {
                 return true
             }
         }

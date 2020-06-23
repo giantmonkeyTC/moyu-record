@@ -174,8 +174,6 @@ class ChannelPanelFragment : Fragment() {
                         View.GONE
                     bottom_emoji_rr.visibility = View.GONE
                 }
-            } else {
-                hideKeyboard(requireActivity())
             }
         }
         var longLastClickTime = 0L
@@ -184,7 +182,7 @@ class ChannelPanelFragment : Fragment() {
                 return@setOnClickListener
             }
             longLastClickTime = SystemClock.elapsedRealtime()
-            if (channelId == null) {
+            if (channelId.isNullOrEmpty()) {
                 return@setOnClickListener
             }
             val textToSend = editText.text.toString()
@@ -316,7 +314,6 @@ class ChannelPanelFragment : Fragment() {
 
         //选择文件事件
         btn_message_menu.setOnClickListener {
-            hideKeyboard(requireActivity())
             mBottomSheet =
                 FileBottomSheetFragment(
                     requireActivity(),
@@ -371,9 +368,6 @@ class ChannelPanelFragment : Fragment() {
             } else {
                 section_header_layout.visibility = View.VISIBLE
                 bottom_emoji_rr.visibility = View.VISIBLE
-                activity?.let {
-                    hideKeyboard(it)
-                }
                 loadEmoji()
             }
         }
@@ -547,7 +541,7 @@ class ChannelPanelFragment : Fragment() {
     }
 
 
-    
+
 
 
     private fun hideKeyboard(activity: Activity) {
