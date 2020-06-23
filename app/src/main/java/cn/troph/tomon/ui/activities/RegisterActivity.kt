@@ -16,9 +16,6 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        register_to_login.setOnClickListener {
-            gotoLogin()
-        }
         button_confirmation.setOnClickListener {
             Client.global.rest.authService.verify(
                 AuthService.VerifyRequest(

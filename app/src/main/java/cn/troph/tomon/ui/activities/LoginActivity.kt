@@ -126,9 +126,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
         }
-        login_to_register.setOnClickListener {
-            gotoRegister()
-        }
         layout_root.setOnClickListener {
             closeKeyboard()
         }

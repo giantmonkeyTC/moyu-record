@@ -3,7 +3,9 @@ package cn.troph.tomon.ui.activities
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import cn.troph.tomon.R
 import kotlinx.android.synthetic.main.activity_entry_option.*
 
@@ -23,10 +25,10 @@ class EntryOptionActivity : AppCompatActivity() {
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(
             intent,
-            ActivityOptions.makeCustomAnimation(
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
+                register_n_login as View,
+                "register_n_login"
             ).toBundle()
         )
     }
@@ -35,10 +37,10 @@ class EntryOptionActivity : AppCompatActivity() {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(
             intent,
-            ActivityOptions.makeCustomAnimation(
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
+                register_n_login as View,
+                "register_n_login"
             ).toBundle()
         )
     }
