@@ -11,22 +11,31 @@ import cn.troph.tomon.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.snackbar_general.view.*
 
-class GeneralSnackbar(parent: ViewGroup, content: View, contentViewCallback: MContentViewCallback) :
+
+/** Usage: GeneralSnackbar
+ *          .make(GeneralSnackbar.findSuitableParent(view),
+ *                text,
+ *                duration)
+ *          .apply{ ...
+ *                  show()}
+ **/
+class GeneralSnackbar(
+    parent: ViewGroup,
+    val content: View,
+    contentViewCallback: MContentViewCallback
+) :
     BaseTransientBottomBar<GeneralSnackbar>(parent, content, contentViewCallback) {
 
     companion object {
         fun make(
             parent: ViewGroup,
             text: String,
-            duration: Int,
-            textColor: Int? = null
+            duration: Int
         ): GeneralSnackbar {
             val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.snackbar_general, parent, false)
             view.snackbar_text.text = text
-            if (textColor != null) {
-                view.snackbar_text.setTextColor(textColor)
-            }
+            view.snackbar_action.visibility = View.GONE
             val callback = MContentViewCallback(view)
             val generalSnackbar = GeneralSnackbar(parent, view, callback)
             generalSnackbar.view.background = ColorDrawable(Color.TRANSPARENT)
@@ -34,10 +43,7 @@ class GeneralSnackbar(parent: ViewGroup, content: View, contentViewCallback: MCo
             return generalSnackbar
         }
 
-        fun setTextColor(color: Color) {
-
-        }
-
+        /** Get the appropriate parent view of the view parameter */
         fun findSuitableParent(view: View): ViewGroup? {
             var view: View? = view
             var fallback: ViewGroup? = null
@@ -62,6 +68,29 @@ class GeneralSnackbar(parent: ViewGroup, content: View, contentViewCallback: MCo
             return fallback
         }
     }
+
+    override fun dismiss() {
+        super.dismiss()
+    }
+
+    fun setAction(
+        actionText: String?,
+        actionColor: Int? = null,
+        action: () -> Unit
+    ): GeneralSnackbar {
+        this.content.snackbar_action.visibility = View.VISIBLE
+        this.content.snackbar_action.text = actionText
+        this.content.snackbar_action.setOnClickListener { action() }
+        if (actionColor != null)
+            this.content.snackbar_action.setTextColor(actionColor)
+        return this
+    }
+
+    fun setTextColor(color: Int): GeneralSnackbar {
+        this.content.snackbar_text.setTextColor(color)
+        return this
+    }
+
 
     class MContentViewCallback(private val view: View) :
         com.google.android.material.snackbar.ContentViewCallback {
