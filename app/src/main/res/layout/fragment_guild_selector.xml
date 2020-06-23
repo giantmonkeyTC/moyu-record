@@ -13,25 +13,25 @@
         android:layout_marginStart="13dp"
         android:layout_marginEnd="13dp"
         android:layout_marginBottom="15dp"
-        android:clickable="true"
         android:background="@drawable/ic_dm_entry"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/dm_read_count"
-        android:visibility="gone"
-        android:paddingVertical="3dp"
-        android:paddingHorizontal="5dp"
-        android:textSize="12sp"
-        android:textColor="@android:color/holo_red_light"
-        app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
-        app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry"
-        app:layout_constraintBottom_toBottomOf="@id/btn_dm_channel_entry"
-        android:background="@drawable/shape_guild_mention_notification"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_guild_mention_notification"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="3dp"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/btn_dm_channel_entry"
+        app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
+        app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry" />
 
     <View
         android:layout_width="38dp"
@@ -41,8 +41,8 @@
         android:elevation="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
+
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/view_avatar"
         android:layout_width="36dp"

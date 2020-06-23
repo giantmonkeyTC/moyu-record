@@ -23,7 +23,8 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_member_selector"
-        android:layout_width="200dp"
+        android:layout_width="300dp"
+        android:elevation="10dp"
         android:name="cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment"
         android:layout_height="match_parent"
         android:layout_gravity="end"

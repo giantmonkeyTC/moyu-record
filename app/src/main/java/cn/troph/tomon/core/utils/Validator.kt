@@ -10,7 +10,7 @@ object Patterns {
 object Validator {
 
     fun isFullName(value: String?): Boolean {
-        return !TextUtils.isEmpty(value) && Patterns.FULL_NAME.matcher(value).matches();
+        return !TextUtils.isEmpty(value) && Patterns.FULL_NAME.matcher(value).matches()
     }
 
     fun isEmail(value: String?): Boolean {

@@ -13,9 +13,9 @@ interface EventBus {
 }
 
 inline fun <reified T : Any> EventBus.observeEvent(): Flowable<T> {
-    return observeEvents().ofType()
+    return observeEvents().onBackpressureBuffer().ofType()
 }
 
 inline fun <reified T : Any> EventBus.observeEventOnUi(): Flowable<T> {
-    return observeEventsOnUi().ofType()
+    return observeEventsOnUi().onBackpressureBuffer().ofType()
 }
