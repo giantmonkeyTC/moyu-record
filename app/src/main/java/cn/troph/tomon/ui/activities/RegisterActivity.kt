@@ -43,26 +43,30 @@ class RegisterActivity : AppCompatActivity() {
         }
         button_register.setOnClickListener {
 
-//            if (!Validator.isFullName(register_input_user_name.text.toString()))
-//                GeneralSnackbar.make(
-//                    GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-//                    "请输入正确的手机号",
-//                    Snackbar.LENGTH_LONG
-//                ).show()
 
             val username = register_input_user_name.text.toString()
             val code = register_confirmation_code.text.toString()
             val invite = register_input_invite_code.text.toString()
             val unionId = register_input_union_id.text.toString()
-
-            Client.global.register(
-                username = username,
-                code = code,
-                invite = invite,
-                unionId = unionId
-            ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-
-            }
+            if (!Validator.isFullName(username))
+                GeneralSnackbar.make(
+                    GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                    "用户名限制",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            else
+                Client.global.register(
+                    username = username,
+                    code = code,
+                    invite = invite,
+                    unionId = unionId
+                ).observeOn(AndroidSchedulers.mainThread()).subscribe({}, {
+                    GeneralSnackbar.make(
+                        GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                        "注册失败",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }, {})
         }
     }
 }

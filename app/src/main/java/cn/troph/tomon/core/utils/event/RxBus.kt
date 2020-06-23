@@ -13,10 +13,10 @@ class RxBus : EventBus {
     }
 
     override fun observeEvents(): Flowable<Any> {
-        return publishProcessor.serialize()
+        return publishProcessor.serialize().onBackpressureBuffer()
     }
 
     override fun observeEventsOnUi(): Flowable<Any> {
-        return observeEvents().observeOn(AndroidSchedulers.mainThread())
+        return observeEvents().observeOn(AndroidSchedulers.mainThread()).onBackpressureBuffer()
     }
 }
