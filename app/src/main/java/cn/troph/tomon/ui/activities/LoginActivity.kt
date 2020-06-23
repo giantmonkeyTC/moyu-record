@@ -126,9 +126,6 @@ class LoginActivity : AppCompatActivity() {
             }
 
         }
-        login_to_register.setOnClickListener {
-            gotoRegister()
-        }
         layout_root.setOnClickListener {
             closeKeyboard()
         }
@@ -149,20 +146,8 @@ class LoginActivity : AppCompatActivity() {
             intent,
             ActivityOptions.makeCustomAnimation(
                 this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
-            ).toBundle()
-        )
-        finish()
-    }
-    private fun gotoRegister() {
-        val intent = Intent(this, RegisterActivity::class.java)
-        startActivity(
-            intent,
-            ActivityOptions.makeCustomAnimation(
-                this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
+                android.R.anim.bounce_interpolator,
+                android.R.anim.slide_out_right
             ).toBundle()
         )
         finish()

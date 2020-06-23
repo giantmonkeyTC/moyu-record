@@ -5,12 +5,14 @@
     android:layout_height="match_parent"
     android:background="#363636">
 
+
     <ImageView
         android:id="@+id/register_n_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:background="#202020"
+        android:transitionName="register_n_login"
         android:elevation="10dp"
         android:src="@drawable/register_n_login"
         app:layout_constraintTop_toTopOf="parent" />

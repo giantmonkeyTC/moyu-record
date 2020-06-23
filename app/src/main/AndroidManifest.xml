@@ -10,11 +10,11 @@
 
 
     <application
-        android:requestLegacyExternalStorage="true"
         android:name=".TomonApplication"
         android:allowBackup="true"
         android:icon="@drawable/app_logo_sqr"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
         <provider
@@ -36,19 +36,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.RegisterActivity"
-            android:label="@string/register_button"/>
-        <activity android:name=".ui.activities.EntryOptionActivity"
-            android:theme="@style/AppTheme.NoTitle"/>
+        <activity
+            android:name=".ui.activities.RegisterActivity"
+            android:label="@string/register_button"
+            android:theme="@style/AppTheme.NoTitleWithTransitions" />
+        <activity
+            android:name=".ui.activities.EntryOptionActivity"
+            android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
             android:name=".ui.activities.LoginActivity"
-            android:label="@string/login_title" />
+            android:label="@string/login_title"
+            android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
             android:name=".ui.activities.ChatActivity"
             android:label="ChatActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/AppTheme.NoActionBar"
-             />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".ui.activities.ImagePreviewActivity"
             android:label="ImagePreviewActivity"

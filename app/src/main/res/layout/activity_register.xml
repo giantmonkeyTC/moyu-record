@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#363636"
     android:layout_height="match_parent"
     tools:context=".ui.activities.RegisterActivity">
 
@@ -11,17 +12,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
+        android:translationY="-250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/register_n_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:transitionName="register_n_login"
+            android:background="#202020"
+            android:elevation="10dp"
+            android:src="@drawable/register_n_login"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <EditText
             android:id="@+id/register_input_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="24dp"
             android:hint="@string/register_user_name"
             android:inputType="text"
@@ -30,7 +44,7 @@
             android:theme="@style/AppTheme.EditText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/register_n_login" />
 
         <EditText
             android:id="@+id/register_input_union_id"
@@ -99,7 +113,7 @@
             android:layout_height="60dp"
             android:layout_gravity="start"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:layout_marginEnd="24dp"
             android:backgroundTint="@color/primary"
             android:text="@string/register_button"
@@ -107,17 +121,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/register_input_invite_code" />
-
-        <TextView
-            android:id="@+id/register_to_login"
-            android:layout_marginTop="40dp"
-            android:textColor="@color/channelCategoryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:text="@string/register_to_login"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_register" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
