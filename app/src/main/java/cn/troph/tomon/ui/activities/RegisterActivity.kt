@@ -27,6 +27,7 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
         button_register.setOnClickListener {
+
             val username = register_input_user_name.text.toString()
             val code = register_confirmation_code.text.toString()
             val invite = register_input_invite_code.text.toString()
@@ -41,18 +42,5 @@ class RegisterActivity : AppCompatActivity() {
 
             }
         }
-    }
-
-    private fun gotoLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(
-            intent,
-            ActivityOptions.makeCustomAnimation(
-                this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
-            ).toBundle()
-        )
-        finish()
     }
 }

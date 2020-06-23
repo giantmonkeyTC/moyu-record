@@ -39,7 +39,7 @@
         <activity
             android:name=".ui.activities.RegisterActivity"
             android:label="@string/register_button"
-            android:theme="@style/AppTheme.NoTitle" />
+            android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
             android:name=".ui.activities.EntryOptionActivity"
             android:theme="@style/AppTheme.NoTitleWithTransitions" />

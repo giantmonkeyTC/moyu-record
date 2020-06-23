@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.ui.activities.LoginActivity
+import cn.troph.tomon.ui.activities.EntryOptionActivity
 import cn.troph.tomon.ui.chat.viewmodel.UserInfoViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -46,7 +46,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
 
         view.profile_layout.user_sign_out.setOnClickListener {
             Client.global.me.logout()
-            gotoLogin()
+            gotoEntryOption()
         }
 
 
@@ -111,14 +111,14 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         return size
     }
 
-    private fun gotoLogin() {
-        val intent = Intent(requireContext(), LoginActivity::class.java)
+    private fun gotoEntryOption() {
+        val intent = Intent(requireContext(), EntryOptionActivity::class.java)
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(
                 requireContext(),
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
+                android.R.anim.bounce_interpolator,
+                android.R.anim.slide_out_right
             ).toBundle()
         )
         requireActivity().finish()

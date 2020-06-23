@@ -21,12 +21,11 @@
     </style>
 
     <style name="AppTheme.NoTitleWithTransitions">
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentTransitions">true</item>
     </style>
-
 
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
