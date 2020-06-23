@@ -1,12 +1,18 @@
 package cn.troph.tomon.ui.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.emoji.widget.EmojiEditText
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
@@ -75,6 +81,46 @@ class ChatActivity : AppCompatActivity() {
                 image_toolbar_icon.setImageResource(iconId)
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (ev?.action == MotionEvent.ACTION_UP) {
+            val view = this.currentFocus
+
+            if(isShouldHideInput(view,ev)){
+                hideKeyboard(this)
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+
+    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent):Boolean {
+        if(view !=null && (view is EditText || view is EmojiEditText)){
+            val l = arrayOf(0,0)
+            val left = l[0]
+            val top = l[1]
+            val bottom = top+view.height
+            val right = left+view.width
+            if(motionEvent.x>left && motionEvent.x<right && motionEvent.y>top && motionEvent.y<bottom){
+                return false
+            }else{
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun hideKeyboard(activity: Activity) {
+        val imm: InputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 

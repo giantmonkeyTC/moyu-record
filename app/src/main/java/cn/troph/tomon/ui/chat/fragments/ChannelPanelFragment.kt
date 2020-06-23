@@ -154,10 +154,10 @@ class ChannelPanelFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        KeyboardStateLiveData.state.observe(viewLifecycleOwner, Observer {
-        })
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
@@ -545,6 +545,10 @@ class ChannelPanelFragment : Fragment() {
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
 
     }
+
+
+    
+
 
     private fun hideKeyboard(activity: Activity) {
         val imm: InputMethodManager =
