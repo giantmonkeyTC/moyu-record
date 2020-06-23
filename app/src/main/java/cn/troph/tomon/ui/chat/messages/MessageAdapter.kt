@@ -236,7 +236,7 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    Glide.with(holder.itemView).load(item.url).into(holder.itemView.chat_iv)
+                    Glide.with(holder.itemView).load(item.url+"?x-oss-process=image/resize,p_20").placeholder(R.drawable.loadinglogo).into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {
