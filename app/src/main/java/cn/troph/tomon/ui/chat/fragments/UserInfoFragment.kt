@@ -121,5 +121,6 @@ class UserInfoFragment : BottomSheetDialogFragment() {
                 android.R.anim.fade_out
             ).toBundle()
         )
+        requireActivity().finish()
     }
 }

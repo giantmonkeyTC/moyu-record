@@ -29,7 +29,6 @@ class EntryOptionActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
-        finish()
     }
 
     private fun gotoRegister() {
@@ -42,6 +41,5 @@ class EntryOptionActivity : AppCompatActivity() {
                 android.R.anim.fade_out
             ).toBundle()
         )
-        finish()
     }
 }
