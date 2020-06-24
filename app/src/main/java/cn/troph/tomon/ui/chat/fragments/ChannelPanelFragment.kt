@@ -63,10 +63,12 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.apache.commons.io.IOUtils
 
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.time.LocalDateTime
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -153,7 +155,6 @@ class ChannelPanelFragment : Fragment() {
             }
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -373,9 +374,22 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            val event = it
             if (it.message.channelId == channelId) {
-                mMsgList.add(it.message)
-                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                val msg = mMsgList.find {
+                    val localMsg = it
+                    event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
+                }
+                if (msg == null) {
+                    mMsgList.add(it.message)
+                    msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                } else {
+                    val index = mMsgList.indexOf(msg)
+                    mMsgList[index] = event.message
+                    msgListAdapter.notifyItemChanged(index)
+                }
+
+
             }
         })
         //Reaction add
@@ -541,9 +555,6 @@ class ChannelPanelFragment : Fragment() {
     }
 
 
-
-
-
     private fun hideKeyboard(activity: Activity) {
         val imm: InputMethodManager =
             activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -556,20 +567,6 @@ class ChannelPanelFragment : Fragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun uploadFile(file: File) {
-        val requestFile = file.asRequestBody()
-        val requestBody =
-            "{\"content\":null,\"nonce\":\"${SnowFlakesGenerator(1).nextId()}\"}".toRequestBody()
-        val map = mutableMapOf<String, RequestBody>()
-        map["payload_json"] = requestBody
-        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-        (Client.global.channels[channelId!!] as TextChannelBase).messages.uploadAttachments(
-            partMap = map,
-            files = body
-        ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-
-        }
-    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -578,7 +575,6 @@ class ChannelPanelFragment : Fragment() {
             data?.let {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
                     for (item in it) {
-                        Logger.d(item.uri)
                         val parcelFileDescriptor =
                             requireContext().contentResolver.openFileDescriptor(item.uri, "r", null)
 
@@ -590,12 +586,41 @@ class ChannelPanelFragment : Fragment() {
                                     requireContext().contentResolver.getFileName(item.uri)
                                 )
                             val outputStream = FileOutputStream(file)
-                            org.apache.commons.io.IOUtils.copy(inputStream, outputStream)
-                            uploadFile(file)
+                            IOUtils.copy(inputStream, outputStream)
+                            val msgObject = JsonObject()
+                            msgObject.addProperty("id", "")
+                            msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+                            msgObject.addProperty("channelId", channelId)
+                            msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+                            msgObject.addProperty("authorId", Client.global.me.id)
+                            val msg = Message(client = Client.global, data = msgObject)
+                            val attachmentObj = JsonObject()
+                            attachmentObj.addProperty("id", "new_image")
+                            attachmentObj.addProperty("filename", file.absolutePath)
+                            val attachment = MessageAttachment(Client.global, attachmentObj)
+                            msg.attachments["new_attachment"] = attachment
+                            mMsgList.add(msg)
+                            msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                            mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                            uploadFile(file, msg)
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun uploadFile(file: File, msg: Message) {
+        val requestFile = file.asRequestBody()
+        val requestBody =
+            "{\"content\":null,\"nonce\":\"${msg.nonce}\"}".toRequestBody()
+        val map = mutableMapOf<String, RequestBody>()
+        map["payload_json"] = requestBody
+        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
+        (Client.global.channels[channelId!!] as TextChannelBase).messages.uploadAttachments(
+            partMap = map,
+            files = body
+        ).observeOn(AndroidSchedulers.mainThread()).subscribe {
         }
     }
 }
