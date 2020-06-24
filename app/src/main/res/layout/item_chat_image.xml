@@ -38,7 +38,7 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/chat_iv"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="5dp"
