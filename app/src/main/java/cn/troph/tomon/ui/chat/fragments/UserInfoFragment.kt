@@ -82,7 +82,8 @@ class UserInfoFragment : BottomSheetDialogFragment() {
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
+                if (slideOffset > 0)
+                    setAppBarHeight(appBarLayout, slideOffset, getActionBarSize())
             }
         })
         hideAppBar(appBarLayout);
@@ -110,6 +111,13 @@ class UserInfoFragment : BottomSheetDialogFragment() {
     private fun hideAppBar(view: View) {
         val params = view.layoutParams
         params.height = 0
+        view.layoutParams = params
+    }
+
+    private fun setAppBarHeight(view: View, height: Float, size: Int) {
+        val params = view.layoutParams
+        params.height = (size * height).toInt()
+        view.alpha = height
         view.layoutParams = params
     }
 
