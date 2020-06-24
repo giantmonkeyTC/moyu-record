@@ -17,10 +17,13 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.chat.fragments.LAST_CHANNEL_ID
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import cn.troph.tomon.ui.states.ChannelSelection
 import com.bumptech.glide.Glide
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
@@ -48,7 +51,6 @@ class ChatActivity : AppCompatActivity() {
         text_toolbar_title.text = "TOMON"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
-
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it.channelId != null) {

@@ -139,6 +139,7 @@ class ChannelPanelFragment : Fragment() {
             }
         })
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -473,8 +474,12 @@ class ChannelPanelFragment : Fragment() {
             }
 
         } else {
-            AppState.global.channelSelection.value = ChannelSelection(null, lastChannelID)
+            AppState.global.channelSelection.value = ChannelSelection(
+                null,
+                lastChannelID
+            )
         }
+
     }
 
     private fun loadEmoji() {
