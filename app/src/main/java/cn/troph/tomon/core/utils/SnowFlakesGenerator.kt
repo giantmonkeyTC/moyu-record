@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class SnowFlakesGenerator(private val machineId: Int)  {
     private val ATOMIC_INCREMENT = AtomicInteger(0)
-    private val EPOCH = 1420045200000L
+    private val EPOCH = 1559347200000L
     private val MAX_MACHINE_ID = 64
     private val ALPHA_NUMERIC_BASE = 36
     private val TIME_STAMP_SHIFT = 22

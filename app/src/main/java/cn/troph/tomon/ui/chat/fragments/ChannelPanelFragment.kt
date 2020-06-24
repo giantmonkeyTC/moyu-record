@@ -374,9 +374,22 @@ class ChannelPanelFragment : Fragment() {
         }
         //接受新的Message
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            val event = it
             if (it.message.channelId == channelId) {
-                mMsgList.add(it.message)
-                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                val msg = mMsgList.find {
+                    val localMsg = it
+                    event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
+                }
+                if (msg == null) {
+                    mMsgList.add(it.message)
+                    msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                } else {
+                    val index = mMsgList.indexOf(msg)
+                    mMsgList[index] = event.message
+                    msgListAdapter.notifyItemChanged(index)
+                }
+
+
             }
         })
         //Reaction add
@@ -555,7 +568,6 @@ class ChannelPanelFragment : Fragment() {
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -576,20 +588,21 @@ class ChannelPanelFragment : Fragment() {
                             val outputStream = FileOutputStream(file)
                             IOUtils.copy(inputStream, outputStream)
                             val msgObject = JsonObject()
-                            msgObject.addProperty("id", "no_id")
+                            msgObject.addProperty("id", "")
+                            msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
                             msgObject.addProperty("channelId", channelId)
                             msgObject.addProperty("timestamp", LocalDateTime.now().toString())
                             msgObject.addProperty("authorId", Client.global.me.id)
                             val msg = Message(client = Client.global, data = msgObject)
                             val attachmentObj = JsonObject()
                             attachmentObj.addProperty("id", "new_image")
-                            attachmentObj.addProperty("filename",file.absolutePath)
+                            attachmentObj.addProperty("filename", file.absolutePath)
                             val attachment = MessageAttachment(Client.global, attachmentObj)
-                            msg.attachments["new_attachment"]=attachment
+                            msg.attachments["new_attachment"] = attachment
                             mMsgList.add(msg)
-                            msgListAdapter.notifyItemInserted(mMsgList.size-1)
-                            mLayoutManager.scrollToPosition(mMsgList.size-1)
-                            uploadFile(file,msg)
+                            msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                            mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                            uploadFile(file, msg)
                         }
                     }
                 }
@@ -597,10 +610,10 @@ class ChannelPanelFragment : Fragment() {
         }
     }
 
-    private fun uploadFile(file: File,msg:Message) {
+    private fun uploadFile(file: File, msg: Message) {
         val requestFile = file.asRequestBody()
         val requestBody =
-            "{\"content\":null,\"nonce\":\"${SnowFlakesGenerator(1).nextId()}\"}".toRequestBody()
+            "{\"content\":null,\"nonce\":\"${msg.nonce}\"}".toRequestBody()
         val map = mutableMapOf<String, RequestBody>()
         map["payload_json"] = requestBody
         val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
@@ -608,9 +621,6 @@ class ChannelPanelFragment : Fragment() {
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            val index = mMsgList.indexOf(msg)
-            mMsgList.remove(msg)
-            msgListAdapter.notifyItemRemoved(index)
         }
     }
 }
