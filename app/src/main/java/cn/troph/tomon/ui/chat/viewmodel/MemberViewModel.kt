@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.structures.Role
 import cn.troph.tomon.core.structures.TextChannel
@@ -23,8 +24,6 @@ class MemberViewModel : ViewModel() {
                 memberLiveData.notifyObserver()
             }
         }
-
     }
-
 
 }
