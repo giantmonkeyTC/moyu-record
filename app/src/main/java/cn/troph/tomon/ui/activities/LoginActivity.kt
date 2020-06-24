@@ -146,8 +146,8 @@ class LoginActivity : AppCompatActivity() {
             intent,
             ActivityOptions.makeCustomAnimation(
                 this,
-                android.R.anim.bounce_interpolator,
-                android.R.anim.slide_out_right
+                R.animator.bottom_up_anim,
+                R.animator.bottom_up_anim
             ).toBundle()
         )
         finish()
