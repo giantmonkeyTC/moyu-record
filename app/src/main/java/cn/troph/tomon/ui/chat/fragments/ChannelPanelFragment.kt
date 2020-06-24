@@ -110,7 +110,7 @@ class ChannelPanelFragment : Fragment() {
                     msgViewModel.loadTextChannelMessage(value)
                 }
                 Client.global.preferences.edit {
-                    putString(LAST_CHANNEL_ID, channelId)
+                    putString(LAST_CHANNEL_ID, value)
                 }
             }
         }
@@ -139,7 +139,6 @@ class ChannelPanelFragment : Fragment() {
             }
         })
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -152,7 +151,12 @@ class ChannelPanelFragment : Fragment() {
             }
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                channelId = it.channelId
+                if (it.channelId == null) {
+                    channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+                } else {
+                    channelId = it.channelId
+                }
+
             }
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
@@ -418,13 +422,19 @@ class ChannelPanelFragment : Fragment() {
                     removeReac.message?.let {
                         if (it.id == value.id) {
                             indexToReplace = index
-                            value.reactions.remove(removeReac.id)
+                            val updateReaction = value.reactions[removeReac.id]
+                            updateReaction?.let {
+                                if (it.count == 0) {
+                                    value.reactions.remove(removeReac.id)
+                                } else {
+                                    value.reactions[removeReac.id] = it
+                                }
+                            }
                         }
                     }
                 }
                 msgListAdapter.notifyItemChanged(indexToReplace)
             }
-
         })
 
         //delete messsage
@@ -459,27 +469,26 @@ class ChannelPanelFragment : Fragment() {
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
             }
         })
+    }
 
-        val lastChannelID = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
-        if (lastChannelID == null) {
-            for (guild in Client.global.guilds) {
-                for ((index, value) in guild.channels.withIndex()) {
-                    if (index == 0) {
-                        AppState.global.channelSelection.value =
-                            ChannelSelection(guild.id, value.id)
-                        break
-                    }
-                }
-                break
-            }
-
-        } else {
-            AppState.global.channelSelection.value = ChannelSelection(
-                null,
-                lastChannelID
-            )
-        }
-
+    override fun onResume() {
+        super.onResume()
+//        val lastChannelID = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+//        if (lastChannelID == null) {
+//            for (guild in Client.global.guilds) {
+//                for ((index, value) in guild.channels.withIndex()) {
+//                    if (index == 0) {
+//                        AppState.global.channelSelection.value =
+//                            ChannelSelection(guild.id, value.id)
+//                        break
+//                    }
+//                }
+//                break
+//            }
+//
+//        } else {
+//            AppState.global.channelSelection.value = ChannelSelection(null, lastChannelID)
+//        }
     }
 
     private fun loadEmoji() {

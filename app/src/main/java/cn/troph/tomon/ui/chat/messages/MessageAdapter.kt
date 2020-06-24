@@ -231,8 +231,6 @@ class MessageAdapter(
                     holder.itemView.user_info_box_link_image.visibility = View.GONE
                 }
 
-
-
                 holder.itemView.chat_iv.setOnLongClickListener {
                     callBottomSheet(holder, 2)
                     true
