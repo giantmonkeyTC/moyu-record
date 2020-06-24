@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
@@ -237,7 +238,19 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    Glide.with(holder.itemView).load(item.url+"?x-oss-process=image/resize,p_20").placeholder(R.drawable.loadinglogo).transition(DrawableTransitionOptions.withCrossFade(500)).into(holder.itemView.chat_iv)
+                    if (!item.url.isNullOrEmpty()) {
+                        Glide.with(holder.itemView)
+                            .load(item.url + "?x-oss-process=image/resize,p_20")
+                            .placeholder(R.drawable.loadinglogo)
+                            .transition(DrawableTransitionOptions.withCrossFade(500))
+                            .into(holder.itemView.chat_iv)
+                    } else {
+                        Glide.with(holder.itemView).load(item.fileName)
+                            .placeholder(R.drawable.loadinglogo)
+                            .transition(DrawableTransitionOptions.withCrossFade(500))
+                            .into(holder.itemView.chat_iv)
+                    }
+
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {
