@@ -3,10 +3,8 @@ package cn.troph.tomon.ui.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
+import android.transition.TransitionInflater
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -96,7 +94,7 @@ class ChatActivity : AppCompatActivity() {
 
 
     private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
-        if(view?.id == R.id.btn_message_send){
+        if (view?.id == R.id.btn_message_send) {
             return false
         }
         if (view != null && (view is EditText || view is EmojiEditText)) {

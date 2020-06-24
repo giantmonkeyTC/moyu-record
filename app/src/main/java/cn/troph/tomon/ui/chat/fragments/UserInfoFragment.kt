@@ -1,5 +1,8 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.animation.AnimatorInflater
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.ActivityOptions
 import android.app.Dialog
 import android.content.Intent
@@ -7,6 +10,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.addListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
@@ -23,6 +27,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
     private val mUserInfoVM: UserInfoViewModel by viewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         mUserInfoVM.loadUserInfo()
         val bottomSheet = super.onCreateDialog(savedInstanceState)
@@ -31,6 +36,16 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
+//        val appbarAnimator =
+//            AnimatorInflater.loadAnimator(requireContext(), R.animator.user_info_appbar_anim)
+//
+//        appbarAnimator.addListener {
+//            ValueAnimator.AnimatorUpdateListener { animation ->
+//                if (animation != null) {
+//                    appBarLayout.y = animation.animatedValue as Float
+//                }
+//            }
+//        }
         bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
         extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
@@ -117,8 +132,8 @@ class UserInfoFragment : BottomSheetDialogFragment() {
             intent,
             ActivityOptions.makeCustomAnimation(
                 requireContext(),
-                android.R.anim.bounce_interpolator,
-                android.R.anim.slide_out_right
+                R.animator.top_to_bottom_anim,
+                R.animator.top_to_bottom_anim
             ).toBundle()
         )
         requireActivity().finish()
