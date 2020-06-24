@@ -240,7 +240,7 @@ class MessageAdapter(
                 for (item in messageList[position].attachments.values) {
                     if (!item.url.isNullOrEmpty()) {
                         Glide.with(holder.itemView)
-                            .load(item.url + "?x-oss-process=image/resize,p_20")
+                            .load(item.url + "?x-oss-process=image/resize,p_50")
                             .placeholder(R.drawable.loadinglogo)
                             .transition(DrawableTransitionOptions.withCrossFade(500))
                             .into(holder.itemView.chat_iv)
