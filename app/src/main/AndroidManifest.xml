@@ -56,6 +56,8 @@
             android:name=".ui.activities.ImagePreviewActivity"
             android:label="ImagePreviewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <meta-data android:name="io.sentry.dsn" android:value="https://8860606e52db4bfd873cb672dfb6489d@o374408.ingest.sentry.io/5289149" />
+        <meta-data android:name="io.sentry.auto-init" android:value="true" />
     </application>
 
 </manifest>

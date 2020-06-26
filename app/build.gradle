@@ -12,6 +12,12 @@ apply plugin: 'com.google.gms.google-services'
 
 apply plugin: 'com.google.firebase.crashlytics'
 
+apply plugin: 'io.sentry.android.gradle'
+
+repositories {
+    jcenter()
+}
+
 android {
     compileSdkVersion 29
     compileOptions {
@@ -133,6 +139,7 @@ dependencies {
 
     // Add the Firebase Crashlytics SDK.
     implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
+    implementation 'io.sentry:sentry-android:2.1.7'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
