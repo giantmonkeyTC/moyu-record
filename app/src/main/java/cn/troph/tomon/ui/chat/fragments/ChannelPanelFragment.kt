@@ -196,27 +196,28 @@ class ChannelPanelFragment : Fragment() {
             if (!AppState.global.updateEnabled.value.flag) {
                 (Client.global.channels[channelId
                     ?: ""] as TextChannelBase).messages.create(textToSend)
-                    .observeOn(AndroidSchedulers.mainThread()).doOnError { error -> println(error) }
-                    .subscribe {
-                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
-                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ _ -> mLayoutManager.scrollToPosition(mMsgList.size - 1) }
+                        , { error ->
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        })
             } else {
                 message!!.update(textToSend)
-                    .observeOn(AndroidSchedulers.mainThread()).doOnError { error ->
-                        println(
-                            error
-                        )
-                    }.subscribe {
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({ msg ->
                         AppState.global.updateEnabled.value =
                             UpdateEnabled(flag = false)
                         for ((index, value) in mMsgList.withIndex()) {
-                            if (value.id == it.id) {
+                            if (value.id == msg.id) {
                                 msgListAdapter.notifyItemChanged(index)
                                 break
                             }
                         }
                         mLayoutManager.scrollToPosition(mMsgList.size - 1)
-                    }
+                    }, { error ->
+                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                            .show()
+                    })
             }
 
         }
