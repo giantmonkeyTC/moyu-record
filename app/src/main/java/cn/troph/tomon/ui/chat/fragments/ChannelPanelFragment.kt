@@ -191,7 +191,7 @@ class ChannelPanelFragment : Fragment() {
             if (channelId.isNullOrEmpty()) {
                 return@setOnClickListener
             }
-            val textToSend = editText.text.toString()
+            val textToSend = editText.text.toString().trim()
             editText.text = null
             if (!AppState.global.updateEnabled.value.flag) {
                 (Client.global.channels[channelId
@@ -339,6 +339,7 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
+
                                 }
                                 1 -> {
                                     builder.setCheckPermission(true).setShowVideos(true)
@@ -349,6 +350,7 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
+
                                 }
                                 2 -> {
                                     builder.setCheckPermission(true).setShowFiles(true)
@@ -359,9 +361,11 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
+
                                 }
                             }
                             startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
+                            mBottomSheet.dismiss(true)
                         }
                     }).also(BottomSheet::show)
         }
@@ -636,8 +640,14 @@ class ChannelPanelFragment : Fragment() {
         (Client.global.channels[channelId!!] as TextChannelBase).messages.uploadAttachments(
             partMap = map,
             files = body
-        ).observeOn(AndroidSchedulers.mainThread()).subscribe {
-        }
+        ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+            Toast.makeText(requireContext(), R.string.send_success, Toast.LENGTH_SHORT).show()
+        }, {
+            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
+            val index = mMsgList.indexOf(msg)
+            mMsgList.removeAt(index)
+            msgListAdapter.notifyItemRemoved(index)
+        })
     }
 }
 
