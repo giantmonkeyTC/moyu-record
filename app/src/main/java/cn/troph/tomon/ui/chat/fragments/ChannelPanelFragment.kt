@@ -383,6 +383,7 @@ class ChannelPanelFragment : Fragment() {
             val event = it
             if (it.message.channelId == channelId) {
                 val msg = mMsgList.find {
+                    Logger.d(it.id)
                     val localMsg = it
                     event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
                 }
