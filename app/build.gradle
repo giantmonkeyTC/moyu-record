@@ -8,10 +8,6 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
-apply plugin: 'com.google.gms.google-services'
-
-apply plugin: 'com.google.firebase.crashlytics'
-
 apply plugin: 'io.sentry.android.gradle'
 
 repositories {
@@ -133,12 +129,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.4.1'
     implementation 'org.apache.directory.studio:org.apache.commons.io:2.4'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
-    implementation 'com.github.guilhe:keyboard-state-events:1.0.3'
-    // Recommended: Add the Firebase SDK for Google Analytics.
-    implementation 'com.google.firebase:firebase-analytics-ktx:17.4.3'
-
-    // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
+    implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2'
     implementation 'io.sentry:sentry-android:2.1.7'
 
     testImplementation 'junit:junit:4.12'

@@ -13,18 +13,24 @@
 
         <cn.troph.tomon.ui.widgets.UserAvatar
             android:id="@+id/message_avatar"
+            android:layout_marginTop="16dp"
             android:layout_width="30dp"
             android:layout_height="30dp" />
 
         <TextView
+            android:layout_marginTop="8dp"
             android:id="@+id/widget_message_author_name_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:textSize="14sp"
+            android:textStyle="bold"
             android:layout_marginStart="10dp"
             android:textColor="@color/white" />
 
         <TextView
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
             android:id="@+id/widget_message_timestamp_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -37,8 +43,9 @@
         android:id="@+id/widget_message_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="14sp"
         android:layout_marginStart="40dp"
-        android:textColor="@color/white" />
+        android:textColor="#DDFFFFFF" />
 
     <include
         layout="@layout/item_reaction_view"

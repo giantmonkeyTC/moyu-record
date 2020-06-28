@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
+import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
@@ -60,6 +61,9 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         }
 
         view.profile_layout.user_sign_out.setOnClickListener {
+            Client.global.preferences.edit {
+                putString(LAST_CHANNEL_ID, null)
+            }
             Client.global.me.logout()
             gotoEntryOption()
         }

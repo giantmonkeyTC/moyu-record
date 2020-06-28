@@ -16,12 +16,16 @@
 
         <cn.troph.tomon.ui.widgets.UserAvatar
             android:id="@+id/message_avatar_invite"
+            android:layout_marginTop="16dp"
             android:layout_width="30dp"
             android:layout_height="30dp" />
 
         <TextView
             android:id="@+id/widget_message_author_name_text_invite"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
             android:layout_width="wrap_content"
+            android:textStyle="bold"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
@@ -30,6 +34,7 @@
         <TextView
             android:id="@+id/widget_message_timestamp_text_invite"
             android:layout_width="wrap_content"
+            android:textSize="14sp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
@@ -43,7 +48,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/user_info_box_link"
         android:layout_marginStart="40dp"
-        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textColor="#DDFFFFFF"
         android:textColorLink="@android:color/holo_blue_dark"
         app:layout_constraintTop_toBottomOf="@+id/user_info_box_link" />
 
