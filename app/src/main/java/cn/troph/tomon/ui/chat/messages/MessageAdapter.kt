@@ -149,7 +149,7 @@ class MessageAdapter(
                 showReaction(holder, msg)
             }
             1 -> {
-                if (position == 1 || (position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
                         messageList[position].timestamp,
                         messageList[position - 1].timestamp
                     ))
@@ -166,7 +166,6 @@ class MessageAdapter(
                 } else {
                     holder.itemView.user_info_box_link_file.visibility = View.GONE
                 }
-
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 1)
                     true
@@ -211,10 +210,10 @@ class MessageAdapter(
                 }
             }
             2 -> {
-                if ((position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
                         messageList[position].timestamp,
                         messageList[position - 1].timestamp
-                    )) || position == 0 || position == 1
+                    ))
                 ) {
                     holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
@@ -267,7 +266,7 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             4 -> {
-                if (position == 1 || (position - 1 >= 1 && messageList[position - 1].authorId != messageList[position].authorId && isMoreThanFiveMins(
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
                         messageList[position].timestamp,
                         messageList[position - 1].timestamp
                     ))
