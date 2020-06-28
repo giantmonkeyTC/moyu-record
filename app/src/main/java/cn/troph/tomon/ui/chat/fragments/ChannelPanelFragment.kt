@@ -102,6 +102,9 @@ class ChannelPanelFragment : Fragment() {
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
+                    val count = mMsgList.size
+                    mMsgList.clear()
+                    msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadDmChannelMessage(value)
                 } else if (channel is TextChannel) {
                     val count = mMsgList.size
