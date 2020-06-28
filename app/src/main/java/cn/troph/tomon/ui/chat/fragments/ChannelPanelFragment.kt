@@ -47,8 +47,6 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
-import com.github.guilhe.keyboardevents.KeyboardState
-import com.github.guilhe.keyboardevents.KeyboardStateLiveData
 
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
@@ -59,6 +57,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -187,6 +187,21 @@ class ChannelPanelFragment : Fragment() {
                 }
             }
         }
+
+        KeyboardVisibilityEvent.setEventListener(requireActivity(),
+            object : KeyboardVisibilityEventListener {
+                override fun onVisibilityChanged(isOpen: Boolean) {
+                    if (isOpen) {
+                        if (section_header_layout.isVisible) {
+                            section_header_layout.visibility =
+                                View.GONE
+                            bottom_emoji_rr.visibility = View.GONE
+                        }
+                    }
+                }
+            })
+
+
         var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
