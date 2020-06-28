@@ -28,6 +28,7 @@ class AppState {
     val eventBus: RxBus = RxBus()
     val channelSelection: Variable<ChannelSelection> = Variable(
         ChannelSelection(
+            guildId = Client.global.preferences.getString("last_guild_id", null),
             channelId = Client.global.preferences.getString(
                 "last_channel_id",
                 null

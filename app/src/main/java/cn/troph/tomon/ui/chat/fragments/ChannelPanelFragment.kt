@@ -72,6 +72,7 @@ import java.time.LocalDateTime
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
+const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : Fragment() {
 
@@ -102,16 +103,21 @@ class ChannelPanelFragment : Fragment() {
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
+                    Client.global.preferences.edit {
+                        putString(LAST_CHANNEL_ID, value)
+                    }
                     msgViewModel.loadDmChannelMessage(value)
                 } else if (channel is TextChannel) {
+                    Client.global.preferences.edit {
+                        putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
+                        putString(LAST_CHANNEL_ID, value)
+                    }
                     val count = mMsgList.size
                     mMsgList.clear()
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
                 }
-                Client.global.preferences.edit {
-                    putString(LAST_CHANNEL_ID, value)
-                }
+
             }
         }
 
