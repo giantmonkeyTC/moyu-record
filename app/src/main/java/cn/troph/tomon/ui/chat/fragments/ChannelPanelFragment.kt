@@ -108,6 +108,10 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.clear()
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
+                    if (channel.isPrivate)
+                        editText.hint = "你没有此频道发言权限"
+                    else
+                        editText.hint = getString(R.string.emoji_et_hint)
                 }
                 Client.global.preferences.edit {
                     putString(LAST_CHANNEL_ID, value)
@@ -173,6 +177,7 @@ class ChannelPanelFragment : Fragment() {
                 shimmer_view_container.stopShimmer()
             }
         })
+
         editText.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
                 if (section_header_layout.isVisible) {
