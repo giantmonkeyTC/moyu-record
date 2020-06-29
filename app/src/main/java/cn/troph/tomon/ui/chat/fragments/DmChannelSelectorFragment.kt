@@ -16,6 +16,7 @@ import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.utils.BadgeUtil
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.DmChannelViewModel
 import com.orhanobut.logger.Logger
@@ -83,8 +84,6 @@ class DmChannelSelectorFragment : Fragment() {
                     }
                 }
             }
-
         })
-
     }
 }

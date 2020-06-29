@@ -17,6 +17,7 @@ import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.events.ChannelSyncEvent
 import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.utils.BadgeUtil
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
@@ -33,7 +34,6 @@ class GuildSelectorFragment : Fragment() {
     private val mGuildVM: GuildViewModel by viewModels()
     private lateinit var mAdapter: GuildSelectorAdapter
     val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
-    private var totalUnread = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,8 +83,8 @@ class GuildSelectorFragment : Fragment() {
                 if (event.message.guild == null || event.message.guild?.id == "@me") {
                     for ((index, value) in Client.global.dmChannels.withIndex()) {
                         if (value.id == event.message.channelId) {
-                            totalUnread++
-                            updateRedDot(totalUnread)
+                            BadgeUtil.increaseChannelUnread(value.id)
+                            updateRedDot(BadgeUtil.getTotalUnread())
                         }
                     }
                 }
@@ -108,8 +108,8 @@ class GuildSelectorFragment : Fragment() {
                 if (event.message.guild == null || event.message.guild?.id == "@me") {
                     for ((index, value) in Client.global.dmChannels.withIndex()) {
                         if (value.id == event.message.channelId) {
-                            totalUnread -= value.unReadCount
-                            updateRedDot(totalUnread)
+                            BadgeUtil.clearChannelReadCount(value.id)
+                            updateRedDot(BadgeUtil.getTotalUnread())
                         }
                     }
                 }
@@ -143,13 +143,12 @@ class GuildSelectorFragment : Fragment() {
                             event.message.guild!!
                         )
                     )
-
             })
 
         Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
             if (it.channel is DmChannel) {
-                totalUnread += it.channel.unReadCount
-                updateRedDot(totalUnread)
+                BadgeUtil.setChannelUnreadCount(it.channel.id, it.channel.unReadCount)
+                updateRedDot(BadgeUtil.getTotalUnread())
             }
         })
 
@@ -167,10 +166,13 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
         }
+
+        var totalUnread = 0
         for (item in Client.global.dmChannels) {
             totalUnread += item.unReadCount
+            BadgeUtil.setChannelUnreadCount(item.id, item.unReadCount)
         }
-        updateRedDot(totalUnread)
+        updateRedDot(BadgeUtil.getTotalUnread())
     }
 
     private fun updateRedDot(number: Int) {
