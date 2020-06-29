@@ -48,7 +48,7 @@ class RegisterActivity : AppCompatActivity() {
             val code = register_confirmation_code.text.toString()
             val invite = register_input_invite_code.text.toString()
             val unionId = register_input_union_id.text.toString()
-            if (!Validator.isFullName(username))
+            if (!Validator.isUserName(username))
                 GeneralSnackbar.make(
                     GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                     "用户名限制",
