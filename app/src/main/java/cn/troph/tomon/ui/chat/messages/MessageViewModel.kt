@@ -19,7 +19,9 @@ fun <T> MutableLiveData<T>.notifyObserver() {
 }
 
 class MessageViewModel : ViewModel() {
+
     private val messageLiveData = MutableLiveData<MutableList<Message>>()
+
     private val messageMoreLiveData = MutableLiveData<MutableList<Message>>()
 
     val messageLoadingLiveData = MutableLiveData<Boolean>()
@@ -37,9 +39,11 @@ class MessageViewModel : ViewModel() {
         val channel = Client.global.channels[channelId] as TextChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                Consumer {
+                {
                     messageLoadingLiveData.value = false
                     messageLiveData.value = it.toMutableList()
+                }, {
+                    messageLoadingLiveData.value = false
                 })
     }
 
@@ -47,10 +51,12 @@ class MessageViewModel : ViewModel() {
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribe {
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({
                 messageLoadingLiveData.value = false
                 messageLiveData.value = it.toMutableList()
-            }
+            }, {
+                messageLoadingLiveData.value = false
+            })
     }
 
     fun loadOldMessage(channelId: String, beforeId: String) {
@@ -63,8 +69,10 @@ class MessageViewModel : ViewModel() {
                 )
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                        Consumer {
+                        {
                             messageMoreLiveData.value = it.toMutableList()
+                        }, {
+                            Logger.d(it.message)
                         }
                     )
                 ChannelType.TEXT -> (channel as TextChannel).messages.fetch(
@@ -73,8 +81,10 @@ class MessageViewModel : ViewModel() {
                 )
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                        Consumer {
+                        {
                             messageMoreLiveData.value = it.toMutableList()
+                        }, {
+                            Logger.d(it.message)
                         }
                     )
 
