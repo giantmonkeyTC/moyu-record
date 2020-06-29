@@ -28,6 +28,7 @@ import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.CustomTarget
@@ -36,6 +37,7 @@ import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -170,10 +172,10 @@ class MessageAdapter(
                     holder.itemView.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
-                            Toast.makeText(
-                                holder.itemView.context,
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(holder.itemView)!!,
                                 "文件保存至:${holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath}",
-                                Toast.LENGTH_SHORT
+                                Snackbar.LENGTH_SHORT
                             ).show()
                             PRDownloader.download(
                                 file.url,
@@ -182,18 +184,18 @@ class MessageAdapter(
                             )
                                 .build().start(object : OnDownloadListener {
                                     override fun onDownloadComplete() {
-                                        Toast.makeText(
-                                            holder.itemView.context,
+                                        GeneralSnackbar.make(
+                                            GeneralSnackbar.findSuitableParent(holder.itemView)!!,
                                             "下载完成",
-                                            Toast.LENGTH_SHORT
+                                            Snackbar.LENGTH_SHORT
                                         ).show()
                                     }
 
                                     override fun onError(error: Error?) {
-                                        Toast.makeText(
-                                            holder.itemView.context,
-                                            "下载失败:${error?.serverErrorMessage}",
-                                            Toast.LENGTH_SHORT
+                                        GeneralSnackbar.make(
+                                            GeneralSnackbar.findSuitableParent(holder.itemView)!!,
+                                            "下载失败",
+                                            Snackbar.LENGTH_SHORT
                                         ).show()
                                     }
                                 })
@@ -289,8 +291,11 @@ class MessageAdapter(
                             {
                                 notifyItemChanged(holder.adapterPosition)
                             }, {
-                                Toast.makeText(holder.itemView.context, "加入失败", Toast.LENGTH_SHORT)
-                                    .show()
+                                GeneralSnackbar.make(
+                                    GeneralSnackbar.findSuitableParent(holder.itemView)!!,
+                                    "加入失败",
+                                    Snackbar.LENGTH_SHORT
+                                )
                             })
                 }
 
