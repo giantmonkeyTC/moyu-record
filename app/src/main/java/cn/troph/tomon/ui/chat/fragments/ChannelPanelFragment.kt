@@ -111,6 +111,7 @@ class ChannelPanelFragment : Fragment() {
                     }
                     msgViewModel.loadDmChannelMessage(value)
                     editText.hint = getString(R.string.emoji_et_hint)
+                    btn_message_send.visibility = View.VISIBLE
                 } else if (channel is TextChannel) {
                     Client.global.preferences.edit {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
@@ -120,10 +121,13 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.clear()
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
-                    if (channel.isPrivate)
+                    if (channel.isPrivate) {
                         editText.hint = "你没有此频道发言权限"
-                    else
+                        btn_message_send.visibility = View.GONE
+                    } else {
                         editText.hint = getString(R.string.emoji_et_hint)
+                        btn_message_send.visibility = View.VISIBLE
+                    }
                 }
 
             }
@@ -227,7 +231,11 @@ class ChannelPanelFragment : Fragment() {
                 (Client.global.channels[channelId
                     ?: ""] as TextChannelBase).messages.create(textToSend)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ -> mLayoutManager.scrollToPosition(mMsgList.size - 1) }
+                    .subscribe({ _ ->
+                        mHandler.postDelayed({
+                            mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                        }, 300)
+                    }
                         , { error ->
                             Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
                                 .show()

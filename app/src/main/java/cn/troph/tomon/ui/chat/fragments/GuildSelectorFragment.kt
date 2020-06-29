@@ -166,6 +166,7 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
         }
+
         var totalUnread = 0
         for (item in Client.global.dmChannels) {
             totalUnread += item.unReadCount

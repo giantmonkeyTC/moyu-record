@@ -124,14 +124,14 @@ class MessageCollection(client: Client, val channel: Channel) :
         }
     }
 
-    fun create(content: String): Observable<Message> {
+    fun create(content: String): Observable<Unit> {
         return client.rest.messageService.createMessage(
             channel.id,
             MessageService.CreateMessageRequest(content),
             client.auth
         )
             .subscribeOn(Schedulers.io()).map {
-                client.actions.messageCreate(it)
+
             }
     }
 
