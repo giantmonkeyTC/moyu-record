@@ -43,10 +43,12 @@ import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.states.UpdateEnabled
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
 
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.android.material.snackbar.Snackbar
 
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
@@ -225,8 +227,11 @@ class ChannelPanelFragment : Fragment() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ -> mLayoutManager.scrollToPosition(mMsgList.size - 1) }
                         , { error ->
-                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                .show()
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(btn_message_send)!!,
+                                requireContext().resources.getText(R.string.send_fail).toString(),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
                         })
             } else {
                 message!!.update(textToSend)
@@ -241,8 +246,11 @@ class ChannelPanelFragment : Fragment() {
                         }
                         mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }, { error ->
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                        GeneralSnackbar.make(
+                            GeneralSnackbar.findSuitableParent(btn_message_send)!!,
+                            requireContext().resources.getText(R.string.send_fail).toString(),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     })
             }
 
@@ -413,7 +421,7 @@ class ChannelPanelFragment : Fragment() {
             val event = it
             if (it.message.channelId == channelId) {
                 val msg = mMsgList.find {
-                    Logger.d(it.id)
+
                     val localMsg = it
                     event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
                 }
