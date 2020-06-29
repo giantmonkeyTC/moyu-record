@@ -84,6 +84,7 @@ class ChatActivity : AppCompatActivity() {
             }
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
+            image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
         }
     }
 

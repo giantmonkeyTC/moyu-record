@@ -101,6 +101,7 @@ class ChannelPanelFragment : Fragment() {
             val changed = field != value
             field = value
             if (changed && value != null) {
+                editText.text = null
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
                     val count = mMsgList.size
@@ -222,10 +223,10 @@ class ChannelPanelFragment : Fragment() {
                 return@setOnClickListener
             }
             longLastClickTime = SystemClock.elapsedRealtime()
-            if (channelId.isNullOrEmpty()) {
+            if (channelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
             }
-            val textToSend = editText.text.toString().trim()
+            val textToSend = editText.text.toString()
             editText.text = null
             if (!AppState.global.updateEnabled.value.flag) {
                 (Client.global.channels[channelId
