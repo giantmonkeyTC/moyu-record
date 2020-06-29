@@ -49,6 +49,7 @@ import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
@@ -182,6 +183,17 @@ class ChannelPanelFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
 
+    private fun createEmptyMsg(content: String): Message {
+        val msgObject = JsonObject()
+        msgObject.addProperty("id", "")
+        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+        msgObject.addProperty("channelId", channelId)
+        msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+        msgObject.addProperty("authorId", Client.global.me.id)
+        msgObject.addProperty("content", content)
+        return Message(client = Client.global, data = msgObject)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -230,9 +242,16 @@ class ChannelPanelFragment : Fragment() {
             }
             val textToSend = editText.text.toString()
             editText.text = null
+
+
+
             if (!AppState.global.updateEnabled.value.flag) {
+                val emptyMsg = createEmptyMsg(textToSend)
+                mMsgList.add(emptyMsg)
+                msgListAdapter.notifyItemInserted(mMsgList.size-1)
+                mLayoutManager.scrollToPosition(msgListAdapter.itemCount-1)
                 (Client.global.channels[channelId
-                    ?: ""] as TextChannelBase).messages.create(textToSend)
+                    ?: ""] as TextChannelBase).messages.create(textToSend,nonce = emptyMsg.nonce.toString())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ ->
                         mHandler.postDelayed({
