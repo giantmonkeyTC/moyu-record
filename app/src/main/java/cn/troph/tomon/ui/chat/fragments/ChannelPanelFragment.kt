@@ -189,7 +189,7 @@ class ChannelPanelFragment : Fragment() {
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
         msgObject.addProperty("channelId", channelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().toString())
-        msgObject.addProperty("authorId", Client.global.me.id)
+        msgObject.addProperty("authorId", Client.global.users[Client.global.me.id]?.id)
         msgObject.addProperty("content", content)
         return Message(client = Client.global, data = msgObject)
     }
