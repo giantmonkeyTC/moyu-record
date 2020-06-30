@@ -5,19 +5,38 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.ConnectivityManager
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import com.androidadvance.topsnackbar.TSnackbar
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import java.lang.NullPointerException
 
 class NetworkChangeReceiver() : BroadcastReceiver() {
-    lateinit var snackbar: TSnackbar
+    lateinit var mView: View
+    lateinit var old: TSnackbar
+    lateinit var new: TSnackbar
+
     override fun onReceive(context: Context?, intent: Intent?) {
+        new = TSnackbar.make(
+            mView,
+            "Ground Control to Major Tom",
+            TSnackbar.LENGTH_INDEFINITE
+        ).apply {
+            val view = this.view
+            view.setBackgroundColor(Color.parseColor("#FA8072"))
+            val text: TextView =
+                view.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
+            text.setTextColor(Color.WHITE)
+        }
         try {
-            if (isNetworkAvailable(context)) {
-                snackbar.dismiss()
+            if (!isNetworkAvailable(context)) {
+                if (old.isShown)
+                    old.dismiss()
+                new.show()
+                old = new
             } else {
-                snackbar.show()
+                old.dismiss()
             }
         } catch (
             e: NullPointerException
@@ -26,8 +45,19 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
         }
     }
 
-    fun setTopSnackbar(snackbar: TSnackbar) {
-        this.snackbar = snackbar
+    fun setTopView(view: View) {
+        this.mView = view
+        old = TSnackbar.make(
+            mView,
+            "Ground Control to Major Tom",
+            TSnackbar.LENGTH_INDEFINITE
+        ).apply {
+            val view = this.view
+            view.setBackgroundColor(Color.parseColor("#FA8072"))
+            val text: TextView =
+                view.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
+            text.setTextColor(Color.WHITE)
+        }
     }
 
     private fun isNetworkAvailable(context: Context?): Boolean {

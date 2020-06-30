@@ -203,20 +203,6 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        networkChangeReceiver.snackbar =
-            TSnackbar.make(
-                btn_message_send,
-                "Ground Control to Major Tom",
-                TSnackbar.LENGTH_INDEFINITE
-            ).apply {
-                val view = this.view
-                view.setBackgroundColor(Color.parseColor("#FA8072"))
-                val text: TextView =
-                    view.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
-                text.setTextColor(Color.WHITE)
-            }
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
-        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
@@ -249,6 +235,10 @@ class ChannelPanelFragment : Fragment() {
                     }
                 }
             })
+
+        networkChangeReceiver.setTopView(btn_message_send)
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
 
 
         var longLastClickTime = 0L
@@ -345,7 +335,6 @@ class ChannelPanelFragment : Fragment() {
                                                 Logger.d(it.message)
                                             })
                                     }
-
                                 }
                             }
                         }
