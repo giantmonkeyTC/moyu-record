@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -34,6 +35,7 @@ class GuildSelectorFragment : Fragment() {
     private val mGuildVM: GuildViewModel by viewModels()
     private lateinit var mAdapter: GuildSelectorAdapter
     val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
+    private val mHandler = Handler()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

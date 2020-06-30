@@ -43,7 +43,6 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         }
-        Thread.sleep(1000)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
