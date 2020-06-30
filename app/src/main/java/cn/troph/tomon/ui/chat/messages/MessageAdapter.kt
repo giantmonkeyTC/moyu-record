@@ -384,7 +384,12 @@ class MessageAdapter(
     ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
-        itemView.widget_message_author_name_text.text = message.author?.name ?: "T🐱"
+        if (message.author == null) {
+            itemView.widget_message_author_name_text.text = "T🐱"
+        } else {
+            itemView.widget_message_author_name_text.text = message.author?.name
+        }
+
 
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
                 message.content!!

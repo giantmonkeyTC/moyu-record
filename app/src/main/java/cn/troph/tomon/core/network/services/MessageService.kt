@@ -28,7 +28,8 @@ interface MessageService {
     ): Observable<JsonObject>
 
     data class CreateMessageRequest(
-        var content: String
+        var content: String,
+        var nonce:String
     )
 
     @POST("channels/{channelId}/messages")
