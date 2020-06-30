@@ -19,15 +19,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
     <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btn_join_"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:id="@+id/btn_join_guild"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="13dp"
         android:layout_marginEnd="13dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/ic_dm_entry"
+        android:background="@drawable/ic_join_guild"
         android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_dm_channel_entry"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -71,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@id/btn_dm_channel_entry"
+        app:layout_constraintBottom_toTopOf="@id/btn_join_guild"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

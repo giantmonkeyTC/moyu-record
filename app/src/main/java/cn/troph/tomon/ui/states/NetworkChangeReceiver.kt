@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import cn.troph.tomon.core.Client
 import com.androidadvance.topsnackbar.TSnackbar
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import java.lang.NullPointerException
@@ -31,11 +32,13 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
         }
         try {
             if (!isNetworkAvailable(context)) {
+                Client.global.socket.close()
                 if (old.isShown)
                     old.dismiss()
                 new.show()
                 old = new
             } else {
+                Client.global.socket.open()
                 old.dismiss()
             }
         } catch (

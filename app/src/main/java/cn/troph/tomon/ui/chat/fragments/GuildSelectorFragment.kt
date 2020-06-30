@@ -24,10 +24,14 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
+import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.bottom_sheet_guild.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
 class GuildSelectorFragment : Fragment() {
@@ -166,6 +170,9 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
         }
+        btn_join_guild.setOnClickListener {
+            callJoinGuildBottomSheet()
+        }
 
         var totalUnread = 0
         for (item in Client.global.dmChannels) {
@@ -190,10 +197,11 @@ class GuildSelectorFragment : Fragment() {
 
     private fun callJoinGuildBottomSheet() {
         val layoutInflater = LayoutInflater.from(requireContext())
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_join_guild, null)
+        val viewBase = layoutInflater.inflate(R.layout.coordinator_join_guild, null)
+        val view = viewBase.bottom_sheet_join_guild
         val textField = view.findViewById<EditText>(R.id.bs_textfield)
         val dialog = BottomSheetDialog(requireContext())
-        dialog.setContentView(view)
+        dialog.setContentView(viewBase)
         view.cancel.setOnClickListener { dialog.dismiss() }
         view.confirm.setOnClickListener {
             if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))) {
@@ -205,6 +213,11 @@ class GuildSelectorFragment : Fragment() {
                     if (it != null) {
                         val invite = it
                         if (invite.joined) {
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(viewBase)!!,
+                                "你已经在该群组中",
+                                Snackbar.LENGTH_LONG
+                            ).show()
                             textField.setText("")
                         } else {
                             Client.global.guilds.join(

@@ -235,12 +235,9 @@ class ChannelPanelFragment : Fragment() {
                     }
                 }
             })
-
         networkChangeReceiver.setTopView(btn_message_send)
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
         requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
-
-
         var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
