@@ -35,7 +35,6 @@ class GuildSelectorFragment : Fragment() {
     private val mGuildVM: GuildViewModel by viewModels()
     private lateinit var mAdapter: GuildSelectorAdapter
     val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
-    private val mHandler = Handler()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,16 +60,15 @@ class GuildSelectorFragment : Fragment() {
                 })
                 view_guilds.layoutManager = LinearLayoutManager(view.context)
                 view_guilds.adapter = mAdapter
+                it.forEach {
+                    it.updateMention()
+                    it.updateUnread()
+                    mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(it)!!)
+                }
             }
         })
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
-        Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>()
-            .subscribe(Consumer { event ->
-                event.guild?.updateUnread()
-                event.guild?.updateMention()
-                mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(event.guild)!!)
-            })
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
             .subscribe(Consumer { event ->
                 if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
