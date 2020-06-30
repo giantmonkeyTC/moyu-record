@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -42,6 +43,7 @@ import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.alibaba.sdk.android.push.common.util.support.NetworkInfo
@@ -82,6 +84,9 @@ class ChannelPanelFragment : Fragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
+
+    private val intentFilter = IntentFilter()
+    private val networkChangeReceiver = NetworkChangeReceiver()
 
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
@@ -190,9 +195,27 @@ class ChannelPanelFragment : Fragment() {
         return Message(client = Client.global, data = msgObject)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().unregisterReceiver(networkChangeReceiver)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        networkChangeReceiver.snackbar =
+            TSnackbar.make(
+                btn_message_send,
+                "Ground Control to Major Tom",
+                TSnackbar.LENGTH_INDEFINITE
+            ).apply {
+                val view = this.view
+                view.setBackgroundColor(Color.parseColor("#FA8072"))
+                val text: TextView =
+                    view.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
+                text.setTextColor(Color.WHITE)
+            }
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
@@ -377,33 +400,14 @@ class ChannelPanelFragment : Fragment() {
             }, 1000)
         }
 
-
         //消息更新
         btn_update_message_cancel.setOnClickListener {
-            TSnackbar.make(
-                btn_update_message_cancel,
-                "Hello from TSnackBar.",
-                TSnackbar.LENGTH_LONG
-            ).show()
             AppState.global.updateEnabled.value =
                 UpdateEnabled(flag = false)
         }
 
         //选择文件事件
         btn_message_menu.setOnClickListener {
-            TSnackbar.make(
-                btn_update_message_cancel,
-                "Ground Control to Major Tom",
-                TSnackbar.LENGTH_LONG
-            ).apply {
-                val view = this.view
-                view.setBackgroundColor(Color.RED)
-                val textView: TextView =
-                    view.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text) as TextView
-                textView.setTextColor(Color.WHITE)
-                show()
-            }
-
             mBottomSheet =
                 FileBottomSheetFragment(
                     requireActivity(),
