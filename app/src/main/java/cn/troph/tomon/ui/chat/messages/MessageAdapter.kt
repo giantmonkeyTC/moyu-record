@@ -21,6 +21,7 @@ import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
@@ -154,7 +155,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_file.text = "T🐱"
                     }
                     holder.itemView.widget_message_timestamp_text_file.text =
@@ -216,7 +217,7 @@ class MessageAdapter(
 
                     holder.itemView.widget_message_author_name_text_image.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_image.text = "T🐱"
                     }
 
@@ -271,7 +272,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_invite.text = "T🐱"
                     }
                     holder.itemView.widget_message_timestamp_text_invite.text =
@@ -384,7 +385,7 @@ class MessageAdapter(
     ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
-        if (message.author == null) {
+        if (message.type == MessageType.SYSTEM) {
             itemView.widget_message_author_name_text.text = "T🐱"
         } else {
             itemView.widget_message_author_name_text.text = message.author?.name

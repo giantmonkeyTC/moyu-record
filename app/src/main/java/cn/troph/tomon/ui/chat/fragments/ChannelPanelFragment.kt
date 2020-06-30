@@ -189,9 +189,20 @@ class ChannelPanelFragment : Fragment() {
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
         msgObject.addProperty("channelId", channelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().toString())
-        msgObject.addProperty("authorId", Client.global.users[Client.global.me.id]?.id)
+        msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)
-        return Message(client = Client.global, data = msgObject)
+
+        val userObject = JsonObject()
+        userObject.addProperty("id", Client.global.me.id)
+        userObject.addProperty("username", Client.global.me.username)
+        userObject.addProperty("discriminator", Client.global.me.discriminator)
+        userObject.addProperty("name", Client.global.me.name)
+        userObject.addProperty("avatar", Client.global.me.avatar)
+        userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+        msgObject.add("author", userObject)
+
+        val msg = Message(client = Client.global, data = msgObject)
+        return msg
     }
 
 
@@ -627,19 +638,6 @@ class ChannelPanelFragment : Fragment() {
     }
 
 
-    private fun hideKeyboard(activity: Activity) {
-        val imm: InputMethodManager =
-            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(activity)
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -665,6 +663,18 @@ class ChannelPanelFragment : Fragment() {
                             msgObject.addProperty("channelId", channelId)
                             msgObject.addProperty("timestamp", LocalDateTime.now().toString())
                             msgObject.addProperty("authorId", Client.global.me.id)
+
+
+                            val userObject = JsonObject()
+                            userObject.addProperty("id", Client.global.me.id)
+                            userObject.addProperty("username", Client.global.me.username)
+                            userObject.addProperty("discriminator", Client.global.me.discriminator)
+                            userObject.addProperty("name", Client.global.me.name)
+                            userObject.addProperty("avatar", Client.global.me.avatar)
+                            userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+
+                            msgObject.add("author", userObject)
+
                             val msg = Message(client = Client.global, data = msgObject)
                             val attachmentObj = JsonObject()
                             attachmentObj.addProperty("id", "new_image")

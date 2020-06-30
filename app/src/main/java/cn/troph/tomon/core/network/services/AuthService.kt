@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.network.services
 
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.Response
 import retrofit2.http.Body
@@ -9,10 +10,15 @@ import retrofit2.http.POST
 interface AuthService {
 
     data class LoginRequest(
+        @SerializedName("full_name")
         val full_name: String? = null,
+        @SerializedName("email")
         val email: String? = null,
+        @SerializedName("phone")
         val phone: String? = null,
+        @SerializedName("password")
         val password: String? = null,
+        @SerializedName("token")
         val token: String? = null
     )
 
@@ -22,11 +28,17 @@ interface AuthService {
     ): Observable<JsonObject>
 
     data class RegisterRequest(
+        @SerializedName("username")
         val username: String?,
+        @SerializedName("email")
         val email: String?,
+        @SerializedName("phone")
         val phone: String?,
+        @SerializedName("code")
         val code: String?,
+        @SerializedName("password")
         val password: String?,
+        @SerializedName("invite")
         val invite: String?
     )
 
@@ -36,7 +48,9 @@ interface AuthService {
     ): Observable<JsonObject>
 
     data class VerifyRequest(
+        @SerializedName("phone")
         val phone: String?,
+        @SerializedName("type")
         val type: String?
     )
 

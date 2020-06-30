@@ -3,6 +3,7 @@ package cn.troph.tomon.core.network.services
 import cn.troph.tomon.core.structures.DmChannel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -26,9 +27,13 @@ interface ChannelService {
     ): Observable<JsonObject>
 
     data class CreateGuildChannelRequest(
+        @SerializedName("name")
         val name: String,
+        @SerializedName("type")
         val type: Int,
+        @SerializedName("parent_id")
         val parent_id: String?,
+        @SerializedName("default_message_notification")
         val default_message_notifications: Int
     )
 
@@ -40,17 +45,26 @@ interface ChannelService {
     ): Observable<JsonObject>
 
     data class PermissionOverwrites(
+        @SerializedName("id")
         val id: String,
+        @SerializedName("type")
         val type: String,
+        @SerializedName("allow")
         val allow: Int,
+        @SerializedName("deny")
         val deny: Int
     )
 
     data class ModifyChannelRequest(
+        @SerializedName("name")
         val name: String?,
+        @SerializedName("parent_id")
         val parent_id: String?,
+        @SerializedName("topic")
         val topic: String?,
+        @SerializedName("permission_overwrites")
         val permission_overwrites: List<PermissionOverwrites>?,
+        @SerializedName("default_message_notification")
         val default_message_notifications: Int?
     )
 
@@ -68,8 +82,11 @@ interface ChannelService {
     ): Observable<Void>
 
     data class UpsertPermissionOverwritesRequest(
+        @SerializedName("type")
         val type: String?,
+        @SerializedName("allow")
         val allow: Int?,
+        @SerializedName("deny")
         val deny: Int?
     )
 

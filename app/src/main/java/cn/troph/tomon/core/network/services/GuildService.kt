@@ -2,6 +2,7 @@ package cn.troph.tomon.core.network.services
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -17,7 +18,9 @@ interface GuildService {
     ): Observable<JsonObject>;
 
     data class CreateGuildRequest(
+        @SerializedName("name")
         val name: String,
+        @SerializedName("icon")
         val icon: String
     )
 
@@ -28,7 +31,9 @@ interface GuildService {
     ): Observable<JsonObject>
 
     data class ModifyGuildRequest(
+        @SerializedName("name")
         val name: String?,
+        @SerializedName("icon")
         val icon: String?
     )
 

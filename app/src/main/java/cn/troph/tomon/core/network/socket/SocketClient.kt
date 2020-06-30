@@ -46,7 +46,7 @@ fun retryDelay(times: Int): Long {
     }
 }
 
-class SocketClient() : WebSocketListener(),
+class SocketClient: WebSocketListener(),
     ObservableOnSubscribe<SocketEvent> {
 
     private var _webSocket: WebSocket? = null
@@ -139,6 +139,7 @@ class SocketClient() : WebSocketListener(),
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        Logger.d(text)
         try {
             val data = Gson().fromJson(text, JsonElement::class.java)
             _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))
