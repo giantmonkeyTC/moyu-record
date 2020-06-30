@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -59,16 +60,15 @@ class GuildSelectorFragment : Fragment() {
                 })
                 view_guilds.layoutManager = LinearLayoutManager(view.context)
                 view_guilds.adapter = mAdapter
+                it.forEach {
+                    it.updateMention()
+                    it.updateUnread()
+                    mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(it)!!)
+                }
             }
         })
         mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
-        Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>()
-            .subscribe(Consumer { event ->
-                event.guild?.updateUnread()
-                event.guild?.updateMention()
-                mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(event.guild)!!)
-            })
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
             .subscribe(Consumer { event ->
                 if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {

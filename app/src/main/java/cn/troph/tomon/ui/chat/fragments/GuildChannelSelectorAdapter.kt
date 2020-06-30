@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -83,6 +84,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             image.layoutParams = newLp
             if (channel is TextChannel) {
                 if (channel.unread) {
+                    text.typeface = Typeface.DEFAULT_BOLD
                     text.setTextColor(Color.parseColor("#E2E2E2"))
                 } else {
                     text.setTextColor(Color.parseColor("#969696"))

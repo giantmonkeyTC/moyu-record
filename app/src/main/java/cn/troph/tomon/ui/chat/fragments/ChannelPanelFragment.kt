@@ -549,26 +549,6 @@ class ChannelPanelFragment : Fragment() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-//        val lastChannelID = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
-//        if (lastChannelID == null) {
-//            for (guild in Client.global.guilds) {
-//                for ((index, value) in guild.channels.withIndex()) {
-//                    if (index == 0) {
-//                        AppState.global.channelSelection.value =
-//                            ChannelSelection(guild.id, value.id)
-//                        break
-//                    }
-//                }
-//                break
-//            }
-//
-//        } else {
-//            AppState.global.channelSelection.value = ChannelSelection(null, lastChannelID)
-//        }
-    }
-
     private fun loadEmoji() {
         val guildIcon = mutableListOf<GuildIcon>()
         mSectionDataManager = SectionDataManager()
@@ -713,9 +693,17 @@ class ChannelPanelFragment : Fragment() {
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-            Toast.makeText(requireContext(), R.string.send_success, Toast.LENGTH_SHORT).show()
+            GeneralSnackbar.make(
+                GeneralSnackbar.findSuitableParent(editText)!!,
+                requireActivity().getText(R.string.send_success).toString(),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }, {
-            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
+            GeneralSnackbar.make(
+                GeneralSnackbar.findSuitableParent(editText)!!,
+                requireActivity().getText(R.string.send_fail).toString(),
+                Snackbar.LENGTH_SHORT
+            ).show()
             val index = mMsgList.indexOf(msg)
             mMsgList.removeAt(index)
             msgListAdapter.notifyItemRemoved(index)
