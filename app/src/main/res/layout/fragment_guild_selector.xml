@@ -18,6 +18,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btn_join_"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/ic_dm_entry"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <TextView
         android:id="@+id/dm_read_count"
