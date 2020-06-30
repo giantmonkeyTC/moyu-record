@@ -56,6 +56,7 @@ import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
 import com.jaiselrahman.filepicker.model.MediaFile
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
