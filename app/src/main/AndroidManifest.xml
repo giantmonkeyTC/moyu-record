@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 
     <application
@@ -17,6 +19,13 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
+        <receiver
+            android:name=".ui.states.NetworkChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="cn.troph.tomon.fileprovider"
@@ -56,8 +65,13 @@
             android:name=".ui.activities.ImagePreviewActivity"
             android:label="ImagePreviewActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <meta-data android:name="io.sentry.dsn" android:value="https://8860606e52db4bfd873cb672dfb6489d@o374408.ingest.sentry.io/5289149" />
-        <meta-data android:name="io.sentry.auto-init" android:value="true" />
+
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="https://8860606e52db4bfd873cb672dfb6489d@o374408.ingest.sentry.io/5289149" />
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="true" />
     </application>
 
 </manifest>

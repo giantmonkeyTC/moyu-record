@@ -37,16 +37,6 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
-//        val appbarAnimator =
-//            AnimatorInflater.loadAnimator(requireContext(), R.animator.user_info_appbar_anim)
-//
-//        appbarAnimator.addListener {
-//            ValueAnimator.AnimatorUpdateListener { animation ->
-//                if (animation != null) {
-//                    appBarLayout.y = animation.animatedValue as Float
-//                }
-//            }
-//        }
         bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
         extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2

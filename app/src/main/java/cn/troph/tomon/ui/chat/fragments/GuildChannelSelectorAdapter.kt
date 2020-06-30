@@ -87,6 +87,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     text.typeface = Typeface.DEFAULT_BOLD
                     text.setTextColor(Color.parseColor("#E2E2E2"))
                 } else {
+                    text.typeface = Typeface.DEFAULT
                     text.setTextColor(Color.parseColor("#969696"))
                 }
                 if (channel.mention != 0) {
@@ -108,9 +109,13 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
                     if (channel.unread) {
+                        text.typeface = Typeface.DEFAULT_BOLD
                         text.setTextColor(Color.parseColor("#E2E2E2"))
-                    } else
+                    } else {
+                        text.typeface = Typeface.DEFAULT
                         text.setTextColor(Color.parseColor("#969696"))
+                    }
+
                 }
 
             })

@@ -45,7 +45,7 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         }
-        //Thread.sleep(1000)
+        Thread.sleep(1000)
     }
 
 

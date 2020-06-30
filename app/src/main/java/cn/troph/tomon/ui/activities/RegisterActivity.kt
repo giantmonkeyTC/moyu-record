@@ -60,7 +60,9 @@ class RegisterActivity : AppCompatActivity() {
                     code = code,
                     invite = invite,
                     unionId = unionId
-                ).observeOn(AndroidSchedulers.mainThread()).subscribe({}, {
+                ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+
+                }, {
                     GeneralSnackbar.make(
                         GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                         "注册失败",

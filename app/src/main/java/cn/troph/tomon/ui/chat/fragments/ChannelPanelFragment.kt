@@ -1,24 +1,29 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
-import android.app.backup.SharedPreferencesBackupHelper
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Color
+import android.net.ConnectivityManager
 import android.net.Uri
-import android.os.*
-import android.os.FileUtils.copy
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.core.view.isVisible
-import androidx.emoji.bundled.BundledEmojiCompatConfig
-import androidx.emoji.text.EmojiCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -29,28 +34,24 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
-
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
-
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
-import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
-
+import com.alibaba.sdk.android.push.common.util.support.NetworkInfo
+import com.androidadvance.topsnackbar.TSnackbar
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -58,7 +59,6 @@ import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
-
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -67,7 +67,6 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.apache.commons.io.IOUtils
-
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -86,6 +85,9 @@ class ChannelPanelFragment : Fragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
+
+    private val intentFilter = IntentFilter()
+    private val networkChangeReceiver = NetworkChangeReceiver()
 
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
@@ -205,6 +207,10 @@ class ChannelPanelFragment : Fragment() {
         return msg
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().unregisterReceiver(networkChangeReceiver)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -240,8 +246,9 @@ class ChannelPanelFragment : Fragment() {
                     }
                 }
             })
-
-
+        networkChangeReceiver.setTopView(btn_message_send)
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
         var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
@@ -336,7 +343,6 @@ class ChannelPanelFragment : Fragment() {
                                                 Logger.d(it.message)
                                             })
                                     }
-
                                 }
                             }
                         }
