@@ -126,7 +126,7 @@ class ChannelPanelFragment : Fragment() {
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
                     if (channel.isPrivate) {
-                        editText.hint = "你没有此频道发言权限"
+                        editText.hint = getString(R.string.ed_msg_hint_no_permisson)
                         btn_message_send.visibility = View.GONE
                     } else {
                         editText.hint = getString(R.string.emoji_et_hint)
@@ -243,22 +243,25 @@ class ChannelPanelFragment : Fragment() {
             val textToSend = editText.text.toString()
             editText.text = null
 
-
-
             if (!AppState.global.updateEnabled.value.flag) {
+                //新建一个空message，并加入到RecyclerView
                 val emptyMsg = createEmptyMsg(textToSend)
                 mMsgList.add(emptyMsg)
-                msgListAdapter.notifyItemInserted(mMsgList.size-1)
-                mLayoutManager.scrollToPosition(msgListAdapter.itemCount-1)
+                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                mLayoutManager.scrollToPosition(msgListAdapter.itemCount - 1)
+                //发送消息
                 (Client.global.channels[channelId
-                    ?: ""] as TextChannelBase).messages.create(textToSend,nonce = emptyMsg.nonce.toString())
+                    ?: ""] as TextChannelBase).messages.create(
+                    textToSend,
+                    nonce = emptyMsg.nonce.toString()
+                )
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ ->
                         mHandler.postDelayed({
                             mLayoutManager.scrollToPosition(mMsgList.size - 1)
                         }, 300)
                     }
-                        , { error ->
+                        , { _ ->
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(btn_message_send)!!,
                                 requireContext().resources.getText(R.string.send_fail).toString(),
@@ -277,7 +280,7 @@ class ChannelPanelFragment : Fragment() {
                             }
                         }
                         mLayoutManager.scrollToPosition(mMsgList.size - 1)
-                    }, { error ->
+                    }, { _ ->
                         GeneralSnackbar.make(
                             GeneralSnackbar.findSuitableParent(btn_message_send)!!,
                             requireContext().resources.getText(R.string.send_fail).toString(),
@@ -314,11 +317,13 @@ class ChannelPanelFragment : Fragment() {
                                         addProperty("last_message_id", lastMessageId)
                                     })
                                     this.mention = 0
-                                    if (lastMessage != null) {
-                                        lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe {
-                                            }
-                                        client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                    lastMessage?.let {
+                                        it.ack().observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                            }, {
+                                                Logger.d(it.message)
+                                            })
                                     }
 
                                 }
@@ -333,12 +338,13 @@ class ChannelPanelFragment : Fragment() {
                                 patch(JsonObject().apply {
                                     addProperty("ack_message_id", lastMessageId)
                                 })
-                                if (lastMessage != null) {
-                                    lastMessage?.ack().observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe {
+                                lastMessage?.let {
+                                    it.ack().observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe({
                                             client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                        }
-
+                                        }, {
+                                            Logger.d(it.message)
+                                        })
                                 }
                             }
                         }

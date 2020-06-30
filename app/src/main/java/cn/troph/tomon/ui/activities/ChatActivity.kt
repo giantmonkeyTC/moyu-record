@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -28,6 +29,7 @@ import cn.troph.tomon.ui.states.ChannelSelection
 import com.bumptech.glide.Glide
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
+import java.util.concurrent.TimeUnit
 
 class ChatActivity : AppCompatActivity() {
 
@@ -43,17 +45,19 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         }
-        Thread.sleep(1000)
+        //Thread.sleep(1000)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         setSupportActionBar(toolbar)
-        text_toolbar_title.text = "TOMON"
+        text_toolbar_title.text = getString(R.string.app_name_capital)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
-        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
+        AppState.global.channelSelection.observable.delay(1, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it.channelId != null) {
                     val channel = Client.global.channels[it.channelId]
@@ -88,6 +92,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    //用于判断是否要收起键盘
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev?.action == MotionEvent.ACTION_UP) {
             val view = this.currentFocus

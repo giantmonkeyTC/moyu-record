@@ -32,6 +32,8 @@
     <string name="emoji_guild_name">群组名称</string>
     <string name="send_fail">发送失败</string>
     <string name="send_success">发送成功</string>
+    <string name="app_name_capital">TOMON</string>
+    <string name="ed_msg_hint_no_permisson">你没有此频道发言权限</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
