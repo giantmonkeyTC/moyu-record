@@ -9,6 +9,7 @@ import android.transition.TransitionInflater
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.core.view.get
@@ -35,8 +36,6 @@ import java.util.concurrent.TimeUnit
 
 class ChatActivity : AppCompatActivity() {
 
-    private lateinit var mMenu: Menu
-
     init {
         AppState.global.eventBus.observeEventsOnUi().subscribe {
             val event = it as? AppUIEvent
@@ -52,7 +51,7 @@ class ChatActivity : AppCompatActivity() {
         Thread.sleep(1000)
     }
 
-    private val mHandler = Handler()
+    private lateinit var mCurrentChannel: Channel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,8 +66,9 @@ class ChatActivity : AppCompatActivity() {
             .subscribe {
                 if (it.channelId != null) {
                     val channel = Client.global.channels[it.channelId]
-                    if (channel != null) {
-                        updateToolbar(channel)
+                    channel?.let {
+                        mCurrentChannel = it
+                        updateToolbar(it)
                     }
                 }
             }
@@ -91,12 +91,10 @@ class ChatActivity : AppCompatActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
-            mHandler.postDelayed({ mMenu?.findItem(R.id.members)?.isVisible = true }, 1000)
 
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
-            mHandler.postDelayed({ mMenu?.findItem(R.id.members)?.isVisible = false }, 1000)
         }
     }
 
@@ -147,9 +145,6 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_chat, menu)
-        menu?.let {
-            mMenu = it
-        }
         return true
     }
 
@@ -178,8 +173,12 @@ class ChatActivity : AppCompatActivity() {
                 drawerLayout.openDrawer(GravityCompat.START, true)
             }
             R.id.members -> {
-                val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-                drawerLayout.openDrawer(GravityCompat.END, true)
+                if (mCurrentChannel is GuildChannel) {
+                    val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+                    drawerLayout.openDrawer(GravityCompat.END, true)
+                } else if (mCurrentChannel is DmChannel) {
+                    Toast.makeText(this, R.string.no_member, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return true
