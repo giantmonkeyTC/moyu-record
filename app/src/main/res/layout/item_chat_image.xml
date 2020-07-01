@@ -44,6 +44,7 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/chat_iv"
+        android:src="@drawable/loadinglogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -54,6 +55,21 @@
         app:layout_constraintStart_toStartOf="@id/user_info_box_link_image"
         app:layout_constraintTop_toBottomOf="@id/user_info_box_link_image"
         app:riv_corner_radius="10dp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/image_loading_llv"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/chat_iv"
+        app:layout_constraintBottom_toBottomOf="@id/chat_iv"
+        app:layout_constraintStart_toStartOf="@id/chat_iv"
+        app:layout_constraintEnd_toEndOf="@id/chat_iv"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_fileName="7774-loading.json"
+        android:layout_width="60dp"
+        android:layout_height="60dp">
+
+    </com.airbnb.lottie.LottieAnimationView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/reaction_container"

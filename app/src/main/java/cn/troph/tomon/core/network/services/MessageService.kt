@@ -3,6 +3,7 @@ package cn.troph.tomon.core.network.services
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -28,7 +29,9 @@ interface MessageService {
     ): Observable<JsonObject>
 
     data class CreateMessageRequest(
+        @SerializedName("content")
         var content: String,
+        @SerializedName("nonce")
         var nonce:String
     )
 
@@ -58,6 +61,7 @@ interface MessageService {
     ): Observable<Response<Unit>>
 
     data class UpdateMessageRequest(
+        @SerializedName("content")
         val content: String
     )
 

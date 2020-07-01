@@ -13,6 +13,7 @@ import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -21,6 +22,7 @@ import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
@@ -154,7 +156,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_file.text = "T🐱"
                     }
                     holder.itemView.widget_message_timestamp_text_file.text =
@@ -216,7 +218,7 @@ class MessageAdapter(
 
                     holder.itemView.widget_message_author_name_text_image.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_image.text = "T🐱"
                     }
 
@@ -259,6 +261,10 @@ class MessageAdapter(
                     }
                     break
                 }
+
+                holder.itemView.image_loading_llv.visibility =
+                    if (messageList[position].isSending) View.VISIBLE else View.GONE
+
                 showReaction(holder, messageList[position])
             }
             4 -> {
@@ -271,7 +277,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
-                    if (messageList[position].author == null) {
+                    if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_invite.text = "T🐱"
                     }
                     holder.itemView.widget_message_timestamp_text_invite.text =
@@ -384,7 +390,7 @@ class MessageAdapter(
     ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
-        if (message.author == null) {
+        if (message.type == MessageType.SYSTEM) {
             itemView.widget_message_author_name_text.text = "T🐱"
         } else {
             itemView.widget_message_author_name_text.text = message.author?.name
@@ -413,6 +419,14 @@ class MessageAdapter(
             itemView.message_avatar.visibility = View.GONE
             itemView.widget_message_timestamp_text.visibility = View.GONE
             itemView.widget_message_author_name_text.visibility = View.GONE
+        }
+        if (message.isSending) {
+            val apl = AlphaAnimation(0.1f, 0.78f)
+            apl.duration = 1000
+            apl.repeatCount = -1
+            itemView.widget_message_text.startAnimation(apl)
+        }else{
+            itemView.widget_message_text.clearAnimation()
         }
     }
 

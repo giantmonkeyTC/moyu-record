@@ -23,6 +23,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         fun getNonceId(nonce: String): String = "${nonce}N"
     }
 
+    var isSending = false
+
     // 发送中的message id是空的
     var id: String? = null
         private set

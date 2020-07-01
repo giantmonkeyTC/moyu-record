@@ -2,6 +2,7 @@ package cn.troph.tomon.core.network.services
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.*
 
@@ -13,8 +14,11 @@ interface RoleService {
     ): Observable<JsonArray>;
 
     data class CreateRoleRequest(
+        @SerializedName("name")
         val name: String,
+        @SerializedName("color")
         val color: Int?,
+        @SerializedName("permission")
         val permissions: Int?
     )
 
@@ -26,9 +30,13 @@ interface RoleService {
     ): Observable<JsonObject>
 
     data class UpdateRoleRequest(
+        @SerializedName("name")
         val name: String?,
+        @SerializedName("color")
         val color: Int?,
+        @SerializedName("hoist")
         val hoist: Boolean?,
+        @SerializedName("permission")
         val permissions: Int?
     )
 
@@ -44,6 +52,7 @@ interface RoleService {
 
 
     data class UpdatePositionsRequest(
+        @SerializedName("positions")
         val positions: Int
     )
 

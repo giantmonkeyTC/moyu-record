@@ -47,7 +47,6 @@ import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.alibaba.sdk.android.push.common.util.support.NetworkInfo
-import com.androidadvance.topsnackbar.TSnackbar
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
@@ -71,6 +70,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -191,9 +191,21 @@ class ChannelPanelFragment : Fragment() {
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
         msgObject.addProperty("channelId", channelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().toString())
-        msgObject.addProperty("authorId", Client.global.users[Client.global.me.id]?.id)
+        msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)
-        return Message(client = Client.global, data = msgObject)
+
+        val userObject = JsonObject()
+        userObject.addProperty("id", Client.global.me.id)
+        userObject.addProperty("username", Client.global.me.username)
+        userObject.addProperty("discriminator", Client.global.me.discriminator)
+        userObject.addProperty("name", Client.global.me.name)
+        userObject.addProperty("avatar", Client.global.me.avatar)
+        userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+        msgObject.add("author", userObject)
+
+        val msg = Message(client = Client.global, data = msgObject)
+        msg.isSending = true
+        return msg
     }
 
     override fun onDestroy() {
@@ -633,19 +645,6 @@ class ChannelPanelFragment : Fragment() {
     }
 
 
-    private fun hideKeyboard(activity: Activity) {
-        val imm: InputMethodManager =
-            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(activity)
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -671,12 +670,25 @@ class ChannelPanelFragment : Fragment() {
                             msgObject.addProperty("channelId", channelId)
                             msgObject.addProperty("timestamp", LocalDateTime.now().toString())
                             msgObject.addProperty("authorId", Client.global.me.id)
+
+
+                            val userObject = JsonObject()
+                            userObject.addProperty("id", Client.global.me.id)
+                            userObject.addProperty("username", Client.global.me.username)
+                            userObject.addProperty("discriminator", Client.global.me.discriminator)
+                            userObject.addProperty("name", Client.global.me.name)
+                            userObject.addProperty("avatar", Client.global.me.avatar)
+                            userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+
+                            msgObject.add("author", userObject)
+
                             val msg = Message(client = Client.global, data = msgObject)
                             val attachmentObj = JsonObject()
                             attachmentObj.addProperty("id", "new_image")
                             attachmentObj.addProperty("filename", file.absolutePath)
                             val attachment = MessageAttachment(Client.global, attachmentObj)
                             msg.attachments["new_attachment"] = attachment
+                            msg.isSending = true
                             mMsgList.add(msg)
                             msgListAdapter.notifyItemInserted(mMsgList.size - 1)
                             mLayoutManager.scrollToPosition(mMsgList.size - 1)
