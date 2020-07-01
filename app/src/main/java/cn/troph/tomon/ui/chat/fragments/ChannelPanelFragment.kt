@@ -106,7 +106,9 @@ class ChannelPanelFragment : Fragment() {
             val changed = field != value
             field = value
             if (changed && value != null) {
-                editText.text = null
+                editText.post {
+                    editText.text = null
+                }
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
                     val count = mMsgList.size
@@ -712,11 +714,7 @@ class ChannelPanelFragment : Fragment() {
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-            GeneralSnackbar.make(
-                GeneralSnackbar.findSuitableParent(editText)!!,
-                requireActivity().getText(R.string.send_success).toString(),
-                Snackbar.LENGTH_SHORT
-            ).show()
+
         }, {
             GeneralSnackbar.make(
                 GeneralSnackbar.findSuitableParent(editText)!!,
