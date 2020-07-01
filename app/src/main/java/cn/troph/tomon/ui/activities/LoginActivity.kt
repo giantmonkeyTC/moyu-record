@@ -141,7 +141,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun gotoChat() {
-        val intent = Intent(this, ChatActivity::class.java)
+        val intent = Intent(this, ChatActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(
@@ -150,7 +152,6 @@ class LoginActivity : AppCompatActivity() {
                 R.animator.bottom_up_anim
             ).toBundle()
         )
-        finish()
     }
 
 }
