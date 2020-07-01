@@ -47,7 +47,6 @@ import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.alibaba.sdk.android.push.common.util.support.NetworkInfo
-import com.androidadvance.topsnackbar.TSnackbar
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
@@ -204,6 +203,7 @@ class ChannelPanelFragment : Fragment() {
         msgObject.add("author", userObject)
 
         val msg = Message(client = Client.global, data = msgObject)
+        msg.isSending = true
         return msg
     }
 
@@ -687,6 +687,7 @@ class ChannelPanelFragment : Fragment() {
                             attachmentObj.addProperty("filename", file.absolutePath)
                             val attachment = MessageAttachment(Client.global, attachmentObj)
                             msg.attachments["new_attachment"] = attachment
+                            msg.isSending = true
                             mMsgList.add(msg)
                             msgListAdapter.notifyItemInserted(mMsgList.size - 1)
                             mLayoutManager.scrollToPosition(mMsgList.size - 1)

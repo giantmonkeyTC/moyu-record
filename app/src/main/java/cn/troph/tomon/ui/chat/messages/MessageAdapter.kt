@@ -260,6 +260,10 @@ class MessageAdapter(
                     }
                     break
                 }
+
+                holder.itemView.image_loading_llv.visibility =
+                    if (messageList[position].isSending) View.VISIBLE else View.GONE
+
                 showReaction(holder, messageList[position])
             }
             4 -> {
