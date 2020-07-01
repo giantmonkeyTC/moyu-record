@@ -425,7 +425,7 @@ class MessageAdapter(
             apl.duration = 1000
             apl.repeatCount = -1
             itemView.widget_message_text.startAnimation(apl)
-        }else{
+        } else {
             itemView.widget_message_text.clearAnimation()
         }
     }

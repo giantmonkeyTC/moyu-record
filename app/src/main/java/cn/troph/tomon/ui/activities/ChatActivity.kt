@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.transition.TransitionInflater
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -34,8 +35,7 @@ import java.util.concurrent.TimeUnit
 
 class ChatActivity : AppCompatActivity() {
 
-    private var mMenu: Menu? = null
-    private lateinit var mCurrentChannel: Channel
+    private lateinit var mMenu: Menu
 
     init {
         AppState.global.eventBus.observeEventsOnUi().subscribe {
@@ -51,6 +51,8 @@ class ChatActivity : AppCompatActivity() {
         }
         Thread.sleep(1000)
     }
+
+    private val mHandler = Handler()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,16 +74,7 @@ class ChatActivity : AppCompatActivity() {
             }
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.let {
-            mMenu = it
-            it.findItem(R.id.members).isVisible = mCurrentChannel is GuildChannel
-        }
-        return super.onPrepareOptionsMenu(menu)
-    }
-
     private fun updateToolbar(channel: Channel) {
-        mCurrentChannel = channel
         if (channel is GuildChannel) {
             var iconId: Int? = null
             text_toolbar_title.text = channel.name
@@ -98,11 +91,12 @@ class ChatActivity : AppCompatActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
-            mMenu?.findItem(R.id.members)?.isVisible = true
+            mHandler.postDelayed({ mMenu?.findItem(R.id.members)?.isVisible = true }, 1000)
+
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
-            mMenu?.findItem(R.id.members)?.isVisible = false
+            mHandler.postDelayed({ mMenu?.findItem(R.id.members)?.isVisible = false }, 1000)
         }
     }
 
@@ -152,7 +146,6 @@ class ChatActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-
         menuInflater.inflate(R.menu.activity_chat, menu)
         menu?.let {
             mMenu = it

@@ -168,20 +168,7 @@ class ChannelPanelFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                message = it.message
-                updateEnabled = it.flag
-            }
-        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it.channelId == null) {
-                    channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
-                } else {
-                    channelId = it.channelId
-                }
 
-            }
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
 
@@ -215,6 +202,20 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                message = it.message
+                updateEnabled = it.flag
+            }
+        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it.channelId == null) {
+                    channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+                } else {
+                    channelId = it.channelId
+                }
+
+            }
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
