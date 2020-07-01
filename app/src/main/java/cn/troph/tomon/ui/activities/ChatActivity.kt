@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.emoji.widget.EmojiEditText
 import cn.troph.tomon.R
@@ -32,6 +33,9 @@ import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 import java.util.concurrent.TimeUnit
 
 class ChatActivity : AppCompatActivity() {
+
+    private var mMenu: Menu? = null
+    private lateinit var mCurrentChannel: Channel
 
     init {
         AppState.global.eventBus.observeEventsOnUi().subscribe {
@@ -68,8 +72,16 @@ class ChatActivity : AppCompatActivity() {
             }
     }
 
-    private fun updateToolbar(channel: Channel) {
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.let {
+            mMenu = it
+            it.findItem(R.id.members).isVisible = mCurrentChannel is GuildChannel
+        }
+        return super.onPrepareOptionsMenu(menu)
+    }
 
+    private fun updateToolbar(channel: Channel) {
+        mCurrentChannel = channel
         if (channel is GuildChannel) {
             var iconId: Int? = null
             text_toolbar_title.text = channel.name
@@ -86,9 +98,11 @@ class ChatActivity : AppCompatActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
+            mMenu?.findItem(R.id.members)?.isVisible = true
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
+            mMenu?.findItem(R.id.members)?.isVisible = false
         }
     }
 
@@ -138,7 +152,11 @@ class ChatActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
         menuInflater.inflate(R.menu.activity_chat, menu)
+        menu?.let {
+            mMenu = it
+        }
         return true
     }
 
