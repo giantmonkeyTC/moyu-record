@@ -174,28 +174,6 @@ class ChannelPanelFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
 
-    private fun createEmptyMsg(content: String): Message {
-        val msgObject = JsonObject()
-        msgObject.addProperty("id", "")
-        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-        msgObject.addProperty("channelId", channelId)
-        msgObject.addProperty("timestamp", LocalDateTime.now().toString())
-        msgObject.addProperty("authorId", Client.global.me.id)
-        msgObject.addProperty("content", content)
-
-        val userObject = JsonObject()
-        userObject.addProperty("id", Client.global.me.id)
-        userObject.addProperty("username", Client.global.me.username)
-        userObject.addProperty("discriminator", Client.global.me.discriminator)
-        userObject.addProperty("name", Client.global.me.name)
-        userObject.addProperty("avatar", Client.global.me.avatar)
-        userObject.addProperty("avatar_url", Client.global.me.avatarURL)
-        msgObject.add("author", userObject)
-
-        val msg = Message(client = Client.global, data = msgObject)
-        msg.isSending = true
-        return msg
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -725,6 +703,29 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.removeAt(index)
             msgListAdapter.notifyItemRemoved(index)
         })
+    }
+
+    private fun createEmptyMsg(content: String): Message {
+        val msgObject = JsonObject()
+        msgObject.addProperty("id", "")
+        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+        msgObject.addProperty("channelId", channelId)
+        msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+        msgObject.addProperty("authorId", Client.global.me.id)
+        msgObject.addProperty("content", content)
+
+        val userObject = JsonObject()
+        userObject.addProperty("id", Client.global.me.id)
+        userObject.addProperty("username", Client.global.me.username)
+        userObject.addProperty("discriminator", Client.global.me.discriminator)
+        userObject.addProperty("name", Client.global.me.name)
+        userObject.addProperty("avatar", Client.global.me.avatar)
+        userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+        msgObject.add("author", userObject)
+
+        val msg = Message(client = Client.global, data = msgObject)
+        msg.isSending = true
+        return msg
     }
 }
 
