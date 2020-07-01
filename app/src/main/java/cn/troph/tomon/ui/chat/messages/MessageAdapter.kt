@@ -13,6 +13,7 @@ import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -418,6 +419,14 @@ class MessageAdapter(
             itemView.message_avatar.visibility = View.GONE
             itemView.widget_message_timestamp_text.visibility = View.GONE
             itemView.widget_message_author_name_text.visibility = View.GONE
+        }
+        if (message.isSending) {
+            val apl = AlphaAnimation(0.1f, 0.78f)
+            apl.duration = 1000
+            apl.repeatCount = -1
+            itemView.widget_message_text.startAnimation(apl)
+        }else{
+            itemView.widget_message_text.clearAnimation()
         }
     }
 
