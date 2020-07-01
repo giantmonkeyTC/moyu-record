@@ -11,7 +11,7 @@ class ActionManager(val client: Client) {
     fun userLogin(data: JsonObject): User? = UserLoginAction(client).handle(data)
     fun userLogout(): Unit? = UserLogoutAction(client).handle(null)
     fun userUpdate(data: JsonObject): User? = UserUpdateAction(client).handle(data)
-    fun userRegister(data: JsonObject):User? = UserRegisterAction(client).handle(data)
+    fun userRegister(data: JsonObject): User? = UserRegisterAction(client).handle(data)
 
     fun guildFetch(data: JsonArray, isSync: Boolean = true): List<Guild>? =
         GuildFetchAction(client).handle(data, isSync)
@@ -19,6 +19,7 @@ class ActionManager(val client: Client) {
     fun guildCreate(data: JsonObject): Guild? = GuildCreateAction(client).handle(data)
     fun guildDelete(data: JsonObject): Guild? = GuildDeleteAction(client).handle(data)
     fun guildUpdate(data: JsonObject): Guild? = GuildUpdateAction(client).handle(data)
+    //fun guildPositon(data: JsonObject): Unit? = GuildPositionAction(client).handle(data)
 
     fun channelFetch(
         data: JsonElement,
