@@ -122,7 +122,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
             val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
-        val systemEmoji = SystemEmoji()
+        val systemEmoji = SystemEmoji(requireContext())
         mSectionDataManager.addSection(
             EmojiAdapter(
                 systemEmoji.getSystemEmojiEmoticons(),

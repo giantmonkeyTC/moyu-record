@@ -15,5 +15,6 @@ data class CustomGuildEmoji(
 
 data class SystemEmojiData(
     @SerializedName("unified") val code: String,
-    @SerializedName("category") val category: String
+    @SerializedName("category") val category: String,
+    @SerializedName("image")val image:String
 )

@@ -5,14 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
-import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
-import java.text.CharacterIterator
+import java.nio.ByteBuffer
 
 
 class EmojiAdapter(
@@ -39,7 +38,7 @@ class EmojiAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (emojiSectionObj.isBuildIn) emojiSectionObj.systemEmojiList.size else emojiSectionObj.emojiList.size
+        return if (emojiSectionObj.isBuildIn) emojiSectionObj.systemEmojiListData.size else emojiSectionObj.emojiList.size
     }
 
     override fun onBindItemViewHolder(holder: EmojiItemViewHolder?, position: Int) {
@@ -48,9 +47,17 @@ class EmojiAdapter(
                 if (emojiSectionObj.isBuildIn) {
                     it.textview_emoji.visibility = View.VISIBLE
                     it.imageview_emoji.visibility = View.GONE
+                    val charArray = emojiSectionObj.systemEmojiListData[position].code.split("-")
+                    val newString = charArray.map {
+                        "0x${it}"
+                    }.joinToString(separator = "-")
 
-                    it.textview_emoji.text =
-                        emojiSectionObj.systemEmojiListData[holder.sectionAdapterPosition].code
+//                    val bytes =
+//                        ByteBuffer.allocate(newString.size * Long.SIZE_BYTES)
+//                    for (item in newString) {
+//                        bytes.putLong(item)
+//                    }
+                    it.textview_emoji.text = String(newString.toCharArray())
                     it.textview_emoji.setOnClickListener {
                         emojiClickListener.onSystemEmojiSelected(emojiSectionObj.systemEmojiList[holder.sectionAdapterPosition])
                     }

@@ -579,8 +579,6 @@ class ChannelPanelFragment : Fragment() {
         }
 
         val systemEmoji = SystemEmoji(requireContext())
-
-
         for (item in systemEmoji.returnEmojiWithCategory()) {
             val adapter = EmojiAdapter(
                 CustomGuildEmoji(
@@ -590,7 +588,7 @@ class ChannelPanelFragment : Fragment() {
                 ), mEmojiClickListener
             )
             mSectionDataManager.addSection(adapter, 1)
-            guildIcon.add(GuildIcon(null, item.key))
+            guildIcon.add(GuildIcon(null, item.value[0].code))
         }
 
         emoji_rr.adapter = mSectionDataManager.adapter
