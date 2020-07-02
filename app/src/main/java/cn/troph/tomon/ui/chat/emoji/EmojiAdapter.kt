@@ -11,6 +11,7 @@ import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
+import java.lang.StringBuilder
 import java.nio.ByteBuffer
 
 
@@ -48,16 +49,18 @@ class EmojiAdapter(
                     it.textview_emoji.visibility = View.VISIBLE
                     it.imageview_emoji.visibility = View.GONE
                     val charArray = emojiSectionObj.systemEmojiListData[position].code.split("-")
-                    val newString = charArray.map {
-                        "0x${it}"
-                    }.joinToString(separator = "-")
 
-//                    val bytes =
-//                        ByteBuffer.allocate(newString.size * Long.SIZE_BYTES)
-//                    for (item in newString) {
-//                        bytes.putLong(item)
-//                    }
-                    it.textview_emoji.text = String(newString.toCharArray())
+                    val newString = charArray.map {
+                        "${it}".toInt(16)
+                    }
+                    val sb = StringBuilder()
+                    for (item in newString) {
+                        val char = Character.toChars(item)
+                        sb.append(char)
+                    }
+
+                    it.textview_emoji.text = sb.toString()
+
                     it.textview_emoji.setOnClickListener {
                         emojiClickListener.onSystemEmojiSelected(emojiSectionObj.systemEmojiList[holder.sectionAdapterPosition])
                     }
