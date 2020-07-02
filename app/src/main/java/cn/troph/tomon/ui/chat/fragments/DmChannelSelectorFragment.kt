@@ -51,6 +51,9 @@ class DmChannelSelectorFragment : Fragment() {
             it?.let {
                 mDMchannelList.clear()
                 mDMchannelList.addAll(it)
+                mDMchannelList.sortByDescending { item ->
+                    item.lastMessageId
+                }
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
@@ -77,12 +80,15 @@ class DmChannelSelectorFragment : Fragment() {
 
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
             if (it.message.guild == null || it.message.guild?.id == "@me") {
-                for ((index, value) in mDMchannelList.withIndex()) {
+                for (value in mDMchannelList) {
                     if (value.id == it.message.channelId) {
                         value.unReadCount++
-                        mDMchennelAdapter.notifyItemChanged(index)
                     }
                 }
+                mDMchannelList.sortByDescending { item ->
+                    item.lastMessageId
+                }
+                mDMchennelAdapter.notifyDataSetChanged()
             }
         })
     }
