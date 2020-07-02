@@ -10,9 +10,9 @@ import cn.troph.tomon.ui.chat.messages.notifyObserver
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class GuildViewModel : ViewModel() {
-
 
     private val guildListLiveData: MutableLiveData<MutableList<Guild>> = MutableLiveData()
 
@@ -22,25 +22,6 @@ class GuildViewModel : ViewModel() {
 
     fun loadGuildList() {
         guildListLiveData.value = Client.global.guilds.toMutableList()
-        Client.global.guilds.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
-                it?.let {
-                    val event = it
-                    event.obj?.let {
-                        val g = it
-                        if (event.type == EventType.SET) {
-                            guildListLiveData.value?.add(it)
-                            guildListLiveData.notifyObserver()
-                        }
-                        if (event.type == EventType.REMOVE) {
-                            val result = guildListLiveData.value?.removeIf {
-                                it.id == g.id
-                            }
-                            if (result == true) guildListLiveData.notifyObserver()
-                        }
-                    }
-                }
-            })
     }
 
 }
