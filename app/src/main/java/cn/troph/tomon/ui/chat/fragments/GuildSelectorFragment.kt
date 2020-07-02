@@ -144,12 +144,15 @@ class GuildSelectorFragment : Fragment() {
         })
         Client.global.eventBus.observeEventOnUi<MessageUpdateEvent>().subscribe(
             Consumer { event ->
-                if (event.message.guild!!.updateMention())
-                    mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
-                            event.message.guild!!
+                event.message.guild?.let {
+                    if (it.updateMention()) {
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
                         )
-                    )
+                    }
+                }
             })
 
         Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {

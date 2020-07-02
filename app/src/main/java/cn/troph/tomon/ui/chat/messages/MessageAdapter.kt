@@ -467,15 +467,15 @@ class MessageAdapter(
                             transition: Transition<in Drawable>?
                         ) {
                             val width =
-                                (resource.intrinsicWidth / resource.intrinsicHeight) * DensityUtil.dip2px(
+                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
                                     itemView.context,
-                                    14f
-                                )
+                                    15f
+                                ).toFloat()
                             resource.setBounds(
                                 0,
                                 0,
-                                width,
-                                DensityUtil.dip2px(itemView.context, 14f)
+                                width.toInt(),
+                                DensityUtil.dip2px(itemView.context, 15f)
                             )
                             span.setSpan(
                                 ImageSpan(resource),
