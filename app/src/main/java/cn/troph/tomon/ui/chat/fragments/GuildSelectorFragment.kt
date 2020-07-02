@@ -161,9 +161,17 @@ class GuildSelectorFragment : Fragment() {
         })
 
         Client.global.eventBus.observeEventOnUi<GuildPositionEvent>().subscribe {
-
+            val rearrangedGuildList = mutableListOf<Guild>()
+            for (item in it.guilds) {
+                val newGuild = mGuildList.find {
+                    it.id == item.id
+                }
+                newGuild?.let {
+                    rearrangedGuildList.add(item.position, it)
+                }
+            }
             mGuildList.clear()
-            mGuildList.addAll(it.guilds.toMutableList())
+            mGuildList.addAll(rearrangedGuildList)
             mAdapter.notifyDataSetChanged()
         }
 

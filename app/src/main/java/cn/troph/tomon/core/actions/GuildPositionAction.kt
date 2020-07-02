@@ -15,13 +15,10 @@ import org.json.JSONArray
 class GuildPositionAction(client: Client) : Action<Unit>(client) {
 
     override fun handle(data: JsonElement?, vararg extras: Any?): Unit? {
-        Logger.d(data?.toString())
-        val posArray = data?.optJsonArray
-        posArray?.let {
-            val list = GsonBuilder().create().fromJson(it, Array<Position>::class.java)
-                .toMutableList()
-            client.eventBus.postEvent(GuildPositionEvent(list))
-        }
+        val list = GsonBuilder().create()
+            .fromJson(data?.asJsonObject?.get("positions"), Array<Position>::class.java)
+            .toMutableList()
+        client.eventBus.postEvent(GuildPositionEvent(list))
         return Unit
     }
 }
