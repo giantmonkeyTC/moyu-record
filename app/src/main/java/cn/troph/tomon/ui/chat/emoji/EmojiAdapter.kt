@@ -48,8 +48,9 @@ class EmojiAdapter(
                 if (emojiSectionObj.isBuildIn) {
                     it.textview_emoji.visibility = View.VISIBLE
                     it.imageview_emoji.visibility = View.GONE
+
                     it.textview_emoji.text =
-                        String(Character.toChars(emojiSectionObj.systemEmojiList[position]))
+                        emojiSectionObj.systemEmojiListData[holder.sectionAdapterPosition].code
                     it.textview_emoji.setOnClickListener {
                         emojiClickListener.onSystemEmojiSelected(emojiSectionObj.systemEmojiList[holder.sectionAdapterPosition])
                     }

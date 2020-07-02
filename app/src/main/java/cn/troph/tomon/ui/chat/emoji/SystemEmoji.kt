@@ -1,13 +1,18 @@
 package cn.troph.tomon.ui.chat.emoji
 
+import android.content.Context
+import cn.troph.tomon.R
 import com.google.gson.Gson
 
-class SystemEmoji {
+class SystemEmoji(private val context: Context) {
 
     fun returnEmojiWithCategory(): HashMap<String, MutableList<SystemEmojiData>> {
         val map = HashMap<String, MutableList<SystemEmojiData>>()
         val emojiRawList =
-            Gson().fromJson(EmojiJsonList, Array<SystemEmojiData>::class.java).toMutableList()
+            Gson().fromJson(
+                context.getString(R.string.emoji_et_hint),
+                Array<SystemEmojiData>::class.java
+            ).toMutableList()
         for (item in emojiRawList) {
             if (map.containsKey(item.category)) {
                 map[item.category]?.add(item)

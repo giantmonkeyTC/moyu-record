@@ -578,10 +578,10 @@ class ChannelPanelFragment : Fragment() {
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
 
-        val systemEmoji = SystemEmoji()
+        val systemEmoji = SystemEmoji(requireContext())
 
 
-        for (item in SystemEmoji().returnEmojiWithCategory()) {
+        for (item in systemEmoji.returnEmojiWithCategory()) {
             val adapter = EmojiAdapter(
                 CustomGuildEmoji(
                     name = item.key,

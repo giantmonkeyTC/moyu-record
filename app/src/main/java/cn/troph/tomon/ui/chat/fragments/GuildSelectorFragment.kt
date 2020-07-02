@@ -46,7 +46,6 @@ class GuildSelectorFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Logger.d(SystemEmoji().returnEmojiWithCategory().toString())
         return inflater.inflate(R.layout.fragment_guild_selector, container, false)
     }
 
