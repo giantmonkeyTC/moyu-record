@@ -38,7 +38,7 @@ android {
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
                     def formattedDate = new Date().format('yyyyMMddHHmmss')
-                    outputFileName = "Tomon-${variant.versionName}-${formattedDate}-release.apk"
+                    outputFileName = "Tomon-${variant.versionName}-${formattedDate}-${variant.buildType.name}.apk"
                 }
             }
         }
@@ -50,7 +50,7 @@ android {
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
                     def formattedDate = new Date().format('yyyyMMddHHmmss')
-                    outputFileName = "Tomon-${variant.versionName}-${formattedDate}-debug.apk"
+                    outputFileName = "Tomon-${variant.versionName}-${formattedDate}-${variant.buildType.name}.apk"
                 }
             }
         }
