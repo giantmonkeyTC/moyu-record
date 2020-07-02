@@ -580,29 +580,18 @@ class ChannelPanelFragment : Fragment() {
 
         val systemEmoji = SystemEmoji()
 
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiEmoticons(),
-                mEmojiClickListener
-            ), 1
-        )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1F601))))
 
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiDingbats(),
-                mEmojiClickListener
-            ), 1
-        )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x2702))))
-
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiTransport(),
-                mEmojiClickListener
-            ), 1
-        )
-        guildIcon.add(GuildIcon(null, String(Character.toChars(0x1F680))))
+        for (item in SystemEmoji().returnEmojiWithCategory()) {
+            val adapter = EmojiAdapter(
+                CustomGuildEmoji(
+                    name = item.key,
+                    isBuildIn = true,
+                    systemEmojiListData = item.value
+                ), mEmojiClickListener
+            )
+            mSectionDataManager.addSection(adapter, 1)
+            guildIcon.add(GuildIcon(null, item.key))
+        }
 
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)

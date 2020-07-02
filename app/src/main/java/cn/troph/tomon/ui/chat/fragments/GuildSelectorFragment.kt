@@ -21,6 +21,7 @@ import cn.troph.tomon.core.utils.BadgeUtil
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.chat.emoji.SystemEmoji
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -28,6 +29,7 @@ import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.annotations.SerializedName
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
@@ -44,6 +46,7 @@ class GuildSelectorFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Logger.d(SystemEmoji().returnEmojiWithCategory().toString())
         return inflater.inflate(R.layout.fragment_guild_selector, container, false)
     }
 
