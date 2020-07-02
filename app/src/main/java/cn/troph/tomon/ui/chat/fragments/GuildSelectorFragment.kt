@@ -161,6 +161,7 @@ class GuildSelectorFragment : Fragment() {
         })
 
         Client.global.eventBus.observeEventOnUi<GuildPositionEvent>().subscribe {
+
             mGuildList.clear()
             mGuildList.addAll(it.guilds.toMutableList())
             mAdapter.notifyDataSetChanged()

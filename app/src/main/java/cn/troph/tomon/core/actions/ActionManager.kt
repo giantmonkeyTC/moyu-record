@@ -19,7 +19,7 @@ class ActionManager(val client: Client) {
     fun guildCreate(data: JsonObject): Guild? = GuildCreateAction(client).handle(data)
     fun guildDelete(data: JsonObject): Guild? = GuildDeleteAction(client).handle(data)
     fun guildUpdate(data: JsonObject): Guild? = GuildUpdateAction(client).handle(data)
-    //fun guildPositon(data: JsonObject): Unit? = GuildPositionAction(client).handle(data)
+    fun guildPosition(data: JsonObject): Unit? = GuildPositionAction(client).handle(data)
 
     fun channelFetch(
         data: JsonElement,

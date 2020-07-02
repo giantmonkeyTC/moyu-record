@@ -7,9 +7,5 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 
 val handleGuildPosition: Handler = { client: Client, packet: JsonElement ->
-//    val g = packet.asJsonObject["d"].asJsonObject
-//    if (g["system_channel_id"].optString == "0") {
-//        g.add("system_channel_id", JsonNull.INSTANCE)
-//    }
-//    client.actions.
+    client.actions.guildPosition(packet.asJsonObject["d"].asJsonObject)
 }

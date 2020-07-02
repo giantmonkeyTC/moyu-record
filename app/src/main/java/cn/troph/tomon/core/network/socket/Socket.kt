@@ -51,7 +51,8 @@ class Socket : Observer<SocketEvent> {
         "MESSAGE_DELETE" to handleMessageDelete,
         "MESSAGE_UPDATE" to handleMessageUpdate,
         "MESSAGE_REACTION_ADD" to handleMessageReactionAdd,
-        "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove
+        "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove,
+        "GUILD_POSITION" to handleGuildPosition
     )
 
     constructor(client: Client) {
