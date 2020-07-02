@@ -12,7 +12,11 @@ class GuildCollection(client: Client) :
     BaseCollection<Guild>(client) {
 
     private val sortedList: SortedList<Guild> =
-        SortedList(Comparator { o1, o2 -> o1.compareTo(o2) })
+        SortedList(
+            Comparator { o1, o2 ->
+                o1.compareTo(o2)
+            }
+        )
 
     override fun add(data: JsonObject, identify: CollectionIdentify?): Guild? {
         val ins = super.add(data, identify)
