@@ -7,9 +7,13 @@ import android.app.ActivityOptions
 import android.app.Dialog
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
@@ -34,6 +38,12 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         val bottomSheet = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.fragment_user_information, null)
         bottomSheet.setContentView(view)
+        bottomSheet.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
