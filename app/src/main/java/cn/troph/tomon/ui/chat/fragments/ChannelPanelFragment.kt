@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentFilter
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,14 +29,12 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
-import cn.troph.tomon.ui.chat.ui.SpacesItemDecoration
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -623,7 +622,7 @@ class ChannelPanelFragment : Fragment() {
                             val file =
                                 File(
                                     requireContext().cacheDir,
-                                    requireContext().contentResolver.getFileName(item.uri)
+                                    getFileName(item.uri)
                                 )
                             val outputStream = FileOutputStream(file)
                             IOUtils.copy(inputStream, outputStream)
@@ -709,6 +708,30 @@ class ChannelPanelFragment : Fragment() {
         msg.isSending = true
         return msg
     }
+
+    fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? =
+                requireContext().contentResolver.query(uri, null, null, null, null)
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            } finally {
+                cursor?.close()
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result.substring(cut + 1)
+            }
+        }
+        return result
+    }
+
 }
 
 fun ContentResolver.getFileName(fileUri: Uri): String {
