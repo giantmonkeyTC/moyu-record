@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:id="@+id/fragment_user_information"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/shape_user_info_bottom_sheet">
 
-    <View
-        android:id="@+id/indicator"
-        android:layout_marginTop="10dp"
-        android:layout_width="24dp"
-        android:layout_height="12dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/indicator"
-        />
+<!--    <View-->
+<!--        android:id="@+id/indicator"-->
+<!--        android:layout_width="24dp"-->
+<!--        android:layout_height="12dp"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:background="@drawable/indicator" />-->
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_layout"
-        android:background="@color/actionBarBackground"
         android:layout_width="match_parent"
-        android:elevation="0dp"
         android:layout_height="?attr/actionBarSize"
-        >
+        android:background="@color/actionBarBackground"
+        android:elevation="0dp">
+
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:title="档案"
-            app:titleTextColor="@color/white"
-            />
+            app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -36,93 +35,178 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize">
 
-        <cn.troph.tomon.ui.widgets.UserAvatar
-            android:id="@+id/user_info_avatar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="50dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/user_info_name"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/section1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="12345"
-            android:textColor="@color/white"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_info_avatar" />
-        <TextView
-            android:id="@+id/user_info_discriminator"
-            android:layout_width="0dp"
+            android:background="@color/background4"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/section2"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <cn.troph.tomon.ui.widgets.UserAvatar
+                android:id="@+id/user_info_avatar"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/user_info_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/primaryText"
+                android:textSize="24sp"
+                app:layout_constraintStart_toEndOf="@id/user_info_avatar"
+                app:layout_constraintTop_toTopOf="@id/user_info_avatar" />
+
+            <TextView
+                android:id="@+id/user_info_discriminator"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/secondaryText"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/user_info_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/user_info_name" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/section2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="16sp"
-            android:text="124"
-            app:layout_constraintStart_toEndOf="@id/user_info_name"
-            app:layout_constraintBottom_toBottomOf="@id/user_info_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
+            android:layout_marginTop="8dp"
+            android:background="@color/background4"
+            app:layout_constraintTop_toBottomOf="@id/section1">
 
-        <TextView
-            android:id="@+id/user_info_nick"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="20dp"
-            android:background="@color/channelSelectBackground"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:text="12354"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_info_name" />
+            <TextView
+                android:id="@+id/user_info_nick_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:text="@string/profile_username"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/user_info_nick" />
 
-        <TextView
-            android:id="@+id/user_info_phone"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/channelSelectBackground"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:text="12354"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_info_nick" />
+            <TextView
+                android:id="@+id/user_info_nick"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp"
+                android:text="123532452344"
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/user_info_nick_holder" />
 
-        <TextView
-            android:id="@+id/user_info_email"
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/background2"
+                app:layout_constraintBottom_toTopOf="@id/user_info_phone_holder"
+                app:layout_constraintTop_toBottomOf="@id/user_info_nick_holder" />
+
+            <TextView
+                android:id="@+id/user_info_phone_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:text="@string/profile_phone"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+            <TextView
+                android:id="@+id/user_info_phone"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp"
+                android:text="12353474"
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/user_info_phone_holder" />
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:background="@color/background2"
+                app:layout_constraintBottom_toTopOf="@id/user_info_email_holder"
+                app:layout_constraintTop_toBottomOf="@id/user_info_phone_holder" />
+
+            <TextView
+                android:id="@+id/user_info_email_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:text="@string/profile_email"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider2" />
+
+            <TextView
+                android:id="@+id/user_info_email"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp"
+                android:text="12354"
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/user_info_email_holder" />
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/section3"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/channelSelectBackground"
-            android:gravity="center_vertical"
-            android:paddingStart="20dp"
-            android:text="12354"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_info_phone" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/background4"
+            app:layout_constraintTop_toBottomOf="@id/section2">
+
+            <TextView
+                android:id="@+id/user_sign_out"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="@string/profile_logout"
+                android:textColor="#FA8072"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
             android:id="@+id/extraSpace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/user_info_email" />
-
-        <TextView
-            android:id="@+id/user_sign_out"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            android:layout_marginBottom="40dp"
-            android:text="登出"
-            android:textColor="#FA8072"
-            android:textSize="25sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/section2" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
