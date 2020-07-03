@@ -1,16 +1,15 @@
 package cn.troph.tomon.ui.chat.fragments
 
-import android.animation.AnimatorInflater
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.app.ActivityOptions
 import android.app.Dialog
 import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.animation.addListener
 import androidx.core.content.edit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -34,9 +33,16 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         val bottomSheet = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.fragment_user_information, null)
         bottomSheet.setContentView(view)
+        bottomSheet.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
+        val indicator = view.findViewById<View>(R.id.indicator)
         bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
         extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
@@ -68,6 +74,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
                     }
                     BottomSheetBehavior.STATE_COLLAPSED -> {
                         hideAppBar(appBarLayout)
+                        showIndicator(indicator, indicator.measuredWidth, indicator.measuredHeight)
                     }
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         dismiss()
@@ -76,11 +83,19 @@ class UserInfoFragment : BottomSheetDialogFragment() {
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                if (slideOffset > 0)
+                if (slideOffset > 0) {
                     setAppBarHeight(appBarLayout, slideOffset, getActionBarSize())
+                    setIndicatorShape(
+                        indicator,
+                        slideOffset,
+                        indicator.measuredWidth,
+                        indicator.measuredHeight
+                    )
+                }
+
             }
         })
-        hideAppBar(appBarLayout);
+        hideAppBar(appBarLayout)
         return bottomSheet
     }
 
@@ -115,9 +130,26 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         view.layoutParams = params
     }
 
+    private fun setIndicatorShape(view: View, increasingFactor: Float, width: Int, height: Int) {
+        val params = view.layoutParams
+        val factor = ((1 - increasingFactor) * 0.7).toFloat()
+//        params.height = (height * factor).toInt()
+//        params.width = (width * factor).toInt()
+        view.alpha = factor
+        view.layoutParams = params
+    }
+
     private fun showView(view: View, size: Int) {
         val params = view.layoutParams
         params.height = size
+        view.layoutParams = params
+    }
+
+    private fun showIndicator(view: View, width: Int, height: Int) {
+        val params = view.layoutParams
+//        params.width = width
+//        params.height = height
+        view.alpha = 1F
         view.layoutParams = params
     }
 
