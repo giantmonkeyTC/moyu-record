@@ -38,11 +38,9 @@ import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
-import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -254,11 +252,8 @@ class ChannelPanelFragment : Fragment() {
                         }, 300)
                     }
                         , { _ ->
-                            GeneralSnackbar.make(
-                                GeneralSnackbar.findSuitableParent(btn_message_send)!!,
-                                requireContext().resources.getText(R.string.send_fail).toString(),
-                                Snackbar.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
                         })
             } else {
                 message!!.update(textToSend)
@@ -273,11 +268,8 @@ class ChannelPanelFragment : Fragment() {
                         }
                         mLayoutManager.scrollToPosition(mMsgList.size - 1)
                     }, { _ ->
-                        GeneralSnackbar.make(
-                            GeneralSnackbar.findSuitableParent(btn_message_send)!!,
-                            requireContext().resources.getText(R.string.send_fail).toString(),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                            .show()
                     })
             }
 
@@ -529,7 +521,8 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
             if (it.size == 0) {
-                val toast = Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT)
+                val toast =
+                    Toast.makeText(requireContext(), R.string.no_more_msg, Toast.LENGTH_SHORT)
                 toast.setGravity(Gravity.TOP, 0, 200)
                 toast.show()
                 isFetchingMore = false
@@ -675,14 +668,13 @@ class ChannelPanelFragment : Fragment() {
         ).observeOn(AndroidSchedulers.mainThread()).subscribe({
 
         }, {
-            GeneralSnackbar.make(
-                GeneralSnackbar.findSuitableParent(editText)!!,
-                requireActivity().getText(R.string.send_fail).toString(),
-                Snackbar.LENGTH_SHORT
-            ).show()
-            val index = mMsgList.indexOf(msg)
-            mMsgList.removeAt(index)
+            val deletedMsg = mMsgList.find {
+                it.nonce == msg.nonce
+            }
+            val index = mMsgList.indexOf(deletedMsg)
+            mMsgList.remove(deletedMsg)
             msgListAdapter.notifyItemRemoved(index)
+            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
         })
     }
 
