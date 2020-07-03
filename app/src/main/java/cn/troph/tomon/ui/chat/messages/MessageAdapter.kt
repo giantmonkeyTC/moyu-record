@@ -171,7 +171,17 @@ class MessageAdapter(
                 }
                 showReaction(holder, messageList[position])
                 for (item in messageList[position].attachments.values) {
-                    holder.itemView.textView.text = item.fileName
+                    if (messageList[position].isSending) {
+                        val apl = AlphaAnimation(0.1f, 0.78f)
+                        apl.duration = 1000
+                        apl.repeatCount = -1
+                        holder.itemView.textView.text = item.fileName
+                        holder.itemView.textView.startAnimation(apl)
+                    } else {
+                        holder.itemView.textView.text = item.fileName
+                        holder.itemView.textView.clearAnimation()
+                    }
+
                     holder.itemView.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
@@ -236,14 +246,11 @@ class MessageAdapter(
                 for (item in messageList[position].attachments.values) {
                     if (!item.url.isNullOrEmpty()) {
                         Glide.with(holder.itemView)
-                            .load(item.url + "?x-oss-process=image/resize,p_50")
+                            .load(item.url + "?x-oss-process=image/resize,p_40")
                             .placeholder(R.drawable.loadinglogo)
-                            .transition(DrawableTransitionOptions.withCrossFade(500))
                             .into(holder.itemView.chat_iv)
                     } else {
-                        Glide.with(holder.itemView).load(item.fileName)
-                            .placeholder(R.drawable.loadinglogo)
-                            .transition(DrawableTransitionOptions.withCrossFade(500))
+                        Glide.with(holder.itemView).load(item.fileName).placeholder(R.drawable.loadinglogo)
                             .into(holder.itemView.chat_iv)
                     }
 
@@ -262,10 +269,14 @@ class MessageAdapter(
                     }
                     break
                 }
-
-                holder.itemView.image_loading_llv.visibility =
-                    if (messageList[position].isSending) View.VISIBLE else View.GONE
-
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.chat_iv.startAnimation(apl)
+                } else {
+                    holder.itemView.chat_iv.clearAnimation()
+                }
                 showReaction(holder, messageList[position])
             }
             4 -> {
