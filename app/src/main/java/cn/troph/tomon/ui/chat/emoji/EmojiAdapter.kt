@@ -48,21 +48,12 @@ class EmojiAdapter(
                 if (emojiSectionObj.isBuildIn) {
                     it.textview_emoji.visibility = View.VISIBLE
                     it.imageview_emoji.visibility = View.GONE
-                    val charArray = emojiSectionObj.systemEmojiListData[position].code.split("-")
 
-                    val newString = charArray.map {
-                        "${it}".toInt(16)
-                    }
-                    val sb = StringBuilder()
-                    for (item in newString) {
-                        val char = Character.toChars(item)
-                        sb.append(char)
-                    }
-
-                    it.textview_emoji.text = sb.toString()
+                    it.textview_emoji.text =
+                        parseEmoji(emojiSectionObj.systemEmojiListData[position])
 
                     it.textview_emoji.setOnClickListener {
-                        emojiClickListener.onSystemEmojiSelected(emojiSectionObj.systemEmojiList[holder.sectionAdapterPosition])
+                        emojiClickListener.onSystemEmojiSelected(parseEmoji(emojiSectionObj.systemEmojiListData[holder.sectionAdapterPosition]))
                     }
                 } else {
                     it.textview_emoji?.visibility = View.GONE
@@ -75,6 +66,21 @@ class EmojiAdapter(
                 }
             }
         }
+    }
+
+    private fun parseEmoji(emojiObj: SystemEmojiData): String {
+        val charArray = emojiObj.code.split(
+            "-"
+        )
+        val newString = charArray.map {
+            it.toInt(16)
+        }
+        val sb = StringBuilder()
+        for (item in newString) {
+            val char = Character.toChars(item)
+            sb.append(char)
+        }
+        return sb.toString()
     }
 
     class EmojiItemViewHolder(itemView: View) : BaseSectionAdapter.ItemViewHolder(itemView)
@@ -105,7 +111,9 @@ class BottomEmojiAdapter(
         } else {
             holder.itemView.bottom_emoji_iv.visibility = View.GONE
             holder.itemView.ctv.visibility = View.VISIBLE
-            holder.itemView.ctv.text = urlList[position].text!![0].toString()
+            urlList[position].text?.let {
+                holder.itemView.ctv.text = parseEmoji(it)
+            }
         }
 
         holder.itemView.setOnClickListener {
@@ -115,6 +123,21 @@ class BottomEmojiAdapter(
 
     override fun getItemCount(): Int {
         return urlList.size
+    }
+
+    private fun parseEmoji(emojiObj: String): String {
+        val charArray = emojiObj.split(
+            "-"
+        )
+        val newString = charArray.map {
+            it.toInt(16)
+        }
+        val sb = StringBuilder()
+        for (item in newString) {
+            val char = Character.toChars(item)
+            sb.append(char)
+        }
+        return sb.toString()
     }
 
     class BottomEmojiVH(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -129,5 +152,5 @@ interface OnBottomGuildSelectedListener {
 
 interface OnEmojiClickListener {
     fun onEmojiSelected(emojiCode: String)
-    fun onSystemEmojiSelected(unicode: Int)
+    fun onSystemEmojiSelected(unicode: String)
 }

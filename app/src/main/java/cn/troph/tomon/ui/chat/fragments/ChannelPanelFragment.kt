@@ -95,8 +95,8 @@ class ChannelPanelFragment : Fragment() {
             editText.clearFocus()
         }
 
-        override fun onSystemEmojiSelected(unicode: Int) {
-            editText.text?.append(String(Character.toChars(unicode)))
+        override fun onSystemEmojiSelected(unicode: String) {
+            editText.text?.append(unicode)
             editText.clearFocus()
         }
     }
@@ -563,7 +563,7 @@ class ChannelPanelFragment : Fragment() {
             }
         }
         emoji_rr.layoutManager = mGridLayoutManager
-
+        //load guild emoji
         for (item in Client.global.guilds.list) {
             if (item.emojis.values.toMutableList().size == 0)
                 continue
@@ -577,7 +577,7 @@ class ChannelPanelFragment : Fragment() {
             val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
-
+        //loading system emoji
         val systemEmoji = SystemEmoji(requireContext())
         for (item in systemEmoji.returnEmojiWithCategory()) {
             val adapter = EmojiAdapter(
@@ -593,7 +593,7 @@ class ChannelPanelFragment : Fragment() {
 
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)
-
+        // bottom Emoji
         mBottomEmojiAdapter = BottomEmojiAdapter(
             guildIcon,
             onBottomGuildSelectedListener = object : OnBottomGuildSelectedListener {
