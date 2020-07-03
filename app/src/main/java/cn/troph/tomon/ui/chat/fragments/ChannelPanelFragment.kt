@@ -2,11 +2,8 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,11 +14,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -46,7 +40,6 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
-import com.alibaba.sdk.android.push.common.util.support.NetworkInfo
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
@@ -70,7 +63,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -155,6 +147,7 @@ class ChannelPanelFragment : Fragment() {
 
     private var message: Message? = null
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
+    private var isFetchingMore = false
     private val mMsgList = mutableListOf<Message>()
     private val msgListAdapter: MessageAdapter =
         MessageAdapter(mMsgList, object : ReactionSelectorListener {
@@ -349,6 +342,28 @@ class ChannelPanelFragment : Fragment() {
                         }
                     }
                 }
+                //load more message when user scroll up
+                if (!recyclerView.canScrollVertically(-1)) {
+                    if (!isFetchingMore) {
+                        isFetchingMore = true
+                        mMsgList.add(0, mHeaderMsg)
+                        msgListAdapter.notifyItemInserted(0)
+                        mHandler.postDelayed({
+                            channelId?.let {
+                                val cId = it
+                                if (mMsgList.size > 1) {
+                                    mMsgList[1].id?.let {
+                                        msgViewModel.loadOldMessage(cId, it)
+                                    }
+                                } else {
+                                    mMsgList.removeAt(0)
+                                    msgListAdapter.notifyItemRemoved(0)
+                                    isFetchingMore = false
+                                }
+                            }
+                        }, 1000)
+                    }
+                }
             }
         }
         )
@@ -361,28 +376,6 @@ class ChannelPanelFragment : Fragment() {
                     msgListAdapter.notifyDataSetChanged()
                 }
             })
-
-        //加载更多消息
-        swipe_refresh_ll.setDistanceToTriggerSync(10)
-        swipe_refresh_ll.setProgressViewEndTarget(false, 0)
-        swipe_refresh_ll.setOnRefreshListener {
-            mMsgList.add(0, mHeaderMsg)
-            msgListAdapter.notifyItemInserted(0)
-            mHandler.postDelayed(Runnable {
-                channelId?.let {
-                    val cId = it
-                    if (mMsgList.size > 1) {
-                        mMsgList[1].id?.let {
-                            msgViewModel.loadOldMessage(cId, it)
-                        }
-                    } else {
-                        mMsgList.clear()
-                        msgListAdapter.notifyDataSetChanged()
-                        swipe_refresh_ll.isRefreshing = false
-                    }
-                }
-            }, 1000)
-        }
 
         //消息更新
         btn_update_message_cancel.setOnClickListener {
@@ -535,15 +528,16 @@ class ChannelPanelFragment : Fragment() {
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
-            swipe_refresh_ll.isRefreshing = false
             if (it.size == 0) {
                 val toast = Toast.makeText(requireContext(), "没有更多消息了 :(", Toast.LENGTH_SHORT)
                 toast.setGravity(Gravity.TOP, 0, 200)
                 toast.show()
+                isFetchingMore = false
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
+                isFetchingMore = false
             }
         })
     }
