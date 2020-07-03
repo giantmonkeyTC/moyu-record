@@ -43,7 +43,7 @@
         app:layout_constraintTop_toTopOf="@id/message_avatar" />
 
 
-    <TextView
+    <androidx.emoji.widget.EmojiTextView
         android:id="@+id/widget_message_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

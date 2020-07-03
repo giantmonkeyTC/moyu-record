@@ -2,7 +2,6 @@ package cn.troph.tomon.ui.chat.fragments
 
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -16,28 +15,31 @@ import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageDeleteEvent
 import cn.troph.tomon.core.events.MessageReadEvent
-import cn.troph.tomon.core.events.ChannelSyncEvent
 import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.BadgeUtil
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.chat.emoji.SystemEmoji
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.annotations.SerializedName
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
-import kotlinx.android.synthetic.main.activity_register.*
-import kotlinx.android.synthetic.main.bottom_sheet_guild.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
 class GuildSelectorFragment : Fragment() {
 
     private val mGuildVM: GuildViewModel by viewModels()
-    private lateinit var mAdapter: GuildSelectorAdapter
+    private val mGuildList = mutableListOf<Guild>()
+    private val mAdapter = GuildSelectorAdapter(mGuildList)
     val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
 
     override fun onCreateView(
@@ -51,7 +53,8 @@ class GuildSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let { list ->
-                mAdapter = GuildSelectorAdapter(it)
+                mGuildList.clear()
+                mGuildList.addAll(list)
                 mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {
                     override fun onItemClick(view: View?, position: Int) {
                         val transaction =
@@ -141,12 +144,15 @@ class GuildSelectorFragment : Fragment() {
         })
         Client.global.eventBus.observeEventOnUi<MessageUpdateEvent>().subscribe(
             Consumer { event ->
-                if (event.message.guild!!.updateMention())
-                    mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
-                            event.message.guild!!
+                event.message.guild?.let {
+                    if (it.updateMention()) {
+                        mAdapter.notifyItemChanged(
+                            mGuildVM.getGuildListLiveData().value!!.indexOf(
+                                event.message.guild!!
+                            )
                         )
-                    )
+                    }
+                }
             })
 
         Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
@@ -156,9 +162,36 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
+        Client.global.eventBus.observeEventOnUi<GuildPositionEvent>().subscribe {
+            val rearrangedGuildList = mutableListOf<Guild>()
+            for (item in it.guilds) {
+                val newGuild = mGuildList.find {
+                    it.id == item.id
+                }
+                newGuild?.let {
+                    rearrangedGuildList.add(item.position, it)
+                }
+            }
+            mGuildList.clear()
+            mGuildList.addAll(rearrangedGuildList)
+            mAdapter.notifyDataSetChanged()
+        }
+
+        Client.global.eventBus.observeEventOnUi<GuildCreateEvent>().subscribe {
+            mGuildList.add(it.guild)
+            mAdapter.notifyItemInserted(mGuildList.size - 1)
+        }
+
+        Client.global.eventBus.observeEventOnUi<GuildDeleteEvent>().subscribe { event ->
+            mGuildList.removeIf {
+                it.id == event.guild.id
+            }
+            mAdapter.notifyDataSetChanged()
+        }
+
         view_avatar.setOnClickListener {
-            val userInfoBottomsheet = UserInfoFragment()
-            userInfoBottomsheet.show(parentFragmentManager, userInfoBottomsheet.tag)
+            val userInfoBottomSheet = UserInfoFragment()
+            userInfoBottomSheet.show(parentFragmentManager, userInfoBottomSheet.tag)
         }
         btn_dm_channel_entry.setOnClickListener {
             AppState.global.channelSelection.value =
@@ -244,25 +277,40 @@ class GuildSelectorFragment : Fragment() {
 }
 
 data class GuildInvite(
+    @SerializedName("id")
     val id: String,
+    @SerializedName("name")
     val name: String,
+    @SerializedName("memberCount")
     val memberCount: Int,
+    @SerializedName("icon")
     val icon: String,
+    @SerializedName("iconUrl")
     val iconUrl: String
 )
 
 data class Inviter(
+    @SerializedName("id")
     val id: String,
+    @SerializedName("username")
     val username: String,
+    @SerializedName("discriminator")
     val discriminator: String,
+    @SerializedName("avatar")
     val avatar: String,
+    @SerializedName("name")
     val name: String,
+    @SerializedName("avatar_url")
     val avatar_url: String
 )
 
 data class Invite(
+    @SerializedName("code")
     val code: String,
+    @SerializedName("guild")
     val guild: GuildInvite,
+    @SerializedName("inviter")
     val inviter: Inviter,
+    @SerializedName("joined")
     val joined: Boolean
 )

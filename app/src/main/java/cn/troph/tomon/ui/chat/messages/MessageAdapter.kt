@@ -27,6 +27,7 @@ import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -465,11 +466,16 @@ class MessageAdapter(
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
+                            val width =
+                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
+                                    itemView.context,
+                                    15f
+                                ).toFloat()
                             resource.setBounds(
                                 0,
                                 0,
-                                (itemView.widget_message_text.textSize * 2).toInt(),
-                                (itemView.widget_message_text.textSize * 2).toInt()
+                                width.toInt(),
+                                DensityUtil.dip2px(itemView.context, 15f)
                             )
                             span.setSpan(
                                 ImageSpan(resource),

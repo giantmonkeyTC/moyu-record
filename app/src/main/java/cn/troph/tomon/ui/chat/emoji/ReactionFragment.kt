@@ -1,12 +1,12 @@
 package cn.troph.tomon.ui.chat.emoji
 
 import android.os.Bundle
-import android.os.Message
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
@@ -14,9 +14,9 @@ import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_reaction.*
+import kotlinx.android.synthetic.main.fragment_reaction.bottom_emoji_rr
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -77,11 +77,11 @@ class ReactionFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
 
-            override fun onSystemEmojiSelected(unicode: Int) {
+            override fun onSystemEmojiSelected(unicode: String) {
                 Client.global.rest.messageService.addReaction(
                     mMessage.channelId,
                     mMessage.id!!,
-                    String(Character.toChars(unicode)),
+                    unicode,
                     Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ -> Logger.d("success") },
@@ -91,7 +91,8 @@ class ReactionFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
-        val guildIcon = mutableListOf<String>()
+
+        val guildIcon = mutableListOf<GuildIcon>()
         mSectionDataManager = SectionDataManager()
         mGridLayoutManager = GridLayoutManager(requireContext(), 7)
         val positionManager: PositionManager = mSectionDataManager
@@ -105,7 +106,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
             }
         }
         reaction_rr.layoutManager = mGridLayoutManager
-
+        //load guild emoji
         for (item in Client.global.guilds.list) {
             if (item.emojis.values.toMutableList().size == 0)
                 continue
@@ -116,34 +117,45 @@ class ReactionFragment : BottomSheetDialogFragment() {
                 emojiList = item.emojis.values.toMutableList()
             )
             item.iconURL?.let {
-                guildIcon.add(it)
+                guildIcon.add(GuildIcon(url = it, text = item.name))
             }
 
             val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
-        val systemEmoji = SystemEmoji()
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiEmoticons(),
-                emojiClickListener
-            ), 1
-        )
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiDingbats(),
-                emojiClickListener
-            ), 1
-        )
-        mSectionDataManager.addSection(
-            EmojiAdapter(
-                systemEmoji.getSystemEmojiTransport(),
-                emojiClickListener
-            ), 1
-        )
+        //load system emoji
+        val systemEmoji = SystemEmoji(requireContext())
+        for (item in systemEmoji.returnEmojiWithCategory()) {
+            val adapter = EmojiAdapter(
+                CustomGuildEmoji(
+                    name = item.key,
+                    isBuildIn = true,
+                    systemEmojiListData = item.value
+                ), emojiClickListener
+            )
+            mSectionDataManager.addSection(adapter, 1)
+            guildIcon.add(GuildIcon(null, item.value[0].code))
+        }
 
         reaction_rr.adapter = mSectionDataManager.adapter
         reaction_section_header_layout.attachTo(reaction_rr, mSectionDataManager)
+        // bottom Emoji
+        val mBottomEmojiAdapter = BottomEmojiAdapter(
+            guildIcon,
+            onBottomGuildSelectedListener = object : OnBottomGuildSelectedListener {
+                override fun onGuildSelected(position: Int) {
+                    mGridLayoutManager.scrollToPosition(
+                        mSectionDataManager.calcAdapterPos(
+                            position,
+                            0
+                        ) - 1
+                    )
+                }
+            })
+        bottom_emoji_rr.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        bottom_emoji_rr.adapter = mBottomEmojiAdapter
+
     }
 
     companion object {

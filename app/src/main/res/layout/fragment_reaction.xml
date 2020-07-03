@@ -1,19 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="500dp"
     android:background="#313131"
     tools:context=".ui.chat.emoji.ReactionFragment">
+
 
     <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
         android:id="@+id/reaction_section_header_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/line"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reaction_rr"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
     </com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout>
-</FrameLayout>
+
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/primaryDark"
+        app:layout_constraintBottom_toTopOf="@id/bottom_emoji_rr"
+        app:layout_constraintTop_toBottomOf="@id/reaction_section_header_layout" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bottom_emoji_rr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/line" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.events
 
+import cn.troph.tomon.core.actions.Position
 import cn.troph.tomon.core.structures.*
 
 open class Event
@@ -12,7 +13,7 @@ data class GuildFetchEvent(val guilds: List<Guild>) : Event()
 data class GuildCreateEvent(val guild: Guild) : Event()
 data class GuildDeleteEvent(val guild: Guild) : Event()
 data class GuildUpdateEvent(val guild: Guild) : Event()
-data class GuildPositionEvent(val guilds: List<Guild>) : Event()
+data class GuildPositionEvent(val guilds: List<Position>) : Event()
 
 class ChannelSyncEvent(val guild: Guild?) : Event()
 data class ChannelFetchEvent(val channels: List<Channel>) : Event()
