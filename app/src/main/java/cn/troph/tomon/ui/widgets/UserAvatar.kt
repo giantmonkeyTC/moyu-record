@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.graphics.ColorUtils
 import cn.troph.tomon.R
 import cn.troph.tomon.core.structures.User
 import com.bumptech.glide.Glide
@@ -15,6 +16,13 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 
 class UserAvatar : FrameLayout {
+
+    enum class AvatarRare {
+        N,
+        R,
+        SR,
+        SSR
+    }
 
     private lateinit var clipView: CircleView
     private lateinit var imageView: ImageView
@@ -62,6 +70,36 @@ class UserAvatar : FrameLayout {
         val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
         val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
         imageView.setBackgroundColor(color)
+    }
+
+    private fun rareById(seed: Int): AvatarRare {
+        val p = (seed % 10001237) % 20
+        if (p == 7) {
+            return AvatarRare.SSR
+        } else if (p == 4 || p == 13 || p == 19)
+            return AvatarRare.N
+        else if (p == 1 || p == 5 || p == 10 || p == 15)
+            return AvatarRare.SR
+        else
+            return AvatarRare.R
+    }
+
+    private fun colorById(seed: Int, rare: AvatarRare): Int {
+        val mod = ((seed % 100000000) / 100000000.0) * 360
+        var l = 0
+        var s = 0
+        when (rare) {
+            AvatarRare.R, AvatarRare.N, AvatarRare.SR -> {
+                s = 26
+                l = 56
+            }
+            AvatarRare.SSR -> {
+                s = 25
+                l = 5
+            }
+        }
+        return ColorUtils.HSLToColor(floatArrayOf(mod.toFloat(), s.toFloat(), l.toFloat()))
+
     }
 
     private fun listen() {
