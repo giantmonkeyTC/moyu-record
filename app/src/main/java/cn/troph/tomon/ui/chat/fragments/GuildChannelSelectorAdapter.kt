@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -156,6 +157,13 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                                 false
                             )
                         )
+                    }
+                    ChannelType.VOICE -> {
+                        Toast.makeText(
+                            itemView.context,
+                            R.string.no_voice_support,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
