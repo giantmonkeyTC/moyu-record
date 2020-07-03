@@ -286,14 +286,14 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
-        view_messages.addItemDecoration(
-            SpacesItemDecoration(
-                DensityUtil.dip2px(
-                    requireContext(),
-                    5f
-                )
-            )
-        )
+//        view_messages.addItemDecoration(
+//            SpacesItemDecoration(
+//                DensityUtil.dip2px(
+//                    requireContext(),
+//                    5f
+//                )
+//            )
+//        )
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -321,26 +321,27 @@ class ChannelPanelFragment : Fragment() {
                                 }
                             }
                         }
-                    }
-                    if (Client.global.channels[channelId!!] is DmChannel) {
-                        (Client.global.channels[channelId!!] as DmChannel).apply {
-                            if (messages.list.size != 0) {
-                                val lastMessageId = messages.list[messages.size - 1]
-                                val lastMessage = messages[lastMessageId.substring(2)]
-                                patch(JsonObject().apply {
-                                    addProperty("ack_message_id", lastMessageId)
-                                })
-                                lastMessage?.let {
-                                    it.ack().observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe({
-                                            client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                        }, {
-                                            Logger.d(it.message)
-                                        })
+                        if (Client.global.channels[channelId!!] is DmChannel) {
+                            (Client.global.channels[channelId!!] as DmChannel).apply {
+                                if (messages.list.size != 0) {
+                                    val lastMessageId = messages.list[messages.size - 1]
+                                    val lastMessage = messages[lastMessageId.substring(2)]
+                                    patch(JsonObject().apply {
+                                        addProperty("ack_message_id", lastMessageId)
+                                    })
+                                    lastMessage?.let {
+                                        it.ack().observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                            }, {
+                                                Logger.d(it.message)
+                                            })
+                                    }
                                 }
                             }
                         }
                     }
+
                 }
                 //load more message when user scroll up
                 if (!recyclerView.canScrollVertically(-1)) {

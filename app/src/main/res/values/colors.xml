@@ -7,6 +7,8 @@
     <color name="primaryLighter">#B3B0CD</color>
     <color name="primaryDark">#1b1b1b</color>
     <color name="primaryDarker">#1A1734</color>
+    <color name="secondary">#5996b8</color>
+    <color name="secondaryLight"></color>
     <color name="accent">#6d6d6d</color>
     <color name="activityBackground">#242424</color>
     <color name="actionBarBackground">#1E1E1E</color>

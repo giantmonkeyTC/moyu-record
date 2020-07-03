@@ -5,18 +5,17 @@
     android:id="@+id/flow_reaction_ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="5dp"
-    android:paddingTop="5dp"
+    android:layout_marginVertical="4dp"
     android:visibility="gone"
-    app:flChildSpacing="5dp"
+    app:flChildSpacing="4dp"
     app:flChildSpacingForLastRow="align"
-    app:flRowSpacing="5dp">
+    app:flRowSpacing="4dp">
 
     <LinearLayout
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -39,7 +38,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -62,7 +61,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -85,7 +84,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -108,7 +107,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -131,7 +130,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -154,7 +153,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -177,7 +176,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -200,7 +199,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -223,7 +222,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -246,7 +245,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -269,7 +268,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -292,7 +291,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -315,7 +314,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -338,7 +337,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -361,7 +360,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -384,7 +383,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -407,7 +406,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -430,7 +429,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -453,7 +452,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -476,7 +475,7 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:paddingVertical="2dp"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
@@ -498,10 +497,8 @@
     <LinearLayout
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
-        android:paddingVertical="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/round_corner_reaction"
         android:orientation="horizontal">
 
         <ImageView
@@ -512,7 +509,7 @@
             android:paddingHorizontal="2dp"
             android:src="@drawable/emoji_button_ic" />
         <androidx.emoji.widget.EmojiTextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@color/white"
