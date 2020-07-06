@@ -17,7 +17,9 @@ import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
+import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -35,6 +37,7 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -58,6 +61,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
+const val MAX = 600
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
@@ -116,7 +120,7 @@ class MessageAdapter(
         }
         var type = 0
         for (item in messageList[position].attachments.values) {
-            if (isImage(item.fileName)) {
+            if (isImage(item.type)) {
                 type = 2
             } else {
                 type = 1
@@ -251,17 +255,15 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    if (!item.url.isNullOrEmpty()) {
-                        Glide.with(holder.itemView)
-                            .load(item.url + "?x-oss-process=image/resize,p_40")
-                            .placeholder(R.drawable.loadinglogo)
-                            .into(holder.itemView.chat_iv)
-                    } else {
-                        Glide.with(holder.itemView).load(item.fileName)
-                            .placeholder(R.drawable.loadinglogo)
-                            .into(holder.itemView.chat_iv)
+                    holder.itemView.chat_iv.updateLayoutParams {
+                        height =
+                            DensityUtil.px2dip(holder.itemView.context, item.height!!.toFloat())
                     }
-
+                    Glide.with(holder.itemView)
+                        .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
+                        .placeholder(R.drawable.loadinglogo)
+                        .dontAnimate()
+                        .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {

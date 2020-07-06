@@ -19,6 +19,8 @@ class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
     var height: Int? = null
         private set
 
+    var type = ""
+
     init {
         patchSelf(data)
     }
@@ -41,6 +43,9 @@ class MessageAttachment(client: Client, data: JsonObject) : Base(client, data) {
         }
         if (data.has("height")) {
             height = data["height"].optInt
+        }
+        if (data.has("type")) {
+            type = data["type"].asString
         }
     }
 
