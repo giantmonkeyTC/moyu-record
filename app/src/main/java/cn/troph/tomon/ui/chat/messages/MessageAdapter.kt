@@ -299,7 +299,9 @@ class MessageAdapter(
                         messageList[position - 1].timestamp
                     ))
                 ) {
-                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
@@ -309,7 +311,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_invite.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_invite.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 4)

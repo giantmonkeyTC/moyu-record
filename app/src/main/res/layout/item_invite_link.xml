@@ -5,65 +5,63 @@
     android:layout_height="wrap_content"
     android:paddingHorizontal="16dp">
 
-    <LinearLayout
-        android:id="@+id/user_info_box_link"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
+
+    <cn.troph.tomon.ui.widgets.UserAvatar
+        android:id="@+id/message_avatar_invite"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_invite"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <cn.troph.tomon.ui.widgets.UserAvatar
-            android:id="@+id/message_avatar_invite"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="16dp" />
+    <TextView
+        android:id="@+id/widget_message_author_name_text_invite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_invite"
+        app:layout_constraintStart_toEndOf="@+id/message_avatar_invite"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_invite" />
 
-        <TextView
-            android:id="@+id/widget_message_author_name_text_invite"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_message_timestamp_text_invite"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/channelCategoryText"
-            android:textSize="14sp" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/widget_message_timestamp_text_invite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/channelCategoryText"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_invite"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_invite" />
 
     <TextView
         android:id="@+id/link_tv"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:paddingBottom="5dp"
+        android:layout_marginStart="48dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:textColor="#DDFFFFFF"
-        android:textColorLink="@android:color/holo_blue_dark"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/user_info_box_link"
-        app:layout_constraintTop_toBottomOf="@+id/user_info_box_link" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_invite"
+        android:textColorLink="@android:color/holo_blue_dark"
+       />
 
     <ImageView
         android:id="@+id/join_image"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
         android:adjustViewBounds="true"
+        android:layout_marginTop="4dp"
+        android:paddingBottom="4dp"
         android:src="@drawable/join"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/user_info_box_link"
+        app:layout_constraintStart_toStartOf="@id/link_tv"
         app:layout_constraintTop_toBottomOf="@id/link_tv" />
 
     <com.makeramen.roundedimageview.RoundedImageView
@@ -113,20 +111,19 @@
         app:layout_constraintStart_toStartOf="@id/join_image"
         app:layout_constraintTop_toTopOf="@id/join_image" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/reaction_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        app:layout_constraintStart_toStartOf="@id/user_info_box_link"
-        app:layout_constraintTop_toBottomOf="@id/join_image">
 
         <include
             layout="@layout/item_reaction_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintStart_toStartOf="@id/join_image"
+            app:layout_constraintTop_toBottomOf="@id/join_image" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
