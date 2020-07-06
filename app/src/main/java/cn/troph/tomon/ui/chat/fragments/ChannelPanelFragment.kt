@@ -277,14 +277,6 @@ class ChannelPanelFragment : Fragment() {
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
-//        view_messages.addItemDecoration(
-//            SpacesItemDecoration(
-//                DensityUtil.dip2px(
-//                    requireContext(),
-//                    5f
-//                )
-//            )
-//        )
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -335,7 +327,7 @@ class ChannelPanelFragment : Fragment() {
 
                 }
                 //load more message when user scroll up
-                if (!recyclerView.canScrollVertically(-1)) {
+                if (!view_messages.canScrollVertically(-1)) {
                     if (!isFetchingMore) {
                         isFetchingMore = true
                         mMsgList.add(0, mHeaderMsg)
@@ -395,7 +387,6 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
-
                                 }
                                 1 -> {
                                     builder.setCheckPermission(true).setShowVideos(true)
@@ -417,7 +408,6 @@ class ChannelPanelFragment : Fragment() {
                                         FilePickerActivity.CONFIGS,
                                         builder.build()
                                     )
-
                                 }
                             }
                             startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
@@ -605,52 +595,74 @@ class ChannelPanelFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
             data?.let {
-                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)?.let {
-                    for (item in it) {
-                        val parcelFileDescriptor =
-                            requireContext().contentResolver.openFileDescriptor(item.uri, "r", null)
-
-                        parcelFileDescriptor?.let {
-                            val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
-                            val file =
-                                File(
-                                    requireContext().cacheDir,
-                                    getFileName(item.uri)
+                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
+                    ?.let { fileList ->
+                        for (item in fileList) {
+                            val parcelFileDescriptor =
+                                requireContext().contentResolver.openFileDescriptor(
+                                    item.uri,
+                                    "r",
+                                    null
                                 )
-                            val outputStream = FileOutputStream(file)
-                            IOUtils.copy(inputStream, outputStream)
-                            val msgObject = JsonObject()
-                            msgObject.addProperty("id", "")
-                            msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-                            msgObject.addProperty("channelId", channelId)
-                            msgObject.addProperty("timestamp", LocalDateTime.now().toString())
-                            msgObject.addProperty("authorId", Client.global.me.id)
+
+                            parcelFileDescriptor?.let {
+                                val inputStream =
+                                    FileInputStream(parcelFileDescriptor.fileDescriptor)
+                                val file =
+                                    File(
+                                        requireContext().cacheDir,
+                                        getFileName(item.uri)
+                                    )
+                                val outputStream = FileOutputStream(file)
+                                IOUtils.copy(inputStream, outputStream)
+                                val msgObject = JsonObject()
+                                msgObject.addProperty("id", "")
+                                msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+                                msgObject.addProperty("channelId", channelId)
+                                msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+                                msgObject.addProperty("authorId", Client.global.me.id)
 
 
-                            val userObject = JsonObject()
-                            userObject.addProperty("id", Client.global.me.id)
-                            userObject.addProperty("username", Client.global.me.username)
-                            userObject.addProperty("discriminator", Client.global.me.discriminator)
-                            userObject.addProperty("name", Client.global.me.name)
-                            userObject.addProperty("avatar", Client.global.me.avatar)
-                            userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+                                val userObject = JsonObject()
+                                userObject.addProperty("id", Client.global.me.id)
+                                userObject.addProperty("username", Client.global.me.username)
+                                userObject.addProperty(
+                                    "discriminator",
+                                    Client.global.me.discriminator
+                                )
+                                userObject.addProperty("name", Client.global.me.name)
+                                userObject.addProperty("avatar", Client.global.me.avatar)
+                                userObject.addProperty("avatar_url", Client.global.me.avatarURL)
 
-                            msgObject.add("author", userObject)
+                                msgObject.add("author", userObject)
 
-                            val msg = Message(client = Client.global, data = msgObject)
-                            val attachmentObj = JsonObject()
-                            attachmentObj.addProperty("id", "new_image")
-                            attachmentObj.addProperty("filename", file.absolutePath)
-                            val attachment = MessageAttachment(Client.global, attachmentObj)
-                            msg.attachments["new_attachment"] = attachment
-                            msg.isSending = true
-                            mMsgList.add(msg)
-                            msgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                            mLayoutManager.scrollToPosition(mMsgList.size - 1)
-                            uploadFile(file, msg)
+                                val msg = Message(client = Client.global, data = msgObject)
+                                val attachmentObj = JsonObject()
+                                attachmentObj.addProperty("id", "new_image")
+                                attachmentObj.addProperty("filename", file.absolutePath)
+                                if (item.mediaType == MediaFile.TYPE_IMAGE) {
+                                    attachmentObj.addProperty(
+                                        "type",
+                                        file.absolutePath.substringAfterLast(".", "")
+                                    )
+                                    attachmentObj.addProperty("width", item.width)
+                                    attachmentObj.addProperty("height", item.height)
+                                } else {
+                                    attachmentObj.addProperty(
+                                        "type",
+                                        file.absolutePath.substringAfterLast(".", "")
+                                    )
+                                }
+                                val attachment = MessageAttachment(Client.global, attachmentObj)
+                                msg.attachments["new_attachment"] = attachment
+                                msg.isSending = true
+                                mMsgList.add(msg)
+                                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                                mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                                uploadFile(file, msg)
+                            }
                         }
                     }
-                }
             }
         }
     }
