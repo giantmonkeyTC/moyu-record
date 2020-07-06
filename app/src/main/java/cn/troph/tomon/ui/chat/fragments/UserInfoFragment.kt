@@ -45,7 +45,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val profileLayout = view.findViewById<ConstraintLayout>(R.id.profile_layout)
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
-        val indicator = view.findViewById<View>(R.id.indicator)
+//        val indicator = view.findViewById<View>(R.id.indicator)
         bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         val peekHeightPx = requireContext().resources
             .getDimensionPixelSize(R.dimen.profile_peek_height)
