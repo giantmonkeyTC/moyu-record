@@ -46,7 +46,7 @@
         android:id="@+id/chat_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="250dp"
+        android:maxWidth="300dp"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="5dp"
         android:adjustViewBounds="true"
@@ -54,7 +54,7 @@
         app:layout_constraintBottom_toTopOf="@id/reaction_container"
         app:layout_constraintStart_toStartOf="@id/user_info_box_link_image"
         app:layout_constraintTop_toBottomOf="@id/user_info_box_link_image"
-        app:riv_corner_radius="10dp" />
+        app:riv_corner_radius="5dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/reaction_container"

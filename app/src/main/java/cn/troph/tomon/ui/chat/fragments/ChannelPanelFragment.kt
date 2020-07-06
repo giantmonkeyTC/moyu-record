@@ -95,6 +95,7 @@ class ChannelPanelFragment : Fragment() {
             val changed = field != value
             field = value
             if (changed && value != null) {
+                mHeaderMsg.isEnd = false
                 editText.post {
                     editText.text = null
                 }
@@ -330,22 +331,33 @@ class ChannelPanelFragment : Fragment() {
                 if (!view_messages.canScrollVertically(-1)) {
                     if (!isFetchingMore) {
                         isFetchingMore = true
-                        mMsgList.add(0, mHeaderMsg)
-                        msgListAdapter.notifyItemInserted(0)
-                        mHandler.postDelayed({
-                            channelId?.let {
-                                val cId = it
-                                if (mMsgList.size > 1) {
-                                    mMsgList[1].id?.let {
-                                        msgViewModel.loadOldMessage(cId, it)
+                        if (!mHeaderMsg.isEnd) {
+                            mMsgList.add(0, mHeaderMsg)
+                            msgListAdapter.notifyItemInserted(0)
+                            mHandler.postDelayed({
+                                channelId?.let {
+                                    val cId = it
+                                    if (mMsgList.size > 1) {
+                                        mMsgList[1].id?.let {
+                                            msgViewModel.loadOldMessage(cId, it)
+                                        }
+                                    } else {
+                                        mMsgList.removeAt(0)
+                                        msgListAdapter.notifyItemRemoved(0)
+                                        isFetchingMore = false
                                     }
-                                } else {
-                                    mMsgList.removeAt(0)
-                                    msgListAdapter.notifyItemRemoved(0)
-                                    isFetchingMore = false
                                 }
-                            }
-                        }, 1000)
+                            }, 1000)
+                        } else {
+                            mMsgList.add(0, mHeaderMsg)
+                            msgListAdapter.notifyItemInserted(0)
+                            mHandler.postDelayed({
+                                val index = mMsgList.indexOf(mHeaderMsg)
+                                mMsgList.removeAt(index)
+                                msgListAdapter.notifyItemRemoved(index)
+                                isFetchingMore = false
+                            }, 2000)
+                        }
                     }
                 }
             }
@@ -511,10 +523,7 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
             if (it.size == 0) {
-                val toast =
-                    Toast.makeText(requireContext(), R.string.no_more_msg, Toast.LENGTH_SHORT)
-                toast.setGravity(Gravity.TOP, 0, 200)
-                toast.show()
+                mHeaderMsg.isEnd = true
                 isFetchingMore = false
                 return@Observer
             } else {

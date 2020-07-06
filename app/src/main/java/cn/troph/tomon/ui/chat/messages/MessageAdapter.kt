@@ -51,6 +51,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
+import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
@@ -61,7 +62,6 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
-const val MAX = 600
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
@@ -185,11 +185,13 @@ class MessageAdapter(
                         apl.duration = 1000
                         apl.repeatCount = -1
                         holder.itemView.textView.text = item.fileName
-                        holder.itemView.message_file_size.text = FileUtils.sizeConverter(item.size.toString())
+                        holder.itemView.message_file_size.text =
+                            FileUtils.sizeConverter(item.size.toString())
                         holder.itemView.textView.startAnimation(apl)
                     } else {
                         holder.itemView.textView.text = item.fileName
-                        holder.itemView.message_file_size.text = FileUtils.sizeConverter(item.size.toString())
+                        holder.itemView.message_file_size.text =
+                            FileUtils.sizeConverter(item.size.toString())
                         holder.itemView.textView.clearAnimation()
                     }
 
@@ -256,8 +258,10 @@ class MessageAdapter(
                 }
                 for (item in messageList[position].attachments.values) {
                     holder.itemView.chat_iv.updateLayoutParams {
-                        height =
-                            DensityUtil.px2dip(holder.itemView.context, item.height!!.toFloat())
+                        item.height?.let {
+                            height =
+                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
+                        }
                     }
                     Glide.with(holder.itemView)
                         .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
@@ -288,6 +292,16 @@ class MessageAdapter(
                     holder.itemView.chat_iv.clearAnimation()
                 }
                 showReaction(holder, messageList[position])
+            }
+            3 -> {
+                val msg = messageList[position] as HeaderMessage
+                if (msg.isEnd) {
+                    holder.itemView.loading_text_header.visibility = View.VISIBLE
+                    holder.itemView.animation_view.visibility = View.GONE
+                } else {
+                    holder.itemView.loading_text_header.visibility = View.GONE
+                    holder.itemView.animation_view.visibility = View.VISIBLE
+                }
             }
             4 -> {
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(

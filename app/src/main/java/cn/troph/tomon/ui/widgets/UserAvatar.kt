@@ -68,17 +68,16 @@ class UserAvatar : FrameLayout {
     private fun update() {
         val url = user?.avatarURL
         Glide.with(this).load(url).placeholder(R.drawable.ic_avatar_default).into(imageView)
-        val seed = Snowflake.deconstruct(user!!.id).timestamp
-        println(Snowflake.deconstruct(user!!.id))
+        val seed = Snowflake.deconstruct(if (user == null) "0" else user!!.id).timestamp
         val rare = rareById(seed)
-        val color = colorById(seed,rare)
+        val color = colorById(seed, rare)
         imageView.setBackgroundColor(color)
         imageView.setImageResource(
             when (rare) {
                 AvatarRare.SSR -> R.drawable.avatar_ssr
-                AvatarRare.SR-> R.drawable.avatar_sr
+                AvatarRare.SR -> R.drawable.avatar_sr
                 AvatarRare.R -> R.drawable.avatar_r
-                else->R.drawable.avatar_n
+                else -> R.drawable.avatar_n
             }
         )
     }
