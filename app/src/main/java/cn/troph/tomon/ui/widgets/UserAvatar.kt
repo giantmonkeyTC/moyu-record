@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.widgets
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Color.HSVToColor
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import androidx.core.graphics.ColorUtils
 import cn.troph.tomon.R
 import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.utils.Snowflake
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.CircleView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -66,39 +68,52 @@ class UserAvatar : FrameLayout {
     private fun update() {
         val url = user?.avatarURL
         Glide.with(this).load(url).placeholder(R.drawable.ic_avatar_default).into(imageView)
-        val number = user?.id?.toLongOrNull() ?: 0L
-        val hue = (number % 100000000).toFloat() / 100000000.0f * 360f
-        val color = Color.HSVToColor(floatArrayOf(hue, 23.1f, 47.5f))
+        val seed = Snowflake.deconstruct(user!!.id).timestamp
+        println(Snowflake.deconstruct(user!!.id))
+        val rare = rareById(seed)
+        val color = colorById(seed,rare)
         imageView.setBackgroundColor(color)
+        imageView.setImageResource(
+            when (rare) {
+                AvatarRare.SSR -> R.drawable.avatar_ssr
+                AvatarRare.SR-> R.drawable.avatar_sr
+                AvatarRare.R -> R.drawable.avatar_r
+                else->R.drawable.avatar_n
+            }
+        )
     }
 
-    private fun rareById(seed: Int): AvatarRare {
+    private fun rareById(seed: Long): AvatarRare {
         val p = (seed % 10001237) % 20
-        if (p == 7) {
+        if (p == 7L) {
             return AvatarRare.SSR
-        } else if (p == 4 || p == 13 || p == 19)
+        } else if (p == 4L || p == 13L || p == 19L)
             return AvatarRare.N
-        else if (p == 1 || p == 5 || p == 10 || p == 15)
+        else if (p == 1L || p == 5L || p == 10L || p == 15L)
             return AvatarRare.SR
         else
             return AvatarRare.R
     }
 
-    private fun colorById(seed: Int, rare: AvatarRare): Int {
-        val mod = ((seed % 100000000) / 100000000.0) * 360
-        var l = 0
-        var s = 0
+    private fun colorById(seed: Long, rare: AvatarRare): Int {
+        val mod = (((seed % 100000000) / 100000000.0) * 360)
+        var l = 0f
+        var s = 0f
         when (rare) {
             AvatarRare.R, AvatarRare.N, AvatarRare.SR -> {
-                s = 26
-                l = 56
+                s = 0.26f
+                l = 0.56f
             }
             AvatarRare.SSR -> {
-                s = 25
-                l = 5
+                s = 0.25f
+                l = 0.05f
             }
         }
-        return ColorUtils.HSLToColor(floatArrayOf(mod.toFloat(), s.toFloat(), l.toFloat()))
+        val floatArray = FloatArray(3)
+        floatArray[0] = mod.toFloat()
+        floatArray[1] = s
+        floatArray[2] = l
+        return ColorUtils.HSLToColor(floatArray)
 
     }
 
