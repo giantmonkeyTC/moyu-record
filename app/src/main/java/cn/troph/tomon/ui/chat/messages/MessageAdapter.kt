@@ -28,6 +28,7 @@ import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.core.utils.FileUtils
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -153,7 +154,9 @@ class MessageAdapter(
                         messageList[position - 1].timestamp
                     ))
                 ) {
-                    holder.itemView.user_info_box_link_file.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_file.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
@@ -163,7 +166,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_file.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link_file.visibility = View.GONE
+                    holder.itemView.message_avatar_file.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_file.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_file.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 1)
@@ -176,13 +181,15 @@ class MessageAdapter(
                         apl.duration = 1000
                         apl.repeatCount = -1
                         holder.itemView.textView.text = item.fileName
+                        holder.itemView.message_file_size.text = FileUtils.sizeConverter(item.size.toString())
                         holder.itemView.textView.startAnimation(apl)
                     } else {
                         holder.itemView.textView.text = item.fileName
+                        holder.itemView.message_file_size.text = FileUtils.sizeConverter(item.size.toString())
                         holder.itemView.textView.clearAnimation()
                     }
 
-                    holder.itemView.setOnClickListener {
+                    holder.itemView.btn_file_save.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
                             GeneralSnackbar.make(
@@ -250,7 +257,8 @@ class MessageAdapter(
                             .placeholder(R.drawable.loadinglogo)
                             .into(holder.itemView.chat_iv)
                     } else {
-                        Glide.with(holder.itemView).load(item.fileName).placeholder(R.drawable.loadinglogo)
+                        Glide.with(holder.itemView).load(item.fileName)
+                            .placeholder(R.drawable.loadinglogo)
                             .into(holder.itemView.chat_iv)
                     }
 

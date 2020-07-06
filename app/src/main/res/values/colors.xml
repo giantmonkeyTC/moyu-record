@@ -5,6 +5,7 @@
     <color name="primary">#424242</color>
     <color name="primaryLight">#7A74A6</color>
     <color name="primaryLighter">#B3B0CD</color>
+    <color name="primaryLowAlpha">#40424242</color>
     <color name="primaryDark">#1b1b1b</color>
     <color name="primaryDarker">#1A1734</color>
     <color name="secondary">#5996b8</color>

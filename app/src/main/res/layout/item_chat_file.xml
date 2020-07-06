@@ -2,84 +2,115 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout1_file"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="16dp">
 
-    <LinearLayout
-        android:id="@+id/user_info_box_link_file"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
+
+    <cn.troph.tomon.ui.widgets.UserAvatar
+        android:id="@+id/message_avatar_file"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_file"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <cn.troph.tomon.ui.widgets.UserAvatar
-            android:layout_marginTop="16dp"
-            android:id="@+id/message_avatar_file"
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
-
-        <TextView
-            android:layout_marginTop="8dp"
-            android:id="@+id/widget_message_author_name_text_file"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:textColor="@color/white" />
-
-        <TextView
-            android:layout_marginTop="8dp"
-            android:id="@+id/widget_message_timestamp_text_file"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="14sp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:textColor="@color/channelCategoryText" />
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintStart_toStartOf="@id/user_info_box_link_file"
-        app:layout_constraintTop_toBottomOf="@id/user_info_box_link_file"
-        app:srcCompat="@drawable/ic_file" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/widget_message_author_name_text_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:text="file name"
-        android:textColor="#DDFFFFFF"
+        android:textColor="@color/white"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/imageView"
-        app:layout_constraintStart_toEndOf="@id/imageView"
-        app:layout_constraintTop_toTopOf="@id/imageView" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_file"
+        app:layout_constraintStart_toEndOf="@+id/message_avatar_file"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
+
+    <TextView
+        android:id="@+id/widget_message_timestamp_text_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/channelCategoryText"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_file"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+        android:id="@+id/message_file_section"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        app:layout_constraintStart_toStartOf="@id/user_info_box_link_file"
-        app:layout_constraintTop_toBottomOf="@id/imageView">
+        android:layout_marginStart="48dp"
+        android:background="@drawable/shape_message_file"
+        android:paddingVertical="4dp"
+        android:layout_marginVertical="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_file">
 
-        <include
-            layout="@layout/item_reaction_view"
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/outline_insert_drive_file_white_48" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="file name"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/imageView"
+            app:layout_constraintTop_toTopOf="@id/imageView" />
+
+        <TextView
+            android:id="@+id/message_file_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="132413465"
+            android:textColor="@color/secondaryText"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/textView"
+            app:layout_constraintTop_toBottomOf="@id/textView" />
+
+        <ImageView
+            android:id="@+id/btn_file_save"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/outline_save_alt_white_48"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <include
+        layout="@layout/item_reaction_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/message_file_section"
+        app:layout_constraintStart_toStartOf="@id/message_file_section"
+        app:layout_constraintTop_toBottomOf="@id/message_file_section" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
