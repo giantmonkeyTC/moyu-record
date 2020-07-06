@@ -27,7 +27,8 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_file"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_file"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file"
+        />
 
     <TextView
         android:id="@+id/widget_message_timestamp_text_file"
@@ -37,7 +38,8 @@
         android:textColor="@color/channelCategoryText"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_file"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_file_section"
@@ -49,7 +51,8 @@
         android:layout_marginVertical="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_file">
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_file"
+        >
 
         <ImageView
             android:id="@+id/imageView"
