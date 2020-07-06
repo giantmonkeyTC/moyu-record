@@ -235,7 +235,9 @@ class MessageAdapter(
                         messageList[position - 1].timestamp
                     ))
                 ) {
-                    holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_image.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
 
                     holder.itemView.widget_message_author_name_text_image.text =
@@ -247,7 +249,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link_image.visibility = View.GONE
+                    holder.itemView.message_avatar_image.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_image.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_image.visibility = View.GONE
                 }
 
                 holder.itemView.chat_iv.setOnLongClickListener {
