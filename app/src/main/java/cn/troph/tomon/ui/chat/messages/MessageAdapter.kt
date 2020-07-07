@@ -59,6 +59,7 @@ import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
@@ -153,10 +154,11 @@ class MessageAdapter(
                 showReaction(holder, msg)
             }
             1 -> {
-                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
-                        messageList[position].timestamp,
-                        messageList[position - 1].timestamp
-                    ))
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId ||
+                    messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
+
                 ) {
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
@@ -232,10 +234,9 @@ class MessageAdapter(
                 }
             }
             2 -> {
-                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
-                        messageList[position].timestamp,
-                        messageList[position - 1].timestamp
-                    ))
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
                 ) {
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
@@ -308,10 +309,9 @@ class MessageAdapter(
                 }
             }
             4 -> {
-                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || (messageList[position - 1].authorId == messageList[position].authorId && isMoreThanFiveMins(
-                        messageList[position].timestamp,
-                        messageList[position - 1].timestamp
-                    ))
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
                 ) {
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
@@ -355,6 +355,7 @@ class MessageAdapter(
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             {
+                                println("12345"+it.inviter)
                                 Glide.with(holder.itemView).load(it.inviter.avatar_url)
                                     .placeholder(R.drawable.user_avatar_placeholder)
                                     .into(holder.itemView.user_avatar_invite)
@@ -487,7 +488,8 @@ class MessageAdapter(
     }
 
     private fun isMoreThanFiveMins(fromDate: LocalDateTime, toDate: LocalDateTime): Boolean {
-        val min = ChronoUnit.MINUTES.between(fromDate, toDate)
+        val min = (toDate.toInstant(ZoneOffset.UTC).toEpochMilli() - fromDate.toInstant(ZoneOffset.UTC)
+            .toEpochMilli()) / (1000 * 60)
         return min > 5
     }
 

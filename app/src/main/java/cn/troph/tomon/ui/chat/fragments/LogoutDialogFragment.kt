@@ -24,6 +24,10 @@ class LogoutDialogFragment : DialogFragment() {
             builder.setMessage(R.string.porofile_check_logout)
                 .setPositiveButton(R.string.profile_confirm_logout,
                     DialogInterface.OnClickListener { dialog, id ->
+                        Client.global.preferences.edit {
+                            putString(LAST_CHANNEL_ID, null)
+                        }
+                        Client.global.me.logout()
                         gotoEntryOption()
                     })
                 .setNegativeButton(R.string.profile_cancel_logout,

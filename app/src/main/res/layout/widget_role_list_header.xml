@@ -4,15 +4,16 @@
     android:id="@+id/widget_role_list_header"
     android:layout_width="match_parent"
     android:background="@color/channelSelectBackground"
-    android:layout_height="20dp">
+    android:layout_height="28dp">
 
     <TextView
         android:gravity="center"
         android:id="@+id/widget_role_list_header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:layout_marginStart="15dp"
+        android:paddingVertical="4dp"
+        android:textSize="14sp"
+        android:layout_marginStart="28dp"
         android:textColor="@color/channelCategoryText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

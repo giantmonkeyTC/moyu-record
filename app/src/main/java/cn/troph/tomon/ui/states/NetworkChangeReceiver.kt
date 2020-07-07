@@ -21,7 +21,7 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         new = TSnackbar.make(
             mView,
-            "Ground Control to Major Tom",
+            "网络连接中断",
             TSnackbar.LENGTH_INDEFINITE
         ).apply {
             val view = this.view
@@ -52,7 +52,7 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
         this.mView = view
         old = TSnackbar.make(
             mView,
-            "Ground Control to Major Tom",
+            "网络连接中断",
             TSnackbar.LENGTH_INDEFINITE
         ).apply {
             val view = this.view
