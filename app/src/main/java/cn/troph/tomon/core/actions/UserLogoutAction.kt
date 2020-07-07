@@ -10,6 +10,7 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
         client.users.clear()
         client.guilds.clear()
         client.channels.clear()
+        client.dmChannels.clear()
         client.me.clear()
         client.preferences.edit {
             remove("token")
