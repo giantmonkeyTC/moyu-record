@@ -98,6 +98,7 @@ class LoginActivity : AppCompatActivity() {
         })
 
         button_login.setOnClickListener {
+            button_login.isClickable = false
             val uid = register_input_user_name.text.toString()
             val pw = register_input_union_id.text.toString()
             val valid = viewModel.loginDataValidate(uid, pw)
@@ -115,6 +116,7 @@ class LoginActivity : AppCompatActivity() {
                             gotoChat()
                         }
                 }, {
+                    button_login.isClickable = true
                     if (it is HttpException) {
                         button_login.hideProgress(if (it.code() >= 500) R.string.auth_server_error else R.string.login_failed)
                     }
