@@ -355,7 +355,6 @@ class MessageAdapter(
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             {
-                                println("12345"+it.inviter)
                                 Glide.with(holder.itemView).load(it.inviter.avatar_url)
                                     .placeholder(R.drawable.user_avatar_placeholder)
                                     .into(holder.itemView.user_avatar_invite)
