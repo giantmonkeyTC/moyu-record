@@ -329,6 +329,7 @@ class ChannelPanelFragment : Fragment() {
                 }
                 //load more message when user scroll up
                 if (!view_messages.canScrollVertically(-1)) {
+                    Logger.d("header:${mHeaderMsg.isEnd}")
                     if (!isFetchingMore) {
                         isFetchingMore = true
                         if (!mHeaderMsg.isEnd) {
