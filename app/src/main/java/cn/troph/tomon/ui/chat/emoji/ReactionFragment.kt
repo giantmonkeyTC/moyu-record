@@ -1,32 +1,33 @@
 package cn.troph.tomon.ui.chat.emoji
 
+import android.app.Dialog
+import android.content.DialogInterface
+import android.content.res.Resources
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_reaction.*
-import kotlinx.android.synthetic.main.fragment_reaction.bottom_emoji_rr
+
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ReactionFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ReactionFragment : BottomSheetDialogFragment() {
 
     lateinit var mMessage: cn.troph.tomon.core.structures.Message
@@ -34,6 +35,21 @@ class ReactionFragment : BottomSheetDialogFragment() {
     private var param2: String? = null
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
+
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        val bottomSheetDialog =
+//            super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+//        bottomSheetDialog.setOnShowListener { dialog: DialogInterface ->
+//            val dialogc = dialog as BottomSheetDialog
+//            // When using AndroidX the resource can be found at com.google.android.material.R.id.design_bottom_sheet
+//            val bottomSheet =
+//                dialogc.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+//            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet as View)
+//            bottomSheetBehavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+//            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+//        }
+//        return bottomSheetDialog
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
