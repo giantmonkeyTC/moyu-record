@@ -5,9 +5,15 @@
     <color name="primary">#424242</color>
     <color name="primaryLight">#7A74A6</color>
     <color name="primaryLighter">#B3B0CD</color>
+    <color name="primaryLowAlpha">#40424242</color>
     <color name="primaryDark">#1b1b1b</color>
     <color name="primaryDarker">#1A1734</color>
+    <color name="secondary">#5996b8</color>
+    <color name="secondaryLight"></color>
     <color name="accent">#6d6d6d</color>
+    <color name="primaryText">#FFFFFF</color>
+    <color name="captionText">#99FFFFFF</color>
+    <color name="secondaryText">#828282</color>
     <color name="activityBackground">#242424</color>
     <color name="actionBarBackground">#1E1E1E</color>
     <color name="actionBarText">#FFFFFF</color>
@@ -24,4 +30,10 @@
     <color name="channelCategoryText">#828282</color>
     <color name="channelSelectBackground">#3A3A3A</color>
     <color name="inputPanelBackground">#343536</color>
+    <color name="background1">#171717</color>
+    <color name="background2">#2E2E2E</color>
+    <color name="background3">#313131</color>
+    <color name="background4">#393939</color>
+    <color name="error">#FF7A6B</color>
+    <color name="primaryVariant">#FFA1C8</color>
 </resources>

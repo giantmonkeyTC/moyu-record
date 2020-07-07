@@ -17,7 +17,9 @@ import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
+import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -28,12 +30,14 @@ import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.core.utils.FileUtils
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -47,6 +51,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
+import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
@@ -116,7 +121,7 @@ class MessageAdapter(
         }
         var type = 0
         for (item in messageList[position].attachments.values) {
-            if (isImage(item.fileName)) {
+            if (isImage(item.type)) {
                 type = 2
             } else {
                 type = 1
@@ -155,7 +160,9 @@ class MessageAdapter(
                     )
 
                 ) {
-                    holder.itemView.user_info_box_link_file.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_file.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
@@ -165,7 +172,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_file.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link_file.visibility = View.GONE
+                    holder.itemView.message_avatar_file.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_file.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_file.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 1)
@@ -173,8 +182,22 @@ class MessageAdapter(
                 }
                 showReaction(holder, messageList[position])
                 for (item in messageList[position].attachments.values) {
-                    holder.itemView.textView.text = item.fileName
-                    holder.itemView.setOnClickListener {
+                    if (messageList[position].isSending) {
+                        val apl = AlphaAnimation(0.1f, 0.78f)
+                        apl.duration = 1000
+                        apl.repeatCount = -1
+                        holder.itemView.textView.text = item.fileName
+                        holder.itemView.message_file_size.text =
+                            FileUtils.sizeConverter(item.size.toString())
+                        holder.itemView.textView.startAnimation(apl)
+                    } else {
+                        holder.itemView.textView.text = item.fileName
+                        holder.itemView.message_file_size.text =
+                            FileUtils.sizeConverter(item.size.toString())
+                        holder.itemView.textView.clearAnimation()
+                    }
+
+                    holder.itemView.btn_file_save.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
                             GeneralSnackbar.make(
@@ -215,7 +238,9 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
-                    holder.itemView.user_info_box_link_image.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_image.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
 
                     holder.itemView.widget_message_author_name_text_image.text =
@@ -227,7 +252,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link_image.visibility = View.GONE
+                    holder.itemView.message_avatar_image.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_image.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_image.visibility = View.GONE
                 }
 
                 holder.itemView.chat_iv.setOnLongClickListener {
@@ -235,19 +262,17 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    if (!item.url.isNullOrEmpty()) {
-                        Glide.with(holder.itemView)
-                            .load(item.url + "?x-oss-process=image/resize,p_50")
-                            .placeholder(R.drawable.loadinglogo)
-                            .transition(DrawableTransitionOptions.withCrossFade(500))
-                            .into(holder.itemView.chat_iv)
-                    } else {
-                        Glide.with(holder.itemView).load(item.fileName)
-                            .placeholder(R.drawable.loadinglogo)
-                            .transition(DrawableTransitionOptions.withCrossFade(500))
-                            .into(holder.itemView.chat_iv)
+                    holder.itemView.chat_iv.updateLayoutParams {
+                        item.height?.let {
+                            height =
+                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
+                        }
                     }
-
+                    Glide.with(holder.itemView)
+                        .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
+                        .placeholder(R.drawable.loadinglogo)
+                        .dontAnimate()
+                        .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (image in msg.attachments.values) {
@@ -263,18 +288,34 @@ class MessageAdapter(
                     }
                     break
                 }
-
-                holder.itemView.image_loading_llv.visibility =
-                    if (messageList[position].isSending) View.VISIBLE else View.GONE
-
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.chat_iv.startAnimation(apl)
+                } else {
+                    holder.itemView.chat_iv.clearAnimation()
+                }
                 showReaction(holder, messageList[position])
+            }
+            3 -> {
+                val msg = messageList[position] as HeaderMessage
+                if (msg.isEnd) {
+                    holder.itemView.loading_text_header.visibility = View.VISIBLE
+                    holder.itemView.animation_view.visibility = View.GONE
+                } else {
+                    holder.itemView.loading_text_header.visibility = View.GONE
+                    holder.itemView.animation_view.visibility = View.VISIBLE
+                }
             }
             4 -> {
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
-                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.visibility = View.VISIBLE
+                    holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
@@ -284,7 +325,9 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
-                    holder.itemView.user_info_box_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_invite.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_invite.visibility = View.GONE
                 }
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 4)

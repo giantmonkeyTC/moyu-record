@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="@drawable/shape_check_logout_dialog"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/porofile_check_logout"
+        android:layout_width="0dp"
+        android:textSize="16sp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/logout_confirm"
+        android:layout_marginTop="64dp"
+        android:layout_width="78dp"
+        android:layout_height="32dp"
+        android:textColor="#000000"
+        android:layout_marginEnd="16dp"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/shape_button_logout"
+        android:text="@string/profile_confirm_logout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:background="@drawable/shape_button_logout_cancel"
+        android:layout_marginEnd="24dp"
+        android:id="@+id/logout_cancel"
+        android:layout_width="78dp"
+        android:textSize="14sp"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="@id/logout_confirm"
+        android:text="@string/profile_cancel_logout"
+        app:layout_constraintEnd_toStartOf="@id/logout_confirm" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

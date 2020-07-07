@@ -173,13 +173,20 @@ class ChatActivity : AppCompatActivity() {
                 drawerLayout.openDrawer(GravityCompat.START, true)
             }
             R.id.members -> {
-                if (mCurrentChannel is GuildChannel) {
+                if (AppState.global.channelSelection.value.channelId != null) {
+                    if (mCurrentChannel is GuildChannel) {
+                        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+                        drawerLayout.openDrawer(GravityCompat.END, true)
+                    } else if (mCurrentChannel is DmChannel) {
+                        Toast.makeText(this, R.string.no_member, Toast.LENGTH_SHORT).show()
+                    }
+                } else {
                     val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
                     drawerLayout.openDrawer(GravityCompat.END, true)
-                } else if (mCurrentChannel is DmChannel) {
-                    Toast.makeText(this, R.string.no_member, Toast.LENGTH_SHORT).show()
                 }
+
             }
+
         }
         return true
     }

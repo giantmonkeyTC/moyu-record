@@ -168,4 +168,5 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
 
 }
 
-class HeaderMessage(client: Client, obj: JsonObject) : Message(client, obj)
+class HeaderMessage(client: Client, obj: JsonObject, var isEnd: Boolean = false) :
+    Message(client, obj)
