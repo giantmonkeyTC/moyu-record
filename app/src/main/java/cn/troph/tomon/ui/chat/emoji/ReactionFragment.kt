@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.res.Resources
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -168,7 +169,11 @@ class ReactionFragment : BottomSheetDialogFragment() {
         bottom_emoji_rr.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
-
+        val handler = Handler()
+        handler.postDelayed({
+            val view = bottom_emoji_rr.findViewHolderForAdapterPosition(0)
+            view?.itemView?.performClick()
+        }, 500)
     }
 
     companion object {
