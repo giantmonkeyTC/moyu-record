@@ -347,9 +347,9 @@ class ChannelPanelFragment : Fragment() {
 
                 }
                 //load more message when user scroll up
-                if (!view_messages.canScrollVertically(-1)) {
+                if (!view_messages.canScrollVertically(-1) && dy<0) {
                     if (!isFetchingMore.get()) {
-                        isFetchingMore.compareAndSet(false, true)
+                        isFetchingMore.set(true)
                         if (!mHeaderMsg.isEnd) {
                             mMsgList.add(0, mHeaderMsg)
                             msgListAdapter.notifyItemInserted(0)
@@ -363,7 +363,7 @@ class ChannelPanelFragment : Fragment() {
                                 }
                             }, 1000)
                         } else {
-                            isFetchingMore.compareAndSet(true, false)
+                            isFetchingMore.set(false)
                         }
                     }
                 }
@@ -528,16 +528,17 @@ class ChannelPanelFragment : Fragment() {
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
+
             if (it.size == 0) {
                 mHeaderMsg.isEnd = true
                 mMsgList.add(0, mHeaderMsg)
                 msgListAdapter.notifyItemInserted(0)
-                isFetchingMore.compareAndSet(true, false)
+                isFetchingMore.set(false)
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
-                isFetchingMore.compareAndSet(true, false)
+                isFetchingMore.set(false)
             }
         })
     }
