@@ -13,6 +13,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
+import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
 import java.nio.ByteBuffer
@@ -118,6 +119,8 @@ class BottomEmojiAdapter(
                 try {
                     holder.itemView.ctv.text = parseEmoji(it)
                 } catch (e: NumberFormatException) {
+                    holder.itemView.ctv.text = it[0].toString()
+                } catch (e:IllegalArgumentException){
                     holder.itemView.ctv.text = it[0].toString()
                 }
 

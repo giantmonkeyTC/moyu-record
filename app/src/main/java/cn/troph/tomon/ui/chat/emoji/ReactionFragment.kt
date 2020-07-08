@@ -132,10 +132,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
                 isBuildIn = false,
                 emojiList = item.emojis.values.toMutableList()
             )
-            item.iconURL?.let {
-                guildIcon.add(GuildIcon(url = it, text = item.name))
-            }
-
+            guildIcon.add(GuildIcon(item.iconURL, item.name))
             val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
