@@ -509,6 +509,7 @@ class MessageAdapter(
                 }
             }
         } else {
+            itemView.widget_message_author_name_text.text = message.author?.name
             itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
 
