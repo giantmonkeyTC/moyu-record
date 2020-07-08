@@ -487,8 +487,9 @@ class MessageAdapter(
     }
 
     private fun isMoreThanFiveMins(fromDate: LocalDateTime, toDate: LocalDateTime): Boolean {
-        val min = (toDate.toInstant(ZoneOffset.UTC).toEpochMilli() - fromDate.toInstant(ZoneOffset.UTC)
-            .toEpochMilli()) / (1000 * 60)
+        val min =
+            (toDate.toInstant(ZoneOffset.UTC).toEpochMilli() - fromDate.toInstant(ZoneOffset.UTC)
+                .toEpochMilli()) / (1000 * 60)
         return min > 5
     }
 
@@ -632,11 +633,17 @@ class MessageAdapter(
             dialog.dismiss()
         }
 
-        viewHolder.itemView.setBackgroundColor(Color.parseColor("#3A3A3A"))
+        viewHolder.itemView.setBackgroundColor(viewHolder.itemView.context.getColor(R.color.channelSelectBackground))
 
         dialog.show()
 
-        dialog.setOnDismissListener { viewHolder.itemView.setBackgroundColor(Color.parseColor("#242424")) }
+        dialog.setOnDismissListener {
+            viewHolder.itemView.setBackgroundColor(
+                viewHolder.itemView.context.getColor(
+                    R.color.background2
+                )
+            )
+        }
     }
 
     class MessageViewHolder(val view: View) : RecyclerView.ViewHolder(view)
