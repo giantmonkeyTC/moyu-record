@@ -8,6 +8,7 @@ import cn.troph.tomon.R
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
@@ -143,7 +144,10 @@ class BottomEmojiAdapter(
     class BottomEmojiVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
 
-data class GuildIcon(val url: String?, val text: String?)
+data class GuildIcon(
+    @SerializedName("url") val url: String?,
+    @SerializedName("text") val text: String?
+)
 
 interface OnBottomGuildSelectedListener {
     fun onGuildSelected(position: Int)
