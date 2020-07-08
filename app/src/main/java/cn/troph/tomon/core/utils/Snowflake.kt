@@ -19,7 +19,6 @@ class Snowflake(val value: String = "") : Comparable<Snowflake> {
 
         fun deconstruct(snowflake: String): res {
             val binary = idToBinary(snowflake).padStart(64, '0')
-            println(binary)
             return res(
                 timestamp = binary.substring(0, 42).toLong(2) + EPOCH,
                 workerId = binary.substring(42, 47).toInt(2),

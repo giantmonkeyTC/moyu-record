@@ -27,7 +27,6 @@ class ImagePreviewActivity : AppCompatActivity() {
             text = "123454"
         }
         val imageUri: Uri? = intent.getParcelableExtra(MediaStore.EXTRA_OUTPUT)!!
-        println(imageUri)
     }
 
 }
