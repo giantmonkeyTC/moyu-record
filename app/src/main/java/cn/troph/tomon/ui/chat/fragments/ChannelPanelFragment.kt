@@ -101,6 +101,10 @@ class ChannelPanelFragment : Fragment() {
                 }
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
+                    mHeaderMsg.isGuild = false
+                    channel.recipient?.let {
+                        mHeaderMsg.channelText = it.name
+                    }
                     val count = mMsgList.size
                     mMsgList.clear()
                     msgListAdapter.notifyItemRangeRemoved(0, count)
@@ -115,6 +119,8 @@ class ChannelPanelFragment : Fragment() {
                         it.visibility = View.VISIBLE
                     }
                 } else if (channel is TextChannel) {
+                    mHeaderMsg.isGuild = true
+                    mHeaderMsg.channelText = channel.name
                     Client.global.preferences.edit {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
                         putString(LAST_CHANNEL_ID, value)
@@ -347,26 +353,16 @@ class ChannelPanelFragment : Fragment() {
                             msgListAdapter.notifyItemInserted(0)
                             mHandler.postDelayed({
                                 channelId?.let { cId ->
-                                    if (mMsgList.size > 0) {
-                                        mMsgList[0].id?.let { mId ->
+                                    if (mMsgList.size > 1) {
+                                        mMsgList[1].id?.let { mId ->
                                             msgViewModel.loadOldMessage(cId, mId)
                                         }
                                     }
                                 }
                             }, 1000)
+                        } else {
+                            isFetchingMore = false
                         }
-//                        else {
-//                            mMsgList.add(0, mHeaderMsg)
-//                            msgListAdapter.notifyItemInserted(0)
-//                            mHandler.postDelayed({
-//                                val index = mMsgList.indexOf(mHeaderMsg)
-//                                if (index != -1) {
-//                                    mMsgList.removeAt(index)
-//                                    msgListAdapter.notifyItemRemoved(index)
-//                                }
-//                                isFetchingMore = false
-//                            }, 1500)
-//                        }
                     }
                 }
             }

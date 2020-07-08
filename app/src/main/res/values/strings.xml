@@ -47,6 +47,8 @@
     <string name="profile_cancel_logout">取消</string>
     <string name="no_more_msg">没有更多消息了</string>
 
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
