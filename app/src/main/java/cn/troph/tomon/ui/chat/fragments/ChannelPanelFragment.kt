@@ -346,31 +346,27 @@ class ChannelPanelFragment : Fragment() {
                             mMsgList.add(0, mHeaderMsg)
                             msgListAdapter.notifyItemInserted(0)
                             mHandler.postDelayed({
-                                channelId?.let {
-                                    val cId = it
-                                    if (mMsgList.size > 1) {
-                                        mMsgList[1].id?.let {
-                                            msgViewModel.loadOldMessage(cId, it)
+                                channelId?.let { cId ->
+                                    if (mMsgList.size > 0) {
+                                        mMsgList[0].id?.let { mId ->
+                                            msgViewModel.loadOldMessage(cId, mId)
                                         }
-                                    } else {
-                                        mMsgList.removeAt(0)
-                                        msgListAdapter.notifyItemRemoved(0)
-                                        isFetchingMore = false
                                     }
                                 }
                             }, 1000)
-                        } else {
-                            mMsgList.add(0, mHeaderMsg)
-                            msgListAdapter.notifyItemInserted(0)
-                            mHandler.postDelayed({
-                                val index = mMsgList.indexOf(mHeaderMsg)
-                                if (index != -1) {
-                                    mMsgList.removeAt(index)
-                                    msgListAdapter.notifyItemRemoved(index)
-                                }
-                                isFetchingMore = false
-                            }, 1500)
                         }
+//                        else {
+//                            mMsgList.add(0, mHeaderMsg)
+//                            msgListAdapter.notifyItemInserted(0)
+//                            mHandler.postDelayed({
+//                                val index = mMsgList.indexOf(mHeaderMsg)
+//                                if (index != -1) {
+//                                    mMsgList.removeAt(index)
+//                                    msgListAdapter.notifyItemRemoved(index)
+//                                }
+//                                isFetchingMore = false
+//                            }, 1500)
+//                        }
                     }
                 }
             }
@@ -535,6 +531,8 @@ class ChannelPanelFragment : Fragment() {
             msgListAdapter.notifyItemRemoved(0)
             if (it.size == 0) {
                 mHeaderMsg.isEnd = true
+                mMsgList.add(0, mHeaderMsg)
+                msgListAdapter.notifyItemInserted(0)
                 isFetchingMore = false
                 return@Observer
             } else {
