@@ -221,10 +221,10 @@ class MessageAdapter(
                     holder.itemView.btn_file_save.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
                         for (file in msg.attachments.values) {
-                            GeneralSnackbar.make(
-                                GeneralSnackbar.findSuitableParent(holder.itemView)!!,
+                            Toast.makeText(
+                                holder.itemView.context,
                                 "文件保存至:${holder.itemView.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath}",
-                                Snackbar.LENGTH_SHORT
+                                Toast.LENGTH_SHORT
                             ).show()
                             PRDownloader.download(
                                 file.url,
@@ -233,18 +233,18 @@ class MessageAdapter(
                             )
                                 .build().start(object : OnDownloadListener {
                                     override fun onDownloadComplete() {
-                                        GeneralSnackbar.make(
-                                            GeneralSnackbar.findSuitableParent(holder.itemView)!!,
+                                        Toast.makeText(
+                                            holder.itemView.context,
                                             "下载完成",
-                                            Snackbar.LENGTH_SHORT
+                                            Toast.LENGTH_SHORT
                                         ).show()
                                     }
 
                                     override fun onError(error: Error?) {
-                                        GeneralSnackbar.make(
-                                            GeneralSnackbar.findSuitableParent(holder.itemView)!!,
+                                        Toast.makeText(
+                                            holder.itemView.context,
                                             "下载失败",
-                                            Snackbar.LENGTH_SHORT
+                                            Toast.LENGTH_SHORT
                                         ).show()
                                     }
                                 })
