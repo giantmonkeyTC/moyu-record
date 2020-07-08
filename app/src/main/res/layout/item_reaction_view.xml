@@ -506,7 +506,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_weight="1"
-            android:src="@drawable/emoji_button_ic" />
+            android:src="@drawable/emoji_panel" />
 
         <androidx.emoji.widget.EmojiTextView
             android:layout_width="0dp"
