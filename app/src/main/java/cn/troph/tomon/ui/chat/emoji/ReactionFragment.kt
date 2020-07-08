@@ -87,9 +87,11 @@ class ReactionFragment : BottomSheetDialogFragment() {
                     modifyedEmoji,
                     Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ -> },
-                        { _ ->
-
+                    .subscribe({ _ ->
+                        Logger.d("Send Success Reaction")
+                    },
+                        { error ->
+                            Logger.d(error.message)
                         })
                 dismiss()
             }
@@ -101,7 +103,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
                     unicode,
                     Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ -> Logger.d("success") },
+                    .subscribe({ _ -> Logger.d("Send reaction success system") },
                         { throwable ->
                             Logger.d(throwable.message)
                         })
