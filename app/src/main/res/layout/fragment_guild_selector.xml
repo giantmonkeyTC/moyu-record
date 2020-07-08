@@ -13,7 +13,7 @@
         android:layout_marginStart="13dp"
         android:layout_marginEnd="13dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/ic_dm_entry"
+        android:background="@drawable/dm_entry"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
