@@ -29,13 +29,7 @@
         app:layout_constraintTop_toTopOf="@id/view_messages"
         app:shimmer_auto_start="true">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="always">
-
-            <include layout="@layout/shimmer_placeholder" />
-        </ScrollView>
+        <include layout="@layout/shimmer_placeholder" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
