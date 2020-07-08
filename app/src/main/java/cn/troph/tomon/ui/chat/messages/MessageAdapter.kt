@@ -343,6 +343,16 @@ class MessageAdapter(
                 if (msg.isEnd) {
                     holder.itemView.loading_text_header.visibility = View.VISIBLE
                     holder.itemView.animation_view.visibility = View.GONE
+                    holder.itemView.loading_text_header.text =
+                        if (msg.isGuild) "欢迎来到#${msg.channelText} 频道!" else "与@${msg.channelText} 私聊的开始"
+                    holder.itemView.loading_text_header.setCompoundDrawablesWithIntrinsicBounds(
+                        if (msg.isGuild) holder.itemView.context.getDrawable(
+                            R.drawable.ic_group
+                        ) else holder.itemView.context.getDrawable(R.drawable.ic_chat_begin_dm),
+                        null,
+                        null,
+                        null
+                    )
                 } else {
                     holder.itemView.loading_text_header.visibility = View.GONE
                     holder.itemView.animation_view.visibility = View.VISIBLE
