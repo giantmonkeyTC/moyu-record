@@ -98,6 +98,7 @@ class LoginActivity : AppCompatActivity() {
         })
 
         button_login.setOnClickListener {
+            button_login.isEnabled = false
             val uid = register_input_user_name.text.toString()
             val pw = register_input_union_id.text.toString()
             val valid = viewModel.loginDataValidate(uid, pw)
@@ -114,6 +115,7 @@ class LoginActivity : AppCompatActivity() {
                         .subscribe {
                             gotoChat()
                         }
+
                 }, {
                     if (it is HttpException) {
                         button_login.hideProgress(if (it.code() >= 500) R.string.auth_server_error else R.string.login_failed)
@@ -122,8 +124,11 @@ class LoginActivity : AppCompatActivity() {
                         .subscribe {
                             button_login.hideProgress(R.string.login_button)
                         }
+                    button_login.isEnabled = true
                 })
             }
+            else
+            button_login.isEnabled = true
 
         }
         layout_root.setOnClickListener {
