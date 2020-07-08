@@ -531,6 +531,8 @@ class ChannelPanelFragment : Fragment() {
             msgListAdapter.notifyItemRemoved(0)
             if (it.size == 0) {
                 mHeaderMsg.isEnd = true
+                mMsgList.add(0, mHeaderMsg)
+                msgListAdapter.notifyItemInserted(0)
                 isFetchingMore = false
                 return@Observer
             } else {
