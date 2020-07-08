@@ -295,7 +295,7 @@ class ChannelPanelFragment : Fragment() {
 
         }
         mLayoutManager = LinearLayoutManager(requireContext())
-        mLayoutManager.stackFromEnd = true
+        mLayoutManager.stackFromEnd = false
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -377,6 +377,7 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.clear()
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
+                    mLayoutManager.scrollToPosition(mMsgList.size - 1)
                 }
             })
 
