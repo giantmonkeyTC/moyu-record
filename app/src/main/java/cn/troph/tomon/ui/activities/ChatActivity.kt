@@ -110,7 +110,7 @@ class ChatActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
-
+    //是否要收起键盘
     private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
         if (view?.id == R.id.btn_message_send) {
             return false
@@ -130,6 +130,7 @@ class ChatActivity : AppCompatActivity() {
         return false
     }
 
+    //隐藏键盘
     private fun hideKeyboard(activity: Activity) {
         val imm: InputMethodManager =
             activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager

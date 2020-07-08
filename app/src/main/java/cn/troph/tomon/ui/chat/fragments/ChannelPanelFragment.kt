@@ -96,8 +96,8 @@ class ChannelPanelFragment : Fragment() {
             field = value
             if (changed && value != null) {
                 mHeaderMsg.isEnd = false
-                editText.post {
-                    editText.text = null
+                editText?.let {
+                    it.text = null
                 }
                 val channel = Client.global.channels[value]
                 if (channel is DmChannel) {
@@ -108,8 +108,12 @@ class ChannelPanelFragment : Fragment() {
                         putString(LAST_CHANNEL_ID, value)
                     }
                     msgViewModel.loadDmChannelMessage(value)
-                    editText.hint = getString(R.string.emoji_et_hint)
-                    btn_message_send.visibility = View.VISIBLE
+                    editText?.let {
+                        it.hint = getString(R.string.emoji_et_hint)
+                    }
+                    btn_message_send?.let {
+                        it.visibility = View.VISIBLE
+                    }
                 } else if (channel is TextChannel) {
                     Client.global.preferences.edit {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
@@ -120,11 +124,19 @@ class ChannelPanelFragment : Fragment() {
                     msgListAdapter.notifyItemRangeRemoved(0, count)
                     msgViewModel.loadTextChannelMessage(value)
                     if (channel.isPrivate) {
-                        editText.hint = getString(R.string.ed_msg_hint_no_permisson)
-                        btn_message_send.visibility = View.GONE
+                        editText?.let {
+                            it.hint = getString(R.string.ed_msg_hint_no_permisson)
+                        }
+                        btn_message_send?.let {
+                            it.visibility = View.GONE
+                        }
                     } else {
-                        editText.hint = getString(R.string.emoji_et_hint)
-                        btn_message_send.visibility = View.VISIBLE
+                        editText?.let {
+                            it.hint = getString(R.string.emoji_et_hint)
+                        }
+                        btn_message_send?.let {
+                            it.visibility = View.VISIBLE
+                        }
                     }
                 }
 
@@ -329,36 +341,35 @@ class ChannelPanelFragment : Fragment() {
                 }
                 //load more message when user scroll up
                 if (!view_messages.canScrollVertically(-1)) {
-                    Logger.d("header:${mHeaderMsg.isEnd}")
                     if (!isFetchingMore) {
                         isFetchingMore = true
-                        if (!mHeaderMsg.isEnd) {
-                            mMsgList.add(0, mHeaderMsg)
-                            msgListAdapter.notifyItemInserted(0)
-                            mHandler.postDelayed({
-                                channelId?.let {
-                                    val cId = it
-                                    if (mMsgList.size > 1) {
-                                        mMsgList[1].id?.let {
-                                            msgViewModel.loadOldMessage(cId, it)
-                                        }
-                                    } else {
-                                        mMsgList.removeAt(0)
-                                        msgListAdapter.notifyItemRemoved(0)
-                                        isFetchingMore = false
+//                        if (!mHeaderMsg.isEnd) {
+                        mMsgList.add(0, mHeaderMsg)
+                        msgListAdapter.notifyItemInserted(0)
+                        mHandler.postDelayed({
+                            channelId?.let {
+                                val cId = it
+                                if (mMsgList.size > 1) {
+                                    mMsgList[1].id?.let {
+                                        msgViewModel.loadOldMessage(cId, it)
                                     }
+                                } else {
+                                    mMsgList.removeAt(0)
+                                    msgListAdapter.notifyItemRemoved(0)
+                                    isFetchingMore = false
                                 }
-                            }, 1000)
-                        } else {
-                            mMsgList.add(0, mHeaderMsg)
-                            msgListAdapter.notifyItemInserted(0)
-                            mHandler.postDelayed({
-                                val index = mMsgList.indexOf(mHeaderMsg)
-                                mMsgList.removeAt(index)
-                                msgListAdapter.notifyItemRemoved(index)
-                                isFetchingMore = false
-                            }, 2000)
-                        }
+                            }
+                        }, 1000)
+//                        } else {
+//                            mMsgList.add(0, mHeaderMsg)
+//                            msgListAdapter.notifyItemInserted(0)
+//                            mHandler.postDelayed({
+//                                val index = mMsgList.indexOf(mHeaderMsg)
+//                                mMsgList.removeAt(index)
+//                                msgListAdapter.notifyItemRemoved(index)
+//                                isFetchingMore = false
+//                            }, 2000)
+//                        }
                     }
                 }
             }
@@ -458,8 +469,6 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList[index] = event.message
                     msgListAdapter.notifyItemChanged(index)
                 }
-
-
             }
         })
         //Reaction add
@@ -524,7 +533,7 @@ class ChannelPanelFragment : Fragment() {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
             if (it.size == 0) {
-                mHeaderMsg.isEnd = true
+                //mHeaderMsg.isEnd = true
                 isFetchingMore = false
                 return@Observer
             } else {

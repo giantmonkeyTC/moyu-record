@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tomon</string>
+    <string name="app_name">TOMON</string>
     <string name="action_settings">设置</string>
 
     <string name="auth_server_error">服务异常</string>
