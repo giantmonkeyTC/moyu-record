@@ -169,11 +169,24 @@ class MessageAdapter(
                     holder.itemView.widget_message_author_name_text_file.text =
                         messageList[position].author?.name
                     val message = messageList[position]
-                    val member = (Client.global.channels[message.channelId] as TextChannel).members[message.authorId?:""]
-                    if (member != null) {
-                        holder.itemView.widget_message_author_name_text_file.setTextColor( (if (member.roles.color == null)
-                            0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()))
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_file.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_file.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
                     }
+
                     if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_file.text = "T🐱"
                     }
@@ -254,11 +267,24 @@ class MessageAdapter(
                     holder.itemView.widget_message_author_name_text_image.text =
                         messageList[position].author?.name
                     val message = messageList[position]
-                    val member = (Client.global.channels[message.channelId] as TextChannel).members[message.authorId?:""]
-                    if (member != null) {
-                        holder.itemView.widget_message_author_name_text_image.setTextColor( (if (member.roles.color == null)
-                            0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()))
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_image.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_image.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
                     }
+
                     if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_image.text = "T🐱"
                     }
@@ -334,11 +360,24 @@ class MessageAdapter(
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
                     val message = messageList[position]
-                    val member = (Client.global.channels[message.channelId] as TextChannel).members[message.authorId?:""]
-                    if (member != null) {
-                        holder.itemView.widget_message_author_name_text_invite.setTextColor( (if (member.roles.color == null)
-                            0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()))
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_invite.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_invite.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
                     }
+
                     if (messageList[position].type == MessageType.SYSTEM) {
                         holder.itemView.widget_message_author_name_text_invite.text = "T🐱"
                     }
@@ -454,16 +493,25 @@ class MessageAdapter(
     ) {
         itemView.message_avatar.user = message.author
         itemView.widget_message_timestamp_text.text = timestampConverter(message.timestamp)
-        val member = (Client.global.channels[message.channelId] as TextChannel).members[message.authorId?:""]
-        if (message.type == MessageType.SYSTEM) {
-            itemView.widget_message_author_name_text.text = "T🐱"
-        } else {
-            itemView.widget_message_author_name_text.text = message.author?.name
-            if (member != null) {
-                itemView.widget_message_author_name_text.setTextColor( (if (member.roles.color == null)
-                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()))
+        if (Client.global.channels[message.channelId] is TextChannel) {
+            val member =
+                (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                    ?: ""]
+            if (message.type == MessageType.SYSTEM) {
+                itemView.widget_message_author_name_text.text = "T🐱"
+            } else {
+                itemView.widget_message_author_name_text.text = message.author?.name
+                if (member != null) {
+                    itemView.widget_message_author_name_text.setTextColor(
+                        (if (member.roles.color == null)
+                            0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                    )
+                }
             }
+        } else {
+            itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
+
 
 
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
@@ -646,8 +694,6 @@ class MessageAdapter(
                 UpdateEnabled(flag = true, message = messageList[viewHolder.adapterPosition])
             dialog.dismiss()
         }
-
-
 
         view.copy_message_button.setOnClickListener {
             val clipboard =

@@ -5,12 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
+import java.lang.NumberFormatException
 import java.lang.StringBuilder
 import java.nio.ByteBuffer
 
@@ -112,7 +114,12 @@ class BottomEmojiAdapter(
             holder.itemView.bottom_emoji_iv.visibility = View.GONE
             holder.itemView.ctv.visibility = View.VISIBLE
             urlList[position].text?.let {
-                holder.itemView.ctv.text = parseEmoji(it)
+                try {
+                    holder.itemView.ctv.text = parseEmoji(it)
+                } catch (e: NumberFormatException) {
+                    holder.itemView.ctv.text = it[0].toString()
+                }
+
             }
         }
 
