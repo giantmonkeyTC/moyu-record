@@ -469,8 +469,6 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList[index] = event.message
                     msgListAdapter.notifyItemChanged(index)
                 }
-
-
             }
         })
         //Reaction add

@@ -13,8 +13,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/view_messages"
         android:layout_width="match_parent"
-        android:overScrollMode="always"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout" />
 
