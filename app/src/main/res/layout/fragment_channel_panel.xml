@@ -88,7 +88,7 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="16dp"
-                android:background="@drawable/ic_join_guild"
+                android:background="@drawable/ic_plus_regular"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -99,7 +99,7 @@
                 android:layout_height="25dp"
                 android:layout_marginStart="12dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/emoji_panel"
+                android:src="@drawable/ic_smile_solid"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -125,7 +125,7 @@
                 android:layout_width="56dp"
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/send_button"
+                android:src="@drawable/ic_paper_plane_solid"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
