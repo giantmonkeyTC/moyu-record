@@ -468,7 +468,11 @@ class MessageAdapter(
                 image.visibility = View.GONE
                 text.text = "${value.name} ${value.count}"
             } else {
-                Glide.with(image).load(value.emoji?.url).into(image)
+                Glide.with(image).load(
+                    if (value.emoji == null)
+                        Assets.emojiURL(value.id, false) else
+                        value.emoji?.url
+                ).placeholder(R.drawable.user_avatar_placeholder).into(image)
                 text.text = value.count.toString()
             }
             ll.setOnClickListener {
