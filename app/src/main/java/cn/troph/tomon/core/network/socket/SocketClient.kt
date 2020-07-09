@@ -92,9 +92,7 @@ class SocketClient: WebSocketListener(),
         _url = url
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient.Builder()
-        client.writeTimeout(30, TimeUnit.SECONDS)
-        client.readTimeout(30, TimeUnit.SECONDS)
-        client.connectTimeout(30, TimeUnit.SECONDS)
+        client.callTimeout(0,TimeUnit.MILLISECONDS)
         _webSocket = client.build().newWebSocket(request, this)
         _emitter?.onNext(SocketEvent(SocketEventType.CONNECTING))
     }
