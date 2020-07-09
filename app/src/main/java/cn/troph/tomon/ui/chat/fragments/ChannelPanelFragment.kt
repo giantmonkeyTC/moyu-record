@@ -60,6 +60,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicBoolean
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -96,6 +97,7 @@ class ChannelPanelFragment : Fragment() {
             field = value
             if (changed && value != null) {
                 mHeaderMsg.isEnd = false
+                isFetchingMore.set(false)
                 editText?.let {
                     it.text = null
                 }
@@ -163,7 +165,7 @@ class ChannelPanelFragment : Fragment() {
 
     private var message: Message? = null
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
-    private var isFetchingMore = false
+    private val isFetchingMore = AtomicBoolean(false)
     private val mMsgList = mutableListOf<Message>()
     private val msgListAdapter: MessageAdapter =
         MessageAdapter(mMsgList, object : ReactionSelectorListener {
@@ -293,7 +295,7 @@ class ChannelPanelFragment : Fragment() {
 
         }
         mLayoutManager = LinearLayoutManager(requireContext())
-        mLayoutManager.stackFromEnd = true
+        mLayoutManager.stackFromEnd = false
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = msgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -345,9 +347,9 @@ class ChannelPanelFragment : Fragment() {
 
                 }
                 //load more message when user scroll up
-                if (!view_messages.canScrollVertically(-1)) {
-                    if (!isFetchingMore) {
-                        isFetchingMore = true
+                if (!view_messages.canScrollVertically(-1) && dy<0) {
+                    if (!isFetchingMore.get()) {
+                        isFetchingMore.set(true)
                         if (!mHeaderMsg.isEnd) {
                             mMsgList.add(0, mHeaderMsg)
                             msgListAdapter.notifyItemInserted(0)
@@ -361,7 +363,7 @@ class ChannelPanelFragment : Fragment() {
                                 }
                             }, 1000)
                         } else {
-                            isFetchingMore = false
+                            isFetchingMore.set(false)
                         }
                     }
                 }
@@ -375,6 +377,7 @@ class ChannelPanelFragment : Fragment() {
                     mMsgList.clear()
                     mMsgList.addAll(it)
                     msgListAdapter.notifyDataSetChanged()
+                    mLayoutManager.scrollToPosition(mMsgList.size - 1)
                 }
             })
 
@@ -525,16 +528,17 @@ class ChannelPanelFragment : Fragment() {
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
             msgListAdapter.notifyItemRemoved(0)
+
             if (it.size == 0) {
                 mHeaderMsg.isEnd = true
                 mMsgList.add(0, mHeaderMsg)
                 msgListAdapter.notifyItemInserted(0)
-                isFetchingMore = false
+                isFetchingMore.set(false)
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
                 msgListAdapter.notifyItemRangeInserted(0, it.size)
-                isFetchingMore = false
+                isFetchingMore.set(false)
             }
         })
     }
