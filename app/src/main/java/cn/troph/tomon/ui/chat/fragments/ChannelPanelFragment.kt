@@ -59,6 +59,7 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -246,6 +247,7 @@ class ChannelPanelFragment : Fragment() {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
                 return@setOnClickListener
             }
+            throw Exception()
             longLastClickTime = SystemClock.elapsedRealtime()
             if (channelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
@@ -347,7 +349,7 @@ class ChannelPanelFragment : Fragment() {
 
                 }
                 //load more message when user scroll up
-                if (!view_messages.canScrollVertically(-1) && dy<0) {
+                if (!view_messages.canScrollVertically(-1) && dy < 0) {
                     if (!isFetchingMore.get()) {
                         isFetchingMore.set(true)
                         if (!mHeaderMsg.isEnd) {

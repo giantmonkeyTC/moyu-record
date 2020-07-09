@@ -103,7 +103,6 @@ class MessageAdapter(
                         .inflate(R.layout.header_loading_view, parent, false)
                 )
             }
-
         }
     }
 

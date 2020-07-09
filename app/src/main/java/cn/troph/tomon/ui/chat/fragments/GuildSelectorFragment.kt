@@ -46,6 +46,7 @@ class GuildSelectorFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_guild_selector, container, false)
     }
 
@@ -53,6 +54,7 @@ class GuildSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let { list ->
+                Logger.d("${list.size}")
                 mGuildList.clear()
                 mGuildList.addAll(list)
                 mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {
@@ -75,53 +77,57 @@ class GuildSelectorFragment : Fragment() {
             }
         })
         mGuildVM.loadGuildList()
+
         view_avatar.user = Client.global.me
-        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
-            .subscribe(Consumer { event ->
-                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
-                    if (event.message.guild!!.updateUnread()) {
-                        mAdapter.notifyItemChanged(
-                            mGuildVM.getGuildListLiveData().value!!.indexOf(
-                                event.message.guild!!
-                            )
+        mGuildVM.messageCreateLD.observe(viewLifecycleOwner, Observer {
+                event ->
+            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+                if (event.message.guild!!.updateUnread()) {
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
                         )
+                    )
+                }
+            }
+            if (event.message.guild == null || event.message.guild?.id == "@me") {
+                for ((index, value) in Client.global.dmChannels.withIndex()) {
+                    if (value.id == event.message.channelId) {
+                        BadgeUtil.increaseChannelUnread(value.id)
+                        updateRedDot(BadgeUtil.getTotalUnread())
                     }
                 }
-                if (event.message.guild == null || event.message.guild?.id == "@me") {
-                    for ((index, value) in Client.global.dmChannels.withIndex()) {
-                        if (value.id == event.message.channelId) {
-                            BadgeUtil.increaseChannelUnread(value.id)
-                            updateRedDot(BadgeUtil.getTotalUnread())
-                        }
+            }
+        })
+
+        mGuildVM.messageReadLD.observe(viewLifecycleOwner, Observer {
+                event ->
+            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+                if (!event.message.guild!!.updateUnread())
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
+                if (event.message.guild!!.updateMention())
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
+            }
+            if (event.message.guild == null || event.message.guild?.id == "@me") {
+                for ((index, value) in Client.global.dmChannels.withIndex()) {
+                    if (value.id == event.message.channelId) {
+                        BadgeUtil.clearChannelReadCount(value.id)
+                        updateRedDot(BadgeUtil.getTotalUnread())
                     }
                 }
-            })
-        Client.global.eventBus.observeEventOnUi<MessageReadEvent>()
-            .subscribe(Consumer { event ->
-                if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
-                    if (!event.message.guild!!.updateUnread())
-                        mAdapter.notifyItemChanged(
-                            mGuildVM.getGuildListLiveData().value!!.indexOf(
-                                event.message.guild!!
-                            )
-                        )
-                    if (event.message.guild!!.updateMention())
-                        mAdapter.notifyItemChanged(
-                            mGuildVM.getGuildListLiveData().value!!.indexOf(
-                                event.message.guild!!
-                            )
-                        )
-                }
-                if (event.message.guild == null || event.message.guild?.id == "@me") {
-                    for ((index, value) in Client.global.dmChannels.withIndex()) {
-                        if (value.id == event.message.channelId) {
-                            BadgeUtil.clearChannelReadCount(value.id)
-                            updateRedDot(BadgeUtil.getTotalUnread())
-                        }
-                    }
-                }
-            }, Consumer { error -> Logger.d(error.message) })
-        Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
+            }
+        })
+
+        mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer {
+                event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
                 if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
@@ -131,7 +137,9 @@ class GuildSelectorFragment : Fragment() {
                     )
             }
         })
-        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer { event ->
+
+        mGuildVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {
+                event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
                 if (event.message.guild!!.updateUnread()) {
                     mAdapter.notifyItemChanged(
@@ -142,27 +150,27 @@ class GuildSelectorFragment : Fragment() {
                 }
             }
         })
-        Client.global.eventBus.observeEventOnUi<MessageUpdateEvent>().subscribe(
-            Consumer { event ->
-                event.message.guild?.let {
-                    if (it.updateMention()) {
-                        mAdapter.notifyItemChanged(
-                            mGuildVM.getGuildListLiveData().value!!.indexOf(
-                                event.message.guild!!
-                            )
-                        )
-                    }
-                }
-            })
 
-        Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
+        mGuildVM.messageUpdateLD.observe(viewLifecycleOwner, Observer {
+                event ->
+            event.message.guild?.let {
+                if (it.updateMention()) {
+                    mAdapter.notifyItemChanged(
+                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                            event.message.guild!!
+                        )
+                    )
+                }
+            }
+        })
+
+        mGuildVM.channelCreateLD.observe(viewLifecycleOwner, Observer {
             if (it.channel is DmChannel) {
                 BadgeUtil.setChannelUnreadCount(it.channel.id, it.channel.unReadCount)
                 updateRedDot(BadgeUtil.getTotalUnread())
             }
         })
-
-        Client.global.eventBus.observeEventOnUi<GuildPositionEvent>().subscribe {
+        mGuildVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
             val rearrangedGuildList = mutableListOf<Guild>()
             for (item in it.guilds) {
                 val newGuild = mGuildList.find {
@@ -175,19 +183,18 @@ class GuildSelectorFragment : Fragment() {
             mGuildList.clear()
             mGuildList.addAll(rearrangedGuildList)
             mAdapter.notifyDataSetChanged()
-        }
-
-        Client.global.eventBus.observeEventOnUi<GuildCreateEvent>().subscribe {
+        })
+        mGuildVM.guildCreateLD.observe(viewLifecycleOwner, Observer {
             mGuildList.add(it.guild)
             mAdapter.notifyItemInserted(mGuildList.size - 1)
-        }
-
-        Client.global.eventBus.observeEventOnUi<GuildDeleteEvent>().subscribe { event ->
+        })
+        mGuildVM.guildDeleteLD.observe(viewLifecycleOwner, Observer {
+                event ->
             mGuildList.removeIf {
                 it.id == event.guild.id
             }
             mAdapter.notifyDataSetChanged()
-        }
+        })
 
         view_avatar.setOnClickListener {
             val userInfoBottomSheet = UserInfoFragment()
@@ -213,6 +220,7 @@ class GuildSelectorFragment : Fragment() {
             BadgeUtil.setChannelUnreadCount(item.id, item.unReadCount)
         }
         updateRedDot(BadgeUtil.getTotalUnread())
+        mGuildVM.setUpEventBus()
     }
 
     private fun updateRedDot(number: Int) {
