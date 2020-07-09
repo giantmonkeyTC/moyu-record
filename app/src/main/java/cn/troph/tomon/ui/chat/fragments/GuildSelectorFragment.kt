@@ -120,7 +120,7 @@ class GuildSelectorFragment : Fragment() {
                         }
                     }
                 }
-            })
+            }, Consumer { error -> Logger.d(error.message) })
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
                 if (event.message.guild!!.updateMention())
