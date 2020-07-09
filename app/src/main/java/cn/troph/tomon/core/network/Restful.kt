@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.network
 
+import cn.troph.tomon.BuildConfig
 import cn.troph.tomon.core.network.services.*
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
 import okhttp3.OkHttpClient
@@ -12,8 +13,9 @@ class Restful {
 
     private val client: OkHttpClient by lazy {
         val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        OkHttpClient.Builder().addInterceptor(interceptor).callTimeout(5,TimeUnit.MINUTES).build()
+        interceptor.level =
+            if (BuildConfig.BUILD_TYPE.equals("debug")) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        OkHttpClient.Builder().addInterceptor(interceptor).callTimeout(5, TimeUnit.MINUTES).build()
     }
 
     private val retrofit = Retrofit
