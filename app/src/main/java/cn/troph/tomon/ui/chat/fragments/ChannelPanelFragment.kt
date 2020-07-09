@@ -247,7 +247,6 @@ class ChannelPanelFragment : Fragment() {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
                 return@setOnClickListener
             }
-            throw Exception()
             longLastClickTime = SystemClock.elapsedRealtime()
             if (channelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
