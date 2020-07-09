@@ -216,15 +216,17 @@ class GuildSelectorFragment : Fragment() {
     }
 
     private fun updateRedDot(number: Int) {
-        if (number > 99) {
-            dm_read_count.visibility = View.VISIBLE
-            dm_read_count.text = "..."
-        }
-        if (number > 0) {
-            dm_read_count.visibility = View.VISIBLE
-            dm_read_count.text = number.toString()
-        } else {
-            dm_read_count.visibility = View.GONE
+        if (dm_read_count != null) {
+            if (number > 99) {
+                dm_read_count.visibility = View.VISIBLE
+                dm_read_count.text = "..."
+            }
+            if (number > 0) {
+                dm_read_count.visibility = View.VISIBLE
+                dm_read_count.text = number.toString()
+            } else {
+                dm_read_count.visibility = View.GONE
+            }
         }
     }
 
