@@ -46,6 +46,7 @@
     <string name="profile_confirm_logout">确定</string>
     <string name="profile_cancel_logout">取消</string>
     <string name="no_more_msg">没有更多消息了</string>
+    <string name="over_size">上传大小不能超过8MB</string>
 
 
 

@@ -617,6 +617,10 @@ class ChannelPanelFragment : Fragment() {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
                     ?.let { fileList ->
                         for (item in fileList) {
+                            if(item.size>8*1024*1024){
+                                Toast.makeText(requireContext(),R.string.over_size,Toast.LENGTH_SHORT).show()
+                                break
+                            }
                             val parcelFileDescriptor =
                                 requireContext().contentResolver.openFileDescriptor(
                                     item.uri,
