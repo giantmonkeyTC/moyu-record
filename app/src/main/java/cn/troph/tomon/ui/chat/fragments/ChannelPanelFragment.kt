@@ -31,6 +31,7 @@ import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.activities.ChatActivity
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
@@ -41,6 +42,7 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.android.gms.analytics.HitBuilders
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -67,7 +69,7 @@ const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
 const val LAST_GUILD_ID = "last_guild_id"
 
-class ChannelPanelFragment : Fragment() {
+class ChannelPanelFragment : BaseFragment() {
 
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
@@ -253,6 +255,10 @@ class ChannelPanelFragment : Fragment() {
             }
             val textToSend = editText.text.toString()
             editText.text = null
+
+            getTracker().send(
+                HitBuilders.EventBuilder().setCategory("TEST").setAction("Send").build()
+            )
 
             if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView

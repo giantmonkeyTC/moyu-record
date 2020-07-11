@@ -1,40 +1,30 @@
 package cn.troph.tomon.ui.activities
 
-import android.annotation.SuppressLint
+
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.transition.TransitionInflater
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.emoji.widget.EmojiEditText
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.fragments.LAST_CHANNEL_ID
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
-import cn.troph.tomon.ui.states.ChannelSelection
-import com.bumptech.glide.Glide
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 import java.util.concurrent.TimeUnit
 
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : BaseActivity() {
 
     init {
         AppState.global.eventBus.observeEventsOnUi().subscribe {
