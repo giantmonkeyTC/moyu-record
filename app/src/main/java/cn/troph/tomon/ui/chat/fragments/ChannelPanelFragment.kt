@@ -193,20 +193,20 @@ class ChannelPanelFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                message = it.message
-                updateEnabled = it.flag
-            }
-        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it.channelId == null) {
-                    channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
-                } else {
-                    channelId = it.channelId
-                }
 
+        msgViewModel.updateLD.observe(viewLifecycleOwner, Observer {
+            message = it.message
+            updateEnabled = it.flag
+        })
+
+        msgViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
+            if (it.channelId == null) {
+                channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+            } else {
+                channelId = it.channelId
             }
+        })
+
         msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
@@ -217,7 +217,7 @@ class ChannelPanelFragment : Fragment() {
             }
         })
 
-        editText.setOnFocusChangeListener { v, hasFocus ->
+        editText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 if (section_header_layout.isVisible) {
                     section_header_layout.visibility =
@@ -295,82 +295,6 @@ class ChannelPanelFragment : Fragment() {
             }
 
         }
-        mLayoutManager = LinearLayoutManager(requireContext())
-        mLayoutManager.stackFromEnd = false
-        view_messages.layoutManager = mLayoutManager
-        view_messages.adapter = msgListAdapter
-        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (!recyclerView.canScrollVertically(1)) {
-                    if (channelId != null) {
-                        if (Client.global.channels[channelId!!] is TextChannel) {
-                            (Client.global.channels[channelId!!] as TextChannel).apply {
-                                if (messages.list.size != 0) {
-                                    val lastMessageId = messages.list[messages.size - 1]
-                                    val lastMessage = messages[lastMessageId.substring(2)]
-                                    patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
-                                        addProperty("last_message_id", lastMessageId)
-                                    })
-                                    this.mention = 0
-                                    lastMessage?.let {
-                                        it.ack().observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({
-                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                            }, {
-                                                Logger.d(it.message)
-                                            })
-                                    }
-                                }
-                            }
-                        }
-                        if (Client.global.channels[channelId!!] is DmChannel) {
-                            (Client.global.channels[channelId!!] as DmChannel).apply {
-                                if (messages.list.size != 0) {
-                                    val lastMessageId = messages.list[messages.size - 1]
-                                    val lastMessage = messages[lastMessageId.substring(2)]
-                                    patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
-                                    })
-                                    lastMessage?.let {
-                                        it.ack().observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({
-                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                            }, {
-                                                Logger.d(it.message)
-                                            })
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                }
-                //load more message when user scroll up
-                if (!view_messages.canScrollVertically(-1) && dy < 0) {
-                    if (!isFetchingMore.get()) {
-                        isFetchingMore.set(true)
-                        if (!mHeaderMsg.isEnd) {
-                            mMsgList.add(0, mHeaderMsg)
-                            msgListAdapter.notifyItemInserted(0)
-                            mHandler.postDelayed({
-                                channelId?.let { cId ->
-                                    if (mMsgList.size > 1) {
-                                        mMsgList[1].id?.let { mId ->
-                                            msgViewModel.loadOldMessage(cId, mId)
-                                        }
-                                    }
-                                }
-                            }, 1000)
-                        } else {
-                            isFetchingMore.set(false)
-                        }
-                    }
-                }
-            }
-        }
-        )
 
         msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
@@ -449,8 +373,9 @@ class ChannelPanelFragment : Fragment() {
                 loadEmoji()
             }
         }
+
         //接受新的Message
-        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+        msgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer {
             val event = it
             if (it.message.channelId == channelId) {
                 val msg = mMsgList.find {
@@ -468,8 +393,24 @@ class ChannelPanelFragment : Fragment() {
                 }
             }
         })
+
+        //删除消息
+        msgViewModel.messageDeleteLD.observe(viewLifecycleOwner, Observer {
+            if (it.message.channelId == channelId) {
+                var removeIndex = 0
+                for ((index, value) in mMsgList.withIndex()) {
+                    if (value.id == it.message.id) {
+                        removeIndex = index
+                        break
+                    }
+                }
+                mMsgList.removeAt(removeIndex)
+                msgListAdapter.notifyItemRemoved(removeIndex)
+            }
+        })
+
         //Reaction add
-        Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
+        msgViewModel.reactionAddLD.observe(viewLifecycleOwner, Observer {
             if (it.reaction.message?.channelId == channelId) {
                 var indexToReplace = 0
                 val newReac = it.reaction
@@ -484,8 +425,10 @@ class ChannelPanelFragment : Fragment() {
                 msgListAdapter.notifyItemChanged(indexToReplace)
             }
         })
+
+
         //Reaction remove
-        Client.global.eventBus.observeEventOnUi<ReactionRemoveEvent>().subscribe(Consumer {
+        msgViewModel.reactionRemoveLD.observe(viewLifecycleOwner, Observer {
             if (it.reaction.message?.channelId == channelId) {
                 var indexToReplace = 0
                 val removeReac = it.reaction
@@ -508,23 +451,6 @@ class ChannelPanelFragment : Fragment() {
             }
         })
 
-        //delete messsage
-        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer {
-            if (it.message.channelId == channelId) {
-                var removeIndex = 0
-                for ((index, value) in mMsgList.withIndex()) {
-                    if (value.id == it.message.id) {
-                        removeIndex = index
-                        break
-                    }
-                }
-                mMsgList.removeAt(removeIndex)
-                msgListAdapter.notifyItemRemoved(removeIndex)
-            }
-
-        })
-
-
         //加载更老的消息
         msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
@@ -542,6 +468,85 @@ class ChannelPanelFragment : Fragment() {
                 isFetchingMore.set(false)
             }
         })
+        mLayoutManager = LinearLayoutManager(requireContext())
+        mLayoutManager.stackFromEnd = false
+        view_messages.layoutManager = mLayoutManager
+        view_messages.adapter = msgListAdapter
+        view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(1)) {
+                    if (channelId != null) {
+                        if (Client.global.channels[channelId!!] is TextChannel) {
+                            (Client.global.channels[channelId!!] as TextChannel).apply {
+                                if (messages.list.size != 0) {
+                                    val lastMessageId = messages.list[messages.size - 1]
+                                    val lastMessage = messages[lastMessageId.substring(2)]
+                                    patch(JsonObject().apply {
+                                        addProperty("ack_message_id", lastMessageId)
+                                        addProperty("last_message_id", lastMessageId)
+                                    })
+                                    this.mention = 0
+                                    lastMessage?.let {
+                                        it.ack().observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                            }, {
+                                                Logger.d(it.message)
+                                            })
+                                    }
+                                }
+                            }
+                        }
+                        if (Client.global.channels[channelId!!] is DmChannel) {
+                            (Client.global.channels[channelId!!] as DmChannel).apply {
+                                if (messages.list.size != 0) {
+                                    val lastMessageId = messages.list[messages.size - 1]
+                                    val lastMessage = messages[lastMessageId.substring(2)]
+                                    patch(JsonObject().apply {
+                                        addProperty("ack_message_id", lastMessageId)
+                                    })
+                                    lastMessage?.let {
+                                        it.ack().observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({
+                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
+                                            }, {
+                                                Logger.d(it.message)
+                                            })
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                //load more message when user scroll up
+                if (!view_messages.canScrollVertically(-1) && dy < 0) {
+                    if (!isFetchingMore.get()) {
+                        isFetchingMore.set(true)
+                        if (!mHeaderMsg.isEnd) {
+                            mMsgList.add(0, mHeaderMsg)
+                            msgListAdapter.notifyItemInserted(0)
+                            mHandler.postDelayed({
+                                channelId?.let { cId ->
+                                    if (mMsgList.size > 1) {
+                                        mMsgList[1].id?.let { mId ->
+                                            msgViewModel.loadOldMessage(cId, mId)
+                                        }
+                                    }
+                                }
+                            }, 1000)
+                        } else {
+                            isFetchingMore.set(false)
+                        }
+                    }
+                }
+            }
+        }
+        )
+        msgViewModel.setUpEvent()
+
+
     }
 
     private fun loadEmoji() {
@@ -617,8 +622,12 @@ class ChannelPanelFragment : Fragment() {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
                     ?.let { fileList ->
                         for (item in fileList) {
-                            if(item.size>8*1024*1024){
-                                Toast.makeText(requireContext(),R.string.over_size,Toast.LENGTH_SHORT).show()
+                            if (item.size > 8 * 1024 * 1024) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    R.string.over_size,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 break
                             }
                             val parcelFileDescriptor =

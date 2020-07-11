@@ -5,9 +5,17 @@ import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.Event
+import cn.troph.tomon.core.events.MessageCreateEvent
+import cn.troph.tomon.core.events.MessageDeleteEvent
+import cn.troph.tomon.core.events.ReactionAddEvent
+import cn.troph.tomon.core.events.ReactionRemoveEvent
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.states.UpdateEnabled
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
@@ -25,6 +33,43 @@ class MessageViewModel : ViewModel() {
     private val messageMoreLiveData = MutableLiveData<MutableList<Message>>()
 
     val messageLoadingLiveData = MutableLiveData<Boolean>()
+
+    val updateLD = MutableLiveData<UpdateEnabled>()
+
+    val channelSelectionLD = MutableLiveData<ChannelSelection>()
+
+    val messageCreateLD: MutableLiveData<MessageCreateEvent> = MutableLiveData()
+
+    val reactionAddLD = MutableLiveData<ReactionAddEvent>()
+
+    val reactionRemoveLD = MutableLiveData<ReactionRemoveEvent>()
+
+    val messageDeleteLD: MutableLiveData<MessageDeleteEvent> = MutableLiveData()
+
+    fun setUpEvent() {
+        AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(Consumer {
+                updateLD.value = it
+            })
+
+        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe(Consumer {
+                channelSelectionLD.value = it
+            })
+
+        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
+            messageCreateLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<ReactionAddEvent>().subscribe(Consumer {
+            reactionAddLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<ReactionRemoveEvent>().subscribe(Consumer {
+            reactionRemoveLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer {
+            messageDeleteLD.value = it
+        })
+    }
 
     fun getMessageLiveData(): MutableLiveData<MutableList<Message>> {
         return messageLiveData
