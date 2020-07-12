@@ -8,15 +8,19 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.emoji.widget.EmojiEditText
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
@@ -26,8 +30,27 @@ import java.util.concurrent.TimeUnit
 
 class ChatActivity : BaseActivity() {
 
-    init {
-        AppState.global.eventBus.observeEventsOnUi().subscribe {
+
+    private lateinit var mCurrentChannel: Channel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_chat)
+        setSupportActionBar(toolbar)
+        text_toolbar_title.text = getString(R.string.app_name_capital)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
+        val mChatSharedViewModel = ViewModelProvider(this).get(ChatSharedViewModel::class.java)
+        mChatSharedViewModel.channelSelectionLD.observe(this, Observer {
+            if (it.channelId != null) {
+                val channel = Client.global.channels[it.channelId]
+                channel?.let {
+                    mCurrentChannel = it
+                    updateToolbar(it)
+                }
+            }
+        })
+        mChatSharedViewModel.upEventDrawerLD.observe(this, Observer {
             val event = it as? AppUIEvent
             when (event?.type) {
                 AppUIEventType.CHANNEL_DRAWER -> {
@@ -37,31 +60,9 @@ class ChatActivity : BaseActivity() {
                     setMemberDrawerOpen(event.value as Boolean)
                 }
             }
-        }
-        Thread.sleep(1000)
-    }
-
-    private lateinit var mCurrentChannel: Channel
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
-        setSupportActionBar(toolbar)
-        text_toolbar_title.text = getString(R.string.app_name_capital)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
-        AppState.global.channelSelection.observable.delay(1, TimeUnit.SECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                if (it.channelId != null) {
-                    val channel = Client.global.channels[it.channelId]
-                    channel?.let {
-                        mCurrentChannel = it
-                        updateToolbar(it)
-                    }
-                }
-            }
+        })
+        mChatSharedViewModel.setUpChannelSelection()
+        mChatSharedViewModel.setUpDrawer()
     }
 
     private fun updateToolbar(channel: Channel) {

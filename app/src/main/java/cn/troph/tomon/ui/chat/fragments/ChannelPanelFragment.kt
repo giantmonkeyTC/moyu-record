@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,12 +29,11 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
-import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.activities.ChatActivity
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -49,7 +47,6 @@ import com.jaiselrahman.filepicker.config.Configurations
 import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -61,7 +58,6 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -74,13 +70,14 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
-    private val msgViewModel: MessageViewModel by viewModels()
+    private val mMsgViewModel: MessageViewModel by viewModels()
+    private val mChatSharedVM: ChatSharedViewModel by activityViewModels()
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
 
-    private val intentFilter = IntentFilter()
-    private val networkChangeReceiver = NetworkChangeReceiver()
+    private val mIntentFilter = IntentFilter()
+    private val mNetworkChangeReceiver = NetworkChangeReceiver()
 
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
@@ -94,7 +91,7 @@ class ChannelPanelFragment : BaseFragment() {
         }
     }
 
-    private var channelId: String? = null
+    private var mChannelId: String? = null
         set(value) {
             val changed = field != value
             field = value
@@ -112,11 +109,11 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                     val count = mMsgList.size
                     mMsgList.clear()
-                    msgListAdapter.notifyItemRangeRemoved(0, count)
+                    mMsgListAdapter.notifyItemRangeRemoved(0, count)
                     Client.global.preferences.edit {
                         putString(LAST_CHANNEL_ID, value)
                     }
-                    msgViewModel.loadDmChannelMessage(value)
+                    mMsgViewModel.loadDmChannelMessage(value)
                     editText?.let {
                         it.hint = getString(R.string.emoji_et_hint)
                     }
@@ -132,8 +129,8 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                     val count = mMsgList.size
                     mMsgList.clear()
-                    msgListAdapter.notifyItemRangeRemoved(0, count)
-                    msgViewModel.loadTextChannelMessage(value)
+                    mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                    mMsgViewModel.loadTextChannelMessage(value)
                     if (channel.isPrivate) {
                         editText?.let {
                             it.hint = getString(R.string.ed_msg_hint_no_permisson)
@@ -154,7 +151,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
 
-    private var updateEnabled: Boolean = false
+    private var isUpdateEnabled: Boolean = false
         set(value) {
             field = value
             if (field) {
@@ -170,7 +167,7 @@ class ChannelPanelFragment : BaseFragment() {
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
     private val isFetchingMore = AtomicBoolean(false)
     private val mMsgList = mutableListOf<Message>()
-    private val msgListAdapter: MessageAdapter =
+    private val mMsgListAdapter: MessageAdapter =
         MessageAdapter(mMsgList, object : ReactionSelectorListener {
             override fun OnReactionAddClicked(msg: Message) {
                 val bs = ReactionFragment()
@@ -190,26 +187,26 @@ class ChannelPanelFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        requireActivity().unregisterReceiver(networkChangeReceiver)
+        requireActivity().unregisterReceiver(mNetworkChangeReceiver)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        msgViewModel.updateLD.observe(viewLifecycleOwner, Observer {
+        mMsgViewModel.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
-            updateEnabled = it.flag
+            isUpdateEnabled = it.flag
         })
 
-        msgViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.channelSelectionLD.observe(viewLifecycleOwner, Observer {
             if (it.channelId == null) {
-                channelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
+                mChannelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
             } else {
-                channelId = it.channelId
+                mChannelId = it.channelId
             }
         })
 
-        msgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
+        mMsgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
                 shimmer_view_container.startShimmer()
@@ -241,16 +238,16 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                 }
             })
-        networkChangeReceiver.setTopView(btn_message_send)
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
-        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
+        mNetworkChangeReceiver.setTopView(btn_message_send)
+        mIntentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        requireActivity().registerReceiver(mNetworkChangeReceiver, mIntentFilter)
         var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
                 return@setOnClickListener
             }
             longLastClickTime = SystemClock.elapsedRealtime()
-            if (channelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
+            if (mChannelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
             }
             val textToSend = editText.text.toString()
@@ -264,10 +261,10 @@ class ChannelPanelFragment : BaseFragment() {
                 //新建一个空message，并加入到RecyclerView
                 val emptyMsg = createEmptyMsg(textToSend)
                 mMsgList.add(emptyMsg)
-                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                mLayoutManager.scrollToPosition(msgListAdapter.itemCount - 1)
+                mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                mLayoutManager.scrollToPosition(mMsgListAdapter.itemCount - 1)
                 //发送消息
-                (Client.global.channels[channelId
+                (Client.global.channels[mChannelId
                     ?: ""] as TextChannelBase).messages.create(
                     textToSend,
                     nonce = emptyMsg.nonce.toString()
@@ -289,7 +286,7 @@ class ChannelPanelFragment : BaseFragment() {
                             UpdateEnabled(flag = false)
                         for ((index, value) in mMsgList.withIndex()) {
                             if (value.id == msg.id) {
-                                msgListAdapter.notifyItemChanged(index)
+                                mMsgListAdapter.notifyItemChanged(index)
                                 break
                             }
                         }
@@ -302,12 +299,12 @@ class ChannelPanelFragment : BaseFragment() {
 
         }
 
-        msgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
+        mMsgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
                     mMsgList.clear()
                     mMsgList.addAll(it)
-                    msgListAdapter.notifyDataSetChanged()
+                    mMsgListAdapter.notifyDataSetChanged()
                     mLayoutManager.scrollToPosition(mMsgList.size - 1)
                 }
             })
@@ -381,9 +378,9 @@ class ChannelPanelFragment : BaseFragment() {
         }
 
         //接受新的Message
-        msgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer {
+        mMsgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer {
             val event = it
-            if (it.message.channelId == channelId) {
+            if (it.message.channelId == mChannelId) {
                 val msg = mMsgList.find {
 
                     val localMsg = it
@@ -391,18 +388,18 @@ class ChannelPanelFragment : BaseFragment() {
                 }
                 if (msg == null) {
                     mMsgList.add(it.message)
-                    msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                    mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                 } else {
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
-                    msgListAdapter.notifyItemChanged(index)
+                    mMsgListAdapter.notifyItemChanged(index)
                 }
             }
         })
 
         //删除消息
-        msgViewModel.messageDeleteLD.observe(viewLifecycleOwner, Observer {
-            if (it.message.channelId == channelId) {
+        mMsgViewModel.messageDeleteLD.observe(viewLifecycleOwner, Observer {
+            if (it.message.channelId == mChannelId) {
                 var removeIndex = 0
                 for ((index, value) in mMsgList.withIndex()) {
                     if (value.id == it.message.id) {
@@ -411,13 +408,13 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                 }
                 mMsgList.removeAt(removeIndex)
-                msgListAdapter.notifyItemRemoved(removeIndex)
+                mMsgListAdapter.notifyItemRemoved(removeIndex)
             }
         })
 
         //Reaction add
-        msgViewModel.reactionAddLD.observe(viewLifecycleOwner, Observer {
-            if (it.reaction.message?.channelId == channelId) {
+        mMsgViewModel.reactionAddLD.observe(viewLifecycleOwner, Observer {
+            if (it.reaction.message?.channelId == mChannelId) {
                 var indexToReplace = 0
                 val newReac = it.reaction
                 for ((index, value) in mMsgList.withIndex()) {
@@ -428,14 +425,14 @@ class ChannelPanelFragment : BaseFragment() {
                         }
                     }
                 }
-                msgListAdapter.notifyItemChanged(indexToReplace)
+                mMsgListAdapter.notifyItemChanged(indexToReplace)
             }
         })
 
 
         //Reaction remove
-        msgViewModel.reactionRemoveLD.observe(viewLifecycleOwner, Observer {
-            if (it.reaction.message?.channelId == channelId) {
+        mMsgViewModel.reactionRemoveLD.observe(viewLifecycleOwner, Observer {
+            if (it.reaction.message?.channelId == mChannelId) {
                 var indexToReplace = 0
                 val removeReac = it.reaction
                 for ((index, value) in mMsgList.withIndex()) {
@@ -453,38 +450,38 @@ class ChannelPanelFragment : BaseFragment() {
                         }
                     }
                 }
-                msgListAdapter.notifyItemChanged(indexToReplace)
+                mMsgListAdapter.notifyItemChanged(indexToReplace)
             }
         })
 
         //加载更老的消息
-        msgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
+        mMsgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
-            msgListAdapter.notifyItemRemoved(0)
+            mMsgListAdapter.notifyItemRemoved(0)
 
             if (it.size == 0) {
                 mHeaderMsg.isEnd = true
                 mMsgList.add(0, mHeaderMsg)
-                msgListAdapter.notifyItemInserted(0)
+                mMsgListAdapter.notifyItemInserted(0)
                 isFetchingMore.set(false)
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
-                msgListAdapter.notifyItemRangeInserted(0, it.size)
+                mMsgListAdapter.notifyItemRangeInserted(0, it.size)
                 isFetchingMore.set(false)
             }
         })
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = false
         view_messages.layoutManager = mLayoutManager
-        view_messages.adapter = msgListAdapter
+        view_messages.adapter = mMsgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!recyclerView.canScrollVertically(1)) {
-                    if (channelId != null) {
-                        if (Client.global.channels[channelId!!] is TextChannel) {
-                            (Client.global.channels[channelId!!] as TextChannel).apply {
+                    if (mChannelId != null) {
+                        if (Client.global.channels[mChannelId!!] is TextChannel) {
+                            (Client.global.channels[mChannelId!!] as TextChannel).apply {
                                 if (messages.list.size != 0) {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
@@ -504,8 +501,8 @@ class ChannelPanelFragment : BaseFragment() {
                                 }
                             }
                         }
-                        if (Client.global.channels[channelId!!] is DmChannel) {
-                            (Client.global.channels[channelId!!] as DmChannel).apply {
+                        if (Client.global.channels[mChannelId!!] is DmChannel) {
+                            (Client.global.channels[mChannelId!!] as DmChannel).apply {
                                 if (messages.list.size != 0) {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
@@ -532,12 +529,12 @@ class ChannelPanelFragment : BaseFragment() {
                         isFetchingMore.set(true)
                         if (!mHeaderMsg.isEnd) {
                             mMsgList.add(0, mHeaderMsg)
-                            msgListAdapter.notifyItemInserted(0)
+                            mMsgListAdapter.notifyItemInserted(0)
                             mHandler.postDelayed({
-                                channelId?.let { cId ->
+                                mChannelId?.let { cId ->
                                     if (mMsgList.size > 1) {
                                         mMsgList[1].id?.let { mId ->
-                                            msgViewModel.loadOldMessage(cId, mId)
+                                            mMsgViewModel.loadOldMessage(cId, mId)
                                         }
                                     }
                                 }
@@ -550,7 +547,8 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         )
-        msgViewModel.setUpEvent()
+        mChatSharedVM.setUpChannelSelection()
+        mMsgViewModel.setUpEvent()
 
 
     }
@@ -656,7 +654,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 val msgObject = JsonObject()
                                 msgObject.addProperty("id", "")
                                 msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-                                msgObject.addProperty("channelId", channelId)
+                                msgObject.addProperty("channelId", mChannelId)
                                 msgObject.addProperty("timestamp", LocalDateTime.now().toString())
                                 msgObject.addProperty("authorId", Client.global.me.id)
 
@@ -695,7 +693,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 msg.attachments["new_attachment"] = attachment
                                 msg.isSending = true
                                 mMsgList.add(msg)
-                                msgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                                mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                                 mLayoutManager.scrollToPosition(mMsgList.size - 1)
                                 uploadFile(file, msg)
                             }
@@ -712,7 +710,7 @@ class ChannelPanelFragment : BaseFragment() {
         val map = mutableMapOf<String, RequestBody>()
         map["payload_json"] = requestBody
         val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-        (Client.global.channels[channelId!!] as TextChannelBase).messages.uploadAttachments(
+        (Client.global.channels[mChannelId!!] as TextChannelBase).messages.uploadAttachments(
             partMap = map,
             files = body
         ).observeOn(AndroidSchedulers.mainThread()).subscribe({
@@ -723,7 +721,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
             val index = mMsgList.indexOf(deletedMsg)
             mMsgList.remove(deletedMsg)
-            msgListAdapter.notifyItemRemoved(index)
+            mMsgListAdapter.notifyItemRemoved(index)
             Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
         })
     }
@@ -732,7 +730,7 @@ class ChannelPanelFragment : BaseFragment() {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-        msgObject.addProperty("channelId", channelId)
+        msgObject.addProperty("channelId", mChannelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().toString())
         msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)

@@ -36,8 +36,6 @@ class MessageViewModel : ViewModel() {
 
     val updateLD = MutableLiveData<UpdateEnabled>()
 
-    val channelSelectionLD = MutableLiveData<ChannelSelection>()
-
     val messageCreateLD: MutableLiveData<MessageCreateEvent> = MutableLiveData()
 
     val reactionAddLD = MutableLiveData<ReactionAddEvent>()
@@ -50,11 +48,6 @@ class MessageViewModel : ViewModel() {
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
                 updateLD.value = it
-            })
-
-        AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
-                channelSelectionLD.value = it
             })
 
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
