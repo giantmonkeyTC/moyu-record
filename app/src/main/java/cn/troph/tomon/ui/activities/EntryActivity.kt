@@ -19,13 +19,18 @@ import io.reactivex.rxjava3.functions.Consumer
 
 class EntryActivity : AppCompatActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        Client.global.eventBus.observeEventOnUi<GuildSyncEvent>().subscribe(Consumer {
+        val dataPullingViewModel: DataPullingViewModel by viewModels()
+        dataPullingViewModel.setUpFetchData()
+        dataPullingViewModel.dataFetchLD.observe(this, Observer {
             gotoChat()
         })
+
         if (Client.global.loggedIn) {
+            Logger.d("not logged in")
             gotoChat()
         } else {
             Client.global
