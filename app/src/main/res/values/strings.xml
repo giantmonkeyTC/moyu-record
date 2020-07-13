@@ -33,7 +33,6 @@
     <string name="send_fail">发送失败</string>
     <string name="send_success">发送成功</string>
     <string name="app_name_capital">TOMON</string>
-    <string name="no_member">私聊频道下无法打开成员列表</string>
     <string name="ed_msg_hint_no_permisson">你没有此频道发言权限</string>
     <string name="no_voice_support">程序员小哥哥正在努力的开发语音功能!</string>
 

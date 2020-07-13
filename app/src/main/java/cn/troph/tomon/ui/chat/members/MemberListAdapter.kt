@@ -12,6 +12,7 @@ import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.structures.GuildMember
+import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_role_list_header.view.*
 
-class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
+class MemberListAdapter<T>(private val memberList: MutableList<T>) :
     RecyclerView.Adapter<MemberListAdapter.ViewHolder>(),
     StickyRecyclerHeadersAdapter<MemberListAdapter.HeaderViewHolder> {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -38,16 +39,22 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
         return memberList.size
     }
 
-    private fun bind(itemView: View, member: GuildMember) {
-        itemView.setOnClickListener {
-            callMemberDetail(parent = itemView as ViewGroup, member = member)
+    private fun bind(itemView: View, member: T) {
+        if (member is GuildMember) {
+            itemView.setOnClickListener {
+                callMemberDetail(parent = itemView as ViewGroup, member = member)
+            }
+            itemView.member_avatar.user = member.user
+            itemView.widget_member_name_text.text = member.displayName
+            itemView.widget_member_name_text.setTextColor(
+                (if (member.roles.color == null)
+                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+            )
+        } else if (member is User) {
+            itemView.member_avatar.user = member
+            itemView.widget_member_name_text.text = member.name
         }
-        itemView.member_avatar.user = member.user
-        itemView.widget_member_name_text.text = member.displayName
-        itemView.widget_member_name_text.setTextColor(
-            (if (member.roles.color == null)
-                0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
-        )
+
     }
 
     private fun callMemberDetail(parent: ViewGroup, member: GuildMember) {
@@ -89,7 +96,9 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
     }
 
     override fun getHeaderId(position: Int): Long {
-        return memberList[position].roles.highest!!.index.toLong()
+        return if (memberList[position] is GuildMember) {
+            (memberList[position] as GuildMember).roles.highest!!.index.toLong()
+        } else 0
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
@@ -98,8 +107,11 @@ class MemberListAdapter(private val memberList: MutableList<GuildMember>) :
         return HeaderViewHolder(view)
     }
 
-    private fun bindHeader(itemView: View, member: GuildMember) {
-        itemView.widget_role_list_header_text.text = member.roles.highest!!.name
+    private fun bindHeader(itemView: View, member: T) {
+        if (member is GuildMember)
+            itemView.widget_role_list_header_text.text = member.roles.highest!!.name
+        else if (member is User)
+            itemView.widget_role_list_header.visibility = View.GONE
     }
 
     override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
