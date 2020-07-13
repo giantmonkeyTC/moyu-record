@@ -77,26 +77,39 @@
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/bar_update_message">
 
-            <ImageView
+            <View
+                android:id="@+id/input_sep_line"
+                android:layout_width="0dp"
+                android:layout_height="1px"
+                android:background="@android:color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <net.colindodd.toggleimagebutton.ToggleImageButton
                 android:id="@+id/btn_message_menu"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/ic_plus_regular"
+                android:checked="false"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:tib_drawable_off="@drawable/ic_plus_regular"
+                app:tib_drawable_on="@drawable/ic_plus_regular" />
 
-            <ImageView
+            <net.colindodd.toggleimagebutton.ToggleImageButton
                 android:id="@+id/emoji_tv"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginBottom="16dp"
                 android:layout_marginStart="12dp"
+                android:layout_marginBottom="16dp"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_smile_solid"
+                android:checked="false"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btn_message_menu" />
+                app:layout_constraintStart_toEndOf="@id/btn_message_menu"
+                app:tib_drawable_off="@drawable/ic_smile_solid"
+                app:tib_drawable_on="@drawable/ic_smile_solid" />
 
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
@@ -121,18 +134,10 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_paper_plane_solid"
+                android:tag="@string/send_btn_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:id="@+id/input_sep_line"
-            android:layout_width="0dp"
-            android:layout_height="1px"
-            android:background="@android:color/black"
-            app:layout_constraintBottom_toTopOf="@id/layout_input"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
             android:id="@+id/section_header_layout"

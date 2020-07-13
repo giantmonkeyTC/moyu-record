@@ -93,23 +93,26 @@ class ChatActivity : BaseActivity() {
         }
     }
 
-    //用于判断是否要收起键盘
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev?.action == MotionEvent.ACTION_UP) {
-            val view = this.currentFocus
+//    //用于判断是否要收起键盘 DO NOT DELETE
+//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+//        if (ev?.action == MotionEvent.ACTION_UP) {
+//            val view = this.currentFocus
+//
+//            if (isShouldHideInput(view, ev)) {
+//                hideKeyboard(this)
+//            }
+//        }
+//        return super.dispatchTouchEvent(ev)
+//    }
 
-            if (isShouldHideInput(view, ev)) {
-                hideKeyboard(this)
+    //是否要收起键盘 DO NOT DELETE
+    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
+        view?.tag?.let { tag ->
+            if (tag is String && tag == getString(R.string.send_btn_tag)) {
+                return false
             }
         }
-        return super.dispatchTouchEvent(ev)
-    }
 
-    //是否要收起键盘
-    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
-        if (view?.id == R.id.btn_message_send) {
-            return false
-        }
         if (view != null && (view is EditText || view is EmojiEditText)) {
             val l = arrayOf(0, 0)
             val left = l[0]
@@ -125,7 +128,7 @@ class ChatActivity : BaseActivity() {
         return false
     }
 
-    //隐藏键盘
+    //隐藏键盘 DO NOT DELETE
     private fun hideKeyboard(activity: Activity) {
         val imm: InputMethodManager =
             activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
