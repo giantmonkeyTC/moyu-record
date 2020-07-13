@@ -26,10 +26,6 @@ class Restful {
         .client(client)
         .build()
 
-    init {
-
-    }
-
     val authService: AuthService = retrofit.create(AuthService::class.java)
     val guildService: GuildService = retrofit.create(GuildService::class.java)
     val channelService: ChannelService = retrofit.create(ChannelService::class.java)

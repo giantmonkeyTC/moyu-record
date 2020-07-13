@@ -58,6 +58,7 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -243,6 +244,7 @@ class ChannelPanelFragment : BaseFragment() {
         requireActivity().registerReceiver(mNetworkChangeReceiver, mIntentFilter)
         var longLastClickTime = 0L
         btn_message_send.setOnClickListener {
+            throw Exception("test exception")
             if (SystemClock.elapsedRealtime() - longLastClickTime < 1000) {
                 return@setOnClickListener
             }
@@ -382,7 +384,6 @@ class ChannelPanelFragment : BaseFragment() {
             val event = it
             if (it.message.channelId == mChannelId) {
                 val msg = mMsgList.find {
-
                     val localMsg = it
                     event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
                 }

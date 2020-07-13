@@ -73,7 +73,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/edit_pannel_view"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/bar_update_message">
 
@@ -82,21 +82,21 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/ic_plus_regular"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
                 android:id="@+id/emoji_tv"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
+                android:layout_marginBottom="16dp"
                 android:layout_marginStart="12dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_smile_solid"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btn_message_menu"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@id/btn_message_menu" />
 
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
@@ -119,11 +119,20 @@
                 android:layout_width="56dp"
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_paper_plane_solid"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/input_sep_line"
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:background="@android:color/black"
+            app:layout_constraintBottom_toTopOf="@id/layout_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
             android:id="@+id/section_header_layout"
@@ -155,7 +164,6 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
