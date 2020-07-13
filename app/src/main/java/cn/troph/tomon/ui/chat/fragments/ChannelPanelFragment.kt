@@ -87,12 +87,10 @@ class ChannelPanelFragment : BaseFragment() {
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.text?.append(emojiCode)
-            //editText.clearFocus()
         }
 
         override fun onSystemEmojiSelected(unicode: String) {
             editText.text?.append(unicode)
-            //editText.clearFocus()
         }
     }
 
