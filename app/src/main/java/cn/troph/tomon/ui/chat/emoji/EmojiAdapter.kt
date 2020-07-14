@@ -119,9 +119,9 @@ class BottomEmojiAdapter(
                 try {
                     holder.itemView.ctv.text = parseEmoji(it)
                 } catch (e: NumberFormatException) {
-                    holder.itemView.ctv.text = it[0].toString()
+                    holder.itemView.ctv.text = it[0].toUpperCase().toString()
                 } catch (e:IllegalArgumentException){
-                    holder.itemView.ctv.text = it[0].toString()
+                    holder.itemView.ctv.text = it[0].toUpperCase().toString()
                 }
 
             }

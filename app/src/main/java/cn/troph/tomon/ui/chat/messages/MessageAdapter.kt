@@ -471,7 +471,7 @@ class MessageAdapter(
                     if (value.emoji == null)
                         Assets.emojiURL(value.id, false) else
                         value.emoji?.url
-                ).placeholder(R.drawable.user_avatar_placeholder).into(image)
+                ).placeholder(R.drawable.ic_timelapse_white_24dp).into(image)
                 text.text = value.count.toString()
             }
             ll.setOnClickListener {
