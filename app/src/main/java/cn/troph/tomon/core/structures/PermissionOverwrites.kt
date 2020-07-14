@@ -39,4 +39,8 @@ class PermissionOverwrites(client: Client, data: JsonObject) : Base(client, data
         patchSelf(data)
     }
 
+    fun denyPermission(bit: Long): Boolean {
+        return (deny and bit) == bit
+    }
+
 }
