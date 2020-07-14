@@ -134,10 +134,21 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgList.clear()
                     mMsgListAdapter.notifyItemRangeRemoved(0, count)
                     mMsgViewModel.loadTextChannelMessage(value)
-                    if (channel.isPrivate) {
+                    if (channel.members[Client.global.me.id]?.roles?.collection?.none {
+                            it.permissions.has(Permissions.SEND_MESSAGES)
+                        }!! || channel.members[Client.global.me.id]?.roles?.collection?.any {
+                            val po = channel.permissionOverwrites[it.id]
+                            if (po != null)
+                                po.denyPermission(Permissions.SEND_MESSAGES)!!
+                            else false
+                        }!!) {
+
                         editText?.let {
                             it.hint = getString(R.string.ed_msg_hint_no_permisson)
+                            it.isEnabled = false
+                            it.isFocusable = false
                         }
+
                         btn_message_send?.let {
                             it.visibility = View.GONE
                         }
