@@ -41,4 +41,5 @@
     <color name="color_guild_no_img">#7A84D9</color>
     <color name="color_guild_activated">#393939</color>
     <color name="color_guild_unactivated">#313131</color>
+    <color name="warning">#EDD564</color>
 </resources>
