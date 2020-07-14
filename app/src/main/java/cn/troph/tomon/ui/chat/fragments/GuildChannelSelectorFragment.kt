@@ -21,6 +21,7 @@ import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import java.util.*
 
 class GuildChannelSelectorFragment : Fragment() {
