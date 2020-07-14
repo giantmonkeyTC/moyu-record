@@ -30,6 +30,18 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:gravity="center" />
+    <ImageView
+        android:id="@+id/civ"
+        android:visibility="gone"
+        android:textColor="@color/whiteAlpha70"
+        android:background="@drawable/circle_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:gravity="center" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

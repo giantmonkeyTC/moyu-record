@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.emoji
 
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,22 +110,36 @@ class BottomEmojiAdapter(
         if (urlList[position].url != null) {
             holder.itemView.bottom_emoji_iv.visibility = View.VISIBLE
             holder.itemView.ctv.visibility = View.GONE
+            holder.itemView.civ.visibility = View.GONE
             Glide.with(holder.itemView).load(urlList[position].url)
                 .into(holder.itemView.bottom_emoji_iv)
 
         } else {
-            holder.itemView.bottom_emoji_iv.visibility = View.GONE
-            holder.itemView.ctv.visibility = View.VISIBLE
-            urlList[position].text?.let {
-                try {
-                    holder.itemView.ctv.text = parseEmoji(it)
-                } catch (e: NumberFormatException) {
-                    holder.itemView.ctv.text = it[0].toUpperCase().toString()
-                } catch (e:IllegalArgumentException){
-                    holder.itemView.ctv.text = it[0].toUpperCase().toString()
-                }
+            if (urlList[position].drawable == null){
+                holder.itemView.bottom_emoji_iv.visibility = View.GONE
+                holder.itemView.ctv.visibility = View.VISIBLE
+                holder.itemView.civ.visibility = View.GONE
+                urlList[position].text?.let {
+                    try {
+                        holder.itemView.ctv.text = parseEmoji(it)
+                    } catch (e: NumberFormatException) {
+                        holder.itemView.ctv.text = it[0].toUpperCase().toString()
+                    } catch (e:IllegalArgumentException){
+                        holder.itemView.ctv.text = it[0].toUpperCase().toString()
+                    }
 
+                }
             }
+            else{
+                holder.itemView.bottom_emoji_iv.visibility = View.GONE
+                holder.itemView.ctv.visibility = View.GONE
+                holder.itemView.civ.visibility = View.VISIBLE
+                urlList[position].drawable?.let {
+                        holder.itemView.civ.setImageDrawable(it)
+                }
+            }
+
+
         }
 
         holder.itemView.setOnClickListener {
@@ -156,7 +171,8 @@ class BottomEmojiAdapter(
 
 data class GuildIcon(
     @SerializedName("url") val url: String?,
-    @SerializedName("text") val text: String?
+    @SerializedName("text") val text: String?,
+    @SerializedName("drawable") val drawable: Drawable?
 )
 
 interface OnBottomGuildSelectedListener {

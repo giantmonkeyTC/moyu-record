@@ -616,7 +616,7 @@ class ChannelPanelFragment : BaseFragment() {
                 isBuildIn = false,
                 emojiList = item.emojis.values.toMutableList()
             )
-            guildIcon.add(GuildIcon(item.iconURL, item.name))
+            guildIcon.add(GuildIcon(item.iconURL, item.name,null))
             val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
@@ -631,7 +631,7 @@ class ChannelPanelFragment : BaseFragment() {
                 ), mEmojiClickListener
             )
             mSectionDataManager.addSection(adapter, 1)
-            guildIcon.add(GuildIcon(null, item.value[0].code))
+            guildIcon.add(GuildIcon(null, item.value[0].code,null))
         }
 
         emoji_rr.adapter = mSectionDataManager.adapter
