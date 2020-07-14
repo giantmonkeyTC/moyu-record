@@ -30,7 +30,6 @@ class EntryActivity : AppCompatActivity() {
         })
 
         if (Client.global.loggedIn) {
-            Logger.d("not logged in")
             gotoChat()
         } else {
             Client.global
