@@ -46,7 +46,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
 
         fun bind(channel: GuildChannel) {
             itemView.isActivated = AppState.global.channelSelection.value.channelId == channel.id
-            itemView.text_name.isActivated = itemView.isActivated
             when (channel.type) {
                 ChannelType.TEXT -> {
                     if (channel.isPrivate) {
@@ -90,7 +89,11 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     text.setTextColor(Color.parseColor("#E2E2E2"))
                 } else {
                     text.typeface = Typeface.DEFAULT
-                    text.setTextColor(Color.parseColor("#969696"))
+                    if (!itemView.isActivated) {
+                        text.setTextColor(Color.parseColor("#969696"))
+                    } else {
+                        text.setTextColor(Color.parseColor("#E2E2E2"))
+                    }
                 }
                 if (channel.mention != 0) {
                     itemView.channel_unread_mention_notification.text = channel.mention.toString()

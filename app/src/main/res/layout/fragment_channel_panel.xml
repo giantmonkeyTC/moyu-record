@@ -88,28 +88,29 @@
 
             <net.colindodd.toggleimagebutton.ToggleImageButton
                 android:id="@+id/btn_message_menu"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
                 android:checked="false"
+                android:background="?android:attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:tib_drawable_off="@drawable/ic_plus_regular"
-                app:tib_drawable_on="@drawable/ic_plus_regular" />
+                app:tib_drawable_off="@drawable/ic_add_circle_black_24dp"
+                app:tib_drawable_on="@drawable/ic_add_circle_black_24dp" />
 
             <net.colindodd.toggleimagebutton.ToggleImageButton
                 android:id="@+id/emoji_tv"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="16dp"
-                android:background="@android:color/transparent"
+                android:background="?android:attr/selectableItemBackground"
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
-                app:tib_drawable_off="@drawable/ic_smile_solid"
-                app:tib_drawable_on="@drawable/ic_smile_solid" />
+                app:tib_drawable_off="@drawable/ic_sentiment_satisfied_alt_black_24dp"
+                app:tib_drawable_on="@drawable/ic_keyboard_black_24dp" />
 
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
@@ -133,7 +134,8 @@
                 android:layout_height="28dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                android:src="@drawable/ic_paper_plane_solid"
+                android:src="@drawable/ic_send_black_24dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:tag="@string/send_btn_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
