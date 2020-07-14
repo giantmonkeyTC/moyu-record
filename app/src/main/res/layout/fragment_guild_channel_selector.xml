@@ -38,7 +38,7 @@
         app:layout_constraintBottom_toTopOf="@id/view_guild_channels"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.chauthai.overscroll.RecyclerViewBouncy
         android:id="@+id/view_guild_channels"
         android:layout_width="match_parent"
         android:layout_height="0dp"
