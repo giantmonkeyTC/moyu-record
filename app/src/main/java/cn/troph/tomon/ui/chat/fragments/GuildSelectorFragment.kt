@@ -34,6 +34,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class GuildSelectorFragment : Fragment() {
 
@@ -67,6 +68,7 @@ class GuildSelectorFragment : Fragment() {
                     }
                 })
                 view_guilds.layoutManager = LinearLayoutManager(view.context)
+                OverScrollDecoratorHelper.setUpOverScroll(view_guilds,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
                 view_guilds.adapter = mAdapter
                 it.forEach {
                     it.updateMention()

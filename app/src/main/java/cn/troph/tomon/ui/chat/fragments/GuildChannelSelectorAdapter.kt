@@ -86,13 +86,14 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             if (channel is TextChannel) {
                 if (channel.unread) {
                     text.typeface = Typeface.DEFAULT_BOLD
-                    text.setTextColor(Color.parseColor("#E2E2E2"))
+                    text.setTextColor(Color.parseColor("#FFFFFF"))
                 } else {
                     text.typeface = Typeface.DEFAULT
                     if (!itemView.isActivated) {
                         text.setTextColor(Color.parseColor("#969696"))
                     } else {
-                        text.setTextColor(Color.parseColor("#E2E2E2"))
+                        text.typeface = Typeface.DEFAULT_BOLD
+                        text.setTextColor(Color.parseColor("#FFFFFF"))
                     }
                 }
                 if (channel.mention != 0) {
@@ -115,7 +116,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                 if (channel is TextChannel) {
                     if (channel.unread) {
                         text.typeface = Typeface.DEFAULT_BOLD
-                        text.setTextColor(Color.parseColor("#E2E2E2"))
+                        text.setTextColor(Color.parseColor("#FFFFFF"))
                     } else {
                         text.typeface = Typeface.DEFAULT
                         text.setTextColor(Color.parseColor("#969696"))
@@ -134,8 +135,10 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
                     if (channel.unread) {
-                        text.setTextColor(Color.parseColor("#E2E2E2"))
+                        text.typeface = Typeface.DEFAULT_BOLD
+                        text.setTextColor(Color.parseColor("#FFFFFF"))
                     } else {
+                        text.typeface = Typeface.DEFAULT
                         text.setTextColor(Color.parseColor("#969696"))
                         itemView.channel_unread_mention_notification.visibility = View.GONE
                     }

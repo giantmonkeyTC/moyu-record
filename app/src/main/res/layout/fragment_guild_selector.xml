@@ -6,24 +6,27 @@
     android:background="@color/frameworkSelectorDark">
 
 
-    <androidx.appcompat.widget.AppCompatImageButton
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btn_dm_channel_entry"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="13dp"
         android:layout_marginEnd="13dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/dm_entry"
+        android:src="@drawable/dm_entry"
+        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-    <androidx.appcompat.widget.AppCompatImageButton
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btn_join_guild"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/ic_join_guild"
+        android:src="@drawable/add"
+        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@id/btn_dm_channel_entry"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,6 +63,7 @@
         android:layout_height="36dp"
         android:layout_marginTop="20dp"
         android:elevation="60dp"
+        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
