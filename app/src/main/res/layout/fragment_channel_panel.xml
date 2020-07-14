@@ -168,6 +168,7 @@
             android:id="@+id/bottom_emoji_rr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="4dp"
             android:background="@color/background2"
             android:paddingHorizontal="16dp"
             android:visibility="gone"
