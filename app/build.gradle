@@ -148,6 +148,7 @@ dependencies {
     implementation 'io.sentry:sentry-android:2.1.7'
     implementation 'com.androidadvance:topsnackbar:1.1.1'
     implementation 'com.google.android.gms:play-services-analytics:17.0.0'
+    implementation 'net.colindodd:toggleimagebutton:1.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

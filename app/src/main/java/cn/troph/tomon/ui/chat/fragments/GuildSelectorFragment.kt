@@ -54,7 +54,6 @@ class GuildSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let { list ->
-                Logger.d("${list.size}")
                 mGuildList.clear()
                 mGuildList.addAll(list)
                 mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {

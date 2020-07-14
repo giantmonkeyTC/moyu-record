@@ -12,12 +12,17 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.CompoundButton
+import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
 import androidx.core.view.isVisible
+import androidx.emoji.widget.EmojiEditText
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -58,6 +63,7 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.Exception
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -72,22 +78,19 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val mMsgViewModel: MessageViewModel by viewModels()
     private val mChatSharedVM: ChatSharedViewModel by activityViewModels()
-    private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
-
+    private lateinit var mBottomSheet: FileBottomSheetFragment
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
 
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
             editText.text?.append(emojiCode)
-            editText.clearFocus()
         }
 
         override fun onSystemEmojiSelected(unicode: String) {
             editText.text?.append(unicode)
-            editText.clearFocus()
         }
     }
 
@@ -227,25 +230,13 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
 
-        editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                if (section_header_layout.isVisible) {
-                    section_header_layout.visibility =
-                        View.GONE
-                    bottom_emoji_rr.visibility = View.GONE
-                }
-            }
-        }
-
         KeyboardVisibilityEvent.setEventListener(requireActivity(),
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
                     if (isOpen) {
-                        if (section_header_layout.isVisible) {
-                            section_header_layout.visibility =
-                                View.GONE
-                            bottom_emoji_rr.visibility = View.GONE
-                        }
+                        btn_message_menu.isChecked = false
+                        emoji_tv.isChecked = false
+                        scrollToBottom()
                     }
                 }
             })
@@ -273,7 +264,7 @@ class ChannelPanelFragment : BaseFragment() {
                 val emptyMsg = createEmptyMsg(textToSend)
                 mMsgList.add(emptyMsg)
                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                mLayoutManager.scrollToPosition(mMsgListAdapter.itemCount - 1)
+                scrollToBottom()
                 //发送消息
                 (Client.global.channels[mChannelId
                     ?: ""] as TextChannelBase).messages.create(
@@ -283,7 +274,7 @@ class ChannelPanelFragment : BaseFragment() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ ->
                         mHandler.postDelayed({
-                            mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                            scrollToBottom()
                         }, 300)
                     }
                         , { _ ->
@@ -301,7 +292,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 break
                             }
                         }
-                        mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                        scrollToBottom()
                     }, { _ ->
                         Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
                             .show()
@@ -316,7 +307,7 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgList.clear()
                     mMsgList.addAll(it)
                     mMsgListAdapter.notifyDataSetChanged()
-                    mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                    scrollToBottom()
                 }
             })
 
@@ -326,74 +317,37 @@ class ChannelPanelFragment : BaseFragment() {
                 UpdateEnabled(flag = false)
         }
 
-        //选择文件事件
-        btn_message_menu.setOnClickListener {
-            mBottomSheet =
-                FileBottomSheetFragment(
-                    requireActivity(),
-                    onBottomSheetSelect = object : OnBottomSheetSelect {
-                        override fun onItemSelected(index: Int) {
-                            val intent = Intent(requireContext(), FilePickerActivity::class.java)
-                            val builder = Configurations.Builder()
-                            when (index) {
-                                0 -> {
-                                    builder.setCheckPermission(true).setShowImages(true)
-                                        .setShowVideos(false).setShowFiles(false)
-                                        .setShowAudios(false)
-                                        .setSingleChoiceMode(true).setSingleClickSelection(true)
-                                        .enableImageCapture(true)
-                                    intent.putExtra(
-                                        FilePickerActivity.CONFIGS,
-                                        builder.build()
-                                    )
-                                }
-                                1 -> {
-                                    builder.setCheckPermission(true).setShowVideos(true)
-                                        .setShowImages(false).setShowFiles(false)
-                                        .setShowAudios(false)
-                                        .setMaxSelection(1).enableVideoCapture(false)
-                                    intent.putExtra(
-                                        FilePickerActivity.CONFIGS,
-                                        builder.build()
-                                    )
-
-                                }
-                                2 -> {
-                                    builder.setCheckPermission(true).setShowFiles(true)
-                                        .setSingleChoiceMode(true).setSingleClickSelection(true)
-                                        .setShowImages(false).setShowVideos(false)
-                                        .setShowAudios(false)
-                                    intent.putExtra(
-                                        FilePickerActivity.CONFIGS,
-                                        builder.build()
-                                    )
-                                }
-                            }
-                            startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
-                            mBottomSheet.dismiss(true)
-                        }
-                    }).also(BottomSheet::show)
-        }
-
-        //表情事件
-        emoji_tv.setOnClickListener {
-            if (section_header_layout.isVisible) {
-                section_header_layout.visibility =
-                    View.GONE
-                bottom_emoji_rr.visibility = View.GONE
+        //上传文件
+        btn_message_menu.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                hideKeyboard()
+                mBottomSheet.show()
+                emoji_tv.isChecked = false
             } else {
-                section_header_layout.visibility = View.VISIBLE
-                bottom_emoji_rr.visibility = View.VISIBLE
-                loadEmoji()
+                mBottomSheet.dismiss()
             }
         }
 
+        //表情事件
+        emoji_tv.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                hideKeyboard()
+                scrollToBottom()
+                section_header_layout.visibility = View.VISIBLE
+                bottom_emoji_rr.visibility = View.VISIBLE
+                loadEmoji()
+                btn_message_menu.isChecked = false
+            } else {
+                section_header_layout.visibility =
+                    View.GONE
+                bottom_emoji_rr.visibility = View.GONE
+            }
+        }
         //接受新的Message
         mMsgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer {
             val event = it
             if (it.message.channelId == mChannelId) {
                 val msg = mMsgList.find {
-
                     val localMsg = it
                     event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
                 }
@@ -483,10 +437,20 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
         mLayoutManager = LinearLayoutManager(requireContext())
-        mLayoutManager.stackFromEnd = false
+        mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    btn_message_menu.isChecked = false
+                    emoji_tv.isChecked = false
+                    hideKeyboard()
+                }
+            }
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (!recyclerView.canScrollVertically(1)) {
@@ -558,10 +522,68 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         )
+        setUpBottomSheet()
         mChatSharedVM.setUpChannelSelection()
         mMsgViewModel.setUpEvent()
 
+    }
 
+
+    private fun scrollToBottom() {
+        mLayoutManager.scrollToPosition(mMsgList.size - 1)
+    }
+
+    private fun setUpBottomSheet() {
+        mBottomSheet =
+            FileBottomSheetFragment(
+                requireActivity(),
+                onBottomSheetSelect = object : OnBottomSheetSelect {
+                    override fun onItemSelected(index: Int) {
+                        val intent = Intent(requireContext(), FilePickerActivity::class.java)
+                        val builder = Configurations.Builder()
+                        when (index) {
+                            0 -> {
+                                builder.setCheckPermission(true).setShowImages(true)
+                                    .setShowVideos(false).setShowFiles(false)
+                                    .setShowAudios(false)
+                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
+                                    .enableImageCapture(true)
+                                intent.putExtra(
+                                    FilePickerActivity.CONFIGS,
+                                    builder.build()
+                                )
+                            }
+                            1 -> {
+                                builder.setCheckPermission(true).setShowVideos(true)
+                                    .setShowImages(false).setShowFiles(false)
+                                    .setShowAudios(false)
+                                    .setMaxSelection(1).enableVideoCapture(false)
+                                intent.putExtra(
+                                    FilePickerActivity.CONFIGS,
+                                    builder.build()
+                                )
+
+                            }
+                            2 -> {
+                                builder.setCheckPermission(true).setShowFiles(true)
+                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
+                                    .setShowImages(false).setShowVideos(false)
+                                    .setShowAudios(false)
+                                intent.putExtra(
+                                    FilePickerActivity.CONFIGS,
+                                    builder.build()
+                                )
+                            }
+                        }
+                        startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
+                        mBottomSheet.dismiss(true)
+
+                    }
+                })
+
+        mBottomSheet.setOnDismissListener {
+            btn_message_menu.isChecked = false
+        }
     }
 
     private fun loadEmoji() {
@@ -705,7 +727,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 msg.isSending = true
                                 mMsgList.add(msg)
                                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                                mLayoutManager.scrollToPosition(mMsgList.size - 1)
+                                scrollToBottom()
                                 uploadFile(file, msg)
                             }
                         }
@@ -735,6 +757,18 @@ class ChannelPanelFragment : BaseFragment() {
             mMsgListAdapter.notifyItemRemoved(index)
             Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
         })
+    }
+
+    private fun hideKeyboard() {
+        val imm: InputMethodManager =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = requireActivity().currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun createEmptyMsg(content: String): Message {

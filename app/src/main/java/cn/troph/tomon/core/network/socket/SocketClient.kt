@@ -46,7 +46,7 @@ fun retryDelay(times: Int): Long {
     }
 }
 
-class SocketClient: WebSocketListener(),
+class SocketClient : WebSocketListener(),
     ObservableOnSubscribe<SocketEvent> {
 
     private var _webSocket: WebSocket? = null
@@ -64,6 +64,7 @@ class SocketClient: WebSocketListener(),
 
     fun open(url: String) {
         if (_state == SocketClientState.CLOSED) {
+            println("[ws] opening socket")
             connect(url)
         }
     }
@@ -72,6 +73,7 @@ class SocketClient: WebSocketListener(),
         _webSocket?.close(code, reason)
         _webSocket = null
         _state = SocketClientState.CLOSED
+        println("[ws] close:${reason}")
     }
 
     fun send(data: JsonElement) {
@@ -92,7 +94,7 @@ class SocketClient: WebSocketListener(),
         _url = url
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient.Builder()
-        client.callTimeout(0,TimeUnit.MILLISECONDS)
+        client.callTimeout(0, TimeUnit.MILLISECONDS)
         _webSocket = client.build().newWebSocket(request, this)
         _emitter?.onNext(SocketEvent(SocketEventType.CONNECTING))
     }
@@ -127,7 +129,7 @@ class SocketClient: WebSocketListener(),
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
-        println("[ws] close")
+        println("[ws] closed")
         _state = SocketClientState.CLOSED
         when (code) {
             1006 -> if (url != null) reconnect()

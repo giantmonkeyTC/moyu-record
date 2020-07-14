@@ -70,7 +70,7 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
         password: String? = null,
         token: String? = null
     ): Observable<User?> {
-        var request = when {
+        val request = when {
             token?.isNotEmpty() == true -> AuthService.LoginRequest(token = token)
             Validator.isFullName(unionId) -> AuthService.LoginRequest(
                 full_name = unionId,
