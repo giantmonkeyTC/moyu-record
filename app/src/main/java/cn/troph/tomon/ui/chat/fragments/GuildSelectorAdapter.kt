@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.chat.fragments
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -41,6 +42,14 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
                     avatar.selecting = AppState.global.channelSelection.value.guildId == guild?.id
                     itemView.guild_indicator.visibility =
                         if (avatar.selecting) View.VISIBLE else View.INVISIBLE
+                    if (avatar.selecting) {
+                        itemView.guild_indicator.startAnimation(
+                            AnimationUtils.loadAnimation(
+                                itemView.context,
+                                R.anim.scale
+                            )
+                        )
+                    }
                 }
         }
 
