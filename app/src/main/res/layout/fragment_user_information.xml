@@ -71,6 +71,7 @@
                 android:layout_marginStart="8dp"
                 android:textColor="@color/secondaryText"
                 android:textSize="16sp"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/user_info_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/user_info_name" />

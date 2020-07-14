@@ -61,7 +61,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
                 if (me.email == null) getString(R.string.profile_empty) else me.email
             view.profile_layout.user_info_phone.text =
                 if (me.phone == null) getString(R.string.profile_empty) else me.phone
-            view.profile_layout.user_info_nick.text = me.username
+            view.profile_layout.user_info_nick.text = "${me.username} #${me.discriminator}"
         }
 
         view.profile_layout.user_sign_out.setOnClickListener {

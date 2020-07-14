@@ -53,6 +53,7 @@ import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import okhttp3.MultipartBody
@@ -440,6 +441,7 @@ class ChannelPanelFragment : BaseFragment() {
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
+        OverScrollDecoratorHelper.setUpOverScroll(view_messages,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

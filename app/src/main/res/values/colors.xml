@@ -39,4 +39,6 @@
     <color name="background1HalfAlpha">#80171717</color>
     <color name="channel_name_unactivated">#969696</color>
     <color name="color_guild_no_img">#7A84D9</color>
+    <color name="color_guild_activated">#393939</color>
+    <color name="color_guild_unactivated">#313131</color>
 </resources>
