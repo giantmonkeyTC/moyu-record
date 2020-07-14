@@ -1,11 +1,11 @@
 package cn.troph.tomon.ui.chat.emoji
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
-import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.item_bottom_emoji_icon.view.*
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
-import java.nio.ByteBuffer
 
 
 class EmojiAdapter(
@@ -39,7 +38,8 @@ class EmojiAdapter(
     }
 
     override fun onBindHeaderViewHolder(holder: EmojiHeaderViewHolder?) {
-        holder?.itemView?.guid_name_emoji?.text = "#${emojiSectionObj.name}#"
+        holder?.itemView?.guild_name_emoji?.text = "${emojiSectionObj.name.toUpperCase()}"
+        holder?.itemView?.guild_name_emoji?.typeface = Typeface.DEFAULT_BOLD
     }
 
     override fun getItemCount(): Int {

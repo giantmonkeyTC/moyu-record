@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#313131"
+    android:background="@color/background2"
     tools:context=".ui.chat.emoji.ReactionFragment">
 
     <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
         android:id="@+id/reaction_section_header_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintBottom_toTopOf="@id/line_view"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -25,14 +26,15 @@
         android:id="@+id/line_view"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/primaryDark"
+        android:background="@color/background2"
         app:layout_constraintBottom_toTopOf="@id/bottom_emoji_rr" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bottom_emoji_rr"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="#313131"
+        android:layout_marginHorizontal="16dp"
+        android:background="@color/background2"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
