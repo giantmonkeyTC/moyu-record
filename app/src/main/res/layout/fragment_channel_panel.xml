@@ -109,7 +109,7 @@
                 android:checked="false"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
-                app:tib_drawable_off="@drawable/ic_sentiment_satisfied_alt_black_24dp"
+                app:tib_drawable_off="@drawable/ic_emoji_emotions_black_24dp"
                 app:tib_drawable_on="@drawable/ic_keyboard_black_24dp" />
 
             <androidx.emoji.widget.EmojiEditText
