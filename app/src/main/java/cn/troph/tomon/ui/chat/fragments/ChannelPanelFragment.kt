@@ -441,7 +441,10 @@ class ChannelPanelFragment : BaseFragment() {
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
-        OverScrollDecoratorHelper.setUpOverScroll(view_messages,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
+        OverScrollDecoratorHelper.setUpOverScroll(
+            view_messages,
+            OverScrollDecoratorHelper.ORIENTATION_VERTICAL
+        )
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -649,7 +652,6 @@ class ChannelPanelFragment : BaseFragment() {
         bottom_emoji_rr.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
-
     }
 
 
