@@ -39,12 +39,12 @@ class GuildAvatar : FrameLayout {
         set(value) {
             field = value
             val side = width.coerceAtMost(height)
-            var radius = if (selecting) 8f else 30f
+            var radius = if (selecting) 30f else 100f
             clipView.bottomLeftRadius = radius
             clipView.bottomRightRadius = radius
             clipView.topLeftRadius = radius
             clipView.topRightRadius = radius
-            nameView.setBackgroundResource(if (selecting) R.color.guildSelectBackground else R.color.guildBackground)
+            nameView.setBackgroundResource(if (selecting) R.color.color_guild_no_img else R.color.guildBackground)
         }
 
     constructor(context: Context) : super(context) {
