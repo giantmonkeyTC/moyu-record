@@ -381,7 +381,17 @@ class MessageAdapter(
                     holder.itemView.loading_text_header.visibility = View.VISIBLE
                     holder.itemView.animation_view.visibility = View.GONE
                     holder.itemView.loading_text_header.text =
-                        if (msg.isGuild) "欢迎来到#${msg.channelText} 频道!" else "与@${msg.channelText} 私聊的开始"
+                        if (msg.isGuild) {
+                            if (msg.channelText.length < 10) "欢迎来到#${msg.channelText} 频道!" else "欢迎来到#${msg.channelText.substring(
+                                0,
+                                10
+                            )}... 频道!"
+                        } else {
+                            if (msg.channelText.length < 10) "与@${msg.channelText} 私聊的开始" else "与@${msg.channelText.substring(
+                                0,
+                                10
+                            )}... 私聊的开始"
+                        }
                     holder.itemView.loading_text_header.setCompoundDrawablesWithIntrinsicBounds(
                         if (msg.isGuild) holder.itemView.context.getDrawable(
                             R.drawable.ic_group
@@ -469,13 +479,16 @@ class MessageAdapter(
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                             {
-                                Glide.with(holder.itemView).load(it.inviter.avatar_url)
-                                    .placeholder(R.drawable.user_avatar_placeholder)
-                                    .into(holder.itemView.user_avatar_invite)
+                                if (it.joined)
+                                    holder.itemView.join_image.setImageResource(R.drawable.shadow_panel)
                                 holder.itemView.invite_guild_name.text = it.guild.name
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
+                                Glide.with(holder.itemView).load(it.inviter.avatar_url)
+                                    .placeholder(R.drawable.ic_question_circle_solid)
+                                    .into(holder.itemView.user_avatar_invite)
                             }, {
+                                holder.itemView.join_image.setImageResource(R.drawable.invalidation)
                                 holder.itemView.invite_guild_name.text = "无效邀请"
                                 holder.itemView.joined_cover.visibility = View.GONE
                             })

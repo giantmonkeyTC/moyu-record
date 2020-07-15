@@ -2,7 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginHorizontal="16dp"
     android:layout_width="match_parent"
+    android:paddingVertical="4dp"
+    android:layout_marginVertical="4dp"
     android:layout_height="wrap_content">
 
     <com.airbnb.lottie.LottieAnimationView
@@ -21,14 +24,15 @@
         android:id="@+id/loading_text_header"
         android:layout_width="wrap_content"
         android:gravity="center"
-        android:layout_marginEnd="16dp"
+        android:maxLines="2"
+        android:drawablePadding="12dp"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_chat_begin_guild"
         android:text="@string/no_more_msg"
         android:textColor="@color/white"
-        android:textSize="19sp"
+        android:textSize="18sp"
+        android:layout_marginStart="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

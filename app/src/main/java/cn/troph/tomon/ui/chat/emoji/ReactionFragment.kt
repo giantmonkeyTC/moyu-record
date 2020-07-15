@@ -140,6 +140,22 @@ class ReactionFragment : BottomSheetDialogFragment() {
             val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
+        val guildIconDefault = mutableListOf<Drawable>()
+        guildIconDefault.apply {
+            add(resources.getDrawable(R.drawable.ic_running_solid))
+            add(resources.getDrawable(R.drawable.ic_smile_solid))
+            add(resources.getDrawable(R.drawable.ic_icons_alt_regular))
+            add(resources.getDrawable(R.drawable.ic_head_side_solid))
+            add(resources.getDrawable(R.drawable.ic_lightbulb_solid))
+            add(resources.getDrawable(R.drawable.ic_plane_alt_solid))
+            add(resources.getDrawable(R.drawable.ic_flag_solid))
+            add(resources.getDrawable(R.drawable.ic_utensils_alt_solid))
+            add(resources.getDrawable(R.drawable.ic_leaf_solid))
+            add(resources.getDrawable(R.drawable.ic_globe_solid))
+        }
+        guildIconDefault.forEach{
+            guildIcon.add(GuildIcon(null,null,it))
+        }
         //load system emoji
         val systemEmoji = SystemEmoji(requireContext())
         for (item in systemEmoji.returnEmojiWithCategory()) {
@@ -153,23 +169,6 @@ class ReactionFragment : BottomSheetDialogFragment() {
             mSectionDataManager.addSection(adapter, 1)
 //            guildIcon.add(GuildIcon(null, item.value[0].code,null))
         }
-        val guildIconDefault = mutableListOf<Drawable>()
-        guildIconDefault.apply {
-            add(resources.getDrawable(R.drawable.ic_smile_solid))
-            add(resources.getDrawable(R.drawable.ic_head_side_solid))
-            add(resources.getDrawable(R.drawable.ic_leaf_solid))
-            add(resources.getDrawable(R.drawable.ic_utensils_alt_solid))
-            add(resources.getDrawable(R.drawable.ic_paper_plane_solid))
-            add(resources.getDrawable(R.drawable.ic_lightbulb_solid))
-            add(resources.getDrawable(R.drawable.ic_icons_alt_regular))
-            add(resources.getDrawable(R.drawable.ic_flag_solid))
-        }
-        guildIconDefault.forEach{
-            guildIcon.add(GuildIcon(null,null,it))
-        }
-
-
-
         reaction_rr.adapter = mSectionDataManager.adapter
         reaction_section_header_layout.attachTo(reaction_rr, mSectionDataManager)
         // bottom Emoji
