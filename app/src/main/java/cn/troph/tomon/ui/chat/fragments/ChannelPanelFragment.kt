@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -119,6 +120,8 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                     mMsgViewModel.loadDmChannelMessage(value)
                     editText?.let {
+                        it.isEnabled = true
+
                         it.hint = getString(R.string.emoji_et_hint)
                     }
                     btn_message_send?.let {
@@ -143,19 +146,17 @@ class ChannelPanelFragment : BaseFragment() {
                                 po.denyPermission(Permissions.SEND_MESSAGES)!!
                             else false
                         }!!) {
-
                         editText?.let {
                             it.hint = getString(R.string.ed_msg_hint_no_permisson)
                             it.isEnabled = false
-                            it.isFocusable = false
                         }
-
                         btn_message_send?.let {
                             it.visibility = View.GONE
                         }
                     } else {
                         editText?.let {
                             it.hint = getString(R.string.emoji_et_hint)
+                            editText.isEnabled = true
                         }
                         btn_message_send?.let {
                             it.visibility = View.VISIBLE
@@ -616,11 +617,27 @@ class ChannelPanelFragment : BaseFragment() {
                 isBuildIn = false,
                 emojiList = item.emojis.values.toMutableList()
             )
-            guildIcon.add(GuildIcon(item.iconURL, item.name,null))
+            guildIcon.add(GuildIcon(item.iconURL, item.name, null))
             val sectionAdapter = EmojiAdapter(sectionData, mEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
         //loading system emoji
+        val guildIconDefault = mutableListOf<Drawable>()
+        guildIconDefault.apply {
+            add(resources.getDrawable(R.drawable.ic_running_solid))
+            add(resources.getDrawable(R.drawable.ic_smile_solid))
+            add(resources.getDrawable(R.drawable.ic_icons_alt_regular))
+            add(resources.getDrawable(R.drawable.ic_head_side_solid))
+            add(resources.getDrawable(R.drawable.ic_lightbulb_solid))
+            add(resources.getDrawable(R.drawable.ic_plane_alt_solid))
+            add(resources.getDrawable(R.drawable.ic_flag_solid))
+            add(resources.getDrawable(R.drawable.ic_utensils_alt_solid))
+            add(resources.getDrawable(R.drawable.ic_leaf_solid))
+            add(resources.getDrawable(R.drawable.ic_globe_solid))
+        }
+        guildIconDefault.forEach {
+            guildIcon.add(GuildIcon(null, null, it))
+        }
         val systemEmoji = SystemEmoji(requireContext())
         for (item in systemEmoji.returnEmojiWithCategory()) {
             val adapter = EmojiAdapter(
@@ -631,7 +648,6 @@ class ChannelPanelFragment : BaseFragment() {
                 ), mEmojiClickListener
             )
             mSectionDataManager.addSection(adapter, 1)
-            guildIcon.add(GuildIcon(null, item.value[0].code,null))
         }
 
         emoji_rr.adapter = mSectionDataManager.adapter
