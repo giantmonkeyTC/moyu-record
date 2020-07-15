@@ -42,4 +42,5 @@
     <color name="color_guild_activated">#393939</color>
     <color name="color_guild_unactivated">#313131</color>
     <color name="warning">#EDD564</color>
+    <color name="system_pink">#FB9CC7</color>
 </resources>

@@ -47,6 +47,7 @@
     <string name="no_more_msg">没有更多消息了</string>
     <string name="over_size">上传大小不能超过8MB</string>
     <string name="send_btn_tag">Send Button</string>
+    <string name="welcome_msg">确认过眼神, %s 是我们的人</string>
 
 
 
