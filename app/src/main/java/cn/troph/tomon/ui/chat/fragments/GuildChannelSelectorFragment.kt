@@ -6,23 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.ui.chat.viewmodel.DmChannelViewModel
 import cn.troph.tomon.ui.states.AppState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import androidx.lifecycle.Observer
-import cn.troph.tomon.core.events.MessageCreateEvent
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.utils.event.observeEventOnUi
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import java.util.*
 
 class GuildChannelSelectorFragment : Fragment() {
     var disposable: Disposable? = null

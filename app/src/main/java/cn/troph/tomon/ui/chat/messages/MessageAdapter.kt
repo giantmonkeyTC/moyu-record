@@ -17,6 +17,7 @@ import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
@@ -33,6 +34,7 @@ import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.FileUtils
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -71,6 +73,7 @@ class MessageAdapter(
     private val reactionSelectorListener: ReactionSelectorListener
 ) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         when (viewType) {
@@ -156,6 +159,15 @@ class MessageAdapter(
                     callBottomSheet(holder, 0)
                     true
                 }
+                holder.itemView.message_avatar.setOnClickListener {
+                    messageList[holder.adapterPosition].authorId?.let {
+                        if (it != Client.global.me.id) {
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                        }
+
+                    }
+                }
                 if (position > 1) {
                     bind(holder.itemView, msg, messageList[position - 1], holder)
                 } else {
@@ -171,6 +183,14 @@ class MessageAdapter(
 
                 ) {
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_file.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
 
@@ -269,6 +289,14 @@ class MessageAdapter(
                     )
                 ) {
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_image.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
                     holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
@@ -373,6 +401,14 @@ class MessageAdapter(
                     )
                 ) {
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_invite.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
