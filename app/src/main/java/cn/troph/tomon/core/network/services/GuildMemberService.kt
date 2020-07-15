@@ -19,6 +19,6 @@ interface GuildMemberService {
         @SerializedName("target_id") val targetId: String,
         @SerializedName("reason") val reason: Int,
         @SerializedName("type") val type: Int,
-        @SerializedName("comment") val comment: String = ""
+        @SerializedName("comment") val comment: String? = ""
     )
 }

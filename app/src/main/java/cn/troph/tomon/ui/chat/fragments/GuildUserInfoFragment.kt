@@ -38,7 +38,11 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
             user_info_name.text = user.name
             user_info_nick.text = "${user.username} #${user.discriminator}"
             user_sign_out.setOnClickListener {
-                ReportFragment(userId).show((view.context as AppCompatActivity).supportFragmentManager, null)
+                dismiss()
+                ReportFragment(
+                    userId,
+                    1
+                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
             }
 
             user_private_chat.setOnClickListener {
