@@ -57,6 +57,7 @@ import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
+import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -97,6 +98,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_invite_link, parent, false)
                 )
             }
+            5 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_system_welcome_msg, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -117,6 +124,9 @@ class MessageAdapter(
                 return@let
         }
         if (messageList[position].attachments.size == 0) {//normal msg
+            if (messageList[position].type == MessageType.GUILD_MEMBER_JOIN) {
+                return 5
+            }
             return 0
         }
         var type = 0
@@ -440,6 +450,11 @@ class MessageAdapter(
                 holder.view.widget_message_timestamp_text_invite.text =
                     timestampConverter(messageList[position].timestamp)
                 showReaction(holder, messageList[position])
+            }
+            5 -> {
+                holder.itemView.system_txt_welcome.text =
+                    holder.itemView.context.getString(R.string.welcome_msg)
+                        .format(messageList[position].author?.name)
             }
         }
     }
