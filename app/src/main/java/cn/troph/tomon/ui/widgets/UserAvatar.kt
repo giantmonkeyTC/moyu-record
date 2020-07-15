@@ -12,6 +12,7 @@ import androidx.core.graphics.ColorUtils
 import cn.troph.tomon.R
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.Snowflake
+import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import com.bumptech.glide.Glide
 import com.github.florent37.shapeofview.shapes.CircleView
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

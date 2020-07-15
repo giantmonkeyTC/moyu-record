@@ -102,75 +102,8 @@
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/user_info_nick_holder" />
-
-            <View
-                android:id="@+id/divider1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="16dp"
-                android:background="@color/background2"
-                app:layout_constraintBottom_toTopOf="@id/user_info_phone_holder"
-                app:layout_constraintTop_toBottomOf="@id/user_info_nick_holder" />
-
-            <TextView
-                android:id="@+id/user_info_phone_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:text="@string/profile_phone"
-                android:textColor="@color/primaryText"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider1" />
-
-            <TextView
-                android:id="@+id/user_info_phone"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingEnd="16dp"
-                android:textColor="@color/secondaryText"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/user_info_phone_holder" />
-
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="16dp"
-                android:background="@color/background2"
-                app:layout_constraintBottom_toTopOf="@id/user_info_email_holder"
-                app:layout_constraintTop_toBottomOf="@id/user_info_phone_holder" />
-
-            <TextView
-                android:id="@+id/user_info_email_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:text="@string/profile_email"
-                android:textColor="@color/primaryText"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider2" />
-
-            <TextView
-                android:id="@+id/user_info_email"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingEnd="16dp"
-                android:textColor="@color/secondaryText"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/user_info_email_holder" />
-
-
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/section3"
             android:layout_width="match_parent"
@@ -179,16 +112,32 @@
             android:background="@color/background4"
             app:layout_constraintTop_toBottomOf="@id/section2">
 
+
+            <TextView
+                android:id="@+id/user_private_chat"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/siliao"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/user_sign_out"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
-                android:text="@string/profile_logout"
+                android:text="@string/report"
                 android:textColor="#FA8072"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/user_private_chat" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
