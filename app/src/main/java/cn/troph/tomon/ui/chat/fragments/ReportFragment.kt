@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -25,6 +26,8 @@ class ReportFragment(private val target_id: String, private val type: Int) :
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+
+
         return LayoutInflater.from(requireContext()).inflate(R.layout.report_frag, container, false)
     }
 
