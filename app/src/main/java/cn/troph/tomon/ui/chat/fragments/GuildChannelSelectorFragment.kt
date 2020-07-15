@@ -52,6 +52,10 @@ class GuildChannelSelectorFragment : Fragment() {
             val guild = guildId?.let { Client.global.guilds[it] }
             val headerText = view?.findViewById<TextView>(R.id.text_channel_header_text)
             headerText?.text = guild?.name
+            headerText?.setOnLongClickListener {
+                ReportFragment(guild?.id!!, 2).show(requireActivity().supportFragmentManager, null)
+                true
+            }
         }
     }
 

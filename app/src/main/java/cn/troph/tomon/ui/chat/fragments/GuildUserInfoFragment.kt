@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
@@ -37,20 +38,11 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
             user_info_name.text = user.name
             user_info_nick.text = "${user.username} #${user.discriminator}"
             user_sign_out.setOnClickListener {
-                Client.global.rest.guildMemberService.reportMember(
-                    GuildMemberService.ReportMember(
-                        userId,
-                        1,
-                        1
-                    )
-                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    Toast.makeText(requireContext(), R.string.report_success, Toast.LENGTH_SHORT)
-                        .show()
-                }, {
-                    Toast.makeText(requireContext(), R.string.report_success, Toast.LENGTH_SHORT)
-                        .show()
-                })
-
+                dismiss()
+                ReportFragment(
+                    userId,
+                    1
+                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
             }
 
             user_private_chat.setOnClickListener {
