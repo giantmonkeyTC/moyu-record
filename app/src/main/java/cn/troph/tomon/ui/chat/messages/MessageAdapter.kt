@@ -175,7 +175,7 @@ class MessageAdapter(
                 }
                 showReaction(holder, msg)
             }
-            1 -> {
+            1 -> { //附件
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId ||
                     messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
@@ -283,7 +283,7 @@ class MessageAdapter(
                     break
                 }
             }
-            2 -> {
+            2 -> { //图片
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
@@ -348,6 +348,7 @@ class MessageAdapter(
                     Glide.with(holder.itemView)
                         .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
                         .placeholder(R.drawable.loadinglogo)
+                        .override(item.width!!,item.height!!)
                         .dontAnimate()
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
@@ -514,10 +515,13 @@ class MessageAdapter(
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
         vh.itemView.flow_reaction_ll.visibility = View.GONE
-        for (i in 0 until vh.itemView.flow_reaction_ll.childCount - 1) {
+        for (i in 0 until vh.itemView.flow_reaction_ll.childCount-1) {
             vh.itemView.flow_reaction_ll[i].visibility = View.GONE
         }
         for ((index, value) in msg.reactions.withIndex()) {
+            if(index==vh.itemView.flow_reaction_ll.childCount-1){
+                break
+            }
             vh.itemView.flow_reaction_ll.visibility = View.VISIBLE
             vh.itemView.flow_reaction_ll[index].visibility = View.VISIBLE
             val ll = vh.itemView.flow_reaction_ll[index] as LinearLayout

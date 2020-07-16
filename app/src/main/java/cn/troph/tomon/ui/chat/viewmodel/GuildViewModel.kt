@@ -9,6 +9,7 @@ import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.messages.notifyObserver
+import cn.troph.tomon.ui.states.AppState
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
@@ -34,6 +35,7 @@ class GuildViewModel : ViewModel() {
     }
 
     fun setUpEventBus(){
+
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
             .subscribe(Consumer {
                 messageCreateLD.value = it
