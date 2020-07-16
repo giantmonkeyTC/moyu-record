@@ -33,6 +33,7 @@
     <color name="background1">#171717</color>
     <color name="background2">#2E2E2E</color>
     <color name="background3">#313131</color>
+    <color name="background3alpha70">#B3313131</color>
     <color name="background4">#393939</color>
     <color name="error">#FF7A6B</color>
     <color name="primaryVariant">#FFA1C8</color>

@@ -11,7 +11,10 @@ import android.view.Window
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildMember
+import cn.troph.tomon.core.structures.Presence
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
@@ -22,7 +25,9 @@ import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_role_list_header.view.*
 
-class MemberListAdapter<T>(private val memberList: MutableList<T>) :
+class MemberListAdapter<T>(
+    private val memberList: MutableList<T>
+) :
     RecyclerView.Adapter<MemberListAdapter.ViewHolder>(),
     StickyRecyclerHeadersAdapter<MemberListAdapter.HeaderViewHolder> {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -46,10 +51,20 @@ class MemberListAdapter<T>(private val memberList: MutableList<T>) :
             }
             itemView.member_avatar.user = member.user
             itemView.widget_member_name_text.text = member.displayName
-            itemView.widget_member_name_text.setTextColor(
-                (if (member.roles.color == null)
-                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
-            )
+            if (Client.global.presences[member.id]?.status == "offline") {
+                itemView.guild_user_online.visibility = View.GONE
+                itemView.widget_member_name_text.setTextColor(0x60FFFFFF)
+                itemView.offline_user_shadow.visibility = View.VISIBLE
+            } else {
+                itemView.guild_user_online.visibility = View.VISIBLE
+                itemView.offline_user_shadow.visibility = View.GONE
+                itemView.widget_member_name_text.setTextColor(
+                    (if (member.roles.color == null)
+                        0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                )
+            }
+
+
         } else if (member is User) {
             itemView.member_avatar.user = member
             itemView.widget_member_name_text.text = member.name
@@ -97,8 +112,12 @@ class MemberListAdapter<T>(private val memberList: MutableList<T>) :
 
     override fun getHeaderId(position: Int): Long {
         return if (memberList[position] is GuildMember) {
-            (memberList[position] as GuildMember).roles.highest!!.index.toLong()
-        } else 0
+            if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline")
+                1
+            else
+                (memberList[position] as GuildMember).roles.highest!!.index.toLong()
+        } else
+            -1
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
@@ -108,17 +127,18 @@ class MemberListAdapter<T>(private val memberList: MutableList<T>) :
     }
 
     private fun bindHeader(itemView: View, member: T) {
-        if (member is GuildMember)
-            itemView.widget_role_list_header_text.text = member.roles.highest!!.name
-        else if (member is User)
+        if (member is GuildMember) {
+            if (Client.global.presences[member.id]?.status == "offline")
+                itemView.widget_role_list_header_text.text = "离线"
+            else
+                itemView.widget_role_list_header_text.text = member.roles.highest!!.name
+        } else if (member is User)
             itemView.widget_role_list_header.visibility = View.GONE
     }
 
     override fun onBindHeaderViewHolder(p0: HeaderViewHolder?, p1: Int) {
-
         if (p0 != null) {
             bindHeader(p0.itemView, memberList[p1])
         }
     }
-
 }
