@@ -11,10 +11,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 class MemberViewModel : ViewModel() {
     private val memberLiveData: MutableLiveData<MutableList<GuildMember>> = MutableLiveData()
     private val dmMemberLiveData: MutableLiveData<MutableList<User>> = MutableLiveData()
-    private val presenceLiveData: MutableLiveData<MutableList<Presence>> = MutableLiveData()
     fun getMembersLiveData() = memberLiveData
     fun getDmMemberLiveData() = dmMemberLiveData
-    fun getPresenceLiveData() = presenceLiveData
 
     fun loadMemberList(channelId: String) {
         val channel = Client.global.channels[channelId] as TextChannel
@@ -42,13 +40,6 @@ class MemberViewModel : ViewModel() {
         dmMemberLiveData.value = dmMembers
     }
 
-    fun loadPresenceList(channelId: String) {
-        val presences = mutableListOf<Presence>()
-        loadMemberList(channelId)
-        memberLiveData.value?.forEach {
-            Client.global.presences[it.guildId]?.let { it1 -> presences.add(it1) }
-        }
-        presenceLiveData.value = presences
-    }
+
 
 }
