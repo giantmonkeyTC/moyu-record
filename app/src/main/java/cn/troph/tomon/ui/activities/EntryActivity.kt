@@ -23,19 +23,21 @@ class EntryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
+
         val dataPullingViewModel: DataPullingViewModel by viewModels()
+
         dataPullingViewModel.setUpFetchData()
+
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
             gotoChat()
         })
 
-        if (Client.global.loggedIn) {
-            gotoChat()
-        } else {
+        if (!Client.global.loggedIn) {
             Client.global
                 .login()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    //gotoChat()
                 }, {
                     gotoEntryOption()
                 })
