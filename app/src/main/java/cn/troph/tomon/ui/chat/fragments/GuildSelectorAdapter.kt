@@ -41,13 +41,6 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
                 guildId = guildList[holder.adapterPosition].id,
                 channelId = old.channelId
             )
-            (holder.itemView.context as AppCompatActivity).supportFragmentManager.beginTransaction()
-                .apply {
-                    replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
-                    addToBackStack(null)
-                }.commit()
-
-
         }
         holder.itemView.view_avatar.guild = guildList[position]
         val guild = guildList[position]

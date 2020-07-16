@@ -4,6 +4,7 @@ package cn.troph.tomon.ui.chat.fragments
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -70,9 +71,13 @@ class GuildSelectorFragment : Fragment() {
                     newIndex = mGuildList.indexOf(it)
                 }
             }
-
             mAdapter.notifyItemChanged(oldIndex)
             mAdapter.notifyItemChanged(newIndex)
+            requireActivity().supportFragmentManager.beginTransaction()
+                .apply {
+                    replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                    addToBackStack(null)
+                }.commit()
         })
 
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
@@ -89,7 +94,10 @@ class GuildSelectorFragment : Fragment() {
                 }
                 view_guilds.layoutManager = LinearLayoutManager(requireContext())
                 view_guilds.adapter = mAdapter
-                OverScrollDecoratorHelper.setUpOverScroll(view_guilds,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
+                OverScrollDecoratorHelper.setUpOverScroll(
+                    view_guilds,
+                    OverScrollDecoratorHelper.ORIENTATION_VERTICAL
+                )
                 list.forEach {
                     it.updateMention()
                     it.updateUnread()
