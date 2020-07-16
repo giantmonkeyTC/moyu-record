@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,7 @@ import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.SystemEmoji
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -39,49 +41,58 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 class GuildSelectorFragment : Fragment() {
 
     private val mGuildVM: GuildViewModel by viewModels()
+    private val mChatVM: ChatSharedViewModel by activityViewModels()
     private val mGuildList = mutableListOf<Guild>()
     private val mAdapter = GuildSelectorAdapter(mGuildList)
-    val guildChannelFragment: Fragment = GuildChannelSelectorFragment()
+    private var mSelectedGuild: Guild? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_guild_selector, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mChatVM.setUpChannelSelection()
+        mChatVM.channelSelectionLD.observe(viewLifecycleOwner, Observer { channel ->
+            mGuildList.forEach {
+                it.isSelected = false
+                if (it.id == channel.guildId) {
+                    mSelectedGuild = it
+                    it.isSelected = true
+                }
+            }
+            mAdapter.notifyDataSetChanged()
+        })
+
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()
                 mGuildList.addAll(list)
-                mAdapter.setOnItemClickListener(object : GuildSelectorAdapter.OnItemClickListener {
-                    override fun onItemClick(view: View?, position: Int) {
-                        val transaction =
-                            requireActivity().supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fragment_guild_channels, guildChannelFragment)
-                                addToBackStack(null)
-                            }
-                        transaction.commit()
+                mGuildList.forEach { singleGuild ->
+                    singleGuild.isSelected = false
+                    mSelectedGuild?.let {
+                        if (it.id == singleGuild.id) {
+                            singleGuild.isSelected = true
+                        }
                     }
-                })
-                view_guilds.layoutManager = LinearLayoutManager(view.context)
-                OverScrollDecoratorHelper.setUpOverScroll(view_guilds,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
+                }
+                view_guilds.layoutManager = LinearLayoutManager(requireContext())
                 view_guilds.adapter = mAdapter
-                it.forEach {
+                OverScrollDecoratorHelper.setUpOverScroll(view_guilds,OverScrollDecoratorHelper.ORIENTATION_VERTICAL)
+                list.forEach {
                     it.updateMention()
                     it.updateUnread()
                     mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(it)!!)
                 }
             }
         })
-        mGuildVM.loadGuildList()
 
+        mGuildVM.loadGuildList()
         view_avatar.user = Client.global.me
-        mGuildVM.messageCreateLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
                 if (event.message.guild!!.updateUnread()) {
                     mAdapter.notifyItemChanged(
@@ -101,8 +112,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageReadLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.messageReadLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
                 if (!event.message.guild!!.updateUnread())
                     mAdapter.notifyItemChanged(
@@ -127,8 +137,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
                 if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
@@ -139,8 +148,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.messageDeleteLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
                 if (event.message.guild!!.updateUnread()) {
                     mAdapter.notifyItemChanged(
@@ -152,8 +160,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageUpdateLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
             event.message.guild?.let {
                 if (it.updateMention()) {
                     mAdapter.notifyItemChanged(
@@ -189,8 +196,7 @@ class GuildSelectorFragment : Fragment() {
             mGuildList.add(it.guild)
             mAdapter.notifyItemInserted(mGuildList.size - 1)
         })
-        mGuildVM.guildDeleteLD.observe(viewLifecycleOwner, Observer {
-                event ->
+        mGuildVM.guildDeleteLD.observe(viewLifecycleOwner, Observer { event ->
             mGuildList.removeIf {
                 it.id == event.guild.id
             }

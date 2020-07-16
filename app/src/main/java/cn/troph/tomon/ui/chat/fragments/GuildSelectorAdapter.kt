@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -15,6 +16,7 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GuildAvatar
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.widget_guild_selector_item.view.*
@@ -23,54 +25,8 @@ import kotlinx.coroutines.flow.channelFlow
 
 class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
     RecyclerView.Adapter<GuildSelectorAdapter.ViewHolder>() {
-    private lateinit var mOnItemClickListener: OnItemClickListener
 
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
-        this.mOnItemClickListener = onItemClickListener
-    }
-
-    class ViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-
-        private var avatar: GuildAvatar = itemView.findViewById(R.id.view_avatar)
-        private var guild: Guild? = null
-
-
-        init {
-            AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    avatar.selecting = AppState.global.channelSelection.value.guildId == guild?.id
-                    itemView.guild_indicator.visibility =
-                        if (avatar.selecting) View.VISIBLE else View.INVISIBLE
-                    if (avatar.selecting) {
-                        itemView.guild_indicator.startAnimation(
-                            AnimationUtils.loadAnimation(
-                                itemView.context,
-                                R.anim.scale
-                            )
-                        )
-                    }
-                }
-        }
-
-        fun bind(guild: Guild) {
-            this.guild = guild
-            avatar.guild = guild
-            if (guild.mention != 0) {
-                if (guild.mention > 99)
-                    itemView.guild_unread_mention_notification.text = "···"
-                else
-                    itemView.guild_unread_mention_notification.text = guild.mention.toString()
-                itemView.guild_unread_mention_notification.visibility = View.VISIBLE
-            } else
-                itemView.guild_unread_mention_notification.visibility = View.GONE
-            if (guild.unread)
-                itemView.guild_unread_message_notification.visibility = View.VISIBLE
-            else
-                itemView.guild_unread_message_notification.visibility = View.GONE
-            avatar.selecting = AppState.global.channelSelection.value.guildId == guild.id
-        }
-    }
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -86,21 +42,46 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
 
     override fun getItemCount(): Int = guildList.size
 
-    interface OnItemClickListener {
-        fun onItemClick(view: View?, position: Int)
-    }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.setOnClickListener {
+            Logger.d("guild size:${guildList.size} adapter:${holder.adapterPosition}")
             val old = AppState.global.channelSelection.value
-            AppState.global.channelSelection.value =
-                ChannelSelection(guildId = guildList[position].id, channelId = old.channelId)
-            val position = holder.layoutPosition
-            mOnItemClickListener.onItemClick(holder.itemView, position)
+            AppState.global.channelSelection.value = ChannelSelection(
+                guildId = guildList[holder.adapterPosition].id,
+                channelId = old.channelId
+            )
+            holder.itemView.guild_indicator.startAnimation(
+                AnimationUtils.loadAnimation(
+                    holder.itemView.context,
+                    R.anim.scale
+                )
+            )
+
+            (holder.itemView.context as AppCompatActivity).supportFragmentManager.beginTransaction()
+                .apply {
+                    replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                    addToBackStack(null)
+                }.commit()
+
+
         }
-        holder.bind(guildList[position])
-
-
+        holder.itemView.view_avatar.guild = guildList[position]
+        val guild = guildList[position]
+        if (guild.mention != 0) {
+            if (guild.mention > 99)
+                holder.itemView.guild_unread_mention_notification.text = "···"
+            else
+                holder.itemView.guild_unread_mention_notification.text = guild.mention.toString()
+            holder.itemView.guild_unread_mention_notification.visibility = View.VISIBLE
+        } else
+            holder.itemView.guild_unread_mention_notification.visibility = View.GONE
+        if (guild.unread)
+            holder.itemView.guild_unread_message_notification.visibility = View.VISIBLE
+        else
+            holder.itemView.guild_unread_message_notification.visibility = View.GONE
+        holder.itemView.view_avatar.selecting = guildList[position].isSelected
+        holder.itemView.guild_indicator.visibility =
+            if (guild.isSelected) View.VISIBLE else View.INVISIBLE
     }
 
 }

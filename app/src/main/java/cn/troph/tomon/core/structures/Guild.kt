@@ -7,10 +7,7 @@ import cn.troph.tomon.core.collections.GuildChannelCollection
 import cn.troph.tomon.core.collections.GuildEmojiCollection
 import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
-import cn.troph.tomon.core.utils.Converter
-import cn.troph.tomon.core.utils.optInt
-import cn.troph.tomon.core.utils.optString
-import cn.troph.tomon.core.utils.snowflake
+import cn.troph.tomon.core.utils.*
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
@@ -44,6 +41,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     val emojis: GuildEmojiCollection = GuildEmojiCollection(client, this)
     var unread = false
     var mention: Int = 0
+    var isSelected = false
 
 
     init {
@@ -102,6 +100,9 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
         }
         if (data.has("system_channel_id")) {
             systemChannelId = data["system_channel_id"].optString
+        }
+        if (data.has("is_selected")) {
+            isSelected = data["is_selected"].asBoolean
         }
         if (data.has("system_channel_flags")) {
             systemChannelFlags = data["system_channel_flags"].asInt
