@@ -346,17 +346,16 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         //接受新的Message
-        mMsgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer {
-            val event = it
-            if (it.message.channelId == mChannelId) {
-                val msg = mMsgList.find {
-                    val localMsg = it
-                    event.message.nonce == localMsg.nonce && localMsg.id.isNullOrEmpty()
+        mMsgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
+
+            if (event.message.channelId == mChannelId) {
+                val msg = mMsgList.find { msgInList ->
+                    event.message.nonce == msgInList.nonce && msgInList.id.isNullOrEmpty()
                 }
-                if (msg == null) {
-                    mMsgList.add(it.message)
+                if (msg == null) {//接收新的msg
+                    mMsgList.add(event.message)
                     mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                } else {
+                } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
                     mMsgListAdapter.notifyItemChanged(index)
@@ -531,7 +530,6 @@ class ChannelPanelFragment : BaseFragment() {
         setUpBottomSheet()
         mChatSharedVM.setUpChannelSelection()
         mMsgViewModel.setUpEvent()
-
     }
 
 
@@ -624,16 +622,16 @@ class ChannelPanelFragment : BaseFragment() {
         //loading system emoji
         val guildIconDefault = mutableListOf<Drawable>()
         guildIconDefault.apply {
-            add(resources.getDrawable(R.drawable.ic_running_solid))
-            add(resources.getDrawable(R.drawable.ic_smile_solid))
-            add(resources.getDrawable(R.drawable.ic_icons_alt_regular))
-            add(resources.getDrawable(R.drawable.ic_head_side_solid))
-            add(resources.getDrawable(R.drawable.ic_lightbulb_solid))
-            add(resources.getDrawable(R.drawable.ic_plane_alt_solid))
-            add(resources.getDrawable(R.drawable.ic_flag_solid))
-            add(resources.getDrawable(R.drawable.ic_utensils_alt_solid))
-            add(resources.getDrawable(R.drawable.ic_leaf_solid))
-            add(resources.getDrawable(R.drawable.ic_globe_solid))
+            add(resources.getDrawable(R.drawable.ic_running_solid, null))
+            add(resources.getDrawable(R.drawable.ic_smile_solid, null))
+            add(resources.getDrawable(R.drawable.ic_icons_alt_regular, null))
+            add(resources.getDrawable(R.drawable.ic_head_side_solid, null))
+            add(resources.getDrawable(R.drawable.ic_lightbulb_solid, null))
+            add(resources.getDrawable(R.drawable.ic_plane_alt_solid, null))
+            add(resources.getDrawable(R.drawable.ic_flag_solid, null))
+            add(resources.getDrawable(R.drawable.ic_utensils_alt_solid, null))
+            add(resources.getDrawable(R.drawable.ic_leaf_solid, null))
+            add(resources.getDrawable(R.drawable.ic_globe_solid, null))
         }
         guildIconDefault.forEach {
             guildIcon.add(GuildIcon(null, null, it))
@@ -772,10 +770,13 @@ class ChannelPanelFragment : BaseFragment() {
             val deletedMsg = mMsgList.find {
                 it.nonce == msg.nonce
             }
-            val index = mMsgList.indexOf(deletedMsg)
-            mMsgList.remove(deletedMsg)
-            mMsgListAdapter.notifyItemRemoved(index)
-            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
+            deletedMsg?.let {
+                val index = mMsgList.indexOf(it)
+                mMsgList.remove(it)
+                mMsgListAdapter.notifyItemRemoved(index)
+                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
+            }
+
         })
     }
 
