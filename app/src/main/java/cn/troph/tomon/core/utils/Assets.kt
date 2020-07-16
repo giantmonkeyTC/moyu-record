@@ -6,6 +6,9 @@ object Assets {
     fun emojiURL(id: String, animated: Boolean = false): String {
         return "https://cdn.tomon.co/emojis/$id.${if (animated) "gif" else "png"}"
     }
+    fun iconURL(id: String):String{
+        return "https://cdn.tomon.co/icons/$id"
+    }
 
     data class ContentEmoji(
         val start: Int,

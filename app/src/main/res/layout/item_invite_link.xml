@@ -76,7 +76,7 @@
         app:layout_constraintBottom_toBottomOf="@id/join_image"
         app:layout_constraintStart_toStartOf="@id/join_image"
         app:layout_constraintTop_toTopOf="@id/join_image"
-        app:riv_corner_radius="3dp" />
+        app:riv_corner_radius="45dp" />
 
     <TextView
         android:id="@+id/invite_msg"
@@ -84,6 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="邀请您加入"
+        android:translationY="-4dp"
         android:textColor="@color/secondaryText"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@id/user_avatar_invite"
@@ -95,8 +96,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="邀请您加入"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/primaryDarker"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/user_avatar_invite"
         app:layout_constraintTop_toBottomOf="@id/invite_msg" />
 
