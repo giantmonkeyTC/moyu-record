@@ -255,12 +255,7 @@ class ChannelPanelFragment : BaseFragment() {
                 return@setOnClickListener
             }
             val textToSend = editText.text.toString()
-            editText.text = null
-
-            getTracker().send(
-                HitBuilders.EventBuilder().setCategory("TEST").setAction("Send").build()
-            )
-
+            editText.text.clear()
             if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
                 val emptyMsg = createEmptyMsg(textToSend)
@@ -350,7 +345,7 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce && msgInList.id.isNullOrEmpty()
+                    event.message.nonce == msgInList.nonce
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
