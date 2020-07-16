@@ -31,6 +31,7 @@ class ChannelMemberFragment : Fragment() {
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
                 if (channel is TextChannelBase && channel !is DmChannel) {
+                    mMemberVM.loadPresenceList(value)
                     mMemberVM.loadMemberList(value)
                 } else if (channel is DmChannel) {
                     mMemberVM.loadDmMemberList(value)
