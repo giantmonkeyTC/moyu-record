@@ -69,30 +69,22 @@ class DmChannelSelectorFragment : Fragment() {
             mDMchennelAdapter.notifyDataSetChanged()
         })
 
-        Client.global.eventBus.observeEventOnUi<ChannelCreateEvent>().subscribe(Consumer {
+        mDmchannelVM.mChannelCreateLD.observe(viewLifecycleOwner, Observer {
             if (it.channel is DmChannel) {
                 mDMchannelList.add(it.channel)
                 mDMchennelAdapter.notifyItemInserted(mDMchannelList.size - 1)
             }
         })
 
-        Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer { event ->
+        mDmchannelVM.mMessageCreateLD.observe(viewLifecycleOwner, Observer { event ->
             if (event.message.guild == null || event.message.guild?.id == "@me") {
                 mDMchannelList.sortByDescending { item ->
                     item.lastMessageId
                 }
-
-
-                if (event.message.authorId != Client.global.me.id) {
-                    mUnReadViewModel.dmUnReadLiveData.value?.computeIfPresent(event.message.channelId,
-                        BiFunction { t, u ->
-                            u.inc()
-                        })
-                    mUnReadViewModel.dmUnReadLiveData.notifyObserver()
-                    return@Consumer
-                }
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
+
+        mDmchannelVM.setUpEvents()
     }
 }
