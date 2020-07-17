@@ -34,8 +34,8 @@ class MemberViewModel : ViewModel() {
         val dmMembers = mutableListOf<User>()
         val recipient = channel.recipient
         if (recipient != null) {
-            dmMembers.add(recipient)
             dmMembers.add(Client.global.me)
+            dmMembers.add(recipient)
         }
         dmMemberLiveData.value = dmMembers
     }
