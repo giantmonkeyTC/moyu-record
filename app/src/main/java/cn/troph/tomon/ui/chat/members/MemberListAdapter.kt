@@ -112,6 +112,12 @@ class MemberListAdapter<T>(
                 return@explicit
             val layoutInflater = LayoutInflater.from(itemView.context)
             val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
+            role_view.role_color.background = (
+                    ColorDrawable(
+                        (if (role.color == 0)
+                            0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                    )
+                    )
             role_view.role_name.text = role.name
             itemView.member_detail_roles.addView(role_view)
         }

@@ -132,7 +132,7 @@ class GuildSelectorFragment : Fragment() {
 
         mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
-                if (event.message.guild!!.updateMention())
+                if (event.message.guild!!.  updateMention())
                     mAdapter.notifyItemChanged(
                         mGuildVM.getGuildListLiveData().value!!.indexOf(
                             event.message.guild!!
