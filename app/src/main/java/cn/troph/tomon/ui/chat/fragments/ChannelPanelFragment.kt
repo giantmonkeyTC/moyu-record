@@ -40,6 +40,7 @@ import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -79,6 +80,7 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
     private val mMsgViewModel: MessageViewModel by viewModels()
+    private val mUnreadViewModel: UnReadViewModel by activityViewModels()
     private val mChatSharedVM: ChatSharedViewModel by activityViewModels()
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
@@ -487,9 +489,16 @@ class ChannelPanelFragment : BaseFragment() {
                                     lastMessage?.let {
                                         it.ack().observeOn(AndroidSchedulers.mainThread())
                                             .subscribe({
-                                                client.eventBus.postEvent(MessageReadEvent(message = lastMessage))
-                                            }, {
-                                                Logger.d(it.message)
+                                                val map = mUnreadViewModel.dmUnReadLiveData.value
+                                                mChannelId?.let { cId ->
+                                                    map?.put(cId, 0)
+                                                    map?.let { updatedMap ->
+                                                        mUnreadViewModel.dmUnReadLiveData.value =
+                                                            updatedMap
+                                                    }
+                                                }
+                                            }, { error ->
+                                                Logger.d(error.message)
                                             })
                                     }
                                 }

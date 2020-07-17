@@ -25,6 +25,7 @@ class GuildViewModel : ViewModel() {
     val messageDeleteLD: MutableLiveData<MessageDeleteEvent> = MutableLiveData()
     val messageUpdateLD: MutableLiveData<MessageUpdateEvent> = MutableLiveData()
     val channelCreateLD: MutableLiveData<ChannelCreateEvent> = MutableLiveData()
+    val channelDeleteLD: MutableLiveData<ChannelDeleteEvent> = MutableLiveData()
     val guildPositionLD: MutableLiveData<GuildPositionEvent> = MutableLiveData()
     val guildCreateLD: MutableLiveData<GuildCreateEvent> = MutableLiveData()
     val guildDeleteLD: MutableLiveData<GuildDeleteEvent> = MutableLiveData()
@@ -34,7 +35,10 @@ class GuildViewModel : ViewModel() {
         return guildListLiveData
     }
 
-    fun setUpEventBus(){
+    fun setUpEventBus() {
+        Client.global.eventBus.observeEventOnUi<ChannelDeleteEvent>().subscribe {
+            channelDeleteLD.value = it
+        }
 
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>()
             .subscribe(Consumer {

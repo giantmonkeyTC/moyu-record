@@ -37,6 +37,7 @@
         </provider>
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.EntryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -46,22 +47,27 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.RegisterActivity"
             android:label="@string/register_button"
             android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.EntryOptionActivity"
             android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.LoginActivity"
             android:label="@string/login_title"
             android:theme="@style/AppTheme.NoTitleWithTransitions" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.ChatActivity"
             android:label="ChatActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".ui.activities.ImagePreviewActivity"
             android:label="ImagePreviewActivity"
             android:theme="@style/AppTheme.NoActionBar" />

@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Validator
+import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
@@ -86,6 +87,13 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         bindProgressButton(button_login)
         button_login.attachTextChangeAnimator()
+        val dataPullingViewModel: DataPullingViewModel by viewModels()
+        dataPullingViewModel.setUpFetchData()
+        dataPullingViewModel.dataFetchLD.observe(this, Observer {
+            if (it == true) {
+                gotoChat()
+            }
+        })
 
         viewModel.loginForm.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -113,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
                     button_login.hideProgress(R.string.login_succeed)
                     Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            gotoChat()
+                            //gotoChat()
                         }
 
                 }, {
@@ -126,9 +134,8 @@ class LoginActivity : AppCompatActivity() {
                         }
                     button_login.isEnabled = true
                 })
-            }
-            else
-            button_login.isEnabled = true
+            } else
+                button_login.isEnabled = true
 
         }
         layout_root.setOnClickListener {
@@ -149,7 +156,7 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(this, ChatActivity::class.java)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+            }
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(
