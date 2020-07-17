@@ -4,24 +4,36 @@
     android:id="@+id/widget_message_reaction"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="5dp"
-    android:paddingBottom="5dp">
+    android:paddingEnd="4dp"
+    android:paddingBottom="4dp">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/widget_role_unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_role_item">
+        android:background="@drawable/shape_role_item"
+        android:paddingEnd="4dp">
+
+        <ImageView
+            android:id="@+id/role_color"
+            android:layout_width="4dp"
+            android:layout_height="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/role_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:paddingHorizontal="5dp"
-            android:paddingVertical="3dp"
-            android:textColor="@color/white"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/whiteAlpha70"
             android:textSize="15sp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toEndOf="@id/role_color"
             app:layout_constraintStart_toStartOf="@id/widget_role_unit"
             app:layout_constraintTop_toTopOf="@+id/widget_role_unit" />
     </androidx.constraintlayout.widget.ConstraintLayout>
