@@ -14,6 +14,7 @@
     <color name="primaryText">#FFFFFF</color>
     <color name="captionText">#99FFFFFF</color>
     <color name="secondaryText">#828282</color>
+    <color name="secondaryTextAlpha70">#B3828282</color>
     <color name="activityBackground">#242424</color>
     <color name="actionBarBackground">#1E1E1E</color>
     <color name="actionBarText">#FFFFFF</color>

@@ -1,9 +1,12 @@
 package cn.troph.tomon.ui.chat.fragments
 
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -271,6 +274,12 @@ class GuildSelectorFragment : Fragment() {
         val textField = view.findViewById<EditText>(R.id.bs_textfield)
         val dialog = BottomSheetDialog(requireContext())
         dialog.setContentView(viewBase)
+        dialog.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
         view.cancel.setOnClickListener { dialog.dismiss() }
         view.confirm.setOnClickListener {
             if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))) {
@@ -299,6 +308,11 @@ class GuildSelectorFragment : Fragment() {
                                     { guild ->
                                         if (guild != null) {
                                             dialog.dismiss()
+                                            GeneralSnackbar.make(
+                                                GeneralSnackbar.findSuitableParent(viewBase)!!,
+                                                "加入成功",
+                                                Snackbar.LENGTH_LONG
+                                            ).show()
                                         }
                                     }, { error -> println(error) }, { }
                                 )

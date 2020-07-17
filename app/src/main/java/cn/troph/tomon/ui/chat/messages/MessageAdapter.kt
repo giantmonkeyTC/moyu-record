@@ -18,7 +18,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
@@ -30,17 +29,12 @@ import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.utils.Assets
-import cn.troph.tomon.core.utils.DensityUtil
-import cn.troph.tomon.core.utils.FileUtils
-import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -64,7 +58,6 @@ import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
 
@@ -348,7 +341,7 @@ class MessageAdapter(
                     Glide.with(holder.itemView)
                         .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
                         .placeholder(R.drawable.loadinglogo)
-                        .override(item.width!!,item.height!!)
+                        .override(item.width!!, item.height!!)
                         .dontAnimate()
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
@@ -489,11 +482,24 @@ class MessageAdapter(
                                     )}···"
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
-                                Glide.with(holder.itemView).load(Assets.iconURL(it.guild.icon))
-                                    .placeholder(R.drawable.ic_question_circle_solid)
-                                    .into(holder.itemView.user_avatar_invite)
+                                if (it.guild.icon != null) {
+                                    holder.itemView.default_avatar_text.visibility = View.GONE
+                                    Glide.with(holder.itemView).load(Assets.iconURL(it.guild.icon))
+                                        .into(holder.itemView.user_avatar_invite)
+                                } else {
+                                    holder.itemView.user_avatar_invite.setImageResource(R.drawable.shape_guild_placeholder)
+                                    holder.itemView.default_avatar_text.visibility = View.VISIBLE
+                                    holder.itemView.default_avatar_text.text =
+                                        it.guild.name.substring(0, 1)
+                                }
+
+
                             }, {
+                                holder.itemView.default_avatar_text.visibility = View.GONE
                                 holder.itemView.join_image.setImageResource(R.drawable.invalidation)
+                                holder.itemView.user_avatar_invite.setImageResource(
+                                    R.drawable.ic_exclamation_circle_duotone
+                                )
                                 holder.itemView.invite_guild_name.text = "无效邀请"
                                 holder.itemView.joined_cover.visibility = View.GONE
                             })
@@ -506,20 +512,37 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             5 -> {
-                holder.itemView.system_txt_welcome.text =
-                    holder.itemView.context.getString(R.string.welcome_msg)
-                        .format(messageList[position].author?.name)
+                val name = SpannableString(messageList[position].author?.name)
+                holder.itemView.system_txt_welcome.text = spannable {
+                    color(
+                        holder.itemView.context.getColor(R.color.secondaryText),
+                        holder.itemView.context.getString(R.string.welcome_msg1)
+                    )
+                } + spannable {
+                    size(
+                        1.15f, color(
+                            holder.itemView.context.getColor(R.color.primaryText),
+                            name
+                        )
+                    )
+
+                } + spannable {
+                    color(
+                        holder.itemView.context.getColor(R.color.secondaryText),
+                        holder.itemView.context.getString(R.string.welcome_msg2)
+                    )
+                }
             }
         }
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
         vh.itemView.flow_reaction_ll.visibility = View.GONE
-        for (i in 0 until vh.itemView.flow_reaction_ll.childCount-1) {
+        for (i in 0 until vh.itemView.flow_reaction_ll.childCount - 1) {
             vh.itemView.flow_reaction_ll[i].visibility = View.GONE
         }
         for ((index, value) in msg.reactions.withIndex()) {
-            if(index==vh.itemView.flow_reaction_ll.childCount-1){
+            if (index == vh.itemView.flow_reaction_ll.childCount - 1) {
                 break
             }
             vh.itemView.flow_reaction_ll.visibility = View.VISIBLE
