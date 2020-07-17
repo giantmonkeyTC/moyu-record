@@ -61,7 +61,12 @@ class RegisterActivity : AppCompatActivity() {
                     invite = invite,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-
+                    GeneralSnackbar.make(
+                        GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                        "注册成功",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    gotoEntryOption()
                 }, {
                     GeneralSnackbar.make(
                         GeneralSnackbar.findSuitableParent(button_confirmation)!!,
@@ -70,5 +75,18 @@ class RegisterActivity : AppCompatActivity() {
                     ).show()
                 }, {})
         }
+    }
+
+    private fun gotoEntryOption() {
+        val intent = Intent(this, EntryOptionActivity::class.java)
+        startActivity(
+            intent,
+            ActivityOptions.makeCustomAnimation(
+                this,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            ).toBundle()
+        )
+        finish()
     }
 }
