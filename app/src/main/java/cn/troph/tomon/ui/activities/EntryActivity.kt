@@ -17,7 +17,7 @@ import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 
-class EntryActivity : AppCompatActivity() {
+class EntryActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,19 +29,21 @@ class EntryActivity : AppCompatActivity() {
         dataPullingViewModel.setUpFetchData()
 
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
-            gotoChat()
+            if (it == true)
+                gotoChat()
         })
 
-        if (!Client.global.loggedIn) {
-            Client.global
-                .login()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    //gotoChat()
-                }, {
-                    gotoEntryOption()
-                })
-        }
+
+        Client.global
+            .login()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Logger.d("Login Success")
+            }, {
+                Logger.d("Login Failed")
+                gotoEntryOption()
+            })
+
     }
 
     private fun gotoEntryOption() {
