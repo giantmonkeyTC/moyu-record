@@ -61,7 +61,7 @@ class GuildSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mChatVM.setUpChannelSelection()
         mChatVM.channelSelectionLD.observe(viewLifecycleOwner, Observer { channel ->
-            if (channel.guildId.equals("@me", true))
+            if (channel.guildId.equals("@me", true) || channel.guildId==mSelectedGuild?.id)
                 return@Observer
 
             val oldIndex = mGuildList.indexOfFirst {
