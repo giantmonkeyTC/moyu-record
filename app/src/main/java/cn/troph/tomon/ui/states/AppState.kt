@@ -10,6 +10,7 @@ data class UpdateEnabled(val flag: Boolean = false, val message: Message? = null
 
 data class AppUIEvent(val type: AppUIEventType, val value: Any? = null)
 
+
 enum class AppUIEventType {
     CHANNEL_DRAWER,
     MEMBER_DRAWER

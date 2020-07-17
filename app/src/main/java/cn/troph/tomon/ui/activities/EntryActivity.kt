@@ -15,7 +15,11 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
+import java.util.concurrent.TimeUnit
 
 class EntryActivity : BaseActivity() {
 
@@ -32,8 +36,6 @@ class EntryActivity : BaseActivity() {
             if (it == true)
                 gotoChat()
         })
-
-
         Client.global
             .login()
             .observeOn(AndroidSchedulers.mainThread())

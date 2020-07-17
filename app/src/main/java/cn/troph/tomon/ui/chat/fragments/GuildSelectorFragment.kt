@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.EditText
 import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -15,37 +14,27 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.*
-import cn.troph.tomon.core.events.MessageAtMeEvent
-import cn.troph.tomon.core.events.MessageCreateEvent
-import cn.troph.tomon.core.events.MessageDeleteEvent
-import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Guild
-import cn.troph.tomon.core.utils.BadgeUtil
 import cn.troph.tomon.core.utils.Url
-import cn.troph.tomon.core.utils.event.observeEvent
-import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.emoji.SystemEmoji
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
+import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.annotations.SerializedName
-import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
-import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 
 class GuildSelectorFragment : Fragment() {
 
     private val mGuildVM: GuildViewModel by viewModels()
     private val mChatVM: ChatSharedViewModel by activityViewModels()
+    private val mUnReadViewModel: UnReadViewModel by activityViewModels()
     private val mGuildList = mutableListOf<Guild>()
     private val mAdapter = GuildSelectorAdapter(mGuildList)
     private var mSelectedGuild: Guild? = null
@@ -60,8 +49,9 @@ class GuildSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mChatVM.setUpChannelSelection()
+
         mChatVM.channelSelectionLD.observe(viewLifecycleOwner, Observer { channel ->
-            if (channel.guildId.equals("@me", true) || channel.guildId==mSelectedGuild?.id)
+            if (channel.guildId.equals("@me", true) || channel.guildId == mSelectedGuild?.id)
                 return@Observer
 
             val oldIndex = mGuildList.indexOfFirst {
@@ -100,10 +90,6 @@ class GuildSelectorFragment : Fragment() {
                 }
                 view_guilds.layoutManager = LinearLayoutManager(requireContext())
                 view_guilds.adapter = mAdapter
-                OverScrollDecoratorHelper.setUpOverScroll(
-                    view_guilds,
-                    OverScrollDecoratorHelper.ORIENTATION_VERTICAL
-                )
                 list.forEach {
                     it.updateMention()
                     it.updateUnread()
@@ -124,14 +110,6 @@ class GuildSelectorFragment : Fragment() {
                     )
                 }
             }
-            if (event.message.guild == null || event.message.guild?.id == "@me") {
-                for ((index, value) in Client.global.dmChannels.withIndex()) {
-                    if (value.id == event.message.channelId) {
-                        BadgeUtil.increaseChannelUnread(value.id)
-                        updateRedDot(BadgeUtil.getTotalUnread())
-                    }
-                }
-            }
         })
 
         mGuildVM.messageReadLD.observe(viewLifecycleOwner, Observer { event ->
@@ -148,14 +126,6 @@ class GuildSelectorFragment : Fragment() {
                             event.message.guild!!
                         )
                     )
-            }
-            if (event.message.guild == null || event.message.guild?.id == "@me") {
-                for ((index, value) in Client.global.dmChannels.withIndex()) {
-                    if (value.id == event.message.channelId) {
-                        BadgeUtil.clearChannelReadCount(value.id)
-                        updateRedDot(BadgeUtil.getTotalUnread())
-                    }
-                }
             }
         })
 
@@ -194,12 +164,26 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.channelCreateLD.observe(viewLifecycleOwner, Observer {
-            if (it.channel is DmChannel) {
-                BadgeUtil.setChannelUnreadCount(it.channel.id, it.channel.unReadCount)
-                updateRedDot(BadgeUtil.getTotalUnread())
+        mGuildVM.channelCreateLD.observe(viewLifecycleOwner, Observer { event ->
+            if (event.channel is DmChannel) {
+                val map = mUnReadViewModel.dmUnReadLiveData.value
+                map?.put(event.channel.id, event.channel.unReadCount)
+                map?.let {
+                    mUnReadViewModel.dmUnReadLiveData.value = it
+                }
             }
         })
+        mGuildVM.channelDeleteLD.observe(viewLifecycleOwner, Observer { event ->
+            if (event.channel is DmChannel) {
+                val map = mUnReadViewModel.dmUnReadLiveData.value
+                map?.remove(event.channel.id)
+                map?.let {
+                    mUnReadViewModel.dmUnReadLiveData.value = it
+                }
+            }
+        })
+
+
         mGuildVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
             val rearrangedGuildList = mutableListOf<Guild>()
             for (item in it.guilds) {
@@ -243,27 +227,25 @@ class GuildSelectorFragment : Fragment() {
             callJoinGuildBottomSheet()
         }
 
-        var totalUnread = 0
-        for (item in Client.global.dmChannels) {
-            totalUnread += item.unReadCount
-            BadgeUtil.setChannelUnreadCount(item.id, item.unReadCount)
-        }
-        updateRedDot(BadgeUtil.getTotalUnread())
         mGuildVM.setUpEventBus()
+        mUnReadViewModel.dmUnReadLiveData.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                updateRedDot(it.values.sum())
+            }
+        })
+
     }
 
     private fun updateRedDot(number: Int) {
-        if (dm_read_count != null) {
-            if (number > 99) {
-                dm_read_count.visibility = View.VISIBLE
-                dm_read_count.text = "..."
-            }
-            if (number > 0) {
-                dm_read_count.visibility = View.VISIBLE
-                dm_read_count.text = number.toString()
-            } else {
-                dm_read_count.visibility = View.GONE
-            }
+        if (number > 99) {
+            dm_read_count.visibility = View.VISIBLE
+            dm_read_count.text = "..."
+        }
+        if (number > 0) {
+            dm_read_count.visibility = View.VISIBLE
+            dm_read_count.text = number.toString()
+        } else {
+            dm_read_count.visibility = View.GONE
         }
     }
 

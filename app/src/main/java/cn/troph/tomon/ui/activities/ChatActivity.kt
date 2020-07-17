@@ -1,19 +1,14 @@
 package cn.troph.tomon.ui.activities
 
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
+
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.emoji.widget.EmojiEditText
+
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import cn.troph.tomon.R
@@ -23,23 +18,25 @@ import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
-import com.orhanobut.logger.Logger
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
-import java.util.concurrent.TimeUnit
 
 class ChatActivity : BaseActivity() {
-
 
     private lateinit var mCurrentChannel: Channel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
+        val unReadVM: UnReadViewModel by viewModels()
+        val map = HashMap<String, Int>()
+        Client.global.dmChannels.forEach {
+            map[it.id] = it.unReadCount
+        }
+        unReadVM.dmUnReadLiveData.value = map
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -92,55 +89,6 @@ class ChatActivity : BaseActivity() {
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
         }
     }
-
-//    //用于判断是否要收起键盘 DO NOT DELETE
-//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-//        if (ev?.action == MotionEvent.ACTION_UP) {
-//            val view = this.currentFocus
-//
-//            if (isShouldHideInput(view, ev)) {
-//                hideKeyboard(this)
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
-
-    //是否要收起键盘 DO NOT DELETE
-    private fun isShouldHideInput(view: View?, motionEvent: MotionEvent): Boolean {
-        view?.tag?.let { tag ->
-            if (tag is String && tag == getString(R.string.send_btn_tag)) {
-                return false
-            }
-        }
-
-        if (view != null && (view is EditText || view is EmojiEditText)) {
-            val l = arrayOf(0, 0)
-            val left = l[0]
-            val top = l[1]
-            val bottom = top + view.height
-            val right = left + view.width
-            if (motionEvent.x > left && motionEvent.x < right && motionEvent.y > top && motionEvent.y < bottom) {
-                return false
-            } else {
-                return true
-            }
-        }
-        return false
-    }
-
-    //隐藏键盘 DO NOT DELETE
-    private fun hideKeyboard(activity: Activity) {
-        val imm: InputMethodManager =
-            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(activity)
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_chat, menu)
