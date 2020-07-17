@@ -17,6 +17,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
 import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
@@ -164,26 +165,6 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.channelCreateLD.observe(viewLifecycleOwner, Observer { event ->
-            if (event.channel is DmChannel) {
-                val map = mUnReadViewModel.dmUnReadLiveData.value
-                map?.put(event.channel.id, event.channel.unReadCount)
-                map?.let {
-                    mUnReadViewModel.dmUnReadLiveData.value = it
-                }
-            }
-        })
-        mGuildVM.channelDeleteLD.observe(viewLifecycleOwner, Observer { event ->
-            if (event.channel is DmChannel) {
-                val map = mUnReadViewModel.dmUnReadLiveData.value
-                map?.remove(event.channel.id)
-                map?.let {
-                    mUnReadViewModel.dmUnReadLiveData.value = it
-                }
-            }
-        })
-
-
         mGuildVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
             val rearrangedGuildList = mutableListOf<Guild>()
             for (item in it.guilds) {
@@ -229,9 +210,7 @@ class GuildSelectorFragment : Fragment() {
 
         mGuildVM.setUpEventBus()
         mUnReadViewModel.dmUnReadLiveData.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                updateRedDot(it.values.sum())
-            }
+            updateRedDot(it.values.sum())
         })
 
     }

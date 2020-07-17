@@ -17,6 +17,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
 class ChatActivity : BaseActivity() {
 
+
     private lateinit var mCurrentChannel: Channel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +35,14 @@ class ChatActivity : BaseActivity() {
         setContentView(R.layout.activity_chat)
         val unReadVM: UnReadViewModel by viewModels()
         val map = HashMap<String, Int>()
+
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount
         }
+
+        unReadVM.setUpEvents()
         unReadVM.dmUnReadLiveData.value = map
+
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
