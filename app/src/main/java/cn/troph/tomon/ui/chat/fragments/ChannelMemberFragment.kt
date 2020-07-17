@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageCreateEvent
@@ -68,8 +69,14 @@ class ChannelMemberFragment : Fragment() {
                 if (view_members.itemDecorationCount > 0) {
                     view_members.removeItemDecorationAt(0)
                 }
-                view_members.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
+                val headersDecor = StickyRecyclerHeadersDecoration(mAdapter)
+                view_members.addItemDecoration(headersDecor)
                 mAdapter.notifyDataSetChanged()
+                mAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                    override fun onChanged() {
+                        headersDecor.invalidateHeaders()
+                    }
+                })
             }
         })
         mMemberVM.getDmMemberLiveData().observe(viewLifecycleOwner, Observer {

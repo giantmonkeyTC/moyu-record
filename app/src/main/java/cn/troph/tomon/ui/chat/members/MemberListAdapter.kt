@@ -53,7 +53,10 @@ class MemberListAdapter<T>(
             itemView.widget_member_name_text.text = member.displayName
             if (Client.global.presences[member.id]?.status == "offline") {
                 itemView.guild_user_online.visibility = View.GONE
-                itemView.widget_member_name_text.setTextColor(0x60FFFFFF)
+                itemView.widget_member_name_text.setTextColor(
+                    (if (member.roles.color == null)
+                        0 or 0X60FFFFFF.toInt() else member.roles.color!!.color or 0x60000000.toInt())
+                )
                 itemView.offline_user_shadow.visibility = View.VISIBLE
             } else {
                 itemView.guild_user_online.visibility = View.VISIBLE
@@ -68,6 +71,14 @@ class MemberListAdapter<T>(
         } else if (member is User) {
             itemView.member_avatar.user = member
             itemView.widget_member_name_text.text = member.name
+            if (Client.global.presences[member.id]?.status == "offline") {
+                itemView.guild_user_online.visibility = View.GONE
+                itemView.widget_member_name_text.setTextColor(0x60FFFFFF)
+                itemView.offline_user_shadow.visibility = View.VISIBLE
+            } else {
+                itemView.guild_user_online.visibility = View.VISIBLE
+                itemView.offline_user_shadow.visibility = View.GONE
+            }
         }
 
     }
@@ -113,7 +124,7 @@ class MemberListAdapter<T>(
     override fun getHeaderId(position: Int): Long {
         return if (memberList[position] is GuildMember) {
             if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline")
-                1
+                0xffffff
             else
                 (memberList[position] as GuildMember).roles.highest!!.index.toLong()
         } else
