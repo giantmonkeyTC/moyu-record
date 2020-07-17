@@ -59,7 +59,10 @@ class ChannelMemberFragment : Fragment() {
             channelId = it.channelId
         })
         Client.global.eventBus.observeEventOnUi<PresenceUpdateEvent>().subscribe(Consumer {
-            channelId?.let { it1 -> mMemberVM.loadMemberList(it1) }
+            channelId?.let { it1 ->
+                if (Client.global.channels[it1] !is DmChannel)
+                    mMemberVM.loadMemberList(it1)
+            }
         })
         mMemberVM.getMembersLiveData().observe(viewLifecycleOwner, Observer {
             it?.let {

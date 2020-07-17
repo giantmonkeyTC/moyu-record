@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:id="@+id/coordinator_join_guild"
+    android:background="@drawable/shape_bottom_sheet"
     android:layout_height="wrap_content">
     <include
         layout="@layout/bottom_sheet_join_guild"

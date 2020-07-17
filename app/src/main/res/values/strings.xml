@@ -53,6 +53,8 @@
     <string name="over_size">上传大小不能超过8MB</string>
     <string name="send_btn_tag">Send Button</string>
     <string name="welcome_msg">确认过眼神, %s 是我们的人</string>
+    <string name="welcome_msg1">确认过眼神,&#160;</string>
+    <string name="welcome_msg2">&#160;是我们的人</string>
     <string name="report_1">发布色情/欺诈/违法等不良信息</string>
     <string name="report_2">发布广告等骚扰信息</string>
     <string name="report_3">存在骚扰行为</string>

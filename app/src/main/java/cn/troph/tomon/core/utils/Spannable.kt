@@ -1,6 +1,5 @@
 package cn.troph.tomon.core.utils
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableString

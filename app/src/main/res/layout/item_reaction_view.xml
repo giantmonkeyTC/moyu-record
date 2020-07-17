@@ -503,10 +503,10 @@
         android:paddingHorizontal="4dp">
 
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_weight="1"
-            android:src="@drawable/ic_smile_solid" />
+            android:src="@drawable/ic_smile_plus_solid" />
 
         <androidx.emoji.widget.EmojiTextView
             android:layout_width="0dp"
