@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_invite"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_invite"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textColor="@color/channelCategoryText"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_invite"
         app:layout_constraintTop_toTopOf="@id/message_avatar_invite" />
 
@@ -45,7 +45,7 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:textColor="#DDFFFFFF"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_invite"

@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_file"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_file"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textColor="@color/channelCategoryText"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_file"
         app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
 
@@ -71,7 +71,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textColor="@color/primaryText"
-            android:textSize="14sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/btn_file_save"
             app:layout_constraintStart_toEndOf="@id/imageView"
             app:layout_constraintTop_toTopOf="@id/imageView" />
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textColor="@color/secondaryText"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/textView"
             app:layout_constraintTop_toBottomOf="@id/textView" />
 
