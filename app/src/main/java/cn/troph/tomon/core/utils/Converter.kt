@@ -29,7 +29,13 @@ object Converter {
             return LocalDateTime.now()
         }
         return when (value) {
-            is String -> LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+            is String -> {
+                if (value.isNotEmpty()) {
+                    LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+                } else {
+                    LocalDateTime.now()
+                }
+            }
             is JsonPrimitive -> LocalDateTime.parse(value.asString, DateTimeFormatter.ISO_DATE_TIME)
             else -> LocalDateTime.parse(value.toString(), DateTimeFormatter.ISO_DATE_TIME)
         }
