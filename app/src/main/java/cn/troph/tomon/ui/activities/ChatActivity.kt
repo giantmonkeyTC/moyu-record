@@ -134,13 +134,8 @@ class ChatActivity : BaseActivity() {
             }
             R.id.members -> {
                 if (AppState.global.channelSelection.value.channelId != null) {
-                    if (mCurrentChannel is GuildChannel) {
-                        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-                        drawerLayout.openDrawer(GravityCompat.END, true)
-                    } else {
-                        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-                        drawerLayout.openDrawer(GravityCompat.END, true)
-                    }
+                    val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+                    drawerLayout.openDrawer(GravityCompat.END, true)
                 }
             }
 
