@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.Event
-import cn.troph.tomon.core.events.MessageCreateEvent
-import cn.troph.tomon.core.events.MessageDeleteEvent
-import cn.troph.tomon.core.events.ReactionAddEvent
-import cn.troph.tomon.core.events.ReactionRemoveEvent
+import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.TextChannel
@@ -44,6 +41,8 @@ class MessageViewModel : ViewModel() {
 
     val messageDeleteLD: MutableLiveData<MessageDeleteEvent> = MutableLiveData()
 
+    val messageUpdateLD: MutableLiveData<MessageUpdateEvent> = MutableLiveData()
+
     fun setUpEvent() {
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
@@ -62,6 +61,12 @@ class MessageViewModel : ViewModel() {
         Client.global.eventBus.observeEventOnUi<MessageDeleteEvent>().subscribe(Consumer {
             messageDeleteLD.value = it
         })
+
+        Client.global.eventBus.observeEventOnUi<MessageUpdateEvent>().subscribe(
+            Consumer {
+                messageUpdateLD.value = it
+            }
+        )
     }
 
     fun getMessageLiveData(): MutableLiveData<MutableList<Message>> {

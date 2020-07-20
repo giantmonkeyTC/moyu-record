@@ -400,6 +400,10 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
 
+        mMsgViewModel.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
+
+        })
+
         //Reaction add
         mMsgViewModel.reactionAddLD.observe(viewLifecycleOwner, Observer {
             if (it.reaction.message?.channelId == mChannelId) {
