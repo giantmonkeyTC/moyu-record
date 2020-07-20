@@ -156,7 +156,11 @@ class MessageAdapter(
                     messageList[holder.adapterPosition].authorId?.let {
                         if (it != Client.global.me.id) {
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            val guildUserInfoFragment = GuildUserInfoFragment(it)
+                            guildUserInfoFragment.show(
+                                context.supportFragmentManager,
+                                guildUserInfoFragment.tag
+                            )
                         }
 
                     }
