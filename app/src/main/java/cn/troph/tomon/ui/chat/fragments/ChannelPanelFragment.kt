@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
 import androidx.emoji.widget.EmojiEditText
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -126,6 +127,14 @@ class ChannelPanelFragment : BaseFragment() {
 
                         it.hint = getString(R.string.emoji_et_hint)
                     }
+                    btn_message_menu?.let {
+                        it.visibility = View.VISIBLE
+                        it.isEnabled = true
+                    }
+                    emoji_tv?.let {
+                        it.visibility = View.VISIBLE
+                        it.isEnabled = true
+                    }
                     btn_message_send?.let {
                         it.visibility = View.VISIBLE
                     }
@@ -152,6 +161,14 @@ class ChannelPanelFragment : BaseFragment() {
                             it.hint = getString(R.string.ed_msg_hint_no_permisson)
                             it.isEnabled = false
                         }
+                        btn_message_menu?.let {
+                            it.visibility = View.GONE
+                            it.isEnabled = false
+                        }
+                        emoji_tv?.let {
+                            it.visibility = View.GONE
+                            it.isEnabled = false
+                        }
                         btn_message_send?.let {
                             it.visibility = View.GONE
                         }
@@ -159,6 +176,14 @@ class ChannelPanelFragment : BaseFragment() {
                         editText?.let {
                             it.hint = getString(R.string.emoji_et_hint)
                             editText.isEnabled = true
+                        }
+                        btn_message_menu?.let {
+                            it.visibility = View.VISIBLE
+                            it.isEnabled = true
+                        }
+                        emoji_tv?.let {
+                            it.visibility = View.VISIBLE
+                            it.isEnabled = true
                         }
                         btn_message_send?.let {
                             it.visibility = View.VISIBLE

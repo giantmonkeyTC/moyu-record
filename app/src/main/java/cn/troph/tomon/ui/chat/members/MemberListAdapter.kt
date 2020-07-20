@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -20,6 +21,7 @@ import cn.troph.tomon.core.structures.Presence
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
+import cn.troph.tomon.ui.chat.fragments.ReportFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
@@ -106,6 +108,7 @@ class MemberListAdapter<T>(
             displaynameSpan
         view.user_info_discriminator.text = discriminatorSpan
         view.user_info_nick.text = TextUtils.concat(member.displayName, discriminatorSpan)
+
         rolesBinder(itemView = view, member = member)
 
         val dialog = BottomSheetDialog(parent.context)
@@ -116,9 +119,17 @@ class MemberListAdapter<T>(
                     Color.TRANSPARENT
                 )
             )
+        view.user_sign_out.setOnClickListener {
+            dialog.dismiss()
+            ReportFragment(
+                member.id,
+                1
+            ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+        }
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
         val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
-        val peekHeightPx = view.context.resources.getDimensionPixelSize(R.dimen.profile_peek_height)
+        val peekHeightPx =
+            view.context.resources.getDimensionPixelSize(R.dimen.member_profile_peek_height)
         bottomSheetBehavior.setPeekHeight(peekHeightPx)
         extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
         dialog.show()
