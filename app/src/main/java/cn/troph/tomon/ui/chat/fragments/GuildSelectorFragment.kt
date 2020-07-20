@@ -16,6 +16,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Guild
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
@@ -72,15 +73,22 @@ class GuildSelectorFragment : Fragment() {
             mAdapter.notifyItemChanged(newIndex)
             requireActivity().supportFragmentManager.beginTransaction()
                 .apply {
-                    replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                    setCustomAnimations(
+                        android.R.anim.slide_in_left,
+                        0
+                    )
+                    val guildChannelSelectorFragment = GuildChannelSelectorFragment()
+                    replace(R.id.fragment_guild_channels, guildChannelSelectorFragment)
                     addToBackStack(null)
                 }.commit()
+            btn_dm_channel_entry.isEnabled = true
         })
 
         mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()
                 mGuildList.addAll(list)
+
                 mGuildList.forEach { singleGuild ->
                     singleGuild.isSelected = false
                     mSelectedGuild?.let {
@@ -132,7 +140,7 @@ class GuildSelectorFragment : Fragment() {
 
         mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
             if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
-                if (event.message.guild!!.  updateMention())
+                if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
                         mGuildVM.getGuildListLiveData().value!!.indexOf(
                             event.message.guild!!
@@ -199,10 +207,15 @@ class GuildSelectorFragment : Fragment() {
                 ChannelSelection(guildId = "@me", channelId = null)
             val dmChannelFragment: Fragment = DmChannelSelectorFragment()
             val transaction = requireActivity().supportFragmentManager.beginTransaction().apply {
+                setCustomAnimations(
+                    android.R.anim.slide_in_left,
+                    android.R.anim.slide_out_right
+                )
                 replace(R.id.fragment_guild_channels, dmChannelFragment)
                 addToBackStack(null)
             }
             transaction.commit()
+            btn_dm_channel_entry.isEnabled = false
         }
         btn_join_guild.setOnClickListener {
             callJoinGuildBottomSheet()
