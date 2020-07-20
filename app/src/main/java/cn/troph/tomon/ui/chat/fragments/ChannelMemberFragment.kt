@@ -1,7 +1,5 @@
 package cn.troph.tomon.ui.chat.fragments
 
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,16 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.PresenceUpdateEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.chat.viewmodel.MemberViewModel
-import cn.troph.tomon.ui.states.AppState
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_member.*
 
