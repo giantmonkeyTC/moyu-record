@@ -681,6 +681,7 @@ class ChannelPanelFragment : BaseFragment() {
                 it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
                     ?.let { fileList ->
                         for (item in fileList) {
+                            Logger.d("width:${item.width} height:${item.height}")
                             if (item.size > 8 * 1024 * 1024) {
                                 Toast.makeText(
                                     requireContext(),

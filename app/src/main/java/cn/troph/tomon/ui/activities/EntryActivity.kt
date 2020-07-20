@@ -36,15 +36,19 @@ class EntryActivity : BaseActivity() {
             if (it == true)
                 gotoChat()
         })
-        Client.global
-            .login()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Logger.d("Login Success")
-            }, {
-                Logger.d("Login Failed")
-                gotoEntryOption()
-            })
+        if (Client.global.loggedIn) {
+            gotoChat()
+        } else {
+            Client.global
+                .login()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+
+                }, {
+                    gotoEntryOption()
+                })
+        }
+
 
     }
 

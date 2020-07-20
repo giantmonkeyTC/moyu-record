@@ -36,6 +36,7 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
 import com.downloader.OnDownloadListener
@@ -297,7 +298,6 @@ class MessageAdapter(
                     holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
-
                     holder.itemView.widget_message_author_name_text_image.text =
                         messageList[position].author?.name
                     val message = messageList[position]
@@ -336,16 +336,30 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-                    holder.itemView.chat_iv.updateLayoutParams {
-                        item.height?.let {
-                            height =
-                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
-                        }
-                    }
+//                    holder.itemView.chat_iv.updateLayoutParams {
+//                        item.height?.let {
+//                            val calHeight =
+//                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
+//                            height = if (calHeight > 300) {
+//                                DensityUtil.dip2px(holder.itemView.context, 300f)
+//                            } else {
+//                                it
+//                            }
+//                        }
+//                    }
                     Glide.with(holder.itemView)
                         .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
                         .placeholder(R.drawable.loadinglogo)
-                        .override(item.width!!, item.height!!)
+                        .override(
+                            if (item.width != null) item.width!! else DensityUtil.dip2px(
+                                holder.itemView.context,
+                                300f
+                            ),
+                            if (item.height != null) item.height!! else DensityUtil.dip2px(
+                                holder.itemView.context,
+                                300f
+                            )
+                        )
                         .dontAnimate()
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {

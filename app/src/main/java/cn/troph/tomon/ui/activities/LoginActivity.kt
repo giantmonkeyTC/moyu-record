@@ -123,7 +123,6 @@ class LoginActivity : AppCompatActivity() {
                         .subscribe {
                             //gotoChat()
                         }
-
                 }, {
                     if (it is HttpException) {
                         button_login.hideProgress(if (it.code() >= 500) R.string.auth_server_error else R.string.login_failed)
