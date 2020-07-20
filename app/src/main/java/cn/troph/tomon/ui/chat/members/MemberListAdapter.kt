@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.members
 
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.SpannableString
@@ -8,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -18,9 +21,13 @@ import cn.troph.tomon.core.structures.Presence
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
+import cn.troph.tomon.ui.chat.fragments.ReportFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
+import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.member_detail_roles
+import kotlinx.android.synthetic.main.guild_user_info.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_role_list_header.view.*
@@ -85,8 +92,8 @@ class MemberListAdapter<T>(
 
     private fun callMemberDetail(parent: ViewGroup, member: GuildMember) {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_member_detail, null)
-        view.detail_member_avatar.user = member.user
+        val view = layoutInflater.inflate(R.layout.guild_user_info, null)
+        view.user_info_avatar.user = member.user
         val discriminatorSpan: SpannableString =
             spannable { color(Color.GRAY, " #" + member.user!!.discriminator) }
         val displaynameSpan: SpannableString =
@@ -97,30 +104,57 @@ class MemberListAdapter<T>(
                     member.displayName
                 )
             }
-        view.widget_member_name_detail_text.text =
-            TextUtils.concat(displaynameSpan, discriminatorSpan)
+        view.user_info_name.text =
+            displaynameSpan
+        view.user_info_discriminator.text = discriminatorSpan
+        view.user_info_nick.text = TextUtils.concat(member.displayName, discriminatorSpan)
+
         rolesBinder(itemView = view, member = member)
+
         val dialog = BottomSheetDialog(parent.context)
         dialog.setContentView(view)
+        dialog.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
+        view.user_sign_out.setOnClickListener {
+            dialog.dismiss()
+            ReportFragment(
+                member.id,
+                1
+            ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+        }
+        val extraSpace = view.findViewById<View>(R.id.extraSpace)
+        val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
+        val peekHeightPx =
+            view.context.resources.getDimensionPixelSize(R.dimen.member_profile_peek_height)
+        bottomSheetBehavior.setPeekHeight(peekHeightPx)
+        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
         dialog.show()
     }
 
     private fun rolesBinder(itemView: View, member: GuildMember) {
         itemView.member_detail_roles.removeAllViews()
-        member.roles.sequence.forEach explicit@{ role ->
-            if (role.isEveryone)
-                return@explicit
-            val layoutInflater = LayoutInflater.from(itemView.context)
-            val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
-            role_view.role_color.background = (
-                    ColorDrawable(
-                        (if (role.color == 0)
-                            0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
-                    )
-                    )
-            role_view.role_name.text = role.name
-            itemView.member_detail_roles.addView(role_view)
-        }
+        if (member.roles.sequence.size == 1) {
+            itemView.role_section.visibility = View.GONE
+        } else
+            member.roles.sequence.forEach explicit@{ role ->
+                if (role.isEveryone)
+                    return@explicit
+                val layoutInflater = LayoutInflater.from(itemView.context)
+                val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
+                role_view.role_color.background = (
+                        ColorDrawable(
+                            (if (role.color == 0)
+                                0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                        )
+                        )
+                role_view.role_name.text = role.name
+                itemView.member_detail_roles.addView(role_view)
+            }
+
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
