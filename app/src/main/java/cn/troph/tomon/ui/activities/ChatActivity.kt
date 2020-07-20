@@ -23,6 +23,7 @@ import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
 class ChatActivity : BaseActivity() {
@@ -68,8 +69,14 @@ class ChatActivity : BaseActivity() {
                 }
             }
         })
+        mChatSharedViewModel.channelUpdateLD.observe(this, Observer {
+            if (it.channel.id == AppState.global.channelSelection.value.channelId) {
+                updateToolbar(it.channel)
+            }
+        })
         mChatSharedViewModel.setUpChannelSelection()
         mChatSharedViewModel.setUpDrawer()
+        mChatSharedViewModel.setUpChannelUpdate()
     }
 
     private fun updateToolbar(channel: Channel) {
