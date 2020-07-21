@@ -30,9 +30,17 @@
         android:paddingVertical="2dp"
         android:textColor="#D67677"
         android:textSize="10sp"
+        app:layout_constraintStart_toEndOf="@id/test_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/test_barrier"
+        app:constraint_referenced_ids="text_name"
+        app:barrierDirection="end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <TextView
         android:id="@+id/text_name"
