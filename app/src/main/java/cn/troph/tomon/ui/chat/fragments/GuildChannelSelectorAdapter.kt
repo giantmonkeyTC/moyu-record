@@ -89,12 +89,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     text.setTextColor(Color.parseColor("#FFFFFF"))
                 } else {
                     text.typeface = Typeface.DEFAULT
-                    if (!itemView.isActivated) {
-                        text.setTextColor(Color.parseColor("#969696"))
-                    } else {
-                        text.typeface = Typeface.DEFAULT_BOLD
-                        text.setTextColor(Color.parseColor("#FFFFFF"))
-                    }
+                    text.setTextColor(Color.parseColor("#969696"))
                 }
                 if (channel.mention != 0) {
                     itemView.channel_unread_mention_notification.text = channel.mention.toString()
