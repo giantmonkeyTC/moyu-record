@@ -125,10 +125,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     itemView.channel_unread_mention_notification.text = channel.mention.toString()
                     itemView.channel_unread_mention_notification.visibility = View.VISIBLE
                 }
-
             })
             Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
-                if (channel is TextChannel) {
+                if (channel is TextChannel && it.message.channelId == channel.id) {
                     if (channel.unread) {
                         text.typeface = Typeface.DEFAULT_BOLD
                         text.setTextColor(Color.parseColor("#FFFFFF"))
@@ -137,9 +136,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         text.setTextColor(Color.parseColor("#969696"))
                         itemView.channel_unread_mention_notification.visibility = View.GONE
                     }
-
                 }
-
             })
 
 
