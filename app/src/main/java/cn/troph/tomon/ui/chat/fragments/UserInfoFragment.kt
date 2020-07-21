@@ -10,29 +10,29 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.edit
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+
 import androidx.lifecycle.Observer
-import anet.channel.util.Utils
+
 import cn.troph.tomon.R
-import cn.troph.tomon.core.Client
+
 import cn.troph.tomon.ui.activities.EntryOptionActivity
-import cn.troph.tomon.ui.chat.viewmodel.UserInfoViewModel
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_user_information.view.*
-import kotlin.math.log
+
 
 
 class UserInfoFragment : BottomSheetDialogFragment() {
 
-    private val mUserInfoVM: UserInfoViewModel by viewModels()
+    private val mChatVM: ChatSharedViewModel by activityViewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        mUserInfoVM.loadUserInfo()
+        mChatVM.loadUserInfo()
         val bottomSheet = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.fragment_user_information, null)
         bottomSheet.setContentView(view)
@@ -52,7 +52,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         bottomSheetBehavior.setPeekHeight(peekHeightPx)
         extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
 
-        val me = mUserInfoVM.getUserInfoLiveData().value
+        val me = mChatVM.userInfoLiveData.value
         if (me != null) {
             view.user_info_discriminator.text = "#${me.discriminator}"
             view.profile_layout.user_info_avatar.user = me
@@ -65,8 +65,8 @@ class UserInfoFragment : BottomSheetDialogFragment() {
         }
 
         view.profile_layout.user_sign_out.setOnClickListener {
-        val logoutDialog = LogoutDialogFragment()
-            logoutDialog.show(requireActivity().supportFragmentManager,"DIALOG_LOGOUT")
+            val logoutDialog = LogoutDialogFragment()
+            logoutDialog.show(requireActivity().supportFragmentManager, "DIALOG_LOGOUT")
         }
 
 
@@ -106,7 +106,7 @@ class UserInfoFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mUserInfoVM.getUserInfoLiveData().observe(viewLifecycleOwner, Observer {
+        mChatVM.userInfoLiveData.observe(viewLifecycleOwner, Observer {
             it?.let { me ->
                 view.profile_layout.user_info_avatar.user = me
                 view.profile_layout.user_info_name.text = me.name

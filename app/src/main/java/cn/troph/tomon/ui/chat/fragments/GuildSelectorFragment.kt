@@ -9,19 +9,13 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Guild
-import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Url
-import cn.troph.tomon.ui.chat.messages.notifyObserver
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.chat.viewmodel.GuildViewModel
-import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -34,9 +28,7 @@ import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
 class GuildSelectorFragment : Fragment() {
 
-    private val mGuildVM: GuildViewModel by viewModels()
     private val mChatVM: ChatSharedViewModel by activityViewModels()
-    private val mUnReadViewModel: UnReadViewModel by activityViewModels()
     private val mGuildList = mutableListOf<Guild>()
     private val mAdapter = GuildSelectorAdapter(mGuildList)
     private var mSelectedGuild: Guild? = null
@@ -51,12 +43,12 @@ class GuildSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mChatVM.setUpChannelSelection()
         requireActivity().supportFragmentManager.beginTransaction()
             .apply {
                 replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
                 addToBackStack(null)
             }.commit()
+
 
         mChatVM.channelSelectionLD.observe(viewLifecycleOwner, Observer { channel ->
             if (channel.guildId.equals("@me", true) || channel.guildId == mSelectedGuild?.id)
@@ -92,7 +84,7 @@ class GuildSelectorFragment : Fragment() {
             btn_dm_channel_entry.isEnabled = true
         })
 
-        mGuildVM.getGuildListLiveData().observe(viewLifecycleOwner, Observer {
+        mChatVM.guildListLiveData.observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()
                 mGuildList.addAll(list)
@@ -110,18 +102,18 @@ class GuildSelectorFragment : Fragment() {
                 list.forEach {
                     it.updateMention()
                     it.updateUnread()
-                    mAdapter.notifyItemChanged(mGuildVM.getGuildListLiveData().value?.indexOf(it)!!)
+                    mAdapter.notifyItemChanged(mChatVM.guildListLiveData.value?.indexOf(it)!!)
                 }
             }
         })
 
-        mGuildVM.loadGuildList()
+        mChatVM.loadGuildList()
         view_avatar.user = Client.global.me
-        mGuildVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+        mChatVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
+            if (mChatVM.guildListLiveData.value?.contains(event.message.guild)!!) {
                 if (event.message.guild!!.updateUnread()) {
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
@@ -129,39 +121,39 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageReadLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+        mChatVM.messageReadLD.observe(viewLifecycleOwner, Observer { event ->
+            if (mChatVM.guildListLiveData.value?.contains(event.message.guild)!!) {
                 if (!event.message.guild!!.updateUnread())
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
                 if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
             }
         })
 
-        mGuildVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild!!)!!) {
+        mChatVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
+            if (mChatVM.guildListLiveData.value?.contains(event.message.guild!!)!!) {
                 if (event.message.guild!!.updateMention())
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
             }
         })
 
-        mGuildVM.messageDeleteLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mGuildVM.getGuildListLiveData().value?.contains(event.message.guild)!!) {
+        mChatVM.messageDeleteLD.observe(viewLifecycleOwner, Observer { event ->
+            if (mChatVM.guildListLiveData.value?.contains(event.message.guild)!!) {
                 if (event.message.guild!!.updateUnread()) {
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
@@ -169,11 +161,11 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
+        mChatVM.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
             event.message.guild?.let {
                 if (it.updateMention()) {
                     mAdapter.notifyItemChanged(
-                        mGuildVM.getGuildListLiveData().value!!.indexOf(
+                        mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
                         )
                     )
@@ -181,7 +173,7 @@ class GuildSelectorFragment : Fragment() {
             }
         })
 
-        mGuildVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
+        mChatVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
             val rearrangedGuildList = mutableListOf<Guild>()
             for (item in it.guilds) {
                 val newGuild = mGuildList.find {
@@ -195,11 +187,11 @@ class GuildSelectorFragment : Fragment() {
             mGuildList.addAll(rearrangedGuildList)
             mAdapter.notifyDataSetChanged()
         })
-        mGuildVM.guildCreateLD.observe(viewLifecycleOwner, Observer {
+        mChatVM.guildCreateLD.observe(viewLifecycleOwner, Observer {
             mGuildList.add(it.guild)
             mAdapter.notifyItemInserted(mGuildList.size - 1)
         })
-        mGuildVM.guildDeleteLD.observe(viewLifecycleOwner, Observer { event ->
+        mChatVM.guildDeleteLD.observe(viewLifecycleOwner, Observer { event ->
             mGuildList.removeIf {
                 it.id == event.guild.id
             }
@@ -230,8 +222,7 @@ class GuildSelectorFragment : Fragment() {
             callJoinGuildBottomSheet()
         }
 
-        mGuildVM.setUpEventBus()
-        mUnReadViewModel.dmUnReadLiveData.observe(viewLifecycleOwner, Observer {
+        mChatVM.dmUnReadLiveData.observe(viewLifecycleOwner, Observer {
             updateRedDot(it.values.sum())
         })
 
