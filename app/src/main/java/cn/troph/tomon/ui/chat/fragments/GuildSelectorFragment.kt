@@ -32,6 +32,7 @@ class GuildSelectorFragment : Fragment() {
     private val mGuildList = mutableListOf<Guild>()
     private val mAdapter = GuildSelectorAdapter(mGuildList)
     private var mSelectedGuild: Guild? = null
+    private var isLastDmchannel: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +43,12 @@ class GuildSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mChatVM.setUpEvents()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .apply {
+                replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                addToBackStack(null)
+            }.commit()
+
 
         mChatVM.channelSelectionLD.observe(viewLifecycleOwner, Observer { channel ->
             if (channel.guildId.equals("@me", true) || channel.guildId == mSelectedGuild?.id)
@@ -63,16 +69,18 @@ class GuildSelectorFragment : Fragment() {
             }
             mAdapter.notifyItemChanged(oldIndex)
             mAdapter.notifyItemChanged(newIndex)
-            requireActivity().supportFragmentManager.beginTransaction()
-                .apply {
-                    setCustomAnimations(
-                        android.R.anim.slide_in_left,
-                        0
-                    )
-                    val guildChannelSelectorFragment = GuildChannelSelectorFragment()
-                    replace(R.id.fragment_guild_channels, guildChannelSelectorFragment)
-                    addToBackStack(null)
-                }.commit()
+
+            if (isLastDmchannel)
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .apply {
+                        setCustomAnimations(
+                            android.R.anim.slide_in_left,
+                            android.R.anim.slide_out_right
+                        )
+                        replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                        addToBackStack(null)
+                        isLastDmchannel = false
+                    }.commit()
             btn_dm_channel_entry.isEnabled = true
         })
 
@@ -208,6 +216,7 @@ class GuildSelectorFragment : Fragment() {
             }
             transaction.commit()
             btn_dm_channel_entry.isEnabled = false
+            isLastDmchannel = true
         }
         btn_join_guild.setOnClickListener {
             callJoinGuildBottomSheet()
