@@ -23,6 +23,7 @@
         android:visibility="gone"
         android:textColor="@color/whiteAlpha70"
         android:background="@drawable/circle_tv"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
