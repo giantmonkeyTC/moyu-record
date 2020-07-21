@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginVertical="4dp"
     android:layout_marginHorizontal="12dp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:background="@drawable/high_light"
+    android:layout_width="32dp"
+    android:layout_height="32dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/bottom_emoji_iv"
@@ -31,6 +32,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:gravity="center" />
+
     <ImageView
         android:id="@+id/civ"
         android:visibility="gone"

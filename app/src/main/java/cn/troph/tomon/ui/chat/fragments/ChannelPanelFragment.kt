@@ -629,7 +629,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         emoji_rr.layoutManager = mGridLayoutManager
-        //load guild emoji
+        //load guild Emoji
         for (item in Client.global.guilds.list) {
             if (item.emojis.values.toMutableList().size == 0)
                 continue
@@ -675,6 +675,7 @@ class ChannelPanelFragment : BaseFragment() {
         emoji_rr.adapter = mSectionDataManager.adapter
         section_header_layout.attachTo(emoji_rr, mSectionDataManager)
         // bottom Emoji
+        guildIcon[0].isHighLight = true
         mBottomEmojiAdapter = BottomEmojiAdapter(
             guildIcon,
             onBottomGuildSelectedListener = object : OnBottomGuildSelectedListener {
@@ -687,9 +688,27 @@ class ChannelPanelFragment : BaseFragment() {
                     )
                 }
             })
-        bottom_emoji_rr.layoutManager =
+        val mBottomLLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        bottom_emoji_rr.layoutManager = mBottomLLayoutManager
+
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
+        emoji_rr.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    val position =
+                        mSectionDataManager.calcSection(mGridLayoutManager.findFirstCompletelyVisibleItemPosition())
+                    bottom_emoji_rr.smoothScrollToPosition(position)
+                    guildIcon.forEach {
+                        it.isHighLight=false
+                    }
+                    guildIcon[position].isHighLight = true
+                    mBottomEmojiAdapter.notifyDataSetChanged()
+                }
+            }
+        })
     }
 
 

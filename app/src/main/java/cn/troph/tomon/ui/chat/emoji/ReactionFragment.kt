@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
@@ -23,10 +24,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.fragment_reaction.*
+import kotlinx.android.synthetic.main.fragment_reaction.bottom_emoji_rr
 
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
@@ -37,21 +39,6 @@ class ReactionFragment : BottomSheetDialogFragment() {
     private var param2: String? = null
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
-
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//        val bottomSheetDialog =
-//            super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-//        bottomSheetDialog.setOnShowListener { dialog: DialogInterface ->
-//            val dialogc = dialog as BottomSheetDialog
-//            // When using AndroidX the resource can be found at com.google.android.material.R.id.design_bottom_sheet
-//            val bottomSheet =
-//                dialogc.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-//            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet as View)
-//            bottomSheetBehavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
-//            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-//        }
-//        return bottomSheetDialog
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,6 +158,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
         }
         reaction_rr.adapter = mSectionDataManager.adapter
         reaction_section_header_layout.attachTo(reaction_rr, mSectionDataManager)
+        guildIcon[0].isHighLight = true
         // bottom Emoji
         val mBottomEmojiAdapter = BottomEmojiAdapter(
             guildIcon,
@@ -184,14 +172,31 @@ class ReactionFragment : BottomSheetDialogFragment() {
                     )
                 }
             })
-        bottom_emoji_rr.layoutManager =
+        val mBottomLLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        bottom_emoji_rr.layoutManager = mBottomLLayoutManager
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
         val handler = Handler()
         handler.postDelayed({
             val view = bottom_emoji_rr.findViewHolderForAdapterPosition(0)
             view?.itemView?.performClick()
-        }, 500)
+        }, 300)
+        reaction_rr.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    val position =
+                        mSectionDataManager.calcSection(mGridLayoutManager.findFirstCompletelyVisibleItemPosition())
+                    bottom_emoji_rr.smoothScrollToPosition(position)
+                    guildIcon.forEach {
+                        it.isHighLight=false
+                    }
+                    guildIcon[position].isHighLight = true
+                    mBottomEmojiAdapter.notifyDataSetChanged()
+                }
+            }
+        })
     }
 
     companion object {
