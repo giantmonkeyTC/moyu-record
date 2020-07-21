@@ -14,6 +14,11 @@ interface ChannelService {
         @Header("Authorization") token: String
     ): Observable<MutableList<DmChannel>>
 
+    @POST("users/@me/channels")
+    fun createDmChannel(
+        @Header("Authorization") token: String
+    ):Observable<JsonObject>
+
     @GET("guilds/{id}/channels")
     fun getGuildChannels(
         @Path("id") id: String,

@@ -24,6 +24,7 @@ data class GuildChannelPositionEvent(val guild: Guild) : Event()
 data class ChannelAckEvent(val channel: Channel) : Event()
 data class ChannelTypingEvent(val channel: Channel) : Event()
 data class ChannelMemberUpdateEvent(val channel: Channel) : Event()
+data class DmChannelCreateEvent(val channel: DmChannel) : Event()
 
 data class RoleSyncEvent(val guild: Guild) : Event()
 data class RoleFetchEvent(val roles: List<Role>) : Event()

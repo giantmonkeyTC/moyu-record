@@ -580,6 +580,7 @@ class MessageAdapter(
                 image.visibility = View.GONE
                 text.text = "${value.name} ${value.count}"
             } else {
+                image.visibility = View.VISIBLE
                 Glide.with(image).load(
                     if (value.emoji == null)
                         Assets.emojiURL(value.id, false) else

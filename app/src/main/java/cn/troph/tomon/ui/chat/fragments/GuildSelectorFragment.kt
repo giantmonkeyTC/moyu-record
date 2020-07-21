@@ -147,6 +147,7 @@ class GuildSelectorFragment : Fragment() {
                         )
                     )
             }
+
         })
 
         mChatVM.messageDeleteLD.observe(viewLifecycleOwner, Observer { event ->
