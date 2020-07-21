@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
@@ -115,7 +116,7 @@ class BottomEmojiAdapter(
                 .into(holder.itemView.bottom_emoji_iv)
 
         } else {
-            if (urlList[position].drawable == null){
+            if (urlList[position].drawable == null) {
                 holder.itemView.bottom_emoji_iv.visibility = View.GONE
                 holder.itemView.ctv.visibility = View.VISIBLE
                 holder.itemView.civ.visibility = View.GONE
@@ -124,27 +125,30 @@ class BottomEmojiAdapter(
                         holder.itemView.ctv.text = parseEmoji(it)
                     } catch (e: NumberFormatException) {
                         holder.itemView.ctv.text = it[0].toUpperCase().toString()
-                    } catch (e:IllegalArgumentException){
+                    } catch (e: IllegalArgumentException) {
                         holder.itemView.ctv.text = it[0].toUpperCase().toString()
                     }
 
                 }
-            }
-            else{
+            } else {
                 holder.itemView.bottom_emoji_iv.visibility = View.GONE
                 holder.itemView.ctv.visibility = View.GONE
                 holder.itemView.civ.visibility = View.VISIBLE
                 urlList[position].drawable?.let {
-                        holder.itemView.civ.setImageDrawable(it)
+                    holder.itemView.civ.setImageDrawable(it)
                 }
             }
-
-
         }
 
         holder.itemView.setOnClickListener {
+            urlList.forEach {
+                it.isHighLight = false
+            }
+            urlList[holder.adapterPosition].isHighLight = true
             onBottomGuildSelectedListener.onGuildSelected(holder.adapterPosition)
+            notifyDataSetChanged()
         }
+        holder.itemView.isActivated = urlList[position].isHighLight
     }
 
     override fun getItemCount(): Int {
@@ -172,7 +176,8 @@ class BottomEmojiAdapter(
 data class GuildIcon(
     @SerializedName("url") val url: String?,
     @SerializedName("text") val text: String?,
-    @SerializedName("drawable") val drawable: Drawable?
+    @SerializedName("drawable") val drawable: Drawable?,
+    @SerializedName("is_highlight") var isHighLight: Boolean = false
 )
 
 interface OnBottomGuildSelectedListener {
