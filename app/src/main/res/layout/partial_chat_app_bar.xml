@@ -37,6 +37,8 @@
                     android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:textSize="18sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:textStyle="bold" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
