@@ -554,7 +554,6 @@ class ChannelPanelFragment : BaseFragment() {
         }
         )
         setUpBottomSheet()
-        mChatSharedVM.setUpEvents()
     }
 
 

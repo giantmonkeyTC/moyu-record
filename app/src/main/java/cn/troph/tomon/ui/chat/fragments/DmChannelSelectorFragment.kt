@@ -71,7 +71,6 @@ class DmChannelSelectorFragment : Fragment() {
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
-        mChatVM.setUpEvents()
         mChatVM.loadDmChannel()
     }
 }

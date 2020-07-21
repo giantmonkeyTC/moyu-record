@@ -155,6 +155,12 @@ class ChatSharedViewModel : ViewModel() {
         Client.global.eventBus.observeEventOnUi<GuildDeleteEvent>().subscribe(Consumer {
             guildDeleteLD.value = it
         })
+        Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
+            messageReadLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
+            messageAtMeLD.value = it
+        })
     }
 
 

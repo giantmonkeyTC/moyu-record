@@ -121,7 +121,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
 
             })
             Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
-                if (channel is TextChannel && it.message.channel == channel) {
+                if (channel is TextChannel && it.message.channel?.id == channel.id && it.message.guild?.id == AppState.global.channelSelection.value.guildId) {
                     itemView.channel_unread_mention_notification.text = channel.mention.toString()
                     itemView.channel_unread_mention_notification.visibility = View.VISIBLE
                 }
