@@ -46,7 +46,6 @@ class GuildSelectorFragment : Fragment() {
         requireActivity().supportFragmentManager.beginTransaction()
             .apply {
                 replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
-                addToBackStack(null)
             }.commit()
 
 
@@ -78,7 +77,6 @@ class GuildSelectorFragment : Fragment() {
                             android.R.anim.slide_out_right
                         )
                         replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
-                        addToBackStack(null)
                         isLastDmchannel = false
                     }.commit()
             btn_dm_channel_entry.isEnabled = true
@@ -213,7 +211,6 @@ class GuildSelectorFragment : Fragment() {
                     android.R.anim.slide_out_right
                 )
                 replace(R.id.fragment_guild_channels, dmChannelFragment)
-                addToBackStack(null)
             }
             transaction.commit()
             btn_dm_channel_entry.isEnabled = false
