@@ -7,29 +7,19 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
-import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.ChannelCreateEvent
-import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.structures.DmChannel
-import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.messages.notifyObserver
-import cn.troph.tomon.ui.chat.viewmodel.DmChannelViewModel
-import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
-import cn.troph.tomon.ui.states.AppState
-import io.reactivex.rxjava3.functions.Consumer
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+
 import kotlinx.android.synthetic.main.fragment_dmchannel_selector.*
-import java.util.function.BiFunction
 
 
 class DmChannelSelectorFragment : Fragment() {
-    private val mDmchannelVM: DmChannelViewModel by viewModels()
+    private val mChatVM: ChatSharedViewModel by activityViewModels()
     private val mDMchannelList = mutableListOf<DmChannel>()
     private val mDMchennelAdapter = DmChannelSelectorAdapter(mDMchannelList)
-    private val mUnReadViewModel: UnReadViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +37,7 @@ class DmChannelSelectorFragment : Fragment() {
         view_dmchannels_list.layoutManager = LinearLayoutManager(view.context)
         view_dmchannels_list.adapter = mDMchennelAdapter
 
-        mDmchannelVM.getChannelLiveData().observe(viewLifecycleOwner, Observer {
+        mChatVM.dmChannelLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {
                 mDMchannelList.clear()
                 mDMchannelList.addAll(it)
@@ -57,10 +47,7 @@ class DmChannelSelectorFragment : Fragment() {
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
-
-        mDmchannelVM.loadDmChannel()
-
-        mUnReadViewModel.dmUnReadLiveData.observe(viewLifecycleOwner, Observer { map ->
+        mChatVM.dmUnReadLiveData.observe(viewLifecycleOwner, Observer { map ->
             map.keys.forEach { key ->
                 mDMchannelList.find { dmChannel ->
                     dmChannel.id == key
@@ -69,14 +56,14 @@ class DmChannelSelectorFragment : Fragment() {
             mDMchennelAdapter.notifyDataSetChanged()
         })
 
-        mDmchannelVM.mChannelCreateLD.observe(viewLifecycleOwner, Observer {
+        mChatVM.mChannelCreateLD.observe(viewLifecycleOwner, Observer {
             if (it.channel is DmChannel) {
                 mDMchannelList.add(it.channel)
                 mDMchennelAdapter.notifyItemInserted(mDMchannelList.size - 1)
             }
         })
 
-        mDmchannelVM.mMessageCreateLD.observe(viewLifecycleOwner, Observer { event ->
+        mChatVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
             if (event.message.guild == null || event.message.guild?.id == "@me") {
                 mDMchannelList.sortByDescending { item ->
                     item.lastMessageId
@@ -84,7 +71,7 @@ class DmChannelSelectorFragment : Fragment() {
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
-
-        mDmchannelVM.setUpEvents()
+        mChatVM.setUpEvents()
+        mChatVM.loadDmChannel()
     }
 }

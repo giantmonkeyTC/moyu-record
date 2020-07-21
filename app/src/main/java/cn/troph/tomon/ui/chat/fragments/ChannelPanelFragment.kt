@@ -13,20 +13,13 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.CompoundButton
-import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
-import androidx.core.view.isVisible
-import androidx.core.view.marginStart
-import androidx.emoji.widget.EmojiEditText
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,17 +31,13 @@ import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
-import cn.troph.tomon.ui.chat.messages.MessageViewModel
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
 import cn.troph.tomon.ui.states.UpdateEnabled
-import com.arthurivanets.bottomsheets.BottomSheet
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
-import com.google.android.gms.analytics.HitBuilders
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -67,7 +56,6 @@ import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -80,8 +68,6 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
-    private val mMsgViewModel: MessageViewModel by viewModels()
-    private val mUnreadViewModel: UnReadViewModel by activityViewModels()
     private val mChatSharedVM: ChatSharedViewModel by activityViewModels()
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
@@ -121,7 +107,7 @@ class ChannelPanelFragment : BaseFragment() {
                     Client.global.preferences.edit {
                         putString(LAST_CHANNEL_ID, value)
                     }
-                    mMsgViewModel.loadDmChannelMessage(value)
+                    mChatSharedVM.loadDmChannelMessage(value)
                     editText?.let {
                         it.isEnabled = true
 
@@ -148,7 +134,7 @@ class ChannelPanelFragment : BaseFragment() {
                     val count = mMsgList.size
                     mMsgList.clear()
                     mMsgListAdapter.notifyItemRangeRemoved(0, count)
-                    mMsgViewModel.loadTextChannelMessage(value)
+                    mChatSharedVM.loadTextChannelMessage(value)
                     if (channel.members[Client.global.me.id]?.roles?.collection?.none {
                             it.permissions.has(Permissions.SEND_MESSAGES)
                         }!! || channel.members[Client.global.me.id]?.roles?.collection?.any {
@@ -236,7 +222,7 @@ class ChannelPanelFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mMsgViewModel.updateLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
             isUpdateEnabled = it.flag
         })
@@ -249,7 +235,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
 
-        mMsgViewModel.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.messageLoadingLiveData.observe(viewLifecycleOwner, Observer {
             if (it) {
                 shimmer_view_container.visibility = View.VISIBLE
                 shimmer_view_container.startShimmer()
@@ -325,7 +311,7 @@ class ChannelPanelFragment : BaseFragment() {
 
         }
 
-        mMsgViewModel.getMessageLiveData().observe(viewLifecycleOwner,
+        mChatSharedVM.messageLiveData.observe(viewLifecycleOwner,
             Observer<MutableList<Message>?> {
                 it?.let {
                     mMsgList.clear()
@@ -368,7 +354,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         //接受新的Message
-        mMsgViewModel.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
+        mChatSharedVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
@@ -386,7 +372,7 @@ class ChannelPanelFragment : BaseFragment() {
         })
 
         //删除消息
-        mMsgViewModel.messageDeleteLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {
             if (it.message.channelId == mChannelId) {
                 var removeIndex = 0
                 for ((index, value) in mMsgList.withIndex()) {
@@ -400,12 +386,19 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
 
-        mMsgViewModel.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
-
+        mChatSharedVM.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
+            val msg = mMsgList.find {
+                it.id == event.message.id
+            }
+            msg?.let {
+                val index = mMsgList.indexOf(it)
+                mMsgList[index] = event.message
+                mMsgListAdapter.notifyItemChanged(index)
+            }
         })
 
         //Reaction add
-        mMsgViewModel.reactionAddLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.reactionAddLD.observe(viewLifecycleOwner, Observer {
             if (it.reaction.message?.channelId == mChannelId) {
                 var indexToReplace = 0
                 val newReac = it.reaction
@@ -423,7 +416,7 @@ class ChannelPanelFragment : BaseFragment() {
 
 
         //Reaction remove
-        mMsgViewModel.reactionRemoveLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.reactionRemoveLD.observe(viewLifecycleOwner, Observer {
             if (it.reaction.message?.channelId == mChannelId) {
                 var indexToReplace = 0
                 val removeReac = it.reaction
@@ -447,7 +440,7 @@ class ChannelPanelFragment : BaseFragment() {
         })
 
         //加载更老的消息
-        mMsgViewModel.getMessageMoreLiveData().observe(viewLifecycleOwner, Observer {
+        mChatSharedVM.messageMoreLiveData.observe(viewLifecycleOwner, Observer {
             mMsgList.removeAt(0)
             mMsgListAdapter.notifyItemRemoved(0)
 
@@ -518,11 +511,11 @@ class ChannelPanelFragment : BaseFragment() {
                                     lastMessage?.let {
                                         it.ack().observeOn(AndroidSchedulers.mainThread())
                                             .subscribe({
-                                                val map = mUnreadViewModel.dmUnReadLiveData.value
+                                                val map = mChatSharedVM.dmUnReadLiveData.value
                                                 mChannelId?.let { cId ->
                                                     map?.put(cId, 0)
                                                     map?.let { updatedMap ->
-                                                        mUnreadViewModel.dmUnReadLiveData.value =
+                                                        mChatSharedVM.dmUnReadLiveData.value =
                                                             updatedMap
                                                     }
                                                 }
@@ -547,7 +540,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 mChannelId?.let { cId ->
                                     if (mMsgList.size > 1) {
                                         mMsgList[1].id?.let { mId ->
-                                            mMsgViewModel.loadOldMessage(cId, mId)
+                                            mChatSharedVM.loadOldMessage(cId, mId)
                                         }
                                     }
                                 }
@@ -561,8 +554,7 @@ class ChannelPanelFragment : BaseFragment() {
         }
         )
         setUpBottomSheet()
-        mChatSharedVM.setUpChannelSelection()
-        mMsgViewModel.setUpEvent()
+        mChatSharedVM.setUpEvents()
     }
 
 

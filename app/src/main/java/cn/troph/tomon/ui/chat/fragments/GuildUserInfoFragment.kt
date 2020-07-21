@@ -13,22 +13,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
-import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.network.services.GuildMemberService
-import cn.troph.tomon.ui.chat.viewmodel.UserInfoViewModel
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+
 import cn.troph.tomon.ui.widgets.UserAvatar
-import com.google.android.material.appbar.AppBarLayout
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
+
+
 import kotlinx.android.synthetic.main.guild_user_info.*
 
 class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragment() {
-    private val mUserVM: UserInfoViewModel by viewModels()
+    private val mChatVM: ChatSharedViewModel by activityViewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,14 +42,14 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mUserVM.loadGuildUserInfo(userId)
+        mChatVM.loadGuildUserInfo(userId)
         val avatar = view.findViewById<UserAvatar>(R.id.user_info_avatar)
         val name = view.findViewById<TextView>(R.id.user_info_name)
         val nick = view.findViewById<TextView>(R.id.user_info_nick)
         val out = view.findViewById<TextView>(R.id.user_sign_out)
         val roles = view.findViewById<ConstraintLayout>(R.id.role_section)
         roles.visibility = View.GONE
-        mUserVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
+        mChatVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
             avatar.user = user
             name.text = user.name
             nick.text = "${user.username} #${user.discriminator}"

@@ -6,24 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.PresenceUpdateEvent
 import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.chat.viewmodel.MemberViewModel
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_member.*
 
 class ChannelMemberFragment : Fragment() {
-    private val mMemberVM: MemberViewModel by viewModels()
     private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
 
     private var channelId: String? = null
@@ -33,9 +27,9 @@ class ChannelMemberFragment : Fragment() {
             if (changed && value != null) {
                 val channel = Client.global.channels[value]
                 if (channel is TextChannelBase && channel !is DmChannel) {
-                    mMemberVM.loadMemberList(value)
+                    chatSharedViewModel.loadMemberList(value)
                 } else if (channel is DmChannel) {
-                    mMemberVM.loadDmMemberList(value)
+                    chatSharedViewModel.loadDmMemberList(value)
                 }
             }
         }
@@ -53,13 +47,15 @@ class ChannelMemberFragment : Fragment() {
         chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
             channelId = it.channelId
         })
-        Client.global.eventBus.observeEventOnUi<PresenceUpdateEvent>().subscribe(Consumer {
+
+        chatSharedViewModel.presenceUpdateLV.observe(viewLifecycleOwner, Observer {
             channelId?.let { it1 ->
                 if (Client.global.channels[it1] !is DmChannel)
-                    mMemberVM.loadMemberList(it1)
+                    chatSharedViewModel.loadMemberList(it1)
             }
         })
-        mMemberVM.getMembersLiveData().observe(viewLifecycleOwner, Observer {
+
+        chatSharedViewModel.memberLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {
                 val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it)
                 view_members.layoutManager = LinearLayoutManager(view.context)
@@ -77,7 +73,7 @@ class ChannelMemberFragment : Fragment() {
                 })
             }
         })
-        mMemberVM.getDmMemberLiveData().observe(viewLifecycleOwner, Observer {
+        chatSharedViewModel.dmMemberLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {
                 val mAdapter: MemberListAdapter<User> = MemberListAdapter(it)
                 view_members.layoutManager = LinearLayoutManager(view.context)

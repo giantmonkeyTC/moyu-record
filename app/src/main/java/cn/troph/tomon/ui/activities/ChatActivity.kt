@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 
 import android.view.*
-import androidx.activity.viewModels
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 
@@ -17,38 +16,31 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.chat.viewmodel.UnReadViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
-import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
 class ChatActivity : BaseActivity() {
-
-
     private lateinit var mCurrentChannel: Channel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-        val unReadVM: UnReadViewModel by viewModels()
+        val mChatSharedViewModel = ViewModelProvider(this).get(ChatSharedViewModel::class.java)
+
         val map = HashMap<String, Int>()
 
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount
         }
 
-        unReadVM.setUpEvents()
-        unReadVM.dmUnReadLiveData.value = map
-
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
-        val mChatSharedViewModel = ViewModelProvider(this).get(ChatSharedViewModel::class.java)
+
         mChatSharedViewModel.channelSelectionLD.observe(this, Observer {
             if (it.channelId != null) {
                 val channel = Client.global.channels[it.channelId]
@@ -74,9 +66,8 @@ class ChatActivity : BaseActivity() {
                 updateToolbar(it.channel)
             }
         })
-        mChatSharedViewModel.setUpChannelSelection()
-        mChatSharedViewModel.setUpDrawer()
-        mChatSharedViewModel.setUpChannelUpdate()
+        mChatSharedViewModel.setUpEvents()
+        mChatSharedViewModel.dmUnReadLiveData.value = map
     }
 
     private fun updateToolbar(channel: Channel) {
