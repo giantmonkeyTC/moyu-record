@@ -1,11 +1,14 @@
 package cn.troph.tomon.ui.activities
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.DisplayMetrics
 
 import android.view.*
 import androidx.core.view.GravityCompat
+import androidx.customview.widget.ViewDragHelper
 import androidx.drawerlayout.widget.DrawerLayout
 
 import androidx.lifecycle.Observer
@@ -20,6 +23,7 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
 class ChatActivity : BaseActivity() {
@@ -68,6 +72,31 @@ class ChatActivity : BaseActivity() {
         })
         mChatSharedViewModel.setUpEvents()
         mChatSharedViewModel.dmUnReadLiveData.value = map
+
+
+        setDrawerEdge(drawer_layout,isLeftDrawer = true)
+        setDrawerEdge(drawer_layout,isLeftDrawer = false)
+
+    }
+
+
+    private fun setDrawerEdge(mDrawerLayout: DrawerLayout, isLeftDrawer: Boolean = true) {
+        try {
+            val manager = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val width = DisplayMetrics().also { manager.defaultDisplay.getMetrics(it) }.widthPixels
+
+            val viewDragHelper = mDrawerLayout::class.java
+                .getDeclaredField(if (isLeftDrawer) "mLeftDragger" else "mRightDragger")
+                .apply { isAccessible = true }
+                .run { get(mDrawerLayout) as ViewDragHelper }
+
+            viewDragHelper.let { it::class.java.getDeclaredField("mEdgeSize") }
+                .apply { isAccessible = true }
+                .apply { setInt(viewDragHelper, width/2) }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun updateToolbar(channel: Channel) {
