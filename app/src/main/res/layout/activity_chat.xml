@@ -1,34 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.discord.panels.OverlappingPanelsLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
-    android:clickable="true"
-    android:focusableInTouchMode="true"
+    android:id="@+id/overlapping_panels"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:layout_height="match_parent">
 
-    <include
-        layout="@layout/partial_chat_app_bar"
+    <FrameLayout
+        android:id="@+id/start_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+        <androidx.fragment.app.FragmentContainerView
+            android:elevation="10dp"
+            android:id="@+id/fragment_channel_selector"
+            android:name="cn.troph.tomon.ui.chat.fragments.ChannelSelectorFragment"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/center_panel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+        <include
+            layout="@layout/partial_chat_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_channel_selector"
-        android:name="cn.troph.tomon.ui.chat.fragments.ChannelSelectorFragment"
-        android:layout_width="300dp"
+    <!-- Set layout_gravity on the end panel to "end" -->
+    <FrameLayout
+        android:id="@+id/end_panel"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:layout_gravity="end">
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_member_selector"
+            android:layout_width="350dp"
+            android:elevation="10dp"
+            android:name="cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            />
+    </FrameLayout>
 
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_member_selector"
-        android:layout_width="300dp"
-        android:elevation="10dp"
-        android:name="cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-         />
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</com.discord.panels.OverlappingPanelsLayout>

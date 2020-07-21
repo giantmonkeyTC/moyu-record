@@ -58,10 +58,12 @@ class ChatActivity : BaseActivity() {
             val event = it as? AppUIEvent
             when (event?.type) {
                 AppUIEventType.CHANNEL_DRAWER -> {
-                    setChannelDrawerOpen(event.value as Boolean)
+                    val isOpen = event.value as Boolean
+                    if (isOpen) overlapping_panels.openStartPanel() else overlapping_panels.closePanels()
                 }
                 AppUIEventType.MEMBER_DRAWER -> {
-                    setMemberDrawerOpen(event.value as Boolean)
+                    val isOpen = event.value as Boolean
+                    if (isOpen) overlapping_panels.openEndPanel() else overlapping_panels.closePanels()
                 }
             }
         })
@@ -72,10 +74,6 @@ class ChatActivity : BaseActivity() {
         })
         mChatSharedViewModel.setUpEvents()
         mChatSharedViewModel.dmUnReadLiveData.value = map
-
-
-        setDrawerEdge(drawer_layout,isLeftDrawer = true)
-        setDrawerEdge(drawer_layout,isLeftDrawer = false)
 
     }
 
@@ -92,7 +90,7 @@ class ChatActivity : BaseActivity() {
 
             viewDragHelper.let { it::class.java.getDeclaredField("mEdgeSize") }
                 .apply { isAccessible = true }
-                .apply { setInt(viewDragHelper, width/2) }
+                .apply { setInt(viewDragHelper, width / 2) }
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -128,34 +126,14 @@ class ChatActivity : BaseActivity() {
         return true
     }
 
-    private fun setChannelDrawerOpen(open: Boolean) {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        if (open) {
-            drawerLayout.openDrawer(GravityCompat.START, true)
-        } else {
-            drawerLayout.closeDrawer(GravityCompat.START, true)
-        }
-    }
-
-    private fun setMemberDrawerOpen(open: Boolean) {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        if (open) {
-            drawerLayout.openDrawer(GravityCompat.END, true)
-        } else {
-            drawerLayout.closeDrawer(GravityCompat.END, true)
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-                drawerLayout.openDrawer(GravityCompat.START, true)
+                overlapping_panels.openStartPanel()
             }
             R.id.members -> {
                 if (AppState.global.channelSelection.value.channelId != null) {
-                    val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-                    drawerLayout.openDrawer(GravityCompat.END, true)
+                    overlapping_panels.openEndPanel()
                 }
             }
 
