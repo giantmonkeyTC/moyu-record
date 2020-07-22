@@ -15,7 +15,7 @@
             android:elevation="10dp"
             android:id="@+id/fragment_channel_selector"
             android:name="cn.troph.tomon.ui.chat.fragments.ChannelSelectorFragment"
-            android:layout_width="350dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start" />
     </FrameLayout>
@@ -38,7 +38,7 @@
         android:layout_gravity="end">
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_member_selector"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:elevation="10dp"
             android:name="cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment"
             android:layout_height="match_parent"
