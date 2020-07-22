@@ -56,6 +56,7 @@ import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -68,6 +69,8 @@ class MessageAdapter(
     private val reactionSelectorListener: ReactionSelectorListener
 ) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+
+    var onItemClickListner: OnItemClickListener? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -147,6 +150,11 @@ class MessageAdapter(
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        holder.itemView.setOnClickListener {
+            onItemClickListner?.let {
+                it.onItemClick(holder.adapterPosition)
+            }
+        }
         when (getItemViewType(position)) {
             0 -> {
                 val msg = messageList[position]
@@ -850,4 +858,8 @@ class MessageAdapter(
 
 interface ReactionSelectorListener {
     fun OnReactionAddClicked(msg: Message)
+}
+
+interface OnItemClickListener {
+    fun onItemClick(position: Int)
 }

@@ -13,6 +13,7 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -31,6 +32,7 @@ import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
+import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -331,8 +333,10 @@ class ChannelPanelFragment : BaseFragment() {
         btn_message_menu.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 hideKeyboard()
-                mBottomSheet.show()
                 emoji_tv.isChecked = false
+                mHandler.postDelayed({
+                    mBottomSheet.show()
+                }, 200)
             } else {
                 mBottomSheet.dismiss()
             }
@@ -554,6 +558,11 @@ class ChannelPanelFragment : BaseFragment() {
         }
         )
         setUpBottomSheet()
+        mMsgListAdapter.onItemClickListner = object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                hideKeyboard()
+            }
+        }
     }
 
 
@@ -690,9 +699,10 @@ class ChannelPanelFragment : BaseFragment() {
             })
         val mBottomLLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        bottom_emoji_rr.layoutManager = mBottomLLayoutManager
 
+        bottom_emoji_rr.layoutManager = mBottomLLayoutManager
         bottom_emoji_rr.adapter = mBottomEmojiAdapter
+
         emoji_rr.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -702,7 +712,7 @@ class ChannelPanelFragment : BaseFragment() {
                         mSectionDataManager.calcSection(mGridLayoutManager.findFirstCompletelyVisibleItemPosition())
                     bottom_emoji_rr.smoothScrollToPosition(position)
                     guildIcon.forEach {
-                        it.isHighLight=false
+                        it.isHighLight = false
                     }
                     guildIcon[position].isHighLight = true
                     mBottomEmojiAdapter.notifyDataSetChanged()
