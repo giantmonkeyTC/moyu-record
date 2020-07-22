@@ -109,7 +109,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                 }
             Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer {
                 if (channel is TextChannel) {
-                    if (channel.unread) {
+                    if (channel.unread && it.message.authorId!=Client.global.me.id) {
                         text.typeface = Typeface.DEFAULT_BOLD
                         text.setTextColor(Color.parseColor("#FFFFFF"))
                     } else {
