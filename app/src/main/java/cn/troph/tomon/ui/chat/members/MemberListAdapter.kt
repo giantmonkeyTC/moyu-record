@@ -22,9 +22,14 @@ import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.fragments.ReportFragment
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.AppUIEvent
+import cn.troph.tomon.ui.states.AppUIEventType
+import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.member_detail_roles
 import kotlinx.android.synthetic.main.guild_user_info.view.*
@@ -119,6 +124,19 @@ class MemberListAdapter<T>(
                     Color.TRANSPARENT
                 )
             )
+        view.user_private_chat.setOnClickListener {
+            member.directMessage(member.id).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                dialog.dismiss()
+                AppState.global.channelSelection.value =
+                    ChannelSelection(guildId = "@me", channelId = it["id"].asString)
+                AppState.global.eventBus.postEvent(
+                    AppUIEvent(
+                        AppUIEventType.MEMBER_DRAWER,
+                        false
+                    )
+                )
+            }
+        }
         view.user_sign_out.setOnClickListener {
             dialog.dismiss()
             ReportFragment(

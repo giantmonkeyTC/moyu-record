@@ -163,7 +163,6 @@
                 android:text="@string/siliao"
                 android:textColor="@color/success"
                 android:textSize="14sp"
-                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
