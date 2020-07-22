@@ -6,6 +6,7 @@ import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
 

@@ -59,6 +59,7 @@ import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
 
@@ -748,9 +749,8 @@ class MessageAdapter(
     }
 
     private fun timestampConverter(timestamp: LocalDateTime): String {
-        val zoneLocal = ZoneId.systemDefault()
-        val timeLocal = timestamp.atZone(zoneLocal).toLocalTime()
-        val dateLocal = timestamp.atZone(zoneLocal).toLocalDate()
+        val timeLocal = timestamp.toLocalTime()
+        val dateLocal = timestamp.toLocalDate()
         val adjective =
             if (dateLocal.month == LocalDateTime.now().month && dateLocal.year == LocalDateTime.now().year)
                 when (LocalDateTime.now().dayOfMonth - dateLocal.dayOfMonth) {

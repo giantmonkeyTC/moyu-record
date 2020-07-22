@@ -844,7 +844,6 @@ class ChannelPanelFragment : BaseFragment() {
         msgObject.addProperty("timestamp", LocalDateTime.now().toString())
         msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)
-
         val userObject = JsonObject()
         userObject.addProperty("id", Client.global.me.id)
         userObject.addProperty("username", Client.global.me.username)
