@@ -14,7 +14,7 @@ class Restful {
     private val client: OkHttpClient by lazy {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level =
-            if (BuildConfig.BUILD_TYPE.equals("debug")) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+            if (BuildConfig.BUILD_TYPE.equals("debug")) HttpLoggingInterceptor.Level.HEADERS else HttpLoggingInterceptor.Level.NONE
         OkHttpClient.Builder().addInterceptor(interceptor).callTimeout(5, TimeUnit.MINUTES).build()
     }
 

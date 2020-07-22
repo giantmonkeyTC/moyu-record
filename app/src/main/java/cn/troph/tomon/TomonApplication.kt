@@ -1,6 +1,8 @@
 package cn.troph.tomon
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import cn.troph.tomon.core.Client

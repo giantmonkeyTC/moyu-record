@@ -12,6 +12,7 @@ import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<Guild> {
 

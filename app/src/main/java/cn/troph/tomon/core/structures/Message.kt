@@ -14,7 +14,9 @@ import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 open class Message(client: Client, data: JsonObject) : Base(client, data),
     Comparable<Message> {

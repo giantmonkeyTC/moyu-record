@@ -9,6 +9,7 @@ import com.google.gson.JsonObject
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
 

@@ -2,6 +2,8 @@ package cn.troph.tomon.core.utils
 
 import com.google.gson.JsonPrimitive
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 object Converter {
@@ -31,13 +33,23 @@ object Converter {
         return when (value) {
             is String -> {
                 if (value.isNotEmpty()) {
+
                     LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME)
+                        .atZone(ZoneId.of("GMT+0")).withZoneSameInstant(
+                        ZoneId.systemDefault()
+                    ).toLocalDateTime()
                 } else {
                     LocalDateTime.now()
                 }
             }
             is JsonPrimitive -> LocalDateTime.parse(value.asString, DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.of("GMT+0")).withZoneSameInstant(
+                ZoneId.systemDefault()
+            ).toLocalDateTime()
             else -> LocalDateTime.parse(value.toString(), DateTimeFormatter.ISO_DATE_TIME)
+                .atZone(ZoneId.of("GMT+0")).withZoneSameInstant(
+                ZoneId.systemDefault()
+            ).toLocalDateTime()
         }
     }
 }
