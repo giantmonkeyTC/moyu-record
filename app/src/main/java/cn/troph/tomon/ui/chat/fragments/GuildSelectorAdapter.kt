@@ -36,10 +36,9 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.setOnClickListener {
-            val old = AppState.global.channelSelection.value
             AppState.global.channelSelection.value = ChannelSelection(
                 guildId = guildList[holder.adapterPosition].id,
-                channelId = old.channelId
+                channelId = null
             )
         }
         holder.itemView.view_avatar.guild = guildList[position]

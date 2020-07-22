@@ -5,6 +5,7 @@ import cn.troph.tomon.core.collections.MessageCollection
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optInt
 import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
 import java.time.LocalDateTime
@@ -40,7 +41,7 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
             }
         }
         if (data.has("unread_count")) {
-            unReadCount = data["unread_count"].asInt
+            unReadCount = if (data["unread_count"] is JsonNull) 0 else data["unread_count"].asInt
         }
         if (data.has("last_message_id")) {
             lastMessageId = data["last_message_id"].optString

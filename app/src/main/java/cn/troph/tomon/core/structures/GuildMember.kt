@@ -2,9 +2,12 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.GuildMemberRoleCollection
+import cn.troph.tomon.core.network.services.ChannelService
 import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.time.LocalDateTime
 
 class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
@@ -68,5 +71,16 @@ class GuildMember(client: Client, data: JsonObject) : Base(client, data) {
 
     fun hasRole(roleId: String): Boolean {
         return if (roleId == guildId) true else rawRoles.indexOf(roleId) != -1
+    }
+
+    fun directMessage(userId: String): Observable<JsonObject> {
+        return client.rest.channelService.createDmChannel(
+            client.auth,
+            request = ChannelService.CreateDmChannelRequest(mutableListOf(userId))
+        ).doOnError { error -> println(error) }.subscribeOn(
+            Schedulers.io()
+        ).map {
+           it
+        }
     }
 }
