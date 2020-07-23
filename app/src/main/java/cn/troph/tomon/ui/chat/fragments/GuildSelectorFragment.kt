@@ -117,7 +117,7 @@ class GuildSelectorFragment : Fragment() {
         view_avatar.user = Client.global.me
         mChatVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
             if (mChatVM.guildListLiveData.value?.contains(event.message.guild)!!) {
-                if (event.message.guild!!.updateUnread()) {
+                if (event.message.guild!!.updateUnread() && event.message.authorId!=Client.global.me.id) {
                     mAdapter.notifyItemChanged(
                         mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!

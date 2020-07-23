@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 
-apply plugin: 'com.aliyun.ams.emas-services'
-
 apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
@@ -28,6 +26,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            //选择要添加的对应cpu类型的.so库
+            abiFilters 'armeabi', 'x86'
+        }
+
     }
     buildTypes {
         release {
@@ -155,4 +158,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation 'com.aliyun.ams:alicloud-android-push:3.1.10'
+    implementation 'com.aliyun.ams:alicloud-android-utdid:1.5.2'
+    implementation 'com.aliyun.ams:alicloud-android-utils:1.1.6.4'
+    implementation 'com.aliyun.ams:alicloud-android-ut:5.4.3'
+    implementation 'com.aliyun.ams:alicloud-android-beacon:1.0.4.3'
 }
