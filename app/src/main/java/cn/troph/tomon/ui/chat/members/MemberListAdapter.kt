@@ -12,6 +12,7 @@ import android.view.Window
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -21,6 +22,7 @@ import cn.troph.tomon.core.structures.Presence
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
+import cn.troph.tomon.ui.chat.fragments.DmChannelSelectorFragment
 import cn.troph.tomon.ui.chat.fragments.ReportFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
@@ -32,6 +34,7 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.member_detail_roles
+import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*

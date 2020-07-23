@@ -86,6 +86,7 @@ class GuildSelectorFragment : Fragment() {
                         replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
                         isLastDmchannel = false
                     }.commit()
+            btn_dm_channel_entry.setImageResource(R.drawable.dm)
             btn_dm_channel_entry.isEnabled = true
         })
 
@@ -220,6 +221,7 @@ class GuildSelectorFragment : Fragment() {
                 replace(R.id.fragment_guild_channels, dmChannelFragment)
             }
             transaction.commit()
+            btn_dm_channel_entry.setImageResource(R.drawable.dm_activated)
             btn_dm_channel_entry.isEnabled = false
             isLastDmchannel = true
         }

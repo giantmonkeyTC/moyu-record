@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background1">
+    >
 
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -13,8 +13,8 @@
         android:layout_marginStart="13dp"
         android:layout_marginEnd="13dp"
         android:layout_marginBottom="15dp"
-        android:src="@drawable/dm_entry"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:background="@drawable/dm_entry_activated"
+        android:src="@drawable/dm"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,8 +25,10 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginBottom="15dp"
-        android:src="@drawable/add"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:src="@drawable/plus_regular"
+        android:background="@drawable/plus_background"
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@id/btn_dm_channel_entry"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,15 +49,6 @@
         app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
         app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry" />
 
-    <View
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:layout_marginTop="19dp"
-        android:background="@drawable/shape_user_avatar_shadow"
-        android:elevation="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/view_avatar"

@@ -32,7 +32,7 @@ class DmChannelSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val headerText = view.findViewById<TextView>(R.id.text_channel_header_text)
-        headerText?.text = "私聊"
+        headerText?.text = "私信"
 
         view_dmchannels_list.layoutManager = LinearLayoutManager(view.context)
         view_dmchannels_list.adapter = mDMchennelAdapter
