@@ -13,16 +13,24 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
+import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.AppUIEvent
+import cn.troph.tomon.ui.states.AppUIEventType
+import cn.troph.tomon.ui.states.ChannelSelection
 
 import cn.troph.tomon.ui.widgets.UserAvatar
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.fragment_guild_selector.*
 
 
 import kotlinx.android.synthetic.main.guild_user_info.*
@@ -62,8 +70,17 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
             }
 
             user_private_chat.setOnClickListener {
-                Toast.makeText(requireContext(), R.string.no_pchat_support, Toast.LENGTH_SHORT)
-                    .show()
+                user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    dialog?.dismiss()
+                    AppState.global.channelSelection.value =
+                        ChannelSelection(guildId = "@me", channelId = it["id"].asString)
+                    AppState.global.eventBus.postEvent(
+                        AppUIEvent(
+                            AppUIEventType.MEMBER_DRAWER,
+                            false
+                        )
+                    )
+                }
             }
         })
 

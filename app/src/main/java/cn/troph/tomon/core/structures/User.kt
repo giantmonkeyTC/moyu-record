@@ -1,8 +1,11 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.services.ChannelService
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 open class User(client: Client, data: JsonObject) : Base(client, data) {
     var id: String = ""
@@ -56,4 +59,14 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     val identifier: String get() = "$username#$discriminator"
 
+    fun directMessage(userId: String): Observable<JsonObject> {
+        return client.rest.channelService.createDmChannel(
+            client.auth,
+            request = ChannelService.CreateDmChannelRequest(mutableListOf(userId))
+        ).doOnError { error -> println(error) }.subscribeOn(
+            Schedulers.io()
+        ).map {
+            it
+        }
+    }
 }
