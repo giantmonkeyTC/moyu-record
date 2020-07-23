@@ -58,7 +58,6 @@ class DmChannelSelectorFragment : Fragment() {
 
         mChatVM.mChannelCreateLD.observe(viewLifecycleOwner, Observer {
             if (it.channel is DmChannel) {
-                mDMchannelList.add(it.channel)
                 mDMchennelAdapter.notifyItemInserted(mDMchannelList.size - 1)
             }
         })

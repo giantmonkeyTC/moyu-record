@@ -1,12 +1,14 @@
 package cn.troph.tomon.ui.activities
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
 
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.GravityCompat
 import androidx.customview.widget.ViewDragHelper
 import androidx.drawerlayout.widget.DrawerLayout
@@ -23,6 +25,8 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import com.discord.panels.OverlappingPanelsLayout
+import com.discord.panels.PanelState
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
@@ -58,13 +62,29 @@ class ChatActivity : BaseActivity() {
             val event = it as? AppUIEvent
             when (event?.type) {
                 AppUIEventType.CHANNEL_DRAWER -> {
+                    hideKeyboard()
                     val isOpen = event.value as Boolean
-                    if (isOpen) overlapping_panels.openStartPanel() else overlapping_panels.closePanels()
+                    if (isOpen) overlapping_panels.openStartPanel() else
+                        overlapping_panels.closePanels()
                 }
                 AppUIEventType.MEMBER_DRAWER -> {
+                    hideKeyboard()
                     val isOpen = event.value as Boolean
-                    if (isOpen) overlapping_panels.openEndPanel() else overlapping_panels.closePanels()
+                    if (isOpen) overlapping_panels.openEndPanel() else
+                        overlapping_panels.closePanels()
                 }
+            }
+        })
+        overlapping_panels.registerStartPanelStateListeners(object :
+            OverlappingPanelsLayout.PanelStateListener {
+            override fun onPanelStateChange(panelState: PanelState) {
+                hideKeyboard()
+            }
+        })
+        overlapping_panels.registerEndPanelStateListeners(object :
+            OverlappingPanelsLayout.PanelStateListener {
+            override fun onPanelStateChange(panelState: PanelState) {
+                hideKeyboard()
             }
         })
         mChatSharedViewModel.channelUpdateLD.observe(this, Observer {
@@ -77,6 +97,18 @@ class ChatActivity : BaseActivity() {
 
     }
 
+
+    private fun hideKeyboard() {
+        val imm: InputMethodManager =
+            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(this)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
 
     private fun setDrawerEdge(mDrawerLayout: DrawerLayout, isLeftDrawer: Boolean = true) {
         try {
@@ -129,10 +161,12 @@ class ChatActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                hideKeyboard()
                 overlapping_panels.openStartPanel()
             }
             R.id.members -> {
                 if (AppState.global.channelSelection.value.channelId != null) {
+                    hideKeyboard()
                     overlapping_panels.openEndPanel()
                 }
             }
