@@ -1,9 +1,6 @@
 package cn.troph.tomon.core.utils
 
-import com.airbnb.lottie.parser.IntegerParser
-import com.alibaba.sdk.android.oss.common.utils.BinaryUtil
 import com.google.gson.annotations.SerializedName
-import java.sql.Timestamp
 
 class Snowflake(val value: String = "") : Comparable<Snowflake> {
     companion object {
