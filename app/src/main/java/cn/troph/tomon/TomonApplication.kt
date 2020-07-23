@@ -12,7 +12,12 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import cn.troph.tomon.core.Client
 import com.alibaba.sdk.android.push.CommonCallback
+import com.alibaba.sdk.android.push.huawei.HuaWeiRegister
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory
+import com.alibaba.sdk.android.push.register.MeizuRegister
+import com.alibaba.sdk.android.push.register.MiPushRegister
+import com.alibaba.sdk.android.push.register.OppoRegister
+import com.alibaba.sdk.android.push.register.VivoRegister
 import com.downloader.PRDownloader
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
@@ -72,6 +77,8 @@ class TomonApplication : Application() {
             override fun onSuccess(response: String) {
                 Log.i("PUSH", "init cloudchannel success")
                 initChannel()
+
+
             }
 
             override fun onFailed(errorCode: String, errorMessage: String) {
@@ -81,6 +88,13 @@ class TomonApplication : Application() {
                 )
             }
         })
+
+        MiPushRegister.register(applicationContext, "2882303761518514696", "5871851498696")
+        HuaWeiRegister.register(this)
+        OppoRegister.register(applicationContext,"09adbc3666374668b56fe6f36eded638", "appsecret：b883bfa2d7a24978a4d9974487628305")
+        MeizuRegister.register(applicationContext, "326467", "wNtVi9XtJkfJuYGxEykW")
+        VivoRegister.register(applicationContext)
+
     }
 
     @Synchronized

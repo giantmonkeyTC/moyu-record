@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:name=".TomonApplication"
         android:allowBackup="true"
@@ -18,6 +17,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.activities.SecondActivity"></activity>
+
         <receiver
             android:name=".ui.states.NetworkChangeReceiver"
             android:exported="false">
@@ -25,6 +26,7 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="cn.troph.tomon.fileprovider"
@@ -76,9 +78,7 @@
             android:value="https://8860606e52db4bfd873cb672dfb6489d@o374408.ingest.sentry.io/5289149" />
         <meta-data
             android:name="io.sentry.auto-init"
-            android:value="true" />
-
-        <!-- 消息接收监听器 （用户可自主扩展） -->
+            android:value="true" /> <!-- 消息接收监听器 （用户可自主扩展） -->
         <receiver
             android:name=".ui.states.TomonMessageReceiver"
             android:exported="false"> <!-- 为保证receiver安全，建议设置不可导出，如需对其他应用开放可通过android：permission进行限制 -->
@@ -93,13 +93,21 @@
             </intent-filter>
         </receiver>
 
-
         <meta-data
             android:name="com.alibaba.app.appkey"
             android:value="30827601" /> <!-- 请填写你自己的- appKey -->
         <meta-data
             android:name="com.alibaba.app.appsecret"
             android:value="7b78868fafb3d75d651188f81e2c10c9" /> <!-- 请填写你自己的appSecret -->
+        <meta-data
+            android:name="com.huawei.hms.client.appid"
+            android:value="appid=102498173" />
+        <meta-data
+            android:name="com.vivo.push.api_key"
+            android:value="请填写vivo平台上注册应用的appKey" />
+        <meta-data
+            android:name="com.vivo.push.app_id"
+            android:value="请填写vivo平台上注册应用的appID" />
     </application>
 
 </manifest>
