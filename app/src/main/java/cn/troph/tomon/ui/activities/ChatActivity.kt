@@ -30,7 +30,7 @@ import com.discord.panels.PanelState
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
-class ChatActivity : BaseActivity() {
+class  ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
 
     override fun onCreate(savedInstanceState: Bundle?) {

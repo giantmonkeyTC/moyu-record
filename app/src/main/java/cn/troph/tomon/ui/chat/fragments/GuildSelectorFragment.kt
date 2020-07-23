@@ -57,12 +57,35 @@ class GuildSelectorFragment : Fragment() {
                 it.isSelected
             }
             if (channel.guildId.equals("@me", true)) {
+                val dmChannelFragment: Fragment = DmChannelSelectorFragment()
+                val transaction =
+                    requireActivity().supportFragmentManager.beginTransaction().apply {
+                        setCustomAnimations(
+                            android.R.anim.slide_in_left,
+                            android.R.anim.slide_out_right
+                        )
+                        replace(R.id.fragment_guild_channels, dmChannelFragment)
+                    }
+                transaction.commit()
+                btn_dm_channel_entry.setImageResource(R.drawable.dm_activated)
+                btn_dm_channel_entry.isEnabled = false
+                isLastDmchannel = true
                 mGuildList.forEach {
                     it.isSelected = false
                 }
                 mSelectedGuild = null
                 mAdapter.notifyItemChanged(oldIndex)
                 return@Observer
+            } else if (isLastDmchannel) {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .apply {
+                        setCustomAnimations(
+                            android.R.anim.slide_in_left,
+                            android.R.anim.slide_out_right
+                        )
+                        replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
+                        isLastDmchannel = false
+                    }.commit()
             }
             var newIndex = 0
             mGuildList.forEach {
@@ -76,20 +99,10 @@ class GuildSelectorFragment : Fragment() {
             mAdapter.notifyItemChanged(oldIndex)
             mAdapter.notifyItemChanged(newIndex)
 
-            if (isLastDmchannel)
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .apply {
-                        setCustomAnimations(
-                            android.R.anim.slide_in_left,
-                            android.R.anim.slide_out_right
-                        )
-                        replace(R.id.fragment_guild_channels, GuildChannelSelectorFragment())
-                        isLastDmchannel = false
-                    }.commit()
+
             btn_dm_channel_entry.setImageResource(R.drawable.dm)
             btn_dm_channel_entry.isEnabled = true
         })
-
         mChatVM.guildListLiveData.observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()
@@ -117,7 +130,7 @@ class GuildSelectorFragment : Fragment() {
         view_avatar.user = Client.global.me
         mChatVM.messageCreateLD.observe(viewLifecycleOwner, Observer { event ->
             if (mChatVM.guildListLiveData.value?.contains(event.message.guild)!!) {
-                if (event.message.guild!!.updateUnread() && event.message.authorId!=Client.global.me.id) {
+                if (event.message.guild!!.updateUnread() && event.message.authorId != Client.global.me.id) {
                     mAdapter.notifyItemChanged(
                         mChatVM.guildListLiveData.value!!.indexOf(
                             event.message.guild!!
@@ -212,17 +225,6 @@ class GuildSelectorFragment : Fragment() {
         btn_dm_channel_entry.setOnClickListener {
             AppState.global.channelSelection.value =
                 ChannelSelection(guildId = "@me", channelId = null)
-            val dmChannelFragment: Fragment = DmChannelSelectorFragment()
-            val transaction = requireActivity().supportFragmentManager.beginTransaction().apply {
-                setCustomAnimations(
-                    android.R.anim.slide_in_left,
-                    android.R.anim.slide_out_right
-                )
-                replace(R.id.fragment_guild_channels, dmChannelFragment)
-            }
-            transaction.commit()
-            btn_dm_channel_entry.setImageResource(R.drawable.dm_activated)
-            btn_dm_channel_entry.isEnabled = false
             isLastDmchannel = true
         }
         btn_join_guild.setOnClickListener {

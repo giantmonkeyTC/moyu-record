@@ -23,7 +23,6 @@ class ChatSharedViewModel : ViewModel() {
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
-
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
 
     val messageLiveData = MutableLiveData<MutableList<Message>>()
