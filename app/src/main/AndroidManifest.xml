@@ -101,7 +101,7 @@
             android:value="7b78868fafb3d75d651188f81e2c10c9" /> <!-- 请填写你自己的appSecret -->
         <meta-data
             android:name="com.huawei.hms.client.appid"
-            android:value="appid=102498173" />
+            android:value="102498173"/>
         <meta-data
             android:name="com.vivo.push.api_key"
             android:value="请填写vivo平台上注册应用的appKey" />
