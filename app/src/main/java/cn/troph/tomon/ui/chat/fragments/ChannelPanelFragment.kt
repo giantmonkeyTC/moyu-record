@@ -482,7 +482,7 @@ class ChannelPanelFragment : BaseFragment() {
                     emoji_tv.isChecked = false
                     hideKeyboard()
                 }
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && mLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && mLayoutManager.findFirstVisibleItemPosition() == 0) {
                     fetchMore()
                 }
             }
