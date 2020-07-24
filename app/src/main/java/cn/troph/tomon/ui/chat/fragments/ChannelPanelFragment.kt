@@ -55,6 +55,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.apache.commons.io.IOUtils
+import retrofit2.http.Header
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -93,19 +94,19 @@ class ChannelPanelFragment : BaseFragment() {
             field = value
             if (changed && value != null) {
                 mHeaderMsg.isEnd = false
-                isFetchingMore.set(false)
+                isFetchingMore = false
                 editText?.let {
                     it.text = null
                 }
                 val channel = Client.global.channels[value]
+                val count = mMsgList.size
+                mMsgList.clear()
+                mMsgListAdapter.notifyItemRangeRemoved(0, count)
                 if (channel is DmChannel) {
                     mHeaderMsg.isGuild = false
                     channel.recipient?.let {
                         mHeaderMsg.channelText = it.name
                     }
-                    val count = mMsgList.size
-                    mMsgList.clear()
-                    mMsgListAdapter.notifyItemRangeRemoved(0, count)
                     Client.global.preferences.edit {
                         putString(LAST_CHANNEL_ID, value)
                     }
@@ -133,9 +134,6 @@ class ChannelPanelFragment : BaseFragment() {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
                         putString(LAST_CHANNEL_ID, value)
                     }
-                    val count = mMsgList.size
-                    mMsgList.clear()
-                    mMsgListAdapter.notifyItemRangeRemoved(0, count)
                     mChatSharedVM.loadTextChannelMessage(value)
                     if (channel.members[Client.global.me.id]?.roles?.collection?.none {
                             it.permissions.has(Permissions.SEND_MESSAGES)
@@ -196,7 +194,7 @@ class ChannelPanelFragment : BaseFragment() {
 
     private var message: Message? = null
     private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
-    private val isFetchingMore = AtomicBoolean(false)
+    private var isFetchingMore = false
     private val mMsgList = mutableListOf<Message>()
     private val mMsgListAdapter: MessageAdapter =
         MessageAdapter(mMsgList, object : ReactionSelectorListener {
@@ -452,14 +450,16 @@ class ChannelPanelFragment : BaseFragment() {
                 mHeaderMsg.isEnd = true
                 mMsgList.add(0, mHeaderMsg)
                 mMsgListAdapter.notifyItemInserted(0)
-                isFetchingMore.set(false)
+                isFetchingMore = false
                 return@Observer
             } else {
                 mMsgList.addAll(0, it)
                 mMsgListAdapter.notifyItemRangeInserted(0, it.size)
-                isFetchingMore.set(false)
+                isFetchingMore = false
+                mHeaderMsg.isEnd = false
             }
         })
+        //setup recycler view
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
@@ -476,6 +476,9 @@ class ChannelPanelFragment : BaseFragment() {
                     btn_message_menu.isChecked = false
                     emoji_tv.isChecked = false
                     hideKeyboard()
+                }
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && mLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+                    fetchMore()
                 }
             }
 
@@ -534,25 +537,8 @@ class ChannelPanelFragment : BaseFragment() {
 
                 }
                 //load more message when user scroll up
-                if (!view_messages.canScrollVertically(-1) && dy < 0) {
-                    if (!isFetchingMore.get()) {
-                        isFetchingMore.set(true)
-                        if (!mHeaderMsg.isEnd) {
-                            mMsgList.add(0, mHeaderMsg)
-                            mMsgListAdapter.notifyItemInserted(0)
-                            mHandler.postDelayed({
-                                mChannelId?.let { cId ->
-                                    if (mMsgList.size > 1) {
-                                        mMsgList[1].id?.let { mId ->
-                                            mChatSharedVM.loadOldMessage(cId, mId)
-                                        }
-                                    }
-                                }
-                            }, 1000)
-                        } else {
-                            isFetchingMore.set(false)
-                        }
-                    }
+                if (mLayoutManager.findFirstVisibleItemPosition() == 0) {
+                    fetchMore()
                 }
             }
         }
@@ -568,6 +554,31 @@ class ChannelPanelFragment : BaseFragment() {
 
     private fun scrollToBottom() {
         mLayoutManager.scrollToPosition(mMsgList.size - 1)
+    }
+
+    private fun fetchMore() {
+        if (!isFetchingMore) {
+            isFetchingMore = true
+            if (!mHeaderMsg.isEnd) {
+                mMsgList.add(0, mHeaderMsg)
+                mMsgListAdapter.notifyItemInserted(0)
+                mHandler.postDelayed({
+                    mChannelId?.let { cId ->
+                        if (mMsgList.size > 1) {
+                            mMsgList[1].id?.let { mId ->
+                                mChatSharedVM.loadOldMessage(cId, mId)
+                            }
+                        }
+                    }
+                }, 1000)
+            } else {
+                isFetchingMore = false
+                if (mMsgList[0] !is HeaderMessage) {
+                    mMsgList.add(mHeaderMsg)
+                    mMsgListAdapter.notifyItemInserted(0)
+                }
+            }
+        }
     }
 
     private fun setUpBottomSheet() {
