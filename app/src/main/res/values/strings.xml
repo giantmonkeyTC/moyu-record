@@ -34,7 +34,7 @@
     <string name="send_success">发送成功</string>
     <string name="app_name_capital">TOMON</string>
     <string name="ed_msg_hint_no_permisson">你没有此频道发言权限</string>
-    <string name="no_voice_support">程序员小哥哥正在努力的开发语音功能!</string>
+    <string name="no_voice_support">程序员小哥哥正在努力地开发语音功能!</string>
     <string name="no_pchat_support">此功能还未上线</string>
 
     <string name="profile_username">用户名</string>
