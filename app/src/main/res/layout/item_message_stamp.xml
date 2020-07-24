@@ -1,53 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="16dp">
-
+    android:paddingHorizontal="16dp"
+    >
     <cn.troph.tomon.ui.widgets.UserAvatar
-        android:id="@+id/message_avatar_image"
+        android:id="@+id/message_avatar_stamp"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
-        app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_image"
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_stamp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/widget_message_author_name_text_image"
+        android:id="@+id/widget_message_author_name_text_stamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_image"
-        app:layout_constraintStart_toEndOf="@+id/message_avatar_image"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_image" />
+        app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_stamp"
+        app:layout_constraintStart_toEndOf="@+id/message_avatar_stamp"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_stamp" />
 
     <TextView
-        android:id="@+id/widget_message_timestamp_text_image"
+        android:id="@+id/widget_message_timestamp_text_stamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textColor="@color/channelCategoryText"
         android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_image"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_image" />
+        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_stamp"
+        app:layout_constraintTop_toTopOf="@id/message_avatar_stamp" />
 
     <ImageView
-        android:id="@+id/chat_iv"
+        android:id="@+id/chat_iv_stamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="4dp"
         android:layout_marginStart="48dp"
         android:adjustViewBounds="true"
-        android:maxWidth="200dp"
-        android:maxHeight="200dp"
+        android:maxWidth="150dp"
+        android:maxHeight="150dp"
         android:src="@drawable/loadinglogo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_image"
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_stamp"
         />
 
     <include
@@ -59,6 +60,8 @@
         android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/chat_iv"
-        app:layout_constraintTop_toBottomOf="@id/chat_iv" />
+        app:layout_constraintStart_toStartOf="@id/chat_iv_stamp"
+        app:layout_constraintTop_toBottomOf="@id/chat_iv_stamp" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

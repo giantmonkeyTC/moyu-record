@@ -9,7 +9,9 @@ import cn.troph.tomon.core.utils.Converter
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
 import cn.troph.tomon.ui.chat.fragments.Invite
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -50,6 +52,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         private set
 
     val reactions: MessageReactionCollection = MessageReactionCollection(client, this)
+
+    val stamps = mutableListOf<Stamp>()
 
     init {
         patchSelf(data)
@@ -111,6 +115,13 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         if (data.has("pending")) {
             pending = data["pending"].asBoolean
         }
+
+        if (data.has("stamps")) {
+            stamps.clear()
+            stamps.addAll(
+                Gson().fromJson(data.get("stamps"), Array<Stamp>::class.java).toMutableList()
+            )
+        }
     }
 
     override fun patch(data: JsonObject) {
@@ -170,5 +181,25 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
 
 }
 
-class HeaderMessage(client: Client, obj: JsonObject, var isEnd: Boolean = false,var isGuild:Boolean=true,var channelText:String="") :
+
+data class Stamp(
+    @SerializedName("alias") val alias: String,
+    @SerializedName("animated") val animated: Boolean,
+    @SerializedName("author_id") val author_id: String,
+    @SerializedName("hash") val hash: String,
+    @SerializedName("height") val height: Int=0,
+    @SerializedName("width") val width: Int=0,
+    @SerializedName("id") val id: String,
+    @SerializedName("pack_id") val pack_id: String,
+    @SerializedName("position") val position: Int,
+    @SerializedName("updated_at") val updatedAt: String
+)
+
+class HeaderMessage(
+    client: Client,
+    obj: JsonObject,
+    var isEnd: Boolean = false,
+    var isGuild: Boolean = true,
+    var channelText: String = ""
+) :
     Message(client, obj)
