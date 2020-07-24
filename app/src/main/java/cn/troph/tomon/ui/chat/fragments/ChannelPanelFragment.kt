@@ -316,7 +316,12 @@ class ChannelPanelFragment : BaseFragment() {
                 it?.let {
                     mMsgList.clear()
                     mMsgList.addAll(it)
+                    if (mMsgList.size == 0) {
+                        mHeaderMsg.isEnd = true
+                        mMsgList.add(mHeaderMsg)
+                    }
                     mMsgListAdapter.notifyDataSetChanged()
+
                     scrollToBottom()
                 }
             })
@@ -560,8 +565,13 @@ class ChannelPanelFragment : BaseFragment() {
         if (!isFetchingMore) {
             isFetchingMore = true
             if (!mHeaderMsg.isEnd) {
-                mMsgList.add(0, mHeaderMsg)
-                mMsgListAdapter.notifyItemInserted(0)
+                if (mMsgList.size != 0) {
+                    if (mMsgList[0] !is HeaderMessage) {
+                        mMsgList.add(0, mHeaderMsg)
+                        mMsgListAdapter.notifyItemInserted(0)
+                    }
+                }
+
                 mHandler.postDelayed({
                     mChannelId?.let { cId ->
                         if (mMsgList.size > 1) {
@@ -771,7 +781,10 @@ class ChannelPanelFragment : BaseFragment() {
                                 msgObject.addProperty("id", "")
                                 msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
                                 msgObject.addProperty("channelId", mChannelId)
-                                msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+                                msgObject.addProperty(
+                                    "timestamp",
+                                    LocalDateTime.now().toString()
+                                )
                                 msgObject.addProperty("authorId", Client.global.me.id)
 
 
@@ -886,7 +899,8 @@ class ChannelPanelFragment : BaseFragment() {
                 requireContext().contentResolver.query(uri, null, null, null, null)
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                    result =
+                        cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 }
             } finally {
                 cursor?.close()
