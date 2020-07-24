@@ -36,7 +36,6 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
 import com.downloader.OnDownloadListener
@@ -53,16 +52,16 @@ import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
+import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
+const val STAMP_URL = "https://cdn.tomon.co/stamps/%s.png?x-oss-process=image/resize,p_80"
+const val STAMP_URL_GIF = "https://cdn.tomon.co/stamps/%s.gif"
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
@@ -105,6 +104,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_system_welcome_msg, parent, false)
                 )
             }
+            6 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_stamp, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -132,6 +137,8 @@ class MessageAdapter(
             }
             return type
 
+        } else if (messageList[position].stamps.size > 0 && messageList[position].type == MessageType.DEFAULT) {
+            return 6
         } else if (messageList[position].type == MessageType.DEFAULT) {
             messageList[position].content?.let {
                 if (it.contains(INVITE_LINK))
@@ -357,19 +364,24 @@ class MessageAdapter(
 //                        }
 //                    }
                     Glide.with(holder.itemView)
-                        .load(if (item.url.isEmpty()) item.fileName else "${item.url}?x-oss-process=image/resize,p_50")
+                        .load(
+                            if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
+                                    ".gif",
+                                    true
+                                )
+                            ) "" else "?x-oss-process=image/resize,p_50"}"
+                        )
                         .placeholder(R.drawable.loadinglogo)
                         .override(
                             if (item.width != null) item.width!! else DensityUtil.dip2px(
                                 holder.itemView.context,
-                                300f
+                                200f
                             ),
                             if (item.height != null) item.height!! else DensityUtil.dip2px(
                                 holder.itemView.context,
-                                300f
+                                200f
                             )
                         )
-                        .dontAnimate()
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
@@ -559,6 +571,89 @@ class MessageAdapter(
                         holder.itemView.context.getString(R.string.welcome_msg2)
                     )
                 }
+            }
+            6 -> {
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
+                ) {
+                    holder.itemView.message_avatar_stamp.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_stamp.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
+                    holder.itemView.widget_message_author_name_text_stamp.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_stamp.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_stamp.user = messageList[position].author
+                    holder.itemView.widget_message_author_name_text_stamp.text =
+                        messageList[position].author?.name
+                    val message = messageList[position]
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_stamp.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_stamp.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    if (messageList[position].type == MessageType.SYSTEM) {
+                        holder.itemView.widget_message_author_name_text_image.text = "T🐱"
+                    }
+
+                    holder.itemView.widget_message_timestamp_text_stamp.text =
+                        timestampConverter(messageList[position].timestamp)
+                } else {
+                    holder.itemView.message_avatar_stamp.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_stamp.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_stamp.visibility = View.GONE
+                }
+
+                holder.itemView.chat_iv_stamp.setOnLongClickListener {
+                    callBottomSheet(holder, 2)
+                    true
+                }
+                for (item in messageList[position].stamps) {
+//                    holder.itemView.chat_iv_stamp.updateLayoutParams {
+//                        item.height?.let {
+//                            val calHeight =
+//                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
+//                            height = if (calHeight > 300) {
+//                                DensityUtil.dip2px(holder.itemView.context, 300f)
+//                            } else {
+//                                it
+//                            }
+//                        }
+//                    }
+                    Glide.with(holder.itemView)
+                        .load(if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(item.hash))
+                        .placeholder(R.drawable.loadinglogo)
+                        .override(item.width, item.height)
+                        .into(holder.itemView.chat_iv_stamp)
+                    break
+                }
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.chat_iv_stamp.startAnimation(apl)
+                } else {
+                    holder.itemView.chat_iv_stamp.clearAnimation()
+                }
+                showReaction(holder, messageList[position])
             }
         }
     }
