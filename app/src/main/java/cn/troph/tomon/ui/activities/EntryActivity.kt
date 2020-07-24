@@ -9,9 +9,9 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+
 //cn.troph.tomon.ui.activities.EntryActivity
 class EntryActivity : BaseActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
