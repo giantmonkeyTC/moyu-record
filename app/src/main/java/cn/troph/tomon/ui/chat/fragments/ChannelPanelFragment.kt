@@ -391,14 +391,14 @@ class ChannelPanelFragment : BaseFragment() {
         })
 
         mChatSharedVM.messageUpdateLD.observe(viewLifecycleOwner, Observer { event ->
-            val msg = mMsgList.find {
-                it.id == event.message.id
-            }
-            msg?.let {
-                val index = mMsgList.indexOf(it)
-                mMsgList[index] = event.message
-                mMsgListAdapter.notifyItemChanged(index)
-            }
+//            val msg = mMsgList.find {
+//                it.id == event.message.id
+//            }
+//            msg?.let {
+//                val index = mMsgList.indexOf(it)
+//                mMsgList[index] = event.message
+//                mMsgListAdapter.notifyItemChanged(index)
+//            }
         })
 
         //Reaction add
