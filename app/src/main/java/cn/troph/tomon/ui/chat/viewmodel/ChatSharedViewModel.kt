@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.viewmodel
 
+import android.text.BoringLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
@@ -23,8 +24,13 @@ class ChatSharedViewModel : ViewModel() {
     val voiceSoundControllerLD = MutableLiveData<Boolean>()
     val voiceEarPhoneControllerLD = MutableLiveData<Boolean>()
     val voiceLeaveControllerLD = MutableLiveData<Boolean>()
-    val voiceGuildVoiceStatusLD = MutableLiveData<GuildChannel>()
-    val voiceGuildVoiceLeaveLD = MutableLiveData<Boolean>()
+    val voiceGuildVoiceEnableLD = MutableLiveData<GuildChannel>()
+    val voiceGuildVoiceDisableLD = MutableLiveData<Boolean>()
+
+    val voiceMicState = MutableLiveData<Boolean>()
+    val voiceSoundState = MutableLiveData<Boolean>()
+    val voiceSpeakerState = MutableLiveData<Boolean>()
+
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
