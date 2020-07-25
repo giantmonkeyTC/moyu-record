@@ -34,25 +34,26 @@ class VoiceBottomSheet(private val mRtcEngine: RtcEngine) : BottomSheetDialogFra
             button4.setOnCheckedChangeListener { buttonView, isChecked ->
                 mChatSharedViewModel.voiceMicControllerLD.value = isChecked
             }
-            button5.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceSoundControllerLD.value = isChecked
-            }
-            button6.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceEarPhoneControllerLD.value = isChecked
-            }
-            button7.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceLeaveControllerLD.value = isChecked
-            }
         })
         mChatSharedViewModel.voiceSoundState.observe(viewLifecycleOwner, Observer {
             if (button5.isChecked != it)
                 button5.isChecked = it
+            button5.setOnCheckedChangeListener { buttonView, isChecked ->
+                mChatSharedViewModel.voiceSoundControllerLD.value = isChecked
+            }
         })
         mChatSharedViewModel.voiceSpeakerState.observe(viewLifecycleOwner, Observer {
-            if (button6.isChecked)
+            if (button6.isChecked!=it)
                 button6.isChecked = it
+            button6.setOnCheckedChangeListener { buttonView, isChecked ->
+                mChatSharedViewModel.voiceEarPhoneControllerLD.value = isChecked
+            }
         })
 
+        button7.setOnCheckedChangeListener { buttonView, isChecked ->
+            mChatSharedViewModel.voiceLeaveControllerLD.value = isChecked
+            dismiss()
+        }
 
     }
 }
