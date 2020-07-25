@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -38,6 +39,7 @@ class GuildChannelSelectorFragment : Fragment() {
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var disposable: Disposable? = null
     private var mRtcEngine: RtcEngine? = null
+    private var mGuildVoiceChannel: GuildChannel? = null
     var guildId: String? = null
         set(value) {
             field = value
@@ -64,8 +66,8 @@ class GuildChannelSelectorFragment : Fragment() {
         val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
         view_guild_channels.layoutManager = LinearLayoutManager(requireContext())
         view_guild_channels.adapter = guildChannelAdapter
-        guildChannelAdapter.onItemClickListner = object : OnItemClickListener {
-            override fun onItemClick(position: Int) {
+        guildChannelAdapter.onItemClickListner = object : OnVoiceChannelClick {
+            override fun onVoiceChannelSelected(channel: GuildChannel) {
                 //check permission of microphone first
                 Dexter.withContext(requireContext())
                     .withPermission(Manifest.permission.RECORD_AUDIO)
@@ -154,12 +156,15 @@ class GuildChannelSelectorFragment : Fragment() {
                     override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                         super.onJoinChannelSuccess(p0, p1, p2)
                         Logger.d("Joined Success:${p1}")
+                        mGuildVoiceChannel?.let {
+                            mChatSharedViewModel.voiceGuildVoiceStatusLD.value = it
+                        }
 
                     }
 
                     override fun onLeaveChannel(p0: RtcStats?) {
                         super.onLeaveChannel(p0)
-                        Logger.d("Left Channel:${p0?.users}")
+                        mChatSharedViewModel.voiceGuildVoiceLeaveLD.value = true
                     }
 
                     override fun onError(p0: Int) {

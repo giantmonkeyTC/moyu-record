@@ -44,7 +44,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     var unread = false
     var mention: Int = 0
     var isSelected = false
-
+    var isVoiceChatting = false
 
     init {
         patchSelf(data)

@@ -103,6 +103,18 @@ class GuildSelectorFragment : Fragment() {
             btn_dm_channel_entry.setImageResource(R.drawable.dm)
             btn_dm_channel_entry.isEnabled = true
         })
+        mChatVM.voiceGuildVoiceStatusLD.observe(viewLifecycleOwner, Observer {
+            mGuildList.forEach { g ->
+                g.isVoiceChatting = g.id == it.guildId
+            }
+            mAdapter.notifyDataSetChanged()
+        })
+        mChatVM.voiceGuildVoiceLeaveLD.observe(viewLifecycleOwner, Observer {
+            mGuildList.forEach {
+                it.isVoiceChatting = false
+            }
+            mAdapter.notifyDataSetChanged()
+        })
         mChatVM.guildListLiveData.observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()

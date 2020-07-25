@@ -42,7 +42,10 @@ class GuildSelectorAdapter(private val guildList: MutableList<Guild>) :
             )
         }
         holder.itemView.view_avatar.guild = guildList[position]
+
         val guild = guildList[position]
+        holder.itemView.guild_voice_indicator.visibility =
+            if (guild.isVoiceChatting) View.VISIBLE else View.GONE
         if (guild.mention != 0) {
             if (guild.mention > 99)
                 holder.itemView.guild_unread_mention_notification.text = "···"

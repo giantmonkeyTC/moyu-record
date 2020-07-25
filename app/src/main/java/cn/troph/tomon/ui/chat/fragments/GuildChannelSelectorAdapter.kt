@@ -30,14 +30,16 @@ import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.widget_guild_channel_selector_item.view.*
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
-    var onItemClickListner: OnItemClickListener? = null
+
+    var onItemClickListner: OnVoiceChannelClick? = null
+
     companion object {
         const val TYPE_CHANNEL = 0
         const val TYPE_CATEGORY = 1
         const val TYPE_EMPTY = 2
     }
 
-    class ViewHolder(itemView: View,private val onItemHolderClickListener: OnItemClickListener?) :
+    class ViewHolder(itemView: View,private val onItemHolderClickListener: OnVoiceChannelClick?) :
         RecyclerView.ViewHolder(itemView) {
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
@@ -160,7 +162,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                             Toast.LENGTH_SHORT
                         ).show()
                         onItemHolderClickListener?.let {
-                            it.onItemClick(adapterPosition)
+                            it.onVoiceChannelSelected(channel)
                         }
                     }
                 }
@@ -310,4 +312,8 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         }
     }
 
+}
+
+interface OnVoiceChannelClick{
+    fun onVoiceChannelSelected(channel:GuildChannel)
 }

@@ -27,6 +27,15 @@
         app:layout_constraintStart_toStartOf="@id/view_avatar"
         app:layout_constraintTop_toTopOf="@id/view_avatar" />
 
+    <ImageView
+        android:id="@+id/guild_voice_indicator"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:visibility="gone"
+        android:src="@drawable/baseline_record_voice_over_white_36"
+        app:layout_constraintEnd_toEndOf="@id/view_avatar"
+        app:layout_constraintTop_toTopOf="@id/view_avatar" />
+
     <TextView
         android:id="@+id/guild_unread_mention_notification"
         android:layout_width="18dp"

@@ -23,6 +23,8 @@ class ChatSharedViewModel : ViewModel() {
     val voiceSoundControllerLD = MutableLiveData<Boolean>()
     val voiceEarPhoneControllerLD = MutableLiveData<Boolean>()
     val voiceLeaveControllerLD = MutableLiveData<Boolean>()
+    val voiceGuildVoiceStatusLD = MutableLiveData<GuildChannel>()
+    val voiceGuildVoiceLeaveLD = MutableLiveData<Boolean>()
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
