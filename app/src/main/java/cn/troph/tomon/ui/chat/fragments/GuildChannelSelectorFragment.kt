@@ -68,6 +68,7 @@ class GuildChannelSelectorFragment : Fragment() {
         view_guild_channels.adapter = guildChannelAdapter
         guildChannelAdapter.onItemClickListner = object : OnVoiceChannelClick {
             override fun onVoiceChannelSelected(channel: GuildChannel) {
+                mGuildVoiceChannel = channel
                 //check permission of microphone first
                 Dexter.withContext(requireContext())
                     .withPermission(Manifest.permission.RECORD_AUDIO)
