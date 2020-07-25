@@ -63,6 +63,15 @@
     <string name="report_detail">详细描述</string>
     <string name="agora_app_id">1f43061ebe7243348efad474298c2bcb</string>
 
+    <string name="voice_mic_off">MIC已关闭</string>
+    <string name="voice_mic_on">MIC已开启</string>
+    <string name="voice_sound_on">声音已开启</string>
+    <string name="voice_sound_off">声音已关闭</string>
+    <string name="voice_ear_phone">耳机</string>
+    <string name="voice_speaker">公放</string>
+    <string name="leave_channel_btn">退出</string>
+    <string name="leaving_channel_btn">退出中…</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

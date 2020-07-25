@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.speech.tts.Voice
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,13 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -31,6 +35,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 
 class GuildChannelSelectorFragment : Fragment() {
+    private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var disposable: Disposable? = null
     private var mRtcEngine: RtcEngine? = null
     var guildId: String? = null
@@ -67,6 +72,8 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                             initAgoraEngineAndJoinChannel()
+                            val voiceBottomSheet = VoiceBottomSheet()
+                            voiceBottomSheet.show(parentFragmentManager, null)
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -82,6 +89,29 @@ class GuildChannelSelectorFragment : Fragment() {
                     }).check()
             }
         }
+
+        //setup audio call
+        mChatSharedViewModel.voiceMicControllerLD.observe(viewLifecycleOwner, Observer {
+            mRtcEngine?.let { engine ->
+                engine.enableLocalAudio(it)
+                engine.muteLocalAudioStream(it)
+            }
+        })
+        mChatSharedViewModel.voiceSoundControllerLD.observe(viewLifecycleOwner, Observer {
+            mRtcEngine?.let { engine ->
+                engine.muteAllRemoteAudioStreams(it)
+            }
+        })
+        mChatSharedViewModel.voiceEarPhoneControllerLD.observe(viewLifecycleOwner, Observer {
+            mRtcEngine?.let { engine ->
+                engine.setEnableSpeakerphone(it)
+            }
+        })
+        mChatSharedViewModel.voiceLeaveControllerLD.observe(viewLifecycleOwner, Observer {
+            mRtcEngine?.let { engine ->
+                engine.leaveChannel()
+            }
+        })
     }
 
     fun update() {
@@ -124,6 +154,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                         super.onJoinChannelSuccess(p0, p1, p2)
                         Logger.d("Joined Success:${p1}")
+
                     }
 
                     override fun onLeaveChannel(p0: RtcStats?) {
@@ -137,6 +168,8 @@ class GuildChannelSelectorFragment : Fragment() {
                     }
                 }
             )
+            mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
+
         } catch (e: Exception) {
             Logger.d(e.message)
             throw RuntimeException(

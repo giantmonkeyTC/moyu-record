@@ -19,6 +19,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class ChatSharedViewModel : ViewModel() {
+    val voiceMicControllerLD = MutableLiveData<Boolean>()
+    val voiceSoundControllerLD = MutableLiveData<Boolean>()
+    val voiceEarPhoneControllerLD = MutableLiveData<Boolean>()
+    val voiceLeaveControllerLD = MutableLiveData<Boolean>()
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
