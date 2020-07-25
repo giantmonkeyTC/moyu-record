@@ -19,6 +19,7 @@ import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
+import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
@@ -29,16 +30,15 @@ import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.widget_guild_channel_selector_item.view.*
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
-
+    var onItemClickListner: OnItemClickListener? = null
     companion object {
         const val TYPE_CHANNEL = 0
         const val TYPE_CATEGORY = 1
         const val TYPE_EMPTY = 2
     }
 
-    class ViewHolder(itemView: View) :
+    class ViewHolder(itemView: View,private val onItemHolderClickListener: OnItemClickListener?) :
         RecyclerView.ViewHolder(itemView) {
-
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
         var disposable: Disposable? = null
@@ -159,6 +159,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                             R.string.no_voice_support,
                             Toast.LENGTH_SHORT
                         ).show()
+                        onItemHolderClickListener?.let {
+                            it.onItemClick(adapterPosition)
+                        }
                     }
                 }
 
@@ -292,7 +295,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             )
             else -> View(parent.context)
         }
-        return ViewHolder(inflatedView)
+        return ViewHolder(inflatedView,onItemClickListner)
     }
 
     override fun getItemCount(): Int = list.size
@@ -306,4 +309,5 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             println("need clear or hide")
         }
     }
+
 }

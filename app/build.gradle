@@ -169,4 +169,7 @@ dependencies {
     implementation 'com.aliyun.ams:huawei-push-base:2.6.3.305'
     implementation 'com.aliyun.ams:meizu-push:3.8.7.1'
     implementation 'com.aliyun.ams:third_vivopush:2.9.0.1'
+
+    implementation 'io.agora.rtc:voice-sdk:3.0.1'
+    implementation 'com.karumi:dexter:6.2.1'
 }
