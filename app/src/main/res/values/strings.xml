@@ -74,7 +74,7 @@
     <string name="voice_mic_on">MIC已开启</string>
     <string name="voice_sound_on">声音已开启</string>
     <string name="voice_sound_off">声音已关闭</string>
-    <string name="voice_ear_phone">耳机</string>
+    <string name="voice_ear_phone">非公放</string>
     <string name="voice_speaker">公放</string>
     <string name="leave_channel_btn">退出</string>
     <string name="leaving_channel_btn">退出中…</string>
