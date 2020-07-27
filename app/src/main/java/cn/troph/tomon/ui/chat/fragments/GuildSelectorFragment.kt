@@ -13,8 +13,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.VoiceChannelSelectedEvent
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -23,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
@@ -103,6 +106,7 @@ class GuildSelectorFragment : Fragment() {
             btn_dm_channel_entry.setImageResource(R.drawable.dm)
             btn_dm_channel_entry.isEnabled = true
         })
+
         mChatVM.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer { voiceChannel ->
             if (voiceChannel == null) {
                 mGuildList.forEach {
@@ -113,6 +117,7 @@ class GuildSelectorFragment : Fragment() {
                     it.isVoiceChatting = voiceChannel.guildId == it.id
                 }
             }
+            mAdapter.notifyDataSetChanged()
         })
 
 

@@ -58,3 +58,4 @@ data class PresenceFetchEvent(val presences: List<Presence>) : Event()
 data class PresenceUpdateEvent(val presence: Presence) : Event()
 
 data class GuildSettingsUpdateEvent(val settings: GuildSettings) : Event()
+data class VoiceChannelSelectedEvent(val voiceChannel: GuildChannel) : Event()

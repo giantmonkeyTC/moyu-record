@@ -36,6 +36,7 @@ class GuildChannelSelectorFragment : Fragment() {
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var disposable: Disposable? = null
     private var mRtcEngine: RtcEngine? = null
+    private lateinit var mSelectedVoiceChannel: GuildChannel
     var guildId: String? = null
         set(value) {
             field = value
@@ -64,14 +65,14 @@ class GuildChannelSelectorFragment : Fragment() {
         view_guild_channels.adapter = guildChannelAdapter
         guildChannelAdapter.onItemClickListner = object : OnVoiceChannelClick {
             override fun onVoiceChannelSelected(channel: GuildChannel) {
-
+                mSelectedVoiceChannel = channel
                 //check permission of microphone first
                 Dexter.withContext(requireContext())
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                             VoiceBottomSheet().show(parentFragmentManager, null)
-                            initAgoraEngineAndJoinChannel(channel)
+                            initAgoraEngineAndJoinChannel()
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -113,8 +114,8 @@ class GuildChannelSelectorFragment : Fragment() {
     }
 
 
-    private fun initAgoraEngineAndJoinChannel(guildChannel: GuildChannel) {
-        initializeAgoraEngine(guildChannel)
+    private fun initAgoraEngineAndJoinChannel() {
+        initializeAgoraEngine()
         joinChannel()
     }
 
@@ -129,7 +130,7 @@ class GuildChannelSelectorFragment : Fragment() {
         ) // if you do not specify the uid, we will generate the uid for you
     }
 
-    private fun initializeAgoraEngine(guildChannel: GuildChannel) {
+    private fun initializeAgoraEngine() {
         try {
             if (mRtcEngine == null) {
                 mRtcEngine = RtcEngine.create(
@@ -141,6 +142,8 @@ class GuildChannelSelectorFragment : Fragment() {
                             super.onLeaveChannel(p0)
                             Logger.d("Leave Channel")
                             mHandler.post {
+                                Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
+                                    .show()
                                 if (mChatSharedViewModel.selectedCurrentVoiceChannel.value != null)
                                     mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
                             }
@@ -150,18 +153,27 @@ class GuildChannelSelectorFragment : Fragment() {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             mHandler.post {
                                 Logger.d("Join Success")
+                                Toast.makeText(requireContext(), "加入频道成功", Toast.LENGTH_SHORT)
+                                    .show()
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
-                                    guildChannel
+                                    mSelectedVoiceChannel
                             }
                         }
 
                         override fun onError(p0: Int) {
                             super.onError(p0)
                             Logger.d("Error Voice:${p0}")
-                            mHandler.post {
-                                Toast.makeText(requireContext(), "链接失败:${p0}", Toast.LENGTH_SHORT)
-                                    .show()
+                            if (p0 == Constants.ERR_JOIN_CHANNEL_REJECTED) {
+                                mHandler.post {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "请先退出之前的语音频道再加入",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
                             }
+
                         }
                     }
                 )

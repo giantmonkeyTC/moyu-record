@@ -39,7 +39,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         const val TYPE_EMPTY = 2
     }
 
-    class ViewHolder(itemView: View,private val onItemHolderClickListener: OnVoiceChannelClick?) :
+    class ViewHolder(itemView: View, private val onItemHolderClickListener: OnVoiceChannelClick?) :
         RecyclerView.ViewHolder(itemView) {
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
@@ -156,11 +156,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         )
                     }
                     ChannelType.VOICE -> {
-                        Toast.makeText(
-                            itemView.context,
-                            R.string.no_voice_support,
-                            Toast.LENGTH_SHORT
-                        ).show()
                         onItemHolderClickListener?.let {
                             it.onVoiceChannelSelected(channel)
                         }
@@ -297,7 +292,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             )
             else -> View(parent.context)
         }
-        return ViewHolder(inflatedView,onItemClickListner)
+        return ViewHolder(inflatedView, onItemClickListner)
     }
 
     override fun getItemCount(): Int = list.size
@@ -314,6 +309,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
 
 }
 
-interface OnVoiceChannelClick{
-    fun onVoiceChannelSelected(channel:GuildChannel)
+interface OnVoiceChannelClick {
+    fun onVoiceChannelSelected(channel: GuildChannel)
 }
