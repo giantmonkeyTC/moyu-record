@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import kotlinx.android.synthetic.main.user_mention_item.view.*
+import kotlinx.android.synthetic.main.widget_member_item.view.*
 
 class MentionListAdapter(
     val mentionList: MutableList<GuildMember>,
@@ -32,7 +34,7 @@ class MentionListAdapter(
     override fun onBindViewHolder(holder: MentionViewHolder, position: Int) {
         val member = mentionList[position]
         holder.itemView.setOnClickListener {
-            mentionSelectedListener.onMentionSelected(member.id,member.displayName)
+            mentionSelectedListener.onMentionSelected(member.id, member.displayName)
         }
         holder.itemView.mention_user_name.text = member.displayName
         val discriminatorSpan: SpannableString =
@@ -45,12 +47,17 @@ class MentionListAdapter(
                     member.displayName
                 )
             }
+        if (Client.global.presences[member.id]?.status == "offline") {
+            holder.itemView.mention_user_online.visibility = View.GONE
+        } else {
+            holder.itemView.mention_user_online.visibility = View.VISIBLE
+        }
         holder.itemView.mention_user_discriminator.text =
             TextUtils.concat(displaynameSpan, discriminatorSpan)
         holder.itemView.mention_user_avatar.user = member.user
     }
 
     interface OnMentionSelectedListener {
-        fun onMentionSelected(userId: String,userName:String)
+        fun onMentionSelected(userId: String, userName: String)
     }
 }
