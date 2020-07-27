@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -20,6 +22,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -31,6 +34,7 @@ import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.ui.chat.emoji.*
+import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
@@ -225,6 +229,62 @@ class ChannelPanelFragment : BaseFragment() {
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
             isUpdateEnabled = it.flag
+        })
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                s?.let {
+                    if (s.length > 0 && start < s.length)
+                        mChatSharedVM.mentionState.value =
+                            ChatSharedViewModel.MentionState(
+                                state = s[start].toString() == "@" && count == 1,
+                                start = start
+                            )
+                    else
+                        mChatSharedVM.mentionState.value =
+                            ChatSharedViewModel.MentionState(
+                                state = false,
+                                start = start
+                            )
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+        mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
+            it.let {
+                if (it.state) {
+                    mChannelId?.let {
+                        mChatSharedVM.loadMemberList(it)
+                    }
+                    hideKeyboard()
+                    mention_panel.visibility = View.VISIBLE
+                } else
+                    mention_panel.visibility = View.GONE
+            }
+        })
+        mChatSharedVM.memberLiveData.observe(viewLifecycleOwner, Observer {
+            it.let {
+                val mentionAdapter =
+                    MentionListAdapter(it, object : MentionListAdapter.OnMentionSelectedListener {
+                        override fun onMentionSelected(userId: String, userName: String) {
+                            mChatSharedVM.mentionState.value?.let {
+                                editText.text.insert(
+                                    it.start + 1,
+                                    userName
+                                )
+                            }
+                        }
+                    })
+                mention_panel.adapter = mentionAdapter
+                mention_panel.layoutManager = LinearLayoutManager(context)
+                mentionAdapter.notifyDataSetChanged()
+            }
         })
 
         mChatSharedVM.channelSelectionLD.observe(viewLifecycleOwner, Observer {

@@ -21,6 +21,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class ChatSharedViewModel : ViewModel() {
     val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
 
+    val mentionState = MutableLiveData<MentionState>()
+
+    data class MentionState(
+        val state: Boolean,
+        val start: Int
+    )
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
