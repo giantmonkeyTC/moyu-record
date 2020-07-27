@@ -9,12 +9,11 @@ import android.util.DisplayMetrics
 
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import androidx.core.view.GravityCompat
+import androidx.activity.viewModels
 import androidx.customview.widget.ViewDragHelper
 import androidx.drawerlayout.widget.DrawerLayout
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
@@ -30,13 +29,13 @@ import com.discord.panels.PanelState
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
-class  ChatActivity : BaseActivity() {
+class ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-        val mChatSharedViewModel = ViewModelProvider(this).get(ChatSharedViewModel::class.java)
+        val mChatSharedViewModel: ChatSharedViewModel by viewModels()
 
         val map = HashMap<String, Int>()
 
