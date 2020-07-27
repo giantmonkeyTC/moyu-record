@@ -70,6 +70,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                            mChatSharedViewModel.voiceCurrentChanelInfo.value = channel
                             if (mGuildVoiceChannel == null || mGuildVoiceChannel?.id != channel.id) {
                                 mGuildVoiceChannel = channel
                                 initAgoraEngineAndJoinChannel()
@@ -78,7 +79,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 mRtcEngine?.let {
                                     if (!mVoiceBottomSheet.isVisible)
                                         mVoiceBottomSheet.show(parentFragmentManager, null)
-                                    mChatSharedViewModel.voiceCurrentChanelInfo.value = channel
+
                                 }
                             }
                         }
