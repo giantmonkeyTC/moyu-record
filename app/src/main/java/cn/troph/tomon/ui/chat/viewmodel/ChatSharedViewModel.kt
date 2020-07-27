@@ -26,6 +26,7 @@ class ChatSharedViewModel : ViewModel() {
     val voiceLeaveControllerLD = MutableLiveData<Boolean>()
     val voiceGuildVoiceEnableLD = MutableLiveData<GuildChannel>()
     val voiceGuildVoiceDisableLD = MutableLiveData<Boolean>()
+    val voiceCurrentChanelInfo = MutableLiveData<GuildChannel>()
 
     val voiceMicState = MutableLiveData<Boolean>()
     val voiceSoundState = MutableLiveData<Boolean>()

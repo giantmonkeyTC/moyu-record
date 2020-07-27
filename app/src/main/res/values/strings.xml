@@ -4,7 +4,7 @@
 
     <string name="auth_server_error">服务异常</string>
     <string name="login_title">登录Tomon</string>
-    <string name="login_id_hint">邮箱/手机</string>
+    <string name="login_id_hint">手机号</string>
     <string name="login_password_hint">密码</string>
     <string name="login_button">登录</string>
 

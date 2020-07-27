@@ -2,7 +2,6 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +45,7 @@ class GuildChannelSelectorFragment : Fragment() {
                 update()
             }
         }
+    private val mVoiceBottomSheet = VoiceBottomSheet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,8 +76,9 @@ class GuildChannelSelectorFragment : Fragment() {
                             } else {
                                 initAgoraEngineAndJoinChannel()
                                 mRtcEngine?.let {
-                                    val voiceBottomSheet = VoiceBottomSheet()
-                                    voiceBottomSheet.show(parentFragmentManager, null)
+                                    if (!mVoiceBottomSheet.isVisible)
+                                        mVoiceBottomSheet.show(parentFragmentManager, null)
+                                    mChatSharedViewModel.voiceCurrentChanelInfo.value = channel
                                 }
                             }
                         }
@@ -185,11 +186,12 @@ class GuildChannelSelectorFragment : Fragment() {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             Logger.d("Joined Success:${p1}")
                             mRtcEngine?.let {
-                                val voiceBottomSheet = VoiceBottomSheet()
-                                voiceBottomSheet.show(parentFragmentManager, null)
+                                if (!mVoiceBottomSheet.isVisible)
+                                    mVoiceBottomSheet.show(parentFragmentManager, null)
                             }
                             mGuildVoiceChannel?.let {
                                 mChatSharedViewModel.voiceGuildVoiceEnableLD.value = it
+                                mChatSharedViewModel.voiceCurrentChanelInfo.value = it
                             }
                         }
 

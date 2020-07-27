@@ -11,11 +11,12 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.agora.rtc.RtcEngine
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
-class VoiceBottomSheet: BottomSheetDialogFragment() {
+class VoiceBottomSheet : BottomSheetDialogFragment() {
+
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,6 +47,10 @@ class VoiceBottomSheet: BottomSheetDialogFragment() {
             mChatSharedViewModel.voiceLeaveControllerLD.value = isChecked
             dismiss()
         }
+        mChatSharedViewModel.voiceCurrentChanelInfo.observe(viewLifecycleOwner, Observer {
+            voice_channel_id.text = "#${it.name}"
+        })
+        voice_channel_id.text = "#${mChatSharedViewModel.voiceCurrentChanelInfo.value?.name}"
 
     }
 }
