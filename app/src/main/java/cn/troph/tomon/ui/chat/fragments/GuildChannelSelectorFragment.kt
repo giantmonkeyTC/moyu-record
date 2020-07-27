@@ -74,6 +74,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 mGuildVoiceChannel = channel
                                 initAgoraEngineAndJoinChannel()
                             } else {
+                                initAgoraEngineAndJoinChannel()
                                 mRtcEngine?.let {
                                     val voiceBottomSheet = VoiceBottomSheet()
                                     voiceBottomSheet.show(parentFragmentManager, null)
