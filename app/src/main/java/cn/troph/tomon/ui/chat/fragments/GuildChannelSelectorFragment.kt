@@ -2,7 +2,6 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +45,7 @@ class GuildChannelSelectorFragment : Fragment() {
                 update()
             }
         }
+    private val mVoiceBottomSheet = VoiceBottomSheet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,13 +70,16 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                            mChatSharedViewModel.voiceCurrentChanelInfo.value = channel
                             if (mGuildVoiceChannel == null || mGuildVoiceChannel?.id != channel.id) {
                                 mGuildVoiceChannel = channel
                                 initAgoraEngineAndJoinChannel()
                             } else {
+                                initAgoraEngineAndJoinChannel()
                                 mRtcEngine?.let {
-                                    val voiceBottomSheet = VoiceBottomSheet(it)
-                                    voiceBottomSheet.show(parentFragmentManager, null)
+                                    if (!mVoiceBottomSheet.isVisible)
+                                        mVoiceBottomSheet.show(parentFragmentManager, null)
+
                                 }
                             }
                         }
@@ -143,14 +146,15 @@ class GuildChannelSelectorFragment : Fragment() {
 
     private fun joinChannel() {
         val accessToken =
-            "0061f43061ebe7243348efad474298c2bcbIAD68/8ynnO5R864kv/XyFKbvMCxqgn0O0RdYzdECZQ1Ywx+f9gAAAAAEAC+3ac7qCgdXwEAAQCoKB1f"
-        // Allows a user to join a channel.
+            "00640b0b4627af84d62b8bf9aef7023cdb9IAC5oLJx4zxibkQvUcnz9DRVSWEvlji+5aYLekcIjHHXMeLcsooAAAAAEAC+3ac7Y6gfXwEAAQBiqB9f"
+//        val accessToken =
+//            "0061f43061ebe7243348efad474298c2bcbIAD68/8ynnO5R864kv/XyFKbvMCxqgn0O0RdYzdECZQ1Ywx+f9gAAAAAEAC+3ac7qCgdXwEAAQCoKB1f"
+        // online token
         mRtcEngine?.leaveChannel()
         mRtcEngine?.joinChannel(
             accessToken,
-            "test",
-            "",
-            0
+            "test1",
+            "Extra Optional Data", 0
         ) // if you do not specify the uid, we will generate the uid for you
     }
 
@@ -183,11 +187,12 @@ class GuildChannelSelectorFragment : Fragment() {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             Logger.d("Joined Success:${p1}")
                             mRtcEngine?.let {
-                                val voiceBottomSheet = VoiceBottomSheet(it)
-                                voiceBottomSheet.show(parentFragmentManager, null)
+                                if (!mVoiceBottomSheet.isVisible)
+                                    mVoiceBottomSheet.show(parentFragmentManager, null)
                             }
                             mGuildVoiceChannel?.let {
                                 mChatSharedViewModel.voiceGuildVoiceEnableLD.value = it
+                                mChatSharedViewModel.voiceCurrentChanelInfo.value = it
                             }
                         }
 
