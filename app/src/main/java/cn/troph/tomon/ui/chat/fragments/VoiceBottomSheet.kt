@@ -1,5 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.agora.rtc.RtcEngine
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
-class VoiceBottomSheet(private val mRtcEngine: RtcEngine) : BottomSheetDialogFragment() {
+class VoiceBottomSheet: BottomSheetDialogFragment() {
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,29 +28,19 @@ class VoiceBottomSheet(private val mRtcEngine: RtcEngine) : BottomSheetDialogFra
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val audioManager =
+            requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.mode = AudioManager.MODE_CURRENT
+        button4.isChecked = audioManager.isMicrophoneMute
+        button6.isChecked = audioManager.isSpeakerphoneOn
 
-        mChatSharedViewModel.voiceMicState.observe(viewLifecycleOwner, Observer {
-            if (button4.isChecked != it)
-                button4.isChecked = it
+        button4.setOnCheckedChangeListener { buttonView, isChecked ->
+            audioManager.isMicrophoneMute = isChecked
+        }
 
-            button4.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceMicControllerLD.value = isChecked
-            }
-        })
-        mChatSharedViewModel.voiceSoundState.observe(viewLifecycleOwner, Observer {
-            if (button5.isChecked != it)
-                button5.isChecked = it
-            button5.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceSoundControllerLD.value = isChecked
-            }
-        })
-        mChatSharedViewModel.voiceSpeakerState.observe(viewLifecycleOwner, Observer {
-            if (button6.isChecked!=it)
-                button6.isChecked = it
-            button6.setOnCheckedChangeListener { buttonView, isChecked ->
-                mChatSharedViewModel.voiceEarPhoneControllerLD.value = isChecked
-            }
-        })
+        button6.setOnCheckedChangeListener { buttonView, isChecked ->
+            audioManager.isSpeakerphoneOn = isChecked
+        }
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
             mChatSharedViewModel.voiceLeaveControllerLD.value = isChecked
