@@ -143,14 +143,15 @@ class GuildChannelSelectorFragment : Fragment() {
 
     private fun joinChannel() {
         val accessToken =
-            "0061f43061ebe7243348efad474298c2bcbIAD68/8ynnO5R864kv/XyFKbvMCxqgn0O0RdYzdECZQ1Ywx+f9gAAAAAEAC+3ac7qCgdXwEAAQCoKB1f"
+            "00640b0b4627af84d62b8bf9aef7023cdb9IAC5oLJx4zxibkQvUcnz9DRVSWEvlji+5aYLekcIjHHXMeLcsooAAAAAEAC+3ac7Y6gfXwEAAQBiqB9f"
+//        val accessToken =
+//            "0061f43061ebe7243348efad474298c2bcbIAD68/8ynnO5R864kv/XyFKbvMCxqgn0O0RdYzdECZQ1Ywx+f9gAAAAAEAC+3ac7qCgdXwEAAQCoKB1f"
         // Allows a user to join a channel.
         mRtcEngine?.leaveChannel()
         mRtcEngine?.joinChannel(
             accessToken,
-            "test",
-            "",
-            0
+            "test1",
+            "Extra Optional Data",2
         ) // if you do not specify the uid, we will generate the uid for you
     }
 
