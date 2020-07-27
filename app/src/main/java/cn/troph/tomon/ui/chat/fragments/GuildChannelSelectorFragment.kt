@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,10 +32,10 @@ import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 
 class GuildChannelSelectorFragment : Fragment() {
+    private val mHandler = Handler()
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var disposable: Disposable? = null
     private var mRtcEngine: RtcEngine? = null
-    private var mGuildVoiceChannel: GuildChannel? = null
     var guildId: String? = null
         set(value) {
             field = value
@@ -45,7 +46,6 @@ class GuildChannelSelectorFragment : Fragment() {
                 update()
             }
         }
-    private val mVoiceBottomSheet = VoiceBottomSheet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,18 +70,8 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                            mChatSharedViewModel.voiceCurrentChanelInfo.value = channel
-                            if (mGuildVoiceChannel == null || mGuildVoiceChannel?.id != channel.id) {
-                                mGuildVoiceChannel = channel
-                                initAgoraEngineAndJoinChannel()
-                            } else {
-                                initAgoraEngineAndJoinChannel()
-                                mRtcEngine?.let {
-                                    if (!mVoiceBottomSheet.isVisible)
-                                        mVoiceBottomSheet.show(parentFragmentManager, null)
-
-                                }
-                            }
+                            VoiceBottomSheet().show(parentFragmentManager, null)
+                            initAgoraEngineAndJoinChannel(channel)
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -101,27 +91,11 @@ class GuildChannelSelectorFragment : Fragment() {
                     }).check()
             }
         }
-
-        //setup audio call
-        mChatSharedViewModel.voiceMicControllerLD.observe(viewLifecycleOwner, Observer {
-            mRtcEngine?.let { engine ->
-                engine.enableLocalAudio(it)
-                engine.muteLocalAudioStream(it)
-            }
-        })
-        mChatSharedViewModel.voiceSoundControllerLD.observe(viewLifecycleOwner, Observer {
-            mRtcEngine?.let { engine ->
-                engine.muteAllRemoteAudioStreams(it)
-            }
-        })
-        mChatSharedViewModel.voiceEarPhoneControllerLD.observe(viewLifecycleOwner, Observer {
-            mRtcEngine?.let { engine ->
-                engine.setEnableSpeakerphone(it)
-            }
-        })
-        mChatSharedViewModel.voiceLeaveControllerLD.observe(viewLifecycleOwner, Observer {
-            mRtcEngine?.let { engine ->
-                engine.leaveChannel()
+        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                mRtcEngine?.leaveChannel()
+            } else {
+                //switch channel
             }
         })
     }
@@ -139,76 +113,55 @@ class GuildChannelSelectorFragment : Fragment() {
     }
 
 
-    private fun initAgoraEngineAndJoinChannel() {
-        initializeAgoraEngine()
+    private fun initAgoraEngineAndJoinChannel(guildChannel: GuildChannel) {
+        initializeAgoraEngine(guildChannel)
         joinChannel()
     }
 
     private fun joinChannel() {
         val accessToken =
-            "00640b0b4627af84d62b8bf9aef7023cdb9IAC5oLJx4zxibkQvUcnz9DRVSWEvlji+5aYLekcIjHHXMeLcsooAAAAAEAC+3ac7Y6gfXwEAAQBiqB9f"
-//        val accessToken =
-//            "0061f43061ebe7243348efad474298c2bcbIAD68/8ynnO5R864kv/XyFKbvMCxqgn0O0RdYzdECZQ1Ywx+f9gAAAAAEAC+3ac7qCgdXwEAAQCoKB1f"
+            "00640b0b4627af84d62b8bf9aef7023cdb9IADmjynlLLISyT7TBfz121jLLbwppQ5M4NIcgDJDbBTd5gx+f9gAAAAAEACj2bq0I/gfXwEAAQAj+B9f"
         // online token
-        mRtcEngine?.leaveChannel()
         mRtcEngine?.joinChannel(
             accessToken,
-            "test1",
+            "test",
             "Extra Optional Data", 0
         ) // if you do not specify the uid, we will generate the uid for you
     }
 
-    private fun initializeAgoraEngine() {
+    private fun initializeAgoraEngine(guildChannel: GuildChannel) {
         try {
             if (mRtcEngine == null) {
                 mRtcEngine = RtcEngine.create(
                     requireContext(),
                     getString(R.string.agora_app_id),
                     object : IRtcEngineEventHandler() {
-                        override fun onLocalAudioStateChanged(p0: Int, p1: Int) {
-                            super.onLocalAudioStateChanged(p0, p1)
-                            mChatSharedViewModel.voiceMicState.value =
-                                p0 == Constants.LOCAL_AUDIO_STREAM_STATE_CAPTURING
-                        }
 
-                        override fun onRemoteAudioStateChanged(p0: Int, p1: Int, p2: Int, p3: Int) {
-                            super.onRemoteAudioStateChanged(p0, p1, p2, p3)
-                            mChatSharedViewModel.voiceSoundState.value =
-                                p1 != Constants.REMOTE_AUDIO_STATE_STOPPED
-                        }
-
-                        override fun onAudioRouteChanged(p0: Int) {
-                            super.onAudioRouteChanged(p0)
-                            mChatSharedViewModel.voiceSpeakerState.value =
-                                p0 == Constants.AUDIO_ROUTE_SPEAKERPHONE
+                        override fun onLeaveChannel(p0: RtcStats?) {
+                            super.onLeaveChannel(p0)
+                            Logger.d("Leave Channel")
+                            mHandler.post {
+                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value != null)
+                                    mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                            }
                         }
 
                         override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                             super.onJoinChannelSuccess(p0, p1, p2)
-                            Logger.d("Joined Success:${p1}")
-                            mRtcEngine?.let {
-                                if (!mVoiceBottomSheet.isVisible)
-                                    mVoiceBottomSheet.show(parentFragmentManager, null)
+                            mHandler.post {
+                                Logger.d("Join Success")
+                                mChatSharedViewModel.selectedCurrentVoiceChannel.value =
+                                    guildChannel
                             }
-                            mGuildVoiceChannel?.let {
-                                mChatSharedViewModel.voiceGuildVoiceEnableLD.value = it
-                                mChatSharedViewModel.voiceCurrentChanelInfo.value = it
-                            }
-                        }
-
-                        override fun onLeaveChannel(p0: RtcStats?) {
-                            super.onLeaveChannel(p0)
-                            mChatSharedViewModel.voiceGuildVoiceDisableLD.value = true
                         }
 
                         override fun onError(p0: Int) {
                             super.onError(p0)
                             Logger.d("Error Voice:${p0}")
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.join_voice_fail,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            mHandler.post {
+                                Toast.makeText(requireContext(), "链接失败:${p0}", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
                     }
                 )

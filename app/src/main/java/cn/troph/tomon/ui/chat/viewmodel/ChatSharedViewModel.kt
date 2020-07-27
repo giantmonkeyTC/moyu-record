@@ -1,6 +1,6 @@
 package cn.troph.tomon.ui.chat.viewmodel
 
-import android.text.BoringLayout
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
@@ -11,26 +11,15 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.states.UpdateEnabled
-import com.google.android.gms.common.api.Api
+
 import com.google.gson.annotations.SerializedName
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class ChatSharedViewModel : ViewModel() {
-    val voiceMicControllerLD = MutableLiveData<Boolean>()
-    val voiceSoundControllerLD = MutableLiveData<Boolean>()
-    val voiceEarPhoneControllerLD = MutableLiveData<Boolean>()
-    val voiceLeaveControllerLD = MutableLiveData<Boolean>()
-    val voiceGuildVoiceEnableLD = MutableLiveData<GuildChannel>()
-    val voiceGuildVoiceDisableLD = MutableLiveData<Boolean>()
-    val voiceCurrentChanelInfo = MutableLiveData<GuildChannel>()
-
-    val voiceMicState = MutableLiveData<Boolean>()
-    val voiceSoundState = MutableLiveData<Boolean>()
-    val voiceSpeakerState = MutableLiveData<Boolean>()
+    val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
 
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()

@@ -44,13 +44,18 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         }
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
-            mChatSharedViewModel.voiceLeaveControllerLD.value = isChecked
+            mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
             dismiss()
         }
-        mChatSharedViewModel.voiceCurrentChanelInfo.observe(viewLifecycleOwner, Observer {
-            voice_channel_id.text = "#${it.name}"
+        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                voice_channel_id.text = "#${it.name}"
+                voice_guild_name_tv.text =
+                    "${it.guild?.name}"
+            }
         })
-        voice_channel_id.text = "#${mChatSharedViewModel.voiceCurrentChanelInfo.value?.name}"
-
+        voice_channel_id.text = "#${mChatSharedViewModel.selectedCurrentVoiceChannel.value?.name}"
+        voice_guild_name_tv.text =
+            "${mChatSharedViewModel.selectedCurrentVoiceChannel.value?.guild?.name}"
     }
 }

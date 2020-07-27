@@ -21,6 +21,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/voice_guild_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/voice_channel_id" />
+
     <net.colindodd.toggleimagebutton.ToggleImageButton
         android:id="@+id/button4"
         android:layout_width="30dp"
@@ -31,7 +45,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button6"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/voice_channel_id"
+        app:layout_constraintTop_toBottomOf="@id/voice_guild_name_tv"
         app:tib_drawable_off="@drawable/baseline_mic_white_48"
         app:tib_drawable_on="@drawable/baseline_mic_off_white_48" />
 
@@ -44,7 +58,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button7"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button4"
-        app:layout_constraintTop_toBottomOf="@id/voice_channel_id"
+        app:layout_constraintTop_toBottomOf="@id/voice_guild_name_tv"
         app:tib_drawable_off="@drawable/baseline_hearing_white_48"
         app:tib_drawable_on="@drawable/baseline_volume_up_white_48" />
 
@@ -57,7 +71,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button6"
-        app:layout_constraintTop_toBottomOf="@id/voice_channel_id"
+        app:layout_constraintTop_toBottomOf="@id/voice_guild_name_tv"
         app:tib_drawable_off="@drawable/ic_phone_disabled_white_24dp"
         app:tib_drawable_on="@drawable/ic_phone_disabled_white_24dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
