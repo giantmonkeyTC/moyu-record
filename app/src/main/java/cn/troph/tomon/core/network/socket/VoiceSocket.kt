@@ -70,6 +70,7 @@ class VoiceSocket : Observer<SocketEvent> {
 
             3 -> {
                 //heart beart ack ignore
+                println("voice heartbeat ack")
             }
 
             6 -> {//someone is speaking

@@ -113,6 +113,7 @@ class GuildChannelSelectorFragment : Fragment() {
 
         mChatSharedViewModel.voiceLeaveChannelLD.observe(viewLifecycleOwner, Observer {
             //disconnect voice ws
+            Client.global.voiceSocket.close()
             mRtcEngine?.leaveChannel()
         })
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
@@ -174,10 +175,6 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             Logger.d("Leave Channel")
-                            Client.global.socket.send(
-                                GatewayOp.VOICE,
-                                Gson().toJsonTree(VoiceConnectSend("", false, false))
-                            )
                             mHandler.post {
                                 Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
                                     .show()

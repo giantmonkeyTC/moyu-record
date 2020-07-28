@@ -6,6 +6,7 @@ import cn.troph.tomon.core.events.VoiceLeaveChannelEvent
 import cn.troph.tomon.core.structures.VoiceAllowConnectReceive
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.orhanobut.logger.Logger
 
 
 class JoinVoiceChannelAction(client: Client) : Action<VoiceAllowConnectReceive>(client) {
@@ -14,6 +15,7 @@ class JoinVoiceChannelAction(client: Client) : Action<VoiceAllowConnectReceive>(
         super.handle(data, *extras)
         val obj = Gson().fromJson(data, VoiceAllowConnectReceive::class.java)
         if (obj.channelId != null) {
+            Logger.d("Mic:" + data.toString())
             Client.global.eventBus.postEvent(VoiceAllowConnectEvent(obj))
         } else {//leave channel event
             Client.global.eventBus.postEvent(VoiceLeaveChannelEvent(obj))

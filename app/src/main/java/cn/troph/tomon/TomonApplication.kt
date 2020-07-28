@@ -75,7 +75,7 @@ class TomonApplication : Application() {
         val pushService = PushServiceFactory.getCloudPushService()
         pushService.register(applicationContext, object : CommonCallback {
             override fun onSuccess(response: String) {
-                Logger.d("init cloudchannel success ${pushService.deviceId}")
+                Logger.d("init cloudchannel success")
                 initChannel()
             }
 
