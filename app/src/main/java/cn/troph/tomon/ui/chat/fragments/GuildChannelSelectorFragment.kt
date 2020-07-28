@@ -18,7 +18,8 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.VoiceConnect
+import cn.troph.tomon.core.structures.VoiceConnectSend
+import cn.troph.tomon.core.structures.VoiceLeaveConnect
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import com.google.gson.Gson
@@ -82,7 +83,7 @@ class GuildChannelSelectorFragment : Fragment() {
                             Client.global.socket.send(
                                 GatewayOp.VOICE,
                                 Gson().toJsonTree(
-                                    VoiceConnect(
+                                    VoiceConnectSend(
                                         channel.id,
                                         audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
                                         audioManager.isMicrophoneMute
@@ -108,9 +109,14 @@ class GuildChannelSelectorFragment : Fragment() {
                     }).check()
             }
         }
+
+        mChatSharedViewModel.voiceLeaveChannelLD.observe(viewLifecycleOwner, Observer {
+            //disconnect voice ws
+            mRtcEngine?.leaveChannel()
+        })
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                mRtcEngine?.leaveChannel()
+                Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
             } else {
                 //switch channel
             }
@@ -118,7 +124,7 @@ class GuildChannelSelectorFragment : Fragment() {
 
         mChatSharedViewModel.voiceAllowConnectLD.observe(viewLifecycleOwner, Observer {
             VoiceBottomSheet().show(parentFragmentManager, null)
-            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId)
+            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
         })
 
     }
@@ -155,6 +161,10 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             Logger.d("Leave Channel")
+                            Client.global.socket.send(
+                                GatewayOp.VOICE,
+                                Gson().toJsonTree(VoiceConnectSend("", false, false))
+                            )
                             mHandler.post {
                                 Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
                                     .show()
