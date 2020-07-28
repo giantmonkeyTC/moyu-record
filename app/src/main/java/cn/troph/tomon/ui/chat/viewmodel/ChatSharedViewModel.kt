@@ -33,14 +33,15 @@ class ChatSharedViewModel : ViewModel() {
     val mentionState = MutableLiveData<MentionState>()
 
     data class MentionState(
-        val state: Boolean,
-        val start: Int
+        @SerializedName("state") val state: Boolean,
+        @SerializedName("start") val start: Int
     )
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
+
 
     val messageLiveData = MutableLiveData<MutableList<Message>>()
 

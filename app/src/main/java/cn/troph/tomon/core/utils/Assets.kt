@@ -6,7 +6,8 @@ object Assets {
     fun emojiURL(id: String, animated: Boolean = false): String {
         return "https://cdn.tomon.co/emojis/$id.${if (animated) "gif" else "png"}"
     }
-    fun iconURL(id: String):String{
+
+    fun iconURL(id: String): String {
         return "https://cdn.tomon.co/icons/$id"
     }
 
@@ -21,7 +22,13 @@ object Assets {
     data class ContentAtUser(
         val start: Int,
         val end: Int,
-        val name: String
+        val name: String,
+        val id: String
+    )
+
+    data class ContentUser(
+        val name: String,
+        val id: String
     )
 
     data class ContentSpan(
@@ -32,28 +39,30 @@ object Assets {
 
     val regexEmoji: Regex = Regex("""<%[\w\u4e00-\u9fa5]+:[0-9]+>""")
     val regexAtUser: Regex = Regex("""<@[0-9]+>""")
+    val regexMention: Regex = Regex("""@[\w\u4e00-\u9fa5]+#[0-9]{4}""")
     fun contentParser(content: String): ContentSpan {
         val regexRaw = Regex("""\:""")
-        val userNames = mutableListOf<String>()
+        val users = mutableListOf<ContentUser>()
         val parserContent =
             content.replace(
                 regexAtUser
             ) {
                 val name =
                     Client.global.users[it.value.substring(2, it.value.length - 1)]?.name ?: ""
-                userNames.add(name)
+                users.add(ContentUser(name = name, id = it.value.substring(2, it.value.length - 1)))
                 "@$name"
             }
         var index = 0
         val listAtUser = mutableListOf<ContentAtUser>()
         listAtUser.clear()
-        userNames.forEach {
-            val start = parserContent.indexOf("@${it}", index)
-            index += it.length
+        users.forEach {
+            val start = parserContent.indexOf("@${it.name}", index)
+            index += it.name.length
             val contentAtUser = ContentAtUser(
                 start = start,
-                end = start + it.length,
-                name = it
+                end = start + it.name.length,
+                name = it.name,
+                id = it.id
             )
             listAtUser.add(contentAtUser)
         }
@@ -76,6 +85,18 @@ object Assets {
             contentEmoji = listContentEmoji,
             parseContent = parserContent
         )
+    }
+
+    fun mentionSendParser(content: String): String {
+        val parserContent =
+            content.replace(
+                regexMention
+            ) {
+                val id =
+                    Client.global.users.findWithIdentifier(it.value.substring(1))?.id
+                "<@$id>"
+            }
+        return parserContent
     }
 
 }
