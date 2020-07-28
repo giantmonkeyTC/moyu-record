@@ -1,6 +1,8 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -14,9 +16,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.VoiceConnect
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
+import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -58,6 +63,7 @@ class GuildChannelSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeAgoraEngine()
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
         val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
@@ -71,8 +77,18 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                            VoiceBottomSheet().show(parentFragmentManager, null)
-                            initAgoraEngineAndJoinChannel()
+                            val audioManager =
+                                requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            Client.global.socket.send(
+                                GatewayOp.VOICE,
+                                Gson().toJsonTree(
+                                    VoiceConnect(
+                                        channel.id,
+                                        audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                        audioManager.isMicrophoneMute
+                                    )
+                                )
+                            )
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -99,6 +115,12 @@ class GuildChannelSelectorFragment : Fragment() {
                 //switch channel
             }
         })
+
+        mChatSharedViewModel.voiceAllowConnectLD.observe(viewLifecycleOwner, Observer {
+            VoiceBottomSheet().show(parentFragmentManager, null)
+            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId)
+        })
+
     }
 
     fun update() {
@@ -113,20 +135,12 @@ class GuildChannelSelectorFragment : Fragment() {
         }
     }
 
-
-    private fun initAgoraEngineAndJoinChannel() {
-        initializeAgoraEngine()
-        joinChannel()
-    }
-
-    private fun joinChannel() {
-        val accessToken =
-            "00640b0b4627af84d62b8bf9aef7023cdb9IADmjynlLLISyT7TBfz121jLLbwppQ5M4NIcgDJDbBTd5gx+f9gAAAAAEACj2bq0I/gfXwEAAQAj+B9f"
+    private fun joinChannel(token: String, uid: Int, channelId: String) {
         // online token
         mRtcEngine?.joinChannel(
-            accessToken,
-            "test",
-            "Extra Optional Data", 0
+            token,
+            channelId,
+            "Extra Optional Data", uid
         ) // if you do not specify the uid, we will generate the uid for you
     }
 

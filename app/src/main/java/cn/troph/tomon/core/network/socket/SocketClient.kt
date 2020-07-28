@@ -139,6 +139,7 @@ class SocketClient : WebSocketListener(),
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
+        println(text)
         try {
             val data = Gson().fromJson(text, JsonElement::class.java)
             Logger.d(data.toString())

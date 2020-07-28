@@ -21,7 +21,8 @@ enum class GatewayOp(val value: Int) {
     HEARTBEAT(1),
     IDENTITY(2),
     HELLO(3),
-    HEARTBEAT_ACK(4);
+    HEARTBEAT_ACK(4),
+    VOICE(5);
 
     companion object {
         private val map = values().associateBy(GatewayOp::value)
@@ -53,7 +54,8 @@ class Socket : Observer<SocketEvent> {
         "MESSAGE_REACTION_ADD" to handleMessageReactionAdd,
         "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove,
         "GUILD_POSITION" to handleGuildPosition,
-        "USER_PRESENCE_UPDATE" to handlePresenceUpdate
+        "USER_PRESENCE_UPDATE" to handlePresenceUpdate,
+        "VOICE_ALLOW_CONNECT" to handleVoiceConnectAllow
     )
 
     constructor(client: Client) {
@@ -149,6 +151,13 @@ class Socket : Observer<SocketEvent> {
                 send(GatewayOp.HEARTBEAT_ACK)
             }
             GatewayOp.HEARTBEAT_ACK -> {
+
+            }
+            GatewayOp.VOICE -> {
+                val handler = _handlers["VOICE_ALLOW_CONNECT"]
+                handler?.let {
+                    it(_client, obj)
+                }
             }
             else -> {
             }
