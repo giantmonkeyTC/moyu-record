@@ -31,6 +31,9 @@ enum class GatewayOp(val value: Int) {
 }
 
 class Socket : Observer<SocketEvent> {
+    fun getSesstion(): String? {
+        return _sessionId
+    }
 
     private val _socketClient: SocketClient = SocketClient()
     private val _client: Client

@@ -7,3 +7,4 @@ import com.google.gson.JsonObject
 val handleVoiceConnectAllow: Handler = { client: Client, packet: JsonObject ->
     client.actions.joinVoiceChannel(packet.asJsonObject["d"].asJsonObject)
 }
+

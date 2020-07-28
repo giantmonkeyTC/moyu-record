@@ -61,3 +61,5 @@ data class VoiceLeaveChannelEvent(val voiceAllowConnect: VoiceAllowConnectReceiv
 
 data class GuildSettingsUpdateEvent(val settings: GuildSettings) : Event()
 data class VoiceChannelSelectedEvent(val voiceChannel: GuildChannel) : Event()
+data class VoiceSpeakEvent(val speaking: Speaking) : Event()
+data class VoiceSocketStateEvent(val isOpen:Boolean): Event()

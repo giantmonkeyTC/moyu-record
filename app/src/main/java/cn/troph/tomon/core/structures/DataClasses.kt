@@ -22,3 +22,12 @@ data class VoiceLeaveConnect(
     @SerializedName("self_deaf") val self_deaf: Boolean = false,
     @SerializedName("self_mute") val selfMute: Boolean = false
 )
+
+data class VoiceIdentify(
+    @SerializedName("op") val op: Int = 0,
+    @SerializedName("session_id") val sessionId: String,
+    @SerializedName("voice_id") val voiceId: Int
+)
+
+data class Speaking(@SerializedName("speaking") val isSpeaking: Boolean)
+

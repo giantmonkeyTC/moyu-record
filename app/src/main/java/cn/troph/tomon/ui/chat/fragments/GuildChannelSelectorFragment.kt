@@ -19,6 +19,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.GuildChannel
 import cn.troph.tomon.core.structures.VoiceConnectSend
+import cn.troph.tomon.core.structures.VoiceIdentify
 import cn.troph.tomon.core.structures.VoiceLeaveConnect
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -121,10 +122,22 @@ class GuildChannelSelectorFragment : Fragment() {
                 //switch channel
             }
         })
+        mChatSharedViewModel.voiceSocketIsOpen.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val voice = VoiceIdentify(
+                    sessionId = Client.global.socket.getSesstion()!!,
+                    voiceId = mChatSharedViewModel.voiceAllowConnectLD.value?.voiceUserIdAgora!!
+                )
+                Client.global.voiceSocket.send(GatewayOp.IDENTITY, Gson().toJsonTree(voice))
+            } else {
+
+            }
+        })
 
         mChatSharedViewModel.voiceAllowConnectLD.observe(viewLifecycleOwner, Observer {
             VoiceBottomSheet().show(parentFragmentManager, null)
             joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
+            Client.global.voiceSocket.open()
         })
 
     }

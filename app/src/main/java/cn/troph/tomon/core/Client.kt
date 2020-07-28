@@ -8,6 +8,7 @@ import cn.troph.tomon.core.collections.*
 import cn.troph.tomon.core.network.Restful
 import cn.troph.tomon.core.network.socket.Socket
 import cn.troph.tomon.core.network.socket.SocketClientState
+import cn.troph.tomon.core.network.socket.VoiceSocket
 import cn.troph.tomon.core.structures.Me
 import cn.troph.tomon.core.utils.event.RxBus
 import io.reactivex.rxjava3.core.Observable
@@ -25,6 +26,7 @@ class Client {
     val rest = Restful()
     val actions = ActionManager(this)
     val socket = Socket(this)
+    val voiceSocket = VoiceSocket(this)
     val eventBus = RxBus()
     lateinit var preferences: SharedPreferences
         private set

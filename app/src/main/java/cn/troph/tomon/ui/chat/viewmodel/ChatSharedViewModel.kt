@@ -20,6 +20,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val voiceSocketIsOpen = MutableLiveData<Boolean>()
+
+    val voiceSpeakingLD = MutableLiveData<Speaking>()
+
     val voiceAllowConnectLD = MutableLiveData<VoiceAllowConnectReceive>()
 
     val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
@@ -114,6 +118,14 @@ class ChatSharedViewModel : ViewModel() {
                 dmUnReadLiveData.value?.remove(it.channel.id)
                 dmUnReadLiveData.notifyObserver()
             }
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceSpeakEvent>().subscribe(Consumer {
+            voiceSpeakingLD.value = it.speaking
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceSocketStateEvent>().subscribe(Consumer {
+            voiceSocketIsOpen.value = it.isOpen
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceAllowConnectEvent>().subscribe(Consumer {
