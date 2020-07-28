@@ -93,6 +93,7 @@ class MemberListAdapter<T>(
                 itemView.offline_user_shadow.visibility = View.VISIBLE
             } else {
                 itemView.guild_user_online.visibility = View.VISIBLE
+                itemView.widget_member_name_text.setTextColor(0xFFFFFFFF.toInt())
                 itemView.offline_user_shadow.visibility = View.GONE
             }
         }

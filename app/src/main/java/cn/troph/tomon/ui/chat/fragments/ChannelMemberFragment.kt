@@ -52,6 +52,8 @@ class ChannelMemberFragment : Fragment() {
             channelId?.let { it1 ->
                 if (Client.global.channels[it1] !is DmChannel)
                     chatSharedViewModel.loadMemberList(it1)
+                else if (Client.global.channels[it1] is DmChannel)
+                    chatSharedViewModel.loadDmMemberList(it1)
             }
         })
 
@@ -81,6 +83,7 @@ class ChannelMemberFragment : Fragment() {
                 if (view_members.itemDecorationCount > 0) {
                     view_members.removeItemDecorationAt(0)
                 }
+                mAdapter.notifyDataSetChanged()
                 view_members.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
             }
         })

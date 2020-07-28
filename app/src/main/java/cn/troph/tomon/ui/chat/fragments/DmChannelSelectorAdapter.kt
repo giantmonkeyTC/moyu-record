@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.ui.states.AppState
@@ -14,6 +15,7 @@ import cn.troph.tomon.ui.states.ChannelSelection
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.widget_dmchannel_item.view.*
+import kotlinx.android.synthetic.main.widget_member_item.view.*
 
 class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>) :
     RecyclerView.Adapter<DmChannelSelectorAdapter.ViewHolder>() {
@@ -46,6 +48,19 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
                     AppUIEventType.CHANNEL_DRAWER,
                     false
                 )
+            )
+        }
+        if (Client.global.presences[dmChannel.recipientId]?.status == "offline") {
+            itemView.dmchannel_user_online.visibility = View.GONE
+            itemView.offline_dmchannel_user_shadow.visibility = View.VISIBLE
+            itemView.text_name.setTextColor(
+                0 or 0X60FFFFFF.toInt()
+            )
+        } else {
+            itemView.dmchannel_user_online.visibility = View.VISIBLE
+            itemView.offline_dmchannel_user_shadow.visibility = View.GONE
+            itemView.text_name.setTextColor(
+                0 or 0XFFFFFFFF.toInt()
             )
         }
         itemView.dmchannel_user_avatar.user = dmChannel.recipient

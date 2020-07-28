@@ -4,7 +4,10 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources
 import android.database.Cursor
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -19,8 +22,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
@@ -39,11 +44,11 @@ import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.states.AppState
-import cn.troph.tomon.ui.states.NetworkChangeReceiver
-import cn.troph.tomon.ui.states.UpdateEnabled
+import cn.troph.tomon.ui.states.*
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -51,6 +56,7 @@ import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import kotlinx.android.synthetic.main.guild_user_info.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -233,18 +239,23 @@ class ChannelPanelFragment : BaseFragment() {
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
-                    if (s.length > 0 && start < s.length)
-                        mChatSharedVM.mentionState.value =
-                            ChatSharedViewModel.MentionState(
-                                state = s[start].toString() == "@" && count == 1,
-                                start = start
-                            )
-                    else
-                        mChatSharedVM.mentionState.value =
-                            ChatSharedViewModel.MentionState(
-                                state = false,
-                                start = start
-                            )
+                    mChannelId?.let {
+                        if (Client.global.channels[it] is TextChannel)
+                            if (s.length > 0 && start < s.length)
+                                mChatSharedVM.mentionState.value =
+                                    ChatSharedViewModel.MentionState(
+                                        state = s[start].toString() == "@" && count == 1,
+                                        start = start
+                                    )
+                            else
+                                mChatSharedVM.mentionState.value =
+                                    ChatSharedViewModel.MentionState(
+                                        state = false,
+                                        start = start
+                                    )
+                    }
+
+
                 }
             }
 
@@ -263,27 +274,13 @@ class ChannelPanelFragment : BaseFragment() {
                         mChatSharedVM.loadMemberList(it)
                     }
                     hideKeyboard()
-                    mention_panel.visibility = View.VISIBLE
-                } else
-                    mention_panel.visibility = View.GONE
+                }
             }
         })
         mChatSharedVM.memberLiveData.observe(viewLifecycleOwner, Observer {
             it.let {
-                val mentionAdapter =
-                    MentionListAdapter(it, object : MentionListAdapter.OnMentionSelectedListener {
-                        override fun onMentionSelected(userId: String, userName: String) {
-                            mChatSharedVM.mentionState.value?.let {
-                                editText.text.insert(
-                                    it.start + 1,
-                                    userName
-                                )
-                            }
-                        }
-                    })
-                mention_panel.adapter = mentionAdapter
-                mention_panel.layoutManager = LinearLayoutManager(context)
-                mentionAdapter.notifyDataSetChanged()
+                if (mChatSharedVM.mentionState.value?.state!!)
+                    callMentionBottomSheet(it)
             }
         })
 
@@ -890,6 +887,35 @@ class ChannelPanelFragment : BaseFragment() {
                     }
             }
         }
+    }
+
+    private fun callMentionBottomSheet(mentionList: MutableList<GuildMember>) {
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.botom_sheet_mention, null)
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setContentView(view)
+        val mentionAdapter =
+            MentionListAdapter(mentionList, object : MentionListAdapter.OnMentionSelectedListener {
+                override fun onMentionSelected(userId: String, userName: String) {
+                    mChatSharedVM.mentionState.value?.let {
+                        editText.text.insert(
+                            it.start + 1,
+                            userName
+                        )
+                    }
+                    dialog.dismiss()
+                }
+            })
+        val mentionPanel = view.findViewById<RecyclerView>(R.id.mention_panel)
+        mentionPanel.adapter = mentionAdapter
+        mentionPanel.layoutManager = LinearLayoutManager(context)
+        mentionAdapter.notifyDataSetChanged()
+        dialog.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
+        dialog.show()
     }
 
     private fun uploadFile(file: File, msg: Message) {
