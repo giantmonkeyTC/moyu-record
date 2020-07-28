@@ -81,4 +81,6 @@ class ActionManager(val client: Client) {
 
     fun guildSettingsUpdate(data: JsonObject): GuildSettings? =
         GuildSettingsUpdateAction(client).handle(data)
+
+    fun joinVoiceChannel(data:JsonObject):VoiceAllowConnectReceive? = JoinVoiceChannelAction(client).handle(data)
 }
