@@ -16,7 +16,10 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.text.Editable
+import android.text.Spannable
 import android.text.TextWatcher
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -37,7 +40,10 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
+import cn.troph.tomon.core.utils.color
+import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
@@ -254,8 +260,6 @@ class ChannelPanelFragment : BaseFragment() {
                                         start = start
                                     )
                     }
-
-
                 }
             }
 
@@ -324,7 +328,11 @@ class ChannelPanelFragment : BaseFragment() {
             if (mChannelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
             }
-            val textToSend = editText.text.toString()
+            val textToSend =
+                if (editText.text.toString().matches(Assets.regexMention))
+                    Assets.mentionSendParser(editText.text.toString())
+                else
+                    editText.text.toString()
             editText.text.clear()
             if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
@@ -889,17 +897,27 @@ class ChannelPanelFragment : BaseFragment() {
         }
     }
 
+    private fun mentionFormat(identifier: String): String {
+        return "@${identifier}"
+    }
+
     private fun callMentionBottomSheet(mentionList: MutableList<GuildMember>) {
         val view = LayoutInflater.from(requireContext()).inflate(R.layout.botom_sheet_mention, null)
         val dialog = BottomSheetDialog(requireContext())
         dialog.setContentView(view)
         val mentionAdapter =
             MentionListAdapter(mentionList, object : MentionListAdapter.OnMentionSelectedListener {
-                override fun onMentionSelected(userId: String, userName: String) {
+                override fun onMentionSelected(identifier: String) {
                     mChatSharedVM.mentionState.value?.let {
-                        editText.text.insert(
-                            it.start + 1,
-                            userName
+                        editText.text.replace(
+                            it.start, it.start + 1,
+                            mentionFormat(identifier)
+                        )
+                        editText.text.setSpan(
+                            ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
+                            it.start,
+                            it.start + mentionFormat(identifier).length,
+                            0x11
                         )
                     }
                     dialog.dismiss()

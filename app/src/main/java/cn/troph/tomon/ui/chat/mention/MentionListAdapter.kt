@@ -34,7 +34,9 @@ class MentionListAdapter(
     override fun onBindViewHolder(holder: MentionViewHolder, position: Int) {
         val member = mentionList[position]
         holder.itemView.setOnClickListener {
-            mentionSelectedListener.onMentionSelected(member.id, member.displayName)
+            mentionSelectedListener.onMentionSelected(
+                member.user?.identifier!!
+            )
         }
         holder.itemView.mention_user_name.text = member.displayName
         val discriminatorSpan: SpannableString =
@@ -43,7 +45,7 @@ class MentionListAdapter(
             spannable {
                 color(
                     (if (member.roles.color == null)
-                        0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()),
+                        0 or 0X60FFFFFF.toInt() else member.roles.color!!.color or 0x60000000.toInt()),
                     member.displayName
                 )
             }
@@ -58,6 +60,6 @@ class MentionListAdapter(
     }
 
     interface OnMentionSelectedListener {
-        fun onMentionSelected(userId: String, userName: String)
+        fun onMentionSelected(identifier: String)
     }
 }
