@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
@@ -23,7 +24,8 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
-import com.orhanobut.logger.Logger
+import cn.troph.tomon.ui.widgets.UserAvatar
+import com.nex3z.flowlayout.FlowLayout
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
@@ -43,6 +45,8 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         RecyclerView.ViewHolder(itemView) {
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
+        private var voiceUserContainerLayout: FlowLayout =
+            itemView.findViewById(R.id.user_avatar_flow_ll)
         var disposable: Disposable? = null
         var channel: GuildChannel? = null
 
@@ -107,6 +111,19 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             if (channel is VoiceChannel) {
                 if (channel.guild?.voiceStates?.size!! > 0) {
                     text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
+                    channel.members.forEach { channelMember ->
+                        channel.guild?.voiceStates?.let {
+                            for ((index, value) in it.withIndex()) {
+                                if (channelMember.id == value.userId) {
+                                    (voiceUserContainerLayout[index] as UserAvatar).user =
+                                        channelMember.user
+                                }
+                            }
+                        }
+                    }
+                    voiceUserContainerLayout.visibility = View.VISIBLE
+                } else {
+                    voiceUserContainerLayout.visibility = View.GONE
                 }
             }
             disposable?.dispose()
@@ -158,8 +175,18 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                         }
                         if (channel.guild?.voiceStates?.size!! > 0) {
                             text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
+                            voiceUserContainerLayout.visibility = View.VISIBLE
+                            channel.guild?.voiceStates?.let {
+                                for ((index, value) in it.withIndex()) {
+                                    if (index < 3) {
+                                        (voiceUserContainerLayout[index] as UserAvatar).user =
+                                            Client.global.users[value.userId]
+                                    }
+                                }
+                            }
                         } else {
                             text.text = channel.name
+                            voiceUserContainerLayout.visibility = View.GONE
                         }
                     }
                 })

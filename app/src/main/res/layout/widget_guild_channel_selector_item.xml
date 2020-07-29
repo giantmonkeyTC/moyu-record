@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="8dp"
     android:background="@drawable/sel_channel_item_background">
 
@@ -13,7 +13,7 @@
         android:layout_height="16dp"
         android:layout_marginStart="20dp"
         android:scaleType="center"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/user_avatar_flow_ll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
@@ -30,17 +30,17 @@
         android:paddingVertical="2dp"
         android:textColor="#D67677"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/test_barrier"
+        app:layout_constraintBottom_toBottomOf="@id/image_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/test_barrier"
+        app:layout_constraintTop_toTopOf="@id/image_icon" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/test_barrier"
-        app:constraint_referenced_ids="text_name"
-        app:barrierDirection="end"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="text_name" />
 
     <TextView
         android:id="@+id/text_name"
@@ -48,11 +48,37 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="48dp"
-        android:maxLines="1"
         android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/channel_name_unactivated"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/image_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/image_icon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/image_icon"
+        app:layout_constraintTop_toTopOf="@id/image_icon" />
+
+    <com.nex3z.flowlayout.FlowLayout
+        android:id="@+id/user_avatar_flow_ll"
+        android:layout_width="0dp"
+        android:layout_marginVertical="5dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:flChildSpacing="-10dp"
+        app:flMinChildSpacing="-20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/image_icon"
+        app:layout_constraintTop_toBottomOf="@id/image_icon">
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+    </com.nex3z.flowlayout.FlowLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
