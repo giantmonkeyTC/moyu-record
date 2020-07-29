@@ -172,4 +172,6 @@ dependencies {
 
     implementation 'io.agora.rtc:voice-sdk:3.0.1'
     implementation 'com.karumi:dexter:6.2.1'
+    implementation 'com.kartik.stackimageview:stackimageview:0.0.2'
+
 }

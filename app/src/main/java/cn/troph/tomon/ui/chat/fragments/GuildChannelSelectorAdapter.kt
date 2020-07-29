@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
@@ -17,17 +17,20 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
+import cn.troph.tomon.core.events.VoiceStateUpdateEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.widgets.UserAvatar
+import com.nex3z.flowlayout.FlowLayout
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.widget_guild_channel_selector_item.view.*
+import java.lang.Exception
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
 
@@ -43,6 +46,8 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         RecyclerView.ViewHolder(itemView) {
         private var text: TextView = itemView.findViewById(R.id.text_name)
         private var image: ImageView = itemView.findViewById(R.id.image_icon)
+        private var voiceUserContainerLayout: FlowLayout =
+            itemView.findViewById(R.id.user_avatar_flow_ll)
         var disposable: Disposable? = null
         var channel: GuildChannel? = null
 
@@ -104,6 +109,26 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             }
 
             text.text = channel.name
+            if (channel is VoiceChannel) {
+                if (channel.voiceStates.size > 0) {
+                    for (index in 0 until voiceUserContainerLayout.childCount) {
+                        val avatar = voiceUserContainerLayout[index] as UserAvatar
+                        try {
+                            avatar.user = Client.global.users[channel.voiceStates[index].userId]
+                            avatar.visibility = View.VISIBLE
+                        } catch (e: Exception) {
+                            avatar.visibility = View.GONE
+                        }
+                    }
+                } else {
+                    voiceUserContainerLayout.visibility = View.GONE
+                }
+                if (channel.voiceStates.size > 0) {
+                    text.text = "${channel.name} ${channel.voiceStates.size}人"
+                } else {
+                    text.text = channel.name
+                }
+            }
             disposable?.dispose()
             disposable =
                 channel.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
@@ -136,6 +161,41 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     itemView.channel_unread_mention_notification.visibility = View.GONE
                 }
             })
+            Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>()
+                .subscribe(Consumer { event ->
+                    if (channel is VoiceChannel) {
+                        if (!event.voiceUpdate.channelId.isNullOrEmpty() && channel.id == event.voiceUpdate.channelId && channel.guildId == event.voiceUpdate.guildId) {//加入
+                            val user = channel.voiceStates.find {
+                                it.userId == event.voiceUpdate.userId
+                            }
+                            if (user == null) {
+                                channel.voiceStates.add(event.voiceUpdate)
+                            }
+                        } else {//删除
+                            channel.voiceStates.removeIf {
+                                it.userId == event.voiceUpdate.userId
+                            }
+                        }
+                        //update UI
+                        if (channel.voiceStates.size > 0) {
+                            for (index in 0 until voiceUserContainerLayout.childCount) {
+                                val avatar = voiceUserContainerLayout[index] as UserAvatar
+                                try {
+                                    avatar.visibility = View.VISIBLE
+                                    avatar.user =
+                                        Client.global.users[channel.voiceStates[index].userId]
+                                } catch (e: Exception) {
+                                    avatar.visibility = View.GONE
+                                }
+                            }
+                            voiceUserContainerLayout.visibility = View.VISIBLE
+                            text.text = "${channel.name} ${channel.voiceStates.size}人"
+                        } else {
+                            text.text = channel.name
+                            voiceUserContainerLayout.visibility = View.GONE
+                        }
+                    }
+                })
 
 
             itemView.setOnClickListener {

@@ -20,9 +20,11 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
-    val voiceSocketIsOpen = MutableLiveData<Boolean>()
+    val voiceStateUpdateLD = MutableLiveData<VoiceUpdate>()
 
-    val voiceSpeakingLD = MutableLiveData<Speaking>()
+    val voiceSocketStateLD = MutableLiveData<Boolean>()
+
+    val voiceSpeakLD = MutableLiveData<Speaking>()
 
     val voiceAllowConnectLD = MutableLiveData<VoiceAllowConnectReceive>()
 
@@ -106,6 +108,10 @@ class ChatSharedViewModel : ViewModel() {
                 updateLD.value = it
             })
 
+        Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
+            voiceStateUpdateLD.value = it.voiceUpdate
+        })
+
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
             messageAtMeLD.value = it
         })
@@ -122,11 +128,11 @@ class ChatSharedViewModel : ViewModel() {
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceSpeakEvent>().subscribe(Consumer {
-            voiceSpeakingLD.value = it.speaking
+            voiceSpeakLD.value = it.speaking
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceSocketStateEvent>().subscribe(Consumer {
-            voiceSocketIsOpen.value = it.isOpen
+            voiceSocketStateLD.value = it.isOpen
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceAllowConnectEvent>().subscribe(Consumer {
