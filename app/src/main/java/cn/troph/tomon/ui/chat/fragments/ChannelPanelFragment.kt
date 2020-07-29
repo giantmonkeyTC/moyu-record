@@ -26,16 +26,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
@@ -91,6 +95,8 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
     private lateinit var mBottomSheet: FileBottomSheetFragment
+    private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
+    private lateinit var viewPager: ViewPager2
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
 
@@ -238,6 +244,9 @@ class ChannelPanelFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewPagerCollectionAdapter = ViewPagerCollectionAdapter(this)
+        viewPager = view.findViewById(R.id.reaction_stamp_viewpager)
+        viewPager.adapter = viewPagerCollectionAdapter
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
             isUpdateEnabled = it.flag
@@ -415,14 +424,16 @@ class ChannelPanelFragment : BaseFragment() {
             if (isChecked) {
                 hideKeyboard()
                 scrollToBottom()
-                section_header_layout.visibility = View.VISIBLE
-                bottom_emoji_rr.visibility = View.VISIBLE
-                loadEmoji()
+//                section_header_layout.visibility = View.VISIBLE
+//                bottom_emoji_rr.visibility = View.VISIBLE
+//                loadEmoji()
+                reaction_stamp_viewpager.visibility = View.VISIBLE
                 btn_message_menu.isChecked = false
             } else {
-                section_header_layout.visibility =
-                    View.GONE
-                bottom_emoji_rr.visibility = View.GONE
+                reaction_stamp_viewpager.visibility = View.GONE
+//                section_header_layout.visibility =
+//                    View.GONE
+//                bottom_emoji_rr.visibility = View.GONE
             }
         }
         //接受新的Message
@@ -1018,6 +1029,21 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         return result
+    }
+
+}
+
+class ViewPagerCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    override fun getItemCount(): Int {
+        return 2
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        val fragment = Fragment()
+        fragment.arguments = Bundle().apply {
+            putInt("object", position + 1)
+        }
+        return fragment
     }
 
 }
