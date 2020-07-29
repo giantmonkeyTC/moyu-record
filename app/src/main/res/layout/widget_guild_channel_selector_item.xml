@@ -70,14 +70,17 @@
         app:layout_constraintTop_toBottomOf="@id/image_icon">
 
         <cn.troph.tomon.ui.widgets.UserAvatar
+            android:visibility="gone"
             android:layout_width="20dp"
             android:layout_height="20dp" />
 
         <cn.troph.tomon.ui.widgets.UserAvatar
+            android:visibility="gone"
             android:layout_width="20dp"
             android:layout_height="20dp" />
 
         <cn.troph.tomon.ui.widgets.UserAvatar
+            android:visibility="gone"
             android:layout_width="20dp"
             android:layout_height="20dp" />
     </com.nex3z.flowlayout.FlowLayout>

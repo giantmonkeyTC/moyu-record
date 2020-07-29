@@ -75,15 +75,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     }
 
     private fun patchSelf(data: JsonObject) {
-        if (data.has("voice_states")) {
-            voiceStates.clear()
-            voiceStates.addAll(
-                Gson().fromJson(
-                    data.get("voice_states"),
-                    Array<VoiceUpdate>::class.java
-                )
-            )
-        }
+
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -124,6 +116,15 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             val value = data["default_message_notifications"].asInt
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.ONLY_MENTION
+        }
+        if (data.has("voice_states")) {
+            voiceStates.clear()
+            voiceStates.addAll(
+                Gson().fromJson(
+                    data.get("voice_states"),
+                    Array<VoiceUpdate>::class.java
+                )
+            )
         }
     }
 

@@ -30,6 +30,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.widget_guild_channel_selector_item.view.*
+import java.lang.Exception
 
 class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAdapter.ViewHolder>() {
 
@@ -109,21 +110,23 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
 
             text.text = channel.name
             if (channel is VoiceChannel) {
-                if (channel.guild?.voiceStates?.size!! > 0) {
-                    text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
-                    channel.members.forEach { channelMember ->
-                        channel.guild?.voiceStates?.let {
-                            for ((index, value) in it.withIndex()) {
-                                if (channelMember.id == value.userId) {
-                                    (voiceUserContainerLayout[index] as UserAvatar).user =
-                                        channelMember.user
-                                }
-                            }
+                if (channel.voiceStates.size > 0) {
+                    for (index in 0 until voiceUserContainerLayout.childCount) {
+                        val avatar = voiceUserContainerLayout[index] as UserAvatar
+                        try {
+                            avatar.user = Client.global.users[channel.voiceStates[index].userId]
+                            avatar.visibility = View.VISIBLE
+                        } catch (e: Exception) {
+                            avatar.visibility = View.GONE
                         }
                     }
-                    voiceUserContainerLayout.visibility = View.VISIBLE
                 } else {
                     voiceUserContainerLayout.visibility = View.GONE
+                }
+                if (channel.voiceStates.size > 0) {
+                    text.text = "${channel.name} ${channel.voiceStates.size}人"
+                } else {
+                    text.text = channel.name
                 }
             }
             disposable?.dispose()
@@ -161,29 +164,32 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>()
                 .subscribe(Consumer { event ->
                     if (channel is VoiceChannel) {
-                        if (!event.voiceUpdate.channelId.isNullOrEmpty() && channel.id == event.voiceUpdate.channelId && channel.guildId == event.voiceUpdate.guildId) {
-                            val user = channel.guild?.voiceStates?.find {
+                        if (!event.voiceUpdate.channelId.isNullOrEmpty() && channel.id == event.voiceUpdate.channelId && channel.guildId == event.voiceUpdate.guildId) {//加入
+                            val user = channel.voiceStates.find {
                                 it.userId == event.voiceUpdate.userId
                             }
                             if (user == null) {
-                                channel.guild?.voiceStates?.add(event.voiceUpdate)
+                                channel.voiceStates.add(event.voiceUpdate)
                             }
-                        } else {
-                            channel.guild?.voiceStates?.removeIf {
+                        } else {//删除
+                            channel.voiceStates.removeIf {
                                 it.userId == event.voiceUpdate.userId
                             }
                         }
-                        if (channel.guild?.voiceStates?.size!! > 0) {
-                            text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
-                            voiceUserContainerLayout.visibility = View.VISIBLE
-                            channel.guild?.voiceStates?.let {
-                                for ((index, value) in it.withIndex()) {
-                                    if (index < 3) {
-                                        (voiceUserContainerLayout[index] as UserAvatar).user =
-                                            Client.global.users[value.userId]
-                                    }
+                        //update UI
+                        if (channel.voiceStates.size > 0) {
+                            for (index in 0 until voiceUserContainerLayout.childCount) {
+                                val avatar = voiceUserContainerLayout[index] as UserAvatar
+                                try {
+                                    avatar.visibility = View.VISIBLE
+                                    avatar.user =
+                                        Client.global.users[channel.voiceStates[index].userId]
+                                } catch (e: Exception) {
+                                    avatar.visibility = View.GONE
                                 }
                             }
+                            voiceUserContainerLayout.visibility = View.VISIBLE
+                            text.text = "${channel.name} ${channel.voiceStates.size}人"
                         } else {
                             text.text = channel.name
                             voiceUserContainerLayout.visibility = View.GONE
