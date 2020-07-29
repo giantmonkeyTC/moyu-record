@@ -14,8 +14,7 @@ class JoinVoiceChannelAction(client: Client) : Action<VoiceAllowConnectReceive>(
     override fun handle(data: JsonElement?, vararg extras: Any?): VoiceAllowConnectReceive? {
         super.handle(data, *extras)
         val obj = Gson().fromJson(data, VoiceAllowConnectReceive::class.java)
-        if (obj.channelId != null) {
-            Logger.d("Mic:" + data.toString())
+        if (obj.channelId != null && obj.tokenAgora.isNotEmpty() && obj.vendor.isNotEmpty()) {
             Client.global.eventBus.postEvent(VoiceAllowConnectEvent(obj))
         } else {//leave channel event
             Client.global.eventBus.postEvent(VoiceLeaveChannelEvent(obj))

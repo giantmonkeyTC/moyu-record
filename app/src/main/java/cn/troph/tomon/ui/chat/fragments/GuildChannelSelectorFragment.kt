@@ -123,7 +123,7 @@ class GuildChannelSelectorFragment : Fragment() {
                 //switch channel
             }
         })
-        mChatSharedViewModel.voiceSocketIsOpen.observe(viewLifecycleOwner, Observer {
+        mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
             if (it) {
                 val voice = VoiceIdentify(
                     sessionId = Client.global.socket.getSesstion()!!,

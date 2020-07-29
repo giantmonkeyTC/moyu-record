@@ -63,3 +63,5 @@ data class VoiceLeaveChannelEvent(val voiceAllowConnect: VoiceAllowConnectReceiv
 
 data class VoiceSpeakEvent(val speaking: Speaking) : Event()
 data class VoiceSocketStateEvent(val isOpen:Boolean): Event()
+
+data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate):Event()
