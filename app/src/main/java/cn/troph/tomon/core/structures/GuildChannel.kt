@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.collections.ChannelMemberCollection
+import cn.troph.tomon.core.events.VoiceStateUpdateEvent
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake

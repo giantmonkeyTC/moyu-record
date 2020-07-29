@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
@@ -17,13 +16,14 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.MessageAtMeEvent
 import cn.troph.tomon.core.events.MessageCreateEvent
 import cn.troph.tomon.core.events.MessageReadEvent
+import cn.troph.tomon.core.events.VoiceStateUpdateEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
@@ -104,6 +104,11 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
             }
 
             text.text = channel.name
+            if (channel is VoiceChannel) {
+                if (channel.guild?.voiceStates?.size!! > 0) {
+                    text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
+                }
+            }
             disposable?.dispose()
             disposable =
                 channel.observable.observeOn(AndroidSchedulers.mainThread()).subscribe {
@@ -136,6 +141,28 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     itemView.channel_unread_mention_notification.visibility = View.GONE
                 }
             })
+            Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>()
+                .subscribe(Consumer { event ->
+                    if (channel is VoiceChannel) {
+                        if (!event.voiceUpdate.channelId.isNullOrEmpty() && channel.id == event.voiceUpdate.channelId && channel.guildId == event.voiceUpdate.guildId) {
+                            val user = channel.guild?.voiceStates?.find {
+                                it.userId == event.voiceUpdate.userId
+                            }
+                            if (user == null) {
+                                channel.guild?.voiceStates?.add(event.voiceUpdate)
+                            }
+                        } else {
+                            channel.guild?.voiceStates?.removeIf {
+                                it.userId == event.voiceUpdate.userId
+                            }
+                        }
+                        if (channel.guild?.voiceStates?.size!! > 0) {
+                            text.text = "${channel.name} ${channel.guild?.voiceStates?.size}人"
+                        } else {
+                            text.text = channel.name
+                        }
+                    }
+                })
 
 
             itemView.setOnClickListener {

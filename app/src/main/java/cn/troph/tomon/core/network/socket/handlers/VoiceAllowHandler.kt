@@ -7,23 +7,20 @@ import cn.troph.tomon.core.structures.VoiceUpdate
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 
-val handleVoiceConnectAllow: Handler = { client: Client, packet: JsonObject ->
-    if (packet.has("e")) {
-        when (packet["e"].asString) {
-            "VOICE_STATE_UPDATE" -> {
-                client.eventBus.postEvent(
-                    VoiceStateUpdateEvent(
-                        Gson().fromJson(
-                            packet,
-                            VoiceUpdate::class.java
-                        )
-                    )
-                )
-            }
-        }
-    } else {
-        client.actions.joinVoiceChannel(packet.asJsonObject["d"].asJsonObject)
-    }
 
+val handleVoiceHandler: Handler = { client: Client, packet: JsonObject ->
+    client.actions.joinVoiceChannel(packet.asJsonObject["d"].asJsonObject)
 }
+
+val handleVoiceStateHandler: Handler = { client, packet ->
+    client.eventBus.postEvent(
+        VoiceStateUpdateEvent(
+            Gson().fromJson(
+                packet["d"].asJsonObject,
+                VoiceUpdate::class.java
+            )
+        )
+    )
+}
+
 
