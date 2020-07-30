@@ -18,6 +18,14 @@ class VoiceUserAdapter(private val userList: MutableList<User>) :
 
     override fun onBindViewHolder(holder: VoiceUserHolder, position: Int) {
         holder.itemView.voice_user_avatar.user = userList[position]
+        if (userList[position].isSpeaking) {
+            holder.itemView.speaking_circle_iv.borderColor =
+                holder.itemView.context.getColor(R.color.speaking)
+        } else {
+            holder.itemView.speaking_circle_iv.borderColor =
+                holder.itemView.context.getColor(R.color.white)
+        }
+
     }
 
     override fun getItemCount(): Int {

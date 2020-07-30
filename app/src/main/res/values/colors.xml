@@ -48,5 +48,6 @@
     <color name="color_guild_unactivated">#313131</color>
     <color name="warning">#EDD564</color>
     <color name="success">#67D78E</color>
+    <color name="speaking">#67D78E</color>
     <color name="system_pink">#FB9CC7</color>
 </resources>

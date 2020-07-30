@@ -104,11 +104,30 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                 Client.global.users[it.userId]?.let {
                     mVoiceUserList.add(it)
                 }
-
             }
             mAdapter.notifyDataSetChanged()
         }
-        voice_avatar_rr.layoutManager = GridLayoutManager(requireContext(), 5, GridLayoutManager.VERTICAL, false)
+        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                (it as VoiceChannel).voiceStates.forEach {
+                    Client.global.users[it.userId]?.let {
+                        mVoiceUserList.add(it)
+                    }
+                }
+                mAdapter.notifyDataSetChanged()
+            }
+        })
+
+        mChatSharedViewModel.voiceSpeakLD.observe(viewLifecycleOwner, Observer { speaking ->
+            if (!speaking.userId.isNullOrEmpty()) {
+                mVoiceUserList.forEach {
+                    it.isSpeaking = (it.id == speaking.userId && speaking.isSpeaking)
+                }
+                mAdapter.notifyDataSetChanged()
+            }
+        })
+
+        voice_avatar_rr.layoutManager = GridLayoutManager(requireContext(), 5)
         voice_avatar_rr.adapter = mAdapter
 
 
