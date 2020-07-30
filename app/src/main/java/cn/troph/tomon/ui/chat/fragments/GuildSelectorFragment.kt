@@ -174,14 +174,15 @@ class GuildSelectorFragment : Fragment() {
         })
 
         mChatVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mChatVM.guildListLiveData.value?.contains(event.message.guild!!)!!) {
-                if (event.message.guild!!.updateMention())
-                    mAdapter.notifyItemChanged(
-                        mChatVM.guildListLiveData.value!!.indexOf(
-                            event.message.guild!!
+            if (event.message.guild != null)
+                if (mChatVM.guildListLiveData.value?.contains(event.message.guild!!)!!) {
+                    if (event.message.guild!!.updateMention())
+                        mAdapter.notifyItemChanged(
+                            mChatVM.guildListLiveData.value!!.indexOf(
+                                event.message.guild!!
+                            )
                         )
-                    )
-            }
+                }
 
         })
 
