@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TOMON</string>
     <string name="action_settings">设置</string>
+    <string name="voice_connecting">语音正在连接</string>
 
     <string name="auth_server_error">服务异常</string>
     <string name="login_title">登录Tomon</string>

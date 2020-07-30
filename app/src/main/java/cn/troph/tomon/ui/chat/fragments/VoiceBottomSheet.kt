@@ -1,18 +1,22 @@
 package cn.troph.tomon.ui.chat.fragments
 
+
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
+import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.structures.VoiceChannel
 import cn.troph.tomon.core.structures.VoiceConnectSend
+import cn.troph.tomon.ui.chat.members.VoiceUserAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
@@ -21,6 +25,8 @@ import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 class VoiceBottomSheet : BottomSheetDialogFragment() {
 
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
+    private val mVoiceUserList = mutableListOf<User>()
+    private val mAdapter = VoiceUserAdapter(mVoiceUserList)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +38,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             .inflate(R.layout.voice_bottom_sheet, container, false)
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val audioManager =
@@ -42,30 +49,34 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
 
         button4.setOnCheckedChangeListener { buttonView, isChecked ->
             audioManager.isMicrophoneMute = isChecked
-            Client.global.socket.send(
-                GatewayOp.VOICE,
-                Gson().toJsonTree(
-                    VoiceConnectSend(
-                        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id!!,
-                        audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
-                        isChecked
+            mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+                Client.global.socket.send(
+                    GatewayOp.VOICE,
+                    Gson().toJsonTree(
+                        VoiceConnectSend(
+                            it.id,
+                            audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                            isChecked
+                        )
                     )
                 )
-            )
+            }
         }
 
         button6.setOnCheckedChangeListener { buttonView, isChecked ->
             audioManager.isSpeakerphoneOn = isChecked
-            Client.global.socket.send(
-                GatewayOp.VOICE,
-                Gson().toJsonTree(
-                    VoiceConnectSend(
-                        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id!!,
-                        isChecked,
-                        audioManager.isMicrophoneMute
+            mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+                Client.global.socket.send(
+                    GatewayOp.VOICE,
+                    Gson().toJsonTree(
+                        VoiceConnectSend(
+                            it.id,
+                            isChecked,
+                            audioManager.isMicrophoneMute
+                        )
                     )
                 )
-            )
+            }
         }
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -79,8 +90,27 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                     "${it.guild?.name}"
             }
         })
-        voice_channel_id.text = "#${mChatSharedViewModel.selectedCurrentVoiceChannel.value?.name}"
-        voice_guild_name_tv.text =
-            "${mChatSharedViewModel.selectedCurrentVoiceChannel.value?.guild?.name}"
+
+        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+            voice_channel_id.text = "#${it.name}"
+        }
+        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+            voice_guild_name_tv.text = it.guild?.name
+        }
+
+        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+            mVoiceUserList.clear()
+            (it as VoiceChannel).voiceStates.forEach {
+                Client.global.users[it.userId]?.let {
+                    mVoiceUserList.add(it)
+                }
+
+            }
+            mAdapter.notifyDataSetChanged()
+        }
+        voice_avatar_rr.layoutManager = GridLayoutManager(requireContext(), 5, GridLayoutManager.VERTICAL, false)
+        voice_avatar_rr.adapter = mAdapter
+
+
     }
 }
