@@ -7,6 +7,7 @@ import cn.troph.tomon.core.network.socket.handlers.*
 import cn.troph.tomon.core.structures.VoiceIdentify
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -27,7 +28,7 @@ class VoiceSocket : Observer<SocketEvent> {
     )
 
     private val _socketClient: SocketClient = SocketClient()
-    private val timer = Timer()
+    private var timer = Timer()
 
     fun open() {
         _socketClient.open(Configs.wssVoice)
@@ -43,11 +44,13 @@ class VoiceSocket : Observer<SocketEvent> {
     }
 
     fun sendHeartBeat() {
-        timer.scheduleAtFixedRate(object : TimerTask() {
+        val timerTask = object : TimerTask() {
             override fun run() {
                 send(GatewayOp.HEARTBEAT, Gson().toJsonTree(""))
             }
-        }, 0, 5000)
+        }
+        timer = Timer()
+        timer.scheduleAtFixedRate(timerTask, 0, 5000)
     }
 
     fun stopHeartBeat() {
@@ -65,7 +68,7 @@ class VoiceSocket : Observer<SocketEvent> {
             }
 
             5 -> {//鉴权成功
-
+                Logger.d("鉴权成功")
             }
 
             3 -> {

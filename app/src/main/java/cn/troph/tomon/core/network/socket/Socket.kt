@@ -22,7 +22,8 @@ enum class GatewayOp(val value: Int) {
     IDENTITY(2),
     HELLO(3),
     HEARTBEAT_ACK(4),
-    VOICE(5);
+    VOICE(5),
+    SPEAK(6);
 
     companion object {
         private val map = values().associateBy(GatewayOp::value)
