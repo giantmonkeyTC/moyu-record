@@ -10,6 +10,7 @@ import cn.troph.tomon.core.network.socket.Socket
 import cn.troph.tomon.core.network.socket.SocketClientState
 import cn.troph.tomon.core.network.socket.VoiceSocket
 import cn.troph.tomon.core.structures.Me
+import cn.troph.tomon.core.structures.StampPack
 import cn.troph.tomon.core.utils.event.RxBus
 import io.reactivex.rxjava3.core.Observable
 
@@ -39,6 +40,7 @@ class Client {
     val emojis = EmojiCollection(this)
     val presences = PresenceCollection(this)
     val guildSettings = GuildSettingsCollection(this)
+    val stamps: MutableList<StampPack> = mutableListOf()
 
     val token get() = me.token
     val auth get() = "Bearer ${token ?: ""}"

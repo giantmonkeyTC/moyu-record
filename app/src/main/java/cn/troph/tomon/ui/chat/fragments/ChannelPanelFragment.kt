@@ -33,6 +33,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -53,6 +55,7 @@ import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.*
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
@@ -96,7 +99,7 @@ class ChannelPanelFragment : BaseFragment() {
     private val mHandler = Handler()
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
-    private lateinit var viewPager: ViewPager2
+    private lateinit var viewPager: NestedViewPager
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
 
@@ -244,7 +247,8 @@ class ChannelPanelFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewPagerCollectionAdapter = ViewPagerCollectionAdapter(this)
+        viewPagerCollectionAdapter =
+            ViewPagerCollectionAdapter(mEmojiClickListener, requireFragmentManager())
         viewPager = view.findViewById(R.id.reaction_stamp_viewpager)
         viewPager.adapter = viewPagerCollectionAdapter
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
@@ -1033,17 +1037,27 @@ class ChannelPanelFragment : BaseFragment() {
 
 }
 
-class ViewPagerCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int {
-        return 2
+class ViewPagerCollectionAdapter(
+    val onEmojiClickListener: OnEmojiClickListener,
+    fragmentManager: FragmentManager
+) : FragmentPagerAdapter(fragmentManager) {
+    override fun getItem(position: Int): Fragment {
+        return when (position) {
+            0 -> {
+                val fragment = EmojiFragment(onEmojiClickListener = onEmojiClickListener)
+                return fragment
+            }
+            1 -> {
+                val fragment = StampFragment()
+                return fragment
+            }
+            else -> Fragment()
+        }
+
     }
 
-    override fun createFragment(position: Int): Fragment {
-        val fragment = Fragment()
-        fragment.arguments = Bundle().apply {
-            putInt("object", position + 1)
-        }
-        return fragment
+    override fun getCount(): Int {
+        return 2
     }
 
 }

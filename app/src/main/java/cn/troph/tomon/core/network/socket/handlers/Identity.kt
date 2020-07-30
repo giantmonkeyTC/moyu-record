@@ -3,7 +3,9 @@ package cn.troph.tomon.core.network.socket.handlers
 import android.util.Log
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.Handler
+import cn.troph.tomon.core.structures.StampPack
 import cn.troph.tomon.core.utils.optString
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.orhanobut.logger.Logger
@@ -42,5 +44,10 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
 
     data["guild_settings"].asJsonArray.forEach { e ->
         client.actions.guildSettingsUpdate(e.asJsonObject)
+    }
+    data["stamp_packs"].asJsonArray.forEach { s ->
+        val stampPack = s.asJsonObject
+        client.stamps.add(Gson().fromJson(stampPack, StampPack::class.java))
+        client.stamps.forEach { println("helloworld" + it.authorId + it.stamps) }
     }
 }
