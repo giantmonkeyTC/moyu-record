@@ -82,6 +82,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
             mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+            mChatSharedViewModel.switchingChannelVoiceLD.value = false
             dismiss()
         }
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {

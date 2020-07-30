@@ -80,6 +80,7 @@ class GuildChannelSelectorFragment : Fragment() {
                             val audioManager =
                                 requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
                             if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = false
                                 Client.global.socket.send(
                                     GatewayOp.VOICE,
                                     Gson().toJsonTree(
@@ -92,18 +93,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 )
                             } else {
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
-                                mHandler.postDelayed({
-                                    Client.global.socket.send(
-                                        GatewayOp.VOICE,
-                                        Gson().toJsonTree(
-                                            VoiceConnectSend(
-                                                channel.id,
-                                                audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
-                                                audioManager.isMicrophoneMute
-                                            )
-                                        )
-                                    )
-                                }, 1500)
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = true
                             }
 
                         }
@@ -157,7 +147,6 @@ class GuildChannelSelectorFragment : Fragment() {
             joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
             Client.global.voiceSocket.open()
         })
-
 
     }
 
@@ -219,8 +208,24 @@ class GuildChannelSelectorFragment : Fragment() {
 
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
-                            Logger.d("Leave Channel")
                             mHandler.post {
+                                mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
+                                    if(it){
+                                        val audioManager =
+                                            requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                        Client.global.socket.send(
+                                            GatewayOp.VOICE,
+                                            Gson().toJsonTree(
+                                                VoiceConnectSend(
+                                                    mSelectedVoiceChannel.id,
+                                                    audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                                    audioManager.isMicrophoneMute
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = false
                                 Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
                                     .show()
                             }
@@ -274,4 +279,8 @@ class GuildChannelSelectorFragment : Fragment() {
         mRtcEngine = null
     }
 
+}
+
+interface SwitchChannelVoiceCallback {
+    fun onSwitchFinish()
 }
