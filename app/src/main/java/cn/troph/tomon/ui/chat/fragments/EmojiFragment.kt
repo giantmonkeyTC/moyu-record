@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_reaction.bottom_emoji_rr
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class EmojiFragment : Fragment() {
+class EmojiFragment(val onEmojiClickListener: OnEmojiClickListener) : Fragment() {
 
     lateinit var mMessage: cn.troph.tomon.core.structures.Message
     private var param1: String? = null
@@ -54,41 +54,10 @@ class EmojiFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadEmoji()
+        loadEmoji(onEmojiClickListener = onEmojiClickListener)
     }
 
-    private fun loadEmoji() {
-        val emojiClickListener = object : OnEmojiClickListener {
-            override fun onEmojiSelected(emojiCode: String) {
-                val modifyedEmoji = emojiCode.removePrefix("<%").removeSuffix(">")
-                Client.global.rest.messageService.addReaction(
-                    mMessage.channelId,
-                    mMessage.id!!,
-                    modifyedEmoji,
-                    Client.global.auth
-                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ ->
-                        Logger.d("Send Success Reaction")
-                    },
-                        { error ->
-                            Logger.d(error.message)
-                        })
-            }
-
-            override fun onSystemEmojiSelected(unicode: String) {
-                Client.global.rest.messageService.addReaction(
-                    mMessage.channelId,
-                    mMessage.id!!,
-                    unicode,
-                    Client.global.auth
-                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ -> Logger.d("Send reaction success system") },
-                        { throwable ->
-                            Logger.d(throwable.message)
-                        })
-            }
-        }
-
+    private fun loadEmoji(onEmojiClickListener: OnEmojiClickListener) {
         val guildIcon = mutableListOf<GuildIcon>()
         mSectionDataManager = SectionDataManager()
         mGridLayoutManager = GridLayoutManager(requireContext(), 7)
@@ -114,7 +83,7 @@ class EmojiFragment : Fragment() {
                 emojiList = item.emojis.values.toMutableList()
             )
             guildIcon.add(GuildIcon(item.iconURL, item.name, null))
-            val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
+            val sectionAdapter = EmojiAdapter(sectionData, onEmojiClickListener)
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
         val guildIconDefault = mutableListOf<Drawable>()
@@ -141,7 +110,7 @@ class EmojiFragment : Fragment() {
                     name = item.key,
                     isBuildIn = true,
                     systemEmojiListData = item.value
-                ), emojiClickListener
+                ), onEmojiClickListener
             )
             mSectionDataManager.addSection(adapter, 1)
 //            guildIcon.add(GuildIcon(null, item.value[0].code,null))

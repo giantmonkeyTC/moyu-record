@@ -141,7 +141,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <androidx.viewpager2.widget.ViewPager2
+        <cn.troph.tomon.ui.chat.ui.NestedViewPager
             android:id="@+id/reaction_stamp_viewpager"
             android:layout_width="match_parent"
             android:layout_height="400dp"

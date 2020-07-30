@@ -32,7 +32,7 @@ interface MessageService {
         @SerializedName("content")
         var content: String,
         @SerializedName("nonce")
-        var nonce:String
+        var nonce: String
     )
 
     @POST("channels/{channelId}/messages")
@@ -49,6 +49,22 @@ interface MessageService {
         @PartMap partMap: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part files: MultipartBody.Part,
         @Header(
+            "Authorization"
+        ) token: String
+    ): Observable<JsonObject>
+
+    data class CreateStampRequest(
+        @SerializedName("content")
+        var content: String,
+        @SerializedName("nonce")
+        var nonce: String,
+        @SerializedName("stamps")
+        var stamps: MutableList<String>
+    )
+
+    @POST("channels/{channelId}/messages")
+    fun createStampMessage(
+        @Path("channelId") channelId: String, @Body request: CreateStampRequest, @Header(
             "Authorization"
         ) token: String
     ): Observable<JsonObject>
