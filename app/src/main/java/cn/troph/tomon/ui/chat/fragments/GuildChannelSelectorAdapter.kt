@@ -120,6 +120,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                             avatar.visibility = View.GONE
                         }
                     }
+                    voiceUserContainerLayout.visibility = View.VISIBLE
                 } else {
                     voiceUserContainerLayout.visibility = View.GONE
                 }

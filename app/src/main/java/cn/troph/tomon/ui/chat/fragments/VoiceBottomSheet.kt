@@ -20,6 +20,7 @@ import cn.troph.tomon.ui.chat.members.VoiceUserAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
 class VoiceBottomSheet : BottomSheetDialogFragment() {
@@ -119,7 +120,8 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         })
 
         mChatSharedViewModel.voiceSpeakLD.observe(viewLifecycleOwner, Observer { speaking ->
-            if (!speaking.userId.isNullOrEmpty()) {
+
+            if (speaking.userId.isNotEmpty()) {
                 mVoiceUserList.forEach {
                     it.isSpeaking = (it.id == speaking.userId && speaking.isSpeaking)
                 }

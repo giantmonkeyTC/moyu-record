@@ -16,11 +16,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.VoiceSpeakEvent
 import cn.troph.tomon.core.network.socket.GatewayOp
-import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.VoiceConnectSend
-import cn.troph.tomon.core.structures.VoiceIdentify
-import cn.troph.tomon.core.structures.VoiceLeaveConnect
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import com.google.gson.Gson
@@ -81,16 +79,33 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                             val audioManager =
                                 requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                            Client.global.socket.send(
-                                GatewayOp.VOICE,
-                                Gson().toJsonTree(
-                                    VoiceConnectSend(
-                                        channel.id,
-                                        audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
-                                        audioManager.isMicrophoneMute
+                            if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
+                                Client.global.socket.send(
+                                    GatewayOp.VOICE,
+                                    Gson().toJsonTree(
+                                        VoiceConnectSend(
+                                            channel.id,
+                                            audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                            audioManager.isMicrophoneMute
+                                        )
                                     )
                                 )
-                            )
+                            } else {
+                                mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                                mHandler.postDelayed({
+                                    Client.global.socket.send(
+                                        GatewayOp.VOICE,
+                                        Gson().toJsonTree(
+                                            VoiceConnectSend(
+                                                channel.id,
+                                                audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                                audioManager.isMicrophoneMute
+                                            )
+                                        )
+                                    )
+                                }, 1500)
+                            }
+
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -116,6 +131,7 @@ class GuildChannelSelectorFragment : Fragment() {
             Client.global.voiceSocket.close()
             mRtcEngine?.leaveChannel()
         })
+
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
@@ -127,9 +143,10 @@ class GuildChannelSelectorFragment : Fragment() {
             if (it) {
                 val voice = VoiceIdentify(
                     sessionId = Client.global.socket.getSesstion()!!,
-                    voiceId = mChatSharedViewModel.voiceAllowConnectLD.value?.voiceUserIdAgora!!
+                    voiceId = mChatSharedViewModel.voiceAllowConnectLD.value?.voiceUserIdAgora!!,
+                    userId = Client.global.me.id
                 )
-                Client.global.voiceSocket.send(GatewayOp.IDENTITY, Gson().toJsonTree(voice))
+                Client.global.voiceSocket.send(GatewayOp.DISPATCH, Gson().toJsonTree(voice))
             } else {
 
             }
@@ -140,6 +157,7 @@ class GuildChannelSelectorFragment : Fragment() {
             joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
             Client.global.voiceSocket.open()
         })
+
 
     }
 
@@ -172,14 +190,39 @@ class GuildChannelSelectorFragment : Fragment() {
                     getString(R.string.agora_app_id),
                     object : IRtcEngineEventHandler() {
 
+                        override fun onAudioVolumeIndication(
+                            p0: Array<out AudioVolumeInfo>?,
+                            p1: Int
+                        ) {
+                            super.onAudioVolumeIndication(p0, p1)
+                            val myAudioInfo = p0?.find {
+                                it.vad == 1
+                            }
+                            myAudioInfo?.let {
+                                if (it.volume > 20) {
+                                    Client.global.voiceSocket.send(
+                                        GatewayOp.SPEAK,
+                                        Gson().toJsonTree(Speaking(true))
+                                    )
+                                    mChatSharedViewModel.voiceSpeakLD.value =
+                                        Speaking(true, Client.global.me.id)
+                                } else {
+                                    Client.global.voiceSocket.send(
+                                        GatewayOp.SPEAK,
+                                        Gson().toJsonTree(Speaking(false))
+                                    )
+                                    mChatSharedViewModel.voiceSpeakLD.value =
+                                        Speaking(false, Client.global.me.id)
+                                }
+                            }
+                        }
+
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             Logger.d("Leave Channel")
                             mHandler.post {
                                 Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
                                     .show()
-                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value != null)
-                                    mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
                             }
                         }
 
@@ -212,6 +255,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     }
                 )
                 mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
+                mRtcEngine?.enableAudioVolumeIndication(250, 10, true)
             }
         } catch (e: Exception) {
             Logger.d(e.message)

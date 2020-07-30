@@ -77,6 +77,7 @@ class SocketClient : WebSocketListener(),
     }
 
     fun send(data: JsonElement) {
+        Logger.d("Sending: ${data}")
         _webSocket?.send(Gson().toJson(data))
         _emitter?.onNext(SocketEvent(SocketEventType.SEND, data = data))
     }
@@ -139,7 +140,7 @@ class SocketClient : WebSocketListener(),
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
-        Logger.d("${url}: "+text)
+        Logger.d("Receive ${url}: "+text)
         try {
             val data = Gson().fromJson(text, JsonElement::class.java)
             _emitter?.onNext(SocketEvent(SocketEventType.RECEIVE, data = data))

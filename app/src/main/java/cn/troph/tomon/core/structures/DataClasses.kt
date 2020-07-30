@@ -24,7 +24,7 @@ data class VoiceLeaveConnect(
 )
 
 data class VoiceIdentify(
-    @SerializedName("op") val op: Int = 0,
+    @SerializedName("user_id") val userId:String,
     @SerializedName("session_id") val sessionId: String,
     @SerializedName("voice_id") val voiceId: Int
 )
