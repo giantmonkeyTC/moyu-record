@@ -209,8 +209,9 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
+                                var isToastLeaveChannel = true
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
-                                    if(it){
+                                    if (it) {
                                         val audioManager =
                                             requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
                                         Client.global.socket.send(
@@ -223,18 +224,19 @@ class GuildChannelSelectorFragment : Fragment() {
                                                 )
                                             )
                                         )
+                                        isToastLeaveChannel = false
                                     }
                                 }
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
-                                Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
-                                    .show()
+                                if (isToastLeaveChannel)
+                                    Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
+                                        .show()
                             }
                         }
 
                         override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             mHandler.post {
-                                Logger.d("Join Success")
                                 Toast.makeText(requireContext(), "加入频道成功", Toast.LENGTH_SHORT)
                                     .show()
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
