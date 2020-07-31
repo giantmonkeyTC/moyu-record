@@ -193,7 +193,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 it.vad == 1
                             }
                             myAudioInfo?.let {
-                                if (it.volume > 100) {
+                                if (it.volume > 150) {
                                     Client.global.voiceSocket.send(
                                         GatewayOp.SPEAK,
                                         Gson().toJsonTree(Speaking(1))
