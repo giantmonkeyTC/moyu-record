@@ -131,6 +131,18 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            android:textColor="@color/white"
+            android:id="@+id/private_agreement_tv"
+            android:textColorLink="@android:color/holo_blue_light"
+            android:text="@string/privacy_agreement"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
