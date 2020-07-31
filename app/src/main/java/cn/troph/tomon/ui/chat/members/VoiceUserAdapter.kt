@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.User
-import com.google.android.gms.common.api.Api
 import kotlinx.android.synthetic.main.item_voice_avatar.view.*
 
 class VoiceUserAdapter(private val userList: MutableList<User>) :

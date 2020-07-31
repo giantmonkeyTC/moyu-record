@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background4">
     <de.hdodenhof.circleimageview.CircleImageView
@@ -29,25 +29,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:layout_marginHorizontal="10dp"
-        app:layout_constraintStart_toEndOf="@id/voice_user_avatar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:textSize="17sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="@color/white"
         android:id="@+id/user_name_voice"
-        app:layout_constraintEnd_toStartOf="@id/voice_mic"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:maxLength="15"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/voice_user_avatar"
+        app:layout_constraintTop_toTopOf="parent" />
     <net.colindodd.toggleimagebutton.ToggleImageButton
         android:id="@+id/voice_mic"
-        app:layout_constraintStart_toEndOf="@id/voice_user_avatar"
-        app:layout_constraintTop_toTopOf="parent"
+
         android:layout_marginHorizontal="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/voice_deaf"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_width="20dp"
         android:layout_height="20dp"
         app:tib_drawable_off="@drawable/baseline_mic_white_48"
@@ -55,10 +55,9 @@
         />
     <net.colindodd.toggleimagebutton.ToggleImageButton
         android:id="@+id/voice_deaf"
-        app:layout_constraintStart_toEndOf="@id/voice_mic"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginHorizontal="10dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:tib_drawable_off="@drawable/baseline_volume_up_white_48"
         app:tib_drawable_on="@drawable/baseline_volume_off_white_48"
