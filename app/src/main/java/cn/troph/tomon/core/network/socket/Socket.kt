@@ -59,8 +59,9 @@ class Socket : Observer<SocketEvent> {
         "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove,
         "GUILD_POSITION" to handleGuildPosition,
         "USER_PRESENCE_UPDATE" to handlePresenceUpdate,
-        "VOICE_HANDLER" to handleVoiceHandler,
-        "VOICE_STATE_UPDATE" to handleVoiceStateHandler
+        "VOICE_STATE_UPDATE" to handleVoiceStateHandler,
+        "LEAVE" to handleVoiceLeaveHandler,
+        "JOIN" to handleVoiceJoinHandler
     )
 
     constructor(client: Client) {
@@ -159,7 +160,8 @@ class Socket : Observer<SocketEvent> {
 
             }
             GatewayOp.VOICE -> {
-                val handler = _handlers["VOICE_HANDLER"]
+                val event = obj["e"].asString
+                val handler = _handlers[event]
                 handler?.let {
                     it(_client, obj)
                 }

@@ -16,7 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.VoiceSpeakEvent
+import cn.troph.tomon.core.events.GuildVoiceSelectorEvent
 import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
@@ -92,8 +92,13 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                             } else {
-                                mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
-                                mChatSharedViewModel.switchingChannelVoiceLD.value = true
+                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id != channel.id) {
+                                    mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                                    mChatSharedViewModel.switchingChannelVoiceLD.value = true
+                                } else {
+                                    VoiceBottomSheet().show(parentFragmentManager, null)
+                                }
+
                             }
 
                         }
@@ -116,7 +121,7 @@ class GuildChannelSelectorFragment : Fragment() {
             }
         }
 
-        mChatSharedViewModel.voiceLeaveChannelLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
             //disconnect voice ws
             Client.global.voiceSocket.close()
             mRtcEngine?.leaveChannel()
@@ -133,7 +138,7 @@ class GuildChannelSelectorFragment : Fragment() {
             if (it) {
                 val voice = VoiceIdentify(
                     sessionId = Client.global.socket.getSesstion()!!,
-                    voiceId = mChatSharedViewModel.voiceAllowConnectLD.value?.voiceUserIdAgora!!,
+                    voiceId = mChatSharedViewModel.voiceJoinLD.value?.voiceUserIdAgora!!,
                     userId = Client.global.me.id
                 )
                 Client.global.voiceSocket.send(GatewayOp.DISPATCH, Gson().toJsonTree(voice))
@@ -142,7 +147,7 @@ class GuildChannelSelectorFragment : Fragment() {
             }
         })
 
-        mChatSharedViewModel.voiceAllowConnectLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedViewModel.voiceJoinLD.observe(viewLifecycleOwner, Observer {
             VoiceBottomSheet().show(parentFragmentManager, null)
             joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
             Client.global.voiceSocket.open()
@@ -188,20 +193,20 @@ class GuildChannelSelectorFragment : Fragment() {
                                 it.vad == 1
                             }
                             myAudioInfo?.let {
-                                if (it.volume > 20) {
+                                if (it.volume > 100) {
                                     Client.global.voiceSocket.send(
                                         GatewayOp.SPEAK,
-                                        Gson().toJsonTree(Speaking(true))
+                                        Gson().toJsonTree(Speaking(1))
                                     )
                                     mChatSharedViewModel.voiceSpeakLD.value =
-                                        Speaking(true, Client.global.me.id)
+                                        Speaking(1, Client.global.me.id)
                                 } else {
                                     Client.global.voiceSocket.send(
                                         GatewayOp.SPEAK,
-                                        Gson().toJsonTree(Speaking(false))
+                                        Gson().toJsonTree(Speaking(0))
                                     )
                                     mChatSharedViewModel.voiceSpeakLD.value =
-                                        Speaking(false, Client.global.me.id)
+                                        Speaking(0, Client.global.me.id)
                                 }
                             }
                         }
@@ -231,6 +236,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 if (isToastLeaveChannel)
                                     Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
                                         .show()
+                                Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
                             }
                         }
 
@@ -241,6 +247,11 @@ class GuildChannelSelectorFragment : Fragment() {
                                     .show()
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
                                     mSelectedVoiceChannel
+                                Client.global.eventBus.postEvent(
+                                    GuildVoiceSelectorEvent(
+                                        mSelectedVoiceChannel.id
+                                    )
+                                )
                             }
                         }
 

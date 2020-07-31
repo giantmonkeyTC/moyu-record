@@ -72,12 +72,12 @@ class VoiceSocket : Observer<SocketEvent> {
             }
 
             3 -> {
-                //heart beart ack ignore
-                println("voice heartbeat ack")
+                //heart beat ack ignore
+                Logger.d("voice heartbeat ack")
             }
 
             6 -> {//someone is speaking
-                val handler = _handlers["SPEAK"]
+                val handler = _handlers["SPEAKING"]
                 handler?.let {
                     it(_client, obj)
                 }

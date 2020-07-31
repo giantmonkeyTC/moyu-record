@@ -14,10 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.MessageAtMeEvent
-import cn.troph.tomon.core.events.MessageCreateEvent
-import cn.troph.tomon.core.events.MessageReadEvent
-import cn.troph.tomon.core.events.VoiceStateUpdateEvent
+import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
@@ -160,6 +157,17 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     text.typeface = Typeface.DEFAULT
                     text.setTextColor(Color.parseColor("#969696"))
                     itemView.channel_unread_mention_notification.visibility = View.GONE
+                }
+            })
+            Client.global.eventBus.observeEventOnUi<GuildVoiceSelectorEvent>().subscribe(Consumer {
+                if (channel is VoiceChannel) {
+                    if (channel.id == it.channelId) {
+                        text.typeface = Typeface.DEFAULT_BOLD
+                        text.setTextColor(Color.parseColor("#FFFFFF"))
+                    } else {
+                        text.typeface = Typeface.DEFAULT
+                        text.setTextColor(Color.parseColor("#969696"))
+                    }
                 }
             })
             Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>()

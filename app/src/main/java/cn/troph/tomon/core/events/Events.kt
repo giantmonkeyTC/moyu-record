@@ -58,10 +58,12 @@ data class PresenceFetchEvent(val presences: List<Presence>) : Event()
 data class PresenceUpdateEvent(val presence: Presence) : Event()
 data class GuildSettingsUpdateEvent(val settings: GuildSettings) : Event()
 
-data class VoiceAllowConnectEvent(val voiceAllowConnect: VoiceAllowConnectReceive):Event()
-data class VoiceLeaveChannelEvent(val voiceAllowConnect: VoiceAllowConnectReceive):Event()
+data class VoiceAllowConnectEvent(val voiceConnectState: VoiceConnectStateReceive):Event()
+data class VoiceLeaveChannelEvent(val voiceConnectState: VoiceConnectStateReceive):Event()
 
 data class VoiceSpeakEvent(val speaking: Speaking) : Event()
 data class VoiceSocketStateEvent(val isOpen:Boolean): Event()
 
 data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate):Event()
+
+data class GuildVoiceSelectorEvent(val channelId:String):Event()

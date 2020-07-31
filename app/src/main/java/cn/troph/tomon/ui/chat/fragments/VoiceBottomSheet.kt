@@ -112,8 +112,13 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             it?.let {
                 (it as VoiceChannel).voiceStates.forEach {
-                    Client.global.users[it.userId]?.let {
-                        mVoiceUserList.add(it)
+                    Client.global.users[it.userId]?.let { user ->
+                        if (mVoiceUserList.find {
+                                it.id == user.id
+                            } == null) {
+                            mVoiceUserList.add(user)
+                        }
+
                     }
                 }
                 mAdapter.notifyDataSetChanged()
@@ -124,7 +129,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
 
             if (speaking.userId.isNotEmpty()) {
                 mVoiceUserList.forEach {
-                    it.isSpeaking = (it.id == speaking.userId && speaking.isSpeaking)
+                    it.isSpeaking = (it.id == speaking.userId && speaking.isSpeaking == 1)
                 }
                 mAdapter.notifyDataSetChanged()
             }

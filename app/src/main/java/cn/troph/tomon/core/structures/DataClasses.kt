@@ -9,8 +9,8 @@ data class VoiceConnectSend(
     @SerializedName("self_mute") val selfMute: Boolean
 )
 
-//allowed to join voice channel
-data class VoiceAllowConnectReceive(
+//join or leave channel
+data class VoiceConnectStateReceive(
     @SerializedName("channel_id") val channelId: String?,
     @SerializedName("vendor") val vendor: String,
     @SerializedName("token") val tokenAgora: String,
@@ -29,7 +29,7 @@ data class VoiceIdentify(
     @SerializedName("voice_id") val voiceId: Int
 )
 
-data class Speaking(@SerializedName("speaking") val isSpeaking: Boolean=false,@SerializedName("user_id") val userId:String="")
+data class Speaking(@SerializedName("speaking") val isSpeaking: Int=0,@SerializedName("user_id") val userId:String="")
 
 data class VoiceUpdate(
     @SerializedName("channel_id") val channelId: String="",

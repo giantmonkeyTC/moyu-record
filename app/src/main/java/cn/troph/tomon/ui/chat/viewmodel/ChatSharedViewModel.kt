@@ -28,11 +28,11 @@ class ChatSharedViewModel : ViewModel() {
 
     val voiceSpeakLD = MutableLiveData<Speaking>()
 
-    val voiceAllowConnectLD = MutableLiveData<VoiceAllowConnectReceive>()
+    val voiceJoinLD = MutableLiveData<VoiceConnectStateReceive>()
 
     val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
 
-    val voiceLeaveChannelLD = MutableLiveData<VoiceAllowConnectReceive>()
+    val voiceLeaveLD = MutableLiveData<VoiceConnectStateReceive>()
 
     val mentionState = MutableLiveData<MentionState>()
 
@@ -138,11 +138,11 @@ class ChatSharedViewModel : ViewModel() {
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceAllowConnectEvent>().subscribe(Consumer {
-            voiceAllowConnectLD.value = it.voiceAllowConnect
+            voiceJoinLD.value = it.voiceConnectState
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceLeaveChannelEvent>().subscribe(Consumer {
-            voiceLeaveChannelLD.value = it.voiceAllowConnect
+            voiceLeaveLD.value = it.voiceConnectState
         })
 
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer { event ->
