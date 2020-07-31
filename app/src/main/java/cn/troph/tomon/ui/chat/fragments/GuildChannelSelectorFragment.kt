@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.PowerManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,8 @@ import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
+import com.github.nisrulz.sensey.ProximityDetector
+import com.github.nisrulz.sensey.Sensey
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -41,6 +44,7 @@ class GuildChannelSelectorFragment : Fragment() {
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var disposable: Disposable? = null
     private var mRtcEngine: RtcEngine? = null
+    private lateinit var mWakeLock: PowerManager.WakeLock
     private lateinit var mSelectedVoiceChannel: GuildChannel
     var guildId: String? = null
         set(value) {
@@ -52,6 +56,16 @@ class GuildChannelSelectorFragment : Fragment() {
                 update()
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val pm = requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
+        mWakeLock = pm.newWakeLock(
+            PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+            "tomon:xxx_new_wake_log_111_xxx"
+        )
+        Sensey.getInstance().init(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,13 +106,8 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                             } else {
-                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id != channel.id) {
-                                    mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
-                                    mChatSharedViewModel.switchingChannelVoiceLD.value = true
-                                } else {
-                                    VoiceBottomSheet().show(parentFragmentManager, null)
-                                }
-
+                                mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = true
                             }
 
                         }
@@ -153,6 +162,21 @@ class GuildChannelSelectorFragment : Fragment() {
             Client.global.voiceSocket.open()
         })
 
+        Sensey.getInstance().startProximityDetection(object : ProximityDetector.ProximityListener {
+            override fun onFar() {
+                if (!mWakeLock.isHeld) {
+                    mWakeLock.acquire(3600*1000)
+                    mChatSharedViewModel.voiceSpeakerOnLD.value = true
+                }
+            }
+
+            override fun onNear() {
+                if (!mWakeLock.isHeld) {
+                    mWakeLock.release()
+                    mChatSharedViewModel.voiceSpeakerOnLD.value = false
+                }
+            }
+        })
     }
 
     fun update() {
@@ -193,7 +217,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                 it.vad == 1
                             }
                             myAudioInfo?.let {
-                                if (it.volume > 150) {
+                                if (it.volume > 100) {
                                     Client.global.voiceSocket.send(
                                         GatewayOp.SPEAK,
                                         Gson().toJsonTree(Speaking(1))
@@ -234,17 +258,18 @@ class GuildChannelSelectorFragment : Fragment() {
                                 }
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
                                 if (isToastLeaveChannel)
-                                    Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
-                                        .show()
-                                Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
+
+//                                    Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
+//                                        .show()
+                                    Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
+                                Logger.d("Leave Success")
                             }
                         }
 
                         override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             mHandler.post {
-                                Toast.makeText(requireContext(), "加入频道成功", Toast.LENGTH_SHORT)
-                                    .show()
+                                Logger.d("Join Success")
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
                                     mSelectedVoiceChannel
                                 Client.global.eventBus.postEvent(
@@ -290,6 +315,7 @@ class GuildChannelSelectorFragment : Fragment() {
         mRtcEngine?.leaveChannel()
         RtcEngine.destroy()
         mRtcEngine = null
+        Sensey.getInstance().stop()
     }
 
 }

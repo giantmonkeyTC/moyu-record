@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val voiceSpeakerOnLD = MutableLiveData<Boolean>()
+
     val switchingChannelVoiceLD = MutableLiveData<Boolean>()
 
     val voiceStateUpdateLD = MutableLiveData<VoiceUpdate>()

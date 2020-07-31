@@ -100,6 +100,14 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             voice_guild_name_tv.text = it.guild?.name
         }
 
+        mChatSharedViewModel.voiceSpeakerOnLD.observe(viewLifecycleOwner, Observer {
+            button6.isChecked = it
+        })
+
+        mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
+            voice_channel_id.text = "语音已断开"
+        })
+
         mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
             mVoiceUserList.clear()
             (it as VoiceChannel).voiceStates.forEach {
@@ -109,6 +117,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
             mAdapter.notifyDataSetChanged()
         }
+
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             it?.let {
                 (it as VoiceChannel).voiceStates.forEach {
@@ -129,7 +138,8 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
 
             if (speaking.userId.isNotEmpty()) {
                 mVoiceUserList.forEach {
-                    it.isSpeaking = (it.id == speaking.userId && speaking.isSpeaking == 1)
+                    it.isSpeaking =
+                        (it.id == speaking.userId && speaking.isSpeaking == 1) || speaking.userId == Client.global.me.id
                 }
                 mAdapter.notifyDataSetChanged()
             }
