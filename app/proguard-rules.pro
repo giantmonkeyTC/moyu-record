@@ -108,3 +108,6 @@
 -keep class com.meizu.cloud.** {*;}
 -dontwarn com.meizu.cloud.**
 
+#声网
+-keep class io.agora.**{*;}
+

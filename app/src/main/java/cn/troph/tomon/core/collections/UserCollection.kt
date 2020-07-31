@@ -9,4 +9,11 @@ class UserCollection(client: Client) :
     override fun instantiate(data: JsonObject): User? {
         return User(client, data)
     }
+
+    fun findWithIdentifier(identifier: String):User? {
+        val result = this.filter { user ->
+            user.identifier == identifier
+        }
+        return if (result.length>0) result.values.first() else null
+    }
 }

@@ -639,7 +639,11 @@ class MessageAdapter(
 //                        }
 //                    }
                     Glide.with(holder.itemView)
-                        .load(if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(item.hash))
+                        .load(
+                            if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(
+                                item.hash
+                            )
+                        )
                         .placeholder(R.drawable.loadinglogo)
                         .override(item.width, item.height)
                         .into(holder.itemView.chat_iv_stamp)

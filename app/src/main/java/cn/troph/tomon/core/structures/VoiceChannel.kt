@@ -11,6 +11,8 @@ class VoiceChannel(client: Client, data: JsonObject) :
     var userLimit: Int = 0
         private set
 
+    val voiceStates = mutableListOf<VoiceUpdate>()
+
     init {
         patchSelf(data)
     }
@@ -21,6 +23,13 @@ class VoiceChannel(client: Client, data: JsonObject) :
         }
         if (data.has("user_limit")) {
             userLimit = data["user_limit"].asInt
+        }
+        guild?.let {
+            it.voiceStates.forEach {
+                if (it.channelId == id) {
+                    voiceStates.add(it)
+                }
+            }
         }
     }
 

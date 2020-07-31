@@ -31,4 +31,26 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.7" />
 
+    <com.nex3z.flowlayout.FlowLayout
+        android:id="@+id/user_avatar_flow_ll"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/image_icon"
+        app:layout_constraintTop_toBottomOf="@id/image_icon">
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+
+        <cn.troph.tomon.ui.widgets.UserAvatar
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+    </com.nex3z.flowlayout.FlowLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

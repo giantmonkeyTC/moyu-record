@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 
@@ -36,6 +37,10 @@ class DmChannelSelectorFragment : Fragment() {
 
         view_dmchannels_list.layoutManager = LinearLayoutManager(view.context)
         view_dmchannels_list.adapter = mDMchennelAdapter
+
+        mChatVM.presenceUpdateLV.observe(viewLifecycleOwner, Observer {
+            mDMchennelAdapter.notifyDataSetChanged()
+        })
 
         mChatVM.dmChannelLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {

@@ -2,10 +2,15 @@ package cn.troph.tomon.ui.activities
 
 import android.app.ActivityOptions
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,6 +29,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
+
 
 data class LoginForm(
     val unionIdError: Int? = null,

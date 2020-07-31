@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">TOMON</string>
     <string name="action_settings">设置</string>
+    <string name="voice_connecting">语音正在连接</string>
 
     <string name="auth_server_error">服务异常</string>
     <string name="login_title">登录Tomon</string>
-    <string name="login_id_hint">邮箱/手机</string>
+    <string name="login_id_hint">手机号</string>
     <string name="login_password_hint">密码</string>
     <string name="login_button">登录</string>
 
@@ -61,6 +62,21 @@
     <string name="report_4">侵犯未成年人权益</string>
     <string name="report_5">其他违规行为</string>
     <string name="report_detail">详细描述</string>
+
+    <string name="agora_app_id">1f43061ebe7243348efad474298c2bcb</string>
+
+    <string name="voice_mic_off">MIC已关闭</string>
+    <string name="voice_mic_on">MIC已开启</string>
+    <string name="voice_sound_on">声音已开启</string>
+    <string name="voice_sound_off">声音已关闭</string>
+    <string name="voice_ear_phone">非公放</string>
+    <string name="voice_speaker">公放</string>
+    <string name="leave_channel_btn">退出</string>
+    <string name="leaving_channel_btn">退出中…</string>
+    <string name="join_voice_fail">加入语音频道失败</string>
+    <string name="join_permission_msg">加入语音频道失败,无麦克风权限</string>
+    <string name="privacy_agreement">注册即同意《用户服务协议》</string>
+    <string name="multi">多选</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

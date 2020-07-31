@@ -21,6 +21,8 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
     var avatarURL: String? = null
         protected set
 
+    var isSpeaking = false
+
     init {
         patchSelf(data)
     }

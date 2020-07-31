@@ -103,6 +103,21 @@ class GuildSelectorFragment : Fragment() {
             btn_dm_channel_entry.setImageResource(R.drawable.dm)
             btn_dm_channel_entry.isEnabled = true
         })
+
+        mChatVM.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer { voiceChannel ->
+            if (voiceChannel == null) {
+                mGuildList.forEach {
+                    it.isVoiceChatting = false
+                }
+            } else {
+                mGuildList.forEach {
+                    it.isVoiceChatting = voiceChannel.guildId == it.id
+                }
+            }
+            mAdapter.notifyDataSetChanged()
+        })
+
+
         mChatVM.guildListLiveData.observe(viewLifecycleOwner, Observer {
             it?.let { list ->
                 mGuildList.clear()
@@ -158,14 +173,15 @@ class GuildSelectorFragment : Fragment() {
         })
 
         mChatVM.messageAtMeLD.observe(viewLifecycleOwner, Observer { event ->
-            if (mChatVM.guildListLiveData.value?.contains(event.message.guild!!)!!) {
-                if (event.message.guild!!.updateMention())
-                    mAdapter.notifyItemChanged(
-                        mChatVM.guildListLiveData.value!!.indexOf(
-                            event.message.guild!!
+            if (event.message.guild != null)
+                if (mChatVM.guildListLiveData.value?.contains(event.message.guild!!)!!) {
+                    if (event.message.guild!!.updateMention())
+                        mAdapter.notifyItemChanged(
+                            mChatVM.guildListLiveData.value!!.indexOf(
+                                event.message.guild!!
+                            )
                         )
-                    )
-            }
+                }
 
         })
 

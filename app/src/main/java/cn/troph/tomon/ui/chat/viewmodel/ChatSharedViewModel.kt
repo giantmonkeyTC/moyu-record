@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.viewmodel
 
+
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
@@ -10,20 +11,41 @@ import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.states.UpdateEnabled
-import com.google.android.gms.common.api.Api
+
 import com.google.gson.annotations.SerializedName
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class ChatSharedViewModel : ViewModel() {
+
+    val switchingChannelVoiceLD = MutableLiveData<Boolean>()
+
+    val voiceStateUpdateLD = MutableLiveData<VoiceUpdate>()
+
+    val voiceSocketStateLD = MutableLiveData<Boolean>()
+
+    val voiceSpeakLD = MutableLiveData<Speaking>()
+
+    val voiceJoinLD = MutableLiveData<VoiceConnectStateReceive>()
+
+    val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
+
+    val voiceLeaveLD = MutableLiveData<VoiceConnectStateReceive>()
+
+    val mentionState = MutableLiveData<MentionState>()
+
+    data class MentionState(
+        @SerializedName("state") val state: Boolean,
+        @SerializedName("start") val start: Int
+    )
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
     val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
+
 
     val messageLiveData = MutableLiveData<MutableList<Message>>()
 
@@ -88,6 +110,10 @@ class ChatSharedViewModel : ViewModel() {
                 updateLD.value = it
             })
 
+        Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
+            voiceStateUpdateLD.value = it.voiceUpdate
+        })
+
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
             messageAtMeLD.value = it
         })
@@ -101,6 +127,22 @@ class ChatSharedViewModel : ViewModel() {
                 dmUnReadLiveData.value?.remove(it.channel.id)
                 dmUnReadLiveData.notifyObserver()
             }
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceSpeakEvent>().subscribe(Consumer {
+            voiceSpeakLD.value = it.speaking
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceSocketStateEvent>().subscribe(Consumer {
+            voiceSocketStateLD.value = it.isOpen
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceAllowConnectEvent>().subscribe(Consumer {
+            voiceJoinLD.value = it.voiceConnectState
+        })
+
+        Client.global.eventBus.observeEventOnUi<VoiceLeaveChannelEvent>().subscribe(Consumer {
+            voiceLeaveLD.value = it.voiceConnectState
         })
 
         Client.global.eventBus.observeEventOnUi<MessageCreateEvent>().subscribe(Consumer { event ->

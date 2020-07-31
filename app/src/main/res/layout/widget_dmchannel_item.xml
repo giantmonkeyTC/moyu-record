@@ -19,6 +19,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
+    <ImageView
+        android:id="@+id/offline_dmchannel_user_shadow"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:visibility="gone"
+        android:src="@drawable/shape_offline_shadow"
+        app:layout_constraintStart_toStartOf="@id/dmchannel_user_avatar"
+        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar"/>
+    <ImageView
+        android:id="@+id/dmchannel_user_online"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/shape_user_online"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        app:layout_constraintStart_toStartOf="@id/dmchannel_user_avatar"
+        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar" />
 
     <TextView
         android:id="@+id/text_name"

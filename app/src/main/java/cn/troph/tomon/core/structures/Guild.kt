@@ -8,6 +8,7 @@ import cn.troph.tomon.core.collections.GuildEmojiCollection
 import cn.troph.tomon.core.collections.GuildMemberCollection
 import cn.troph.tomon.core.collections.RoleCollection
 import cn.troph.tomon.core.utils.*
+import com.google.gson.Gson
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
@@ -44,7 +45,8 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     var unread = false
     var mention: Int = 0
     var isSelected = false
-
+    var isVoiceChatting = false
+    val voiceStates = mutableListOf<VoiceUpdate>()
 
     init {
         patchSelf(data)
@@ -73,6 +75,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     }
 
     private fun patchSelf(data: JsonObject) {
+
         if (data.has("id")) {
             id = data["id"].asString
         }
@@ -113,6 +116,15 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             val value = data["default_message_notifications"].asInt
             defaultMessageNotifications =
                 MessageNotificationsType.fromInt(value) ?: MessageNotificationsType.ONLY_MENTION
+        }
+        if (data.has("voice_states")) {
+            voiceStates.clear()
+            voiceStates.addAll(
+                Gson().fromJson(
+                    data.get("voice_states"),
+                    Array<VoiceUpdate>::class.java
+                )
+            )
         }
     }
 

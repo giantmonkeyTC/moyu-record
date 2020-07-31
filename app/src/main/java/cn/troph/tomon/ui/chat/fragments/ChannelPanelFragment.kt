@@ -4,7 +4,10 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources
 import android.database.Cursor
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -12,34 +15,53 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
+import android.text.Editable
+import android.text.Spannable
+import android.text.TextWatcher
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
+import cn.troph.tomon.core.utils.color
+import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.emoji.*
+import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.states.AppState
-import cn.troph.tomon.ui.states.NetworkChangeReceiver
-import cn.troph.tomon.ui.states.UpdateEnabled
+import cn.troph.tomon.ui.states.*
 import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
@@ -47,6 +69,7 @@ import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import kotlinx.android.synthetic.main.guild_user_info.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
@@ -75,6 +98,8 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
     private lateinit var mBottomSheet: FileBottomSheetFragment
+    private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
+    private lateinit var viewPager: NestedViewPager
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
 
@@ -222,9 +247,58 @@ class ChannelPanelFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewPagerCollectionAdapter =
+            ViewPagerCollectionAdapter(mEmojiClickListener, requireFragmentManager())
+        viewPager = view.findViewById(R.id.reaction_stamp_viewpager)
+        viewPager.adapter = viewPagerCollectionAdapter
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
             isUpdateEnabled = it.flag
+        })
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                s?.let {
+                    mChannelId?.let {
+                        if (Client.global.channels[it] is TextChannel)
+                            if (s.length > 0 && start < s.length)
+                                mChatSharedVM.mentionState.value =
+                                    ChatSharedViewModel.MentionState(
+                                        state = s[start].toString() == "@" && count == 1,
+                                        start = start
+                                    )
+                            else
+                                mChatSharedVM.mentionState.value =
+                                    ChatSharedViewModel.MentionState(
+                                        state = false,
+                                        start = start
+                                    )
+                    }
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+        mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
+            it.let {
+                if (it.state) {
+                    mChannelId?.let {
+                        mChatSharedVM.loadMemberList(it)
+                    }
+                    hideKeyboard()
+                }
+            }
+        })
+        mChatSharedVM.memberLiveData.observe(viewLifecycleOwner, Observer {
+            it.let {
+                if (mChatSharedVM.mentionState.value?.state!!)
+                    callMentionBottomSheet(it)
+            }
         })
 
         mChatSharedVM.channelSelectionLD.observe(viewLifecycleOwner, Observer {
@@ -267,7 +341,11 @@ class ChannelPanelFragment : BaseFragment() {
             if (mChannelId.isNullOrEmpty() || editText.text.isNullOrEmpty()) {
                 return@setOnClickListener
             }
-            val textToSend = editText.text.toString()
+            val textToSend =
+                if (editText.text.toString().matches(Assets.regexMention))
+                    Assets.mentionSendParser(editText.text.toString())
+                else
+                    editText.text.toString()
             editText.text.clear()
             if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
@@ -350,14 +428,16 @@ class ChannelPanelFragment : BaseFragment() {
             if (isChecked) {
                 hideKeyboard()
                 scrollToBottom()
-                section_header_layout.visibility = View.VISIBLE
-                bottom_emoji_rr.visibility = View.VISIBLE
-                loadEmoji()
+//                section_header_layout.visibility = View.VISIBLE
+//                bottom_emoji_rr.visibility = View.VISIBLE
+//                loadEmoji()
+                reaction_stamp_viewpager.visibility = View.VISIBLE
                 btn_message_menu.isChecked = false
             } else {
-                section_header_layout.visibility =
-                    View.GONE
-                bottom_emoji_rr.visibility = View.GONE
+                reaction_stamp_viewpager.visibility = View.GONE
+//                section_header_layout.visibility =
+//                    View.GONE
+//                bottom_emoji_rr.visibility = View.GONE
             }
         }
         //接受新的Message
@@ -832,6 +912,45 @@ class ChannelPanelFragment : BaseFragment() {
         }
     }
 
+    private fun mentionFormat(identifier: String): String {
+        return "@${identifier}"
+    }
+
+    private fun callMentionBottomSheet(mentionList: MutableList<GuildMember>) {
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.botom_sheet_mention, null)
+        val dialog = BottomSheetDialog(requireContext())
+        dialog.setContentView(view)
+        val mentionAdapter =
+            MentionListAdapter(mentionList, object : MentionListAdapter.OnMentionSelectedListener {
+                override fun onMentionSelected(identifier: String) {
+                    mChatSharedVM.mentionState.value?.let {
+                        editText.text.replace(
+                            it.start, it.start + 1,
+                            mentionFormat(identifier)
+                        )
+                        editText.text.setSpan(
+                            ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
+                            it.start,
+                            it.start + mentionFormat(identifier).length,
+                            0x11
+                        )
+                    }
+                    dialog.dismiss()
+                }
+            })
+        val mentionPanel = view.findViewById<RecyclerView>(R.id.mention_panel)
+        mentionPanel.adapter = mentionAdapter
+        mentionPanel.layoutManager = LinearLayoutManager(context)
+        mentionAdapter.notifyDataSetChanged()
+        dialog.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
+        dialog.show()
+    }
+
     private fun uploadFile(file: File, msg: Message) {
         val requestFile = file.asRequestBody()
         val requestBody =
@@ -914,6 +1033,31 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
         return result
+    }
+
+}
+
+class ViewPagerCollectionAdapter(
+    val onEmojiClickListener: OnEmojiClickListener,
+    fragmentManager: FragmentManager
+) : FragmentPagerAdapter(fragmentManager) {
+    override fun getItem(position: Int): Fragment {
+        return when (position) {
+            0 -> {
+                val fragment = EmojiFragment(onEmojiClickListener = onEmojiClickListener)
+                return fragment
+            }
+            1 -> {
+                val fragment = StampFragment()
+                return fragment
+            }
+            else -> Fragment()
+        }
+
+    }
+
+    override fun getCount(): Int {
+        return 2
     }
 
 }

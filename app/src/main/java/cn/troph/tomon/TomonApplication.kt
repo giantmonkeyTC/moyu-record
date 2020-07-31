@@ -75,26 +75,24 @@ class TomonApplication : Application() {
         val pushService = PushServiceFactory.getCloudPushService()
         pushService.register(applicationContext, object : CommonCallback {
             override fun onSuccess(response: String) {
-                Log.i("PUSH", "init cloudchannel success")
+                Logger.d("init cloudchannel success")
                 initChannel()
-
-
             }
 
             override fun onFailed(errorCode: String, errorMessage: String) {
-                Log.e(
-                    "PUSH",
-                    "init cloudchannel failed -- errorcode:$errorCode -- errorMessage:$errorMessage"
-                )
+                Logger.d("init cloudchannel failed -- errorcode:$errorCode -- errorMessage:$errorMessage")
             }
         })
 
         MiPushRegister.register(applicationContext, "2882303761518514696", "5871851498696")
         HuaWeiRegister.register(this)
-        OppoRegister.register(applicationContext,"09adbc3666374668b56fe6f36eded638", "b883bfa2d7a24978a4d9974487628305")
+        OppoRegister.register(
+            applicationContext,
+            "09adbc3666374668b56fe6f36eded638",
+            "b883bfa2d7a24978a4d9974487628305"
+        )
         MeizuRegister.register(applicationContext, "132848", "e36250ebb8fe48e3b4c52636a19c28cb")
         VivoRegister.register(applicationContext)
-
     }
 
     @Synchronized

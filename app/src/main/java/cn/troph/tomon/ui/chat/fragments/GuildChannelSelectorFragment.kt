@@ -1,22 +1,47 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.Manifest
+import android.content.Context
+import android.media.AudioManager
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.GuildVoiceSelectorEvent
+import cn.troph.tomon.core.network.socket.GatewayOp
+import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
+import com.google.gson.Gson
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
+import com.orhanobut.logger.Logger
+import io.agora.rtc.Constants
+import io.agora.rtc.IRtcEngineEventHandler
+import io.agora.rtc.RtcEngine
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 
 class GuildChannelSelectorFragment : Fragment() {
-    var disposable: Disposable? = null
-
+    private val mHandler = Handler()
+    private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
+    private var disposable: Disposable? = null
+    private var mRtcEngine: RtcEngine? = null
+    private lateinit var mSelectedVoiceChannel: GuildChannel
     var guildId: String? = null
         set(value) {
             field = value
@@ -38,13 +63,96 @@ class GuildChannelSelectorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeAgoraEngine()
         AppState.global.channelSelection.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe { guildId = it.guildId }
         val guildChannelAdapter = GuildChannelSelectorAdapter().apply { hasStableIds() }
-        view_guild_channels.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = guildChannelAdapter
+        view_guild_channels.layoutManager = LinearLayoutManager(requireContext())
+        view_guild_channels.adapter = guildChannelAdapter
+        guildChannelAdapter.onItemClickListner = object : OnVoiceChannelClick {
+            override fun onVoiceChannelSelected(channel: GuildChannel) {
+                mSelectedVoiceChannel = channel
+                //check permission of microphone first
+                Dexter.withContext(requireContext())
+                    .withPermission(Manifest.permission.RECORD_AUDIO)
+                    .withListener(object : PermissionListener {
+                        override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                            val audioManager =
+                                requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = false
+                                Client.global.socket.send(
+                                    GatewayOp.VOICE,
+                                    Gson().toJsonTree(
+                                        VoiceConnectSend(
+                                            channel.id,
+                                            audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                            audioManager.isMicrophoneMute
+                                        )
+                                    )
+                                )
+                            } else {
+                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id != channel.id) {
+                                    mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                                    mChatSharedViewModel.switchingChannelVoiceLD.value = true
+                                } else {
+                                    VoiceBottomSheet().show(parentFragmentManager, null)
+                                }
+
+                            }
+
+                        }
+
+                        override fun onPermissionRationaleShouldBeShown(
+                            p0: PermissionRequest?,
+                            p1: PermissionToken?
+                        ) {
+
+                        }
+
+                        override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.join_permission_msg,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }).check()
+            }
         }
+
+        mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
+            //disconnect voice ws
+            Client.global.voiceSocket.close()
+            mRtcEngine?.leaveChannel()
+        })
+
+        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
+            } else {
+                //switch channel
+            }
+        })
+        mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val voice = VoiceIdentify(
+                    sessionId = Client.global.socket.getSesstion()!!,
+                    voiceId = mChatSharedViewModel.voiceJoinLD.value?.voiceUserIdAgora!!,
+                    userId = Client.global.me.id
+                )
+                Client.global.voiceSocket.send(GatewayOp.DISPATCH, Gson().toJsonTree(voice))
+            } else {
+
+            }
+        })
+
+        mChatSharedViewModel.voiceJoinLD.observe(viewLifecycleOwner, Observer {
+            VoiceBottomSheet().show(parentFragmentManager, null)
+            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
+            Client.global.voiceSocket.open()
+        })
+
     }
 
     fun update() {
@@ -59,4 +167,133 @@ class GuildChannelSelectorFragment : Fragment() {
         }
     }
 
+    private fun joinChannel(token: String, uid: Int, channelId: String) {
+        // online token
+        mRtcEngine?.joinChannel(
+            token,
+            channelId,
+            "Extra Optional Data", uid
+        ) // if you do not specify the uid, we will generate the uid for you
+    }
+
+    private fun initializeAgoraEngine() {
+        try {
+            if (mRtcEngine == null) {
+                mRtcEngine = RtcEngine.create(
+                    requireContext(),
+                    getString(R.string.agora_app_id),
+                    object : IRtcEngineEventHandler() {
+
+                        override fun onAudioVolumeIndication(
+                            p0: Array<out AudioVolumeInfo>?,
+                            p1: Int
+                        ) {
+                            super.onAudioVolumeIndication(p0, p1)
+                            val myAudioInfo = p0?.find {
+                                it.vad == 1
+                            }
+                            myAudioInfo?.let {
+                                if (it.volume > 150) {
+                                    Client.global.voiceSocket.send(
+                                        GatewayOp.SPEAK,
+                                        Gson().toJsonTree(Speaking(1))
+                                    )
+                                    mChatSharedViewModel.voiceSpeakLD.value =
+                                        Speaking(1, Client.global.me.id)
+                                } else {
+                                    Client.global.voiceSocket.send(
+                                        GatewayOp.SPEAK,
+                                        Gson().toJsonTree(Speaking(0))
+                                    )
+                                    mChatSharedViewModel.voiceSpeakLD.value =
+                                        Speaking(0, Client.global.me.id)
+                                }
+                            }
+                        }
+
+                        override fun onLeaveChannel(p0: RtcStats?) {
+                            super.onLeaveChannel(p0)
+                            mHandler.post {
+                                var isToastLeaveChannel = true
+                                mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
+                                    if (it) {
+                                        val audioManager =
+                                            requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                                        Client.global.socket.send(
+                                            GatewayOp.VOICE,
+                                            Gson().toJsonTree(
+                                                VoiceConnectSend(
+                                                    mSelectedVoiceChannel.id,
+                                                    audioManager.isStreamMute(AudioManager.STREAM_MUSIC),
+                                                    audioManager.isMicrophoneMute
+                                                )
+                                            )
+                                        )
+                                        isToastLeaveChannel = false
+                                    }
+                                }
+                                mChatSharedViewModel.switchingChannelVoiceLD.value = false
+                                if (isToastLeaveChannel)
+                                    Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
+                                        .show()
+                                Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
+                            }
+                        }
+
+                        override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
+                            super.onJoinChannelSuccess(p0, p1, p2)
+                            mHandler.post {
+                                Toast.makeText(requireContext(), "加入频道成功", Toast.LENGTH_SHORT)
+                                    .show()
+                                mChatSharedViewModel.selectedCurrentVoiceChannel.value =
+                                    mSelectedVoiceChannel
+                                Client.global.eventBus.postEvent(
+                                    GuildVoiceSelectorEvent(
+                                        mSelectedVoiceChannel.id
+                                    )
+                                )
+                            }
+                        }
+
+                        override fun onError(p0: Int) {
+                            super.onError(p0)
+                            Logger.d("Error Voice:${p0}")
+                            if (p0 == Constants.ERR_JOIN_CHANNEL_REJECTED) {
+                                mHandler.post {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "请先退出之前的语音频道再加入",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+                            }
+
+                        }
+                    }
+                )
+                mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
+                mRtcEngine?.enableAudioVolumeIndication(250, 10, true)
+            }
+        } catch (e: Exception) {
+            Logger.d(e.message)
+            Toast.makeText(
+                requireContext(),
+                R.string.join_voice_fail,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mRtcEngine?.leaveChannel()
+        RtcEngine.destroy()
+        mRtcEngine = null
+    }
+
+}
+
+interface SwitchChannelVoiceCallback {
+    fun onSwitchFinish()
 }
