@@ -166,15 +166,15 @@ class GuildChannelSelectorFragment : Fragment() {
             override fun onFar() {
                 if (!mWakeLock.isHeld) {
                     mWakeLock.acquire(3600*1000)
-                    mChatSharedViewModel.voiceSpeakerOnLD.value = true
                 }
+                mChatSharedViewModel.voiceSpeakerOnLD.value = true
             }
 
             override fun onNear() {
                 if (!mWakeLock.isHeld) {
                     mWakeLock.release()
-                    mChatSharedViewModel.voiceSpeakerOnLD.value = false
                 }
+                mChatSharedViewModel.voiceSpeakerOnLD.value = false
             }
         })
     }

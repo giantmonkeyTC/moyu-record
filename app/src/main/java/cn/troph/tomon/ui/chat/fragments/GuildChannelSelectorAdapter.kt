@@ -232,6 +232,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                 }
 
             }
+            if (channel !is VoiceChannel) {
+                voiceUserContainerLayout.visibility = View.GONE
+            }
         }
     }
 
