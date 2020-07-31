@@ -20,6 +20,7 @@ import cn.troph.tomon.ui.chat.members.VoiceUserAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
 class VoiceBottomSheet : BottomSheetDialogFragment() {
@@ -99,10 +100,13 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                         user.id == it.userId
                     }
                     Client.global.users[it.userId]?.let { user ->
-                        user.isSelfDeaf = it.isSelfDeaf
-                        user.isSelfMute = it.isSelfMute
-                        mVoiceUserList.add(user)
-                        mAdapter.notifyDataSetChanged()
+                        if (user.id != Client.global.me.id) {
+                            user.isSelfDeaf = it.isSelfDeaf
+                            user.isSelfMute = it.isSelfMute
+                            mVoiceUserList.add(user)
+                            mAdapter.notifyDataSetChanged()
+                        }
+
                     }
                 }
                 if (it.channelId.isNullOrEmpty() && it.guildId.isNullOrEmpty()) {//remove
@@ -135,9 +139,12 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                 mVoiceUserList.clear()
                 (it as VoiceChannel).voiceStates.forEach {
                     Client.global.users[it.userId]?.let { user ->
-                        user.isSelfMute = it.isSelfMute
-                        user.isSelfDeaf = it.isSelfDeaf
-                        mVoiceUserList.add(user)
+                        if (user.id != Client.global.me.id) {
+                            user.isSelfMute = it.isSelfMute
+                            user.isSelfDeaf = it.isSelfDeaf
+                            mVoiceUserList.add(user)
+                        }
+
                     }
                 }
                 mAdapter.notifyDataSetChanged()
@@ -149,15 +156,25 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             if (speaking.userId.isNotEmpty()) {
                 mVoiceUserList.forEach {
                     it.isSpeaking =
-                        (it.id == speaking.userId && speaking.isSpeaking == 1) || speaking.userId == Client.global.me.id
+                        (it.id == speaking.userId && speaking.isSpeaking == 1)
                 }
                 mAdapter.notifyDataSetChanged()
+            }
+            if (speaking.userId == Client.global.me.id) {
+                if (speaking.isSpeaking == 1) {
+                    voice_myself_state.borderColor = requireContext().getColor(R.color.speaking)
+                } else {
+                    voice_myself_state.borderColor = requireContext().getColor(R.color.white)
+                }
             }
         })
 
         voice_avatar_rr.layoutManager = LinearLayoutManager(requireContext())
         voice_avatar_rr.adapter = mAdapter
 
-
+        voice_myself.user = Client.global.me
+        audioManager.microphones.forEach {
+            it.maxSpl
+        }
     }
 }

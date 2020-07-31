@@ -30,13 +30,6 @@ class VoiceUserAdapter(private val userList: MutableList<User>) :
         holder.itemView.user_name_voice.text = userList[position].name
         holder.itemView.voice_mic.isChecked = userList[position].isSelfMute
         holder.itemView.voice_deaf.isChecked = userList[position].isSelfDeaf
-        if (userList[position].id == Client.global.me.id) {
-            holder.itemView.voice_mic.visibility = View.GONE
-            holder.itemView.voice_deaf.visibility = View.GONE
-        } else {
-            holder.itemView.voice_mic.visibility = View.VISIBLE
-            holder.itemView.voice_deaf.visibility = View.VISIBLE
-        }
     }
 
     override fun getItemCount(): Int {

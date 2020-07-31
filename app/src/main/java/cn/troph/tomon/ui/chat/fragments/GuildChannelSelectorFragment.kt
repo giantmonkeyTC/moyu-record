@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent
+import cn.troph.tomon.core.events.VoiceSpeakEvent
 import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
@@ -165,7 +166,7 @@ class GuildChannelSelectorFragment : Fragment() {
         Sensey.getInstance().startProximityDetection(object : ProximityDetector.ProximityListener {
             override fun onFar() {
                 if (!mWakeLock.isHeld) {
-                    mWakeLock.acquire(3600*1000)
+                    mWakeLock.acquire(3600 * 1000)
                 }
                 mChatSharedViewModel.voiceSpeakerOnLD.value = true
             }
@@ -213,24 +214,38 @@ class GuildChannelSelectorFragment : Fragment() {
                             p1: Int
                         ) {
                             super.onAudioVolumeIndication(p0, p1)
-                            val myAudioInfo = p0?.find {
-                                it.vad == 1
-                            }
-                            myAudioInfo?.let {
-                                if (it.volume > 100) {
-                                    Client.global.voiceSocket.send(
-                                        GatewayOp.SPEAK,
-                                        Gson().toJsonTree(Speaking(1))
-                                    )
-                                    mChatSharedViewModel.voiceSpeakLD.value =
-                                        Speaking(1, Client.global.me.id)
-                                } else {
-                                    Client.global.voiceSocket.send(
-                                        GatewayOp.SPEAK,
-                                        Gson().toJsonTree(Speaking(0))
-                                    )
-                                    mChatSharedViewModel.voiceSpeakLD.value =
-                                        Speaking(0, Client.global.me.id)
+                            p0?.forEach {
+                                if (it.uid == 0) {
+                                    if (it.volume > 50) {
+                                        Logger.d("speaking")
+                                        Client.global.voiceSocket.send(
+                                            GatewayOp.SPEAK,
+                                            Gson().toJsonTree(Speaking(1))
+                                        )
+                                        Client.global.eventBus.postEvent(
+                                            VoiceSpeakEvent(
+                                                Speaking(
+                                                    1,
+                                                    Client.global.me.id
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        Logger.d("no speaking")
+                                        Client.global.voiceSocket.send(
+                                            GatewayOp.SPEAK,
+                                            Gson().toJsonTree(Speaking(0))
+                                        )
+                                        Client.global.eventBus.postEvent(
+                                            VoiceSpeakEvent(
+                                                Speaking(
+                                                    0,
+                                                    Client.global.me.id
+                                                )
+                                            )
+                                        )
+
+                                    }
                                 }
                             }
                         }
@@ -298,7 +313,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     }
                 )
                 mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
-                mRtcEngine?.enableAudioVolumeIndication(250, 10, true)
+                mRtcEngine?.enableAudioVolumeIndication(300, 3, false)
             }
         } catch (e: Exception) {
             Logger.d(e.message)
