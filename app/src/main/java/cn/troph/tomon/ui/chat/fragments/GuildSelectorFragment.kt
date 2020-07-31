@@ -23,7 +23,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
