@@ -9,9 +9,11 @@ import cn.troph.tomon.core.structures.VoiceConnectStateReceive
 import cn.troph.tomon.core.structures.VoiceUpdate
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.orhanobut.logger.Logger
 
 
 val handleVoiceStateHandler: Handler = { client, packet ->
+    Logger.d(packet)
     client.eventBus.postEvent(
         VoiceStateUpdateEvent(
             Gson().fromJson(

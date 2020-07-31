@@ -34,8 +34,8 @@ data class Speaking(@SerializedName("speaking") val isSpeaking: Int=0,@Serialize
 data class VoiceUpdate(
     @SerializedName("channel_id") val channelId: String="",
     @SerializedName("guild_id") val guildId: String="",
-    @SerializedName("self_deaf") val self_deaf: Boolean = false,
-    @SerializedName("self_mute") val selfMute: Boolean = false,
+    @SerializedName("self_deaf") val isSelfDeaf: Boolean = false,
+    @SerializedName("self_mute") val isSelfMute: Boolean = false,
     @SerializedName("session_id") val sessionId: String="",
     @SerializedName("user_id") val userId: String="",
     @SerializedName("voice_id") val voiceId: Int=0

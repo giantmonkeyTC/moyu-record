@@ -30,9 +30,9 @@ class ChatSharedViewModel : ViewModel() {
 
     val voiceSpeakLD = MutableLiveData<Speaking>()
 
-    val voiceJoinLD = MutableLiveData<VoiceConnectStateReceive>()
-
     val selectedCurrentVoiceChannel = MutableLiveData<GuildChannel>()//如果为空就是没有加入语音频道
+
+    val voiceJoinLD = MutableLiveData<VoiceConnectStateReceive>()
 
     val voiceLeaveLD = MutableLiveData<VoiceConnectStateReceive>()
 

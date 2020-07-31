@@ -23,6 +23,10 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     var isSpeaking = false
 
+    var isSelfMute = false
+
+    var isSelfDeaf = false
+
     init {
         patchSelf(data)
     }

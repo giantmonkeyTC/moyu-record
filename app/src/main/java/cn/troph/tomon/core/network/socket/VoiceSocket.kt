@@ -68,12 +68,10 @@ class VoiceSocket : Observer<SocketEvent> {
             }
 
             5 -> {//鉴权成功
-                Logger.d("鉴权成功")
             }
 
             3 -> {
                 //heart beat ack ignore
-                Logger.d("voice heartbeat ack")
             }
 
             6 -> {//someone is speaking

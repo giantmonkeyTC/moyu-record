@@ -6,13 +6,14 @@
     android:background="@color/background4">
     <de.hdodenhof.circleimageview.CircleImageView
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginHorizontal="16dp"
         android:background="@android:color/transparent"
         android:id="@+id/speaking_circle_iv"
         android:src="@drawable/round_account_circle_white_48"
-        app:civ_border_width="3dp"
+        app:civ_border_width="4dp"
         app:civ_border_color="@color/white"
         android:layout_width="32dp"
         android:layout_height="32dp"/>
@@ -22,9 +23,46 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginVertical="5dp"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintStart_toEndOf="@id/voice_user_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="17sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/white"
+        android:id="@+id/user_name_voice"
+        app:layout_constraintEnd_toStartOf="@id/voice_mic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <net.colindodd.toggleimagebutton.ToggleImageButton
+        android:id="@+id/voice_mic"
+        app:layout_constraintStart_toEndOf="@id/voice_user_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/voice_deaf"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:tib_drawable_off="@drawable/baseline_mic_white_48"
+        app:tib_drawable_on="@drawable/baseline_mic_off_white_48"
+        />
+    <net.colindodd.toggleimagebutton.ToggleImageButton
+        android:id="@+id/voice_deaf"
+        app:layout_constraintStart_toEndOf="@id/voice_mic"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tib_drawable_off="@drawable/baseline_volume_up_white_48"
+        app:tib_drawable_on="@drawable/baseline_volume_off_white_48"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

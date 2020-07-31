@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
@@ -20,7 +20,6 @@ import cn.troph.tomon.ui.chat.members.VoiceUserAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
 class VoiceBottomSheet : BottomSheetDialogFragment() {
@@ -93,9 +92,32 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
         })
 
+        mChatSharedViewModel.voiceStateUpdateLD.observe(viewLifecycleOwner, Observer {
+            mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let { channel ->
+                if (!it.channelId.isNullOrEmpty() && !it.guildId.isNullOrEmpty() && !it.sessionId.isNullOrEmpty() && channel.id == it.channelId) {//add
+                    mVoiceUserList.removeIf { user ->
+                        user.id == it.userId
+                    }
+                    Client.global.users[it.userId]?.let { user ->
+                        user.isSelfDeaf = it.isSelfDeaf
+                        user.isSelfMute = it.isSelfMute
+                        mVoiceUserList.add(user)
+                        mAdapter.notifyDataSetChanged()
+                    }
+                }
+                if (it.channelId.isNullOrEmpty() && it.guildId.isNullOrEmpty()) {//remove
+                    mVoiceUserList.removeIf { user ->
+                        user.id == it.userId
+                    }
+                    mAdapter.notifyDataSetChanged()
+                }
+            }
+        })
+
         mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
             voice_channel_id.text = "#${it.name}"
         }
+
         mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
             voice_guild_name_tv.text = it.guild?.name
         }
@@ -108,26 +130,14 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             voice_channel_id.text = "语音已断开"
         })
 
-        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
-            mVoiceUserList.clear()
-            (it as VoiceChannel).voiceStates.forEach {
-                Client.global.users[it.userId]?.let {
-                    mVoiceUserList.add(it)
-                }
-            }
-            mAdapter.notifyDataSetChanged()
-        }
-
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             it?.let {
+                mVoiceUserList.clear()
                 (it as VoiceChannel).voiceStates.forEach {
                     Client.global.users[it.userId]?.let { user ->
-                        if (mVoiceUserList.find {
-                                it.id == user.id
-                            } == null) {
-                            mVoiceUserList.add(user)
-                        }
-
+                        user.isSelfMute = it.isSelfMute
+                        user.isSelfDeaf = it.isSelfDeaf
+                        mVoiceUserList.add(user)
                     }
                 }
                 mAdapter.notifyDataSetChanged()
@@ -145,7 +155,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
         })
 
-        voice_avatar_rr.layoutManager = GridLayoutManager(requireContext(), 5)
+        voice_avatar_rr.layoutManager = LinearLayoutManager(requireContext())
         voice_avatar_rr.adapter = mAdapter
 
 
