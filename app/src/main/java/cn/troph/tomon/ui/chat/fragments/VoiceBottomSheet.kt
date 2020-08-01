@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +20,6 @@ import cn.troph.tomon.ui.chat.members.VoiceUserAdapter
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.voice_bottom_sheet.*
 
 class VoiceBottomSheet : BottomSheetDialogFragment() {
@@ -82,7 +80,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         }
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
-            mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+            mChatSharedViewModel.voiceLeaveClick.value = true
             mChatSharedViewModel.switchingChannelVoiceLD.value = false
             dismiss()
         }
@@ -144,7 +142,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         })
 
         //频道离开
-        mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
+        mChatSharedViewModel.voiceSocketLeaveLD.observe(viewLifecycleOwner, Observer {
             voice_channel_id.text = "语音已断开"
             voice_guild_name_tv.text = ""
             mVoiceUserList.clear()

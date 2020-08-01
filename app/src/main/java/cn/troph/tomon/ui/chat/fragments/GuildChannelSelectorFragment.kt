@@ -22,6 +22,7 @@ import cn.troph.tomon.core.events.VoiceSpeakEvent
 import cn.troph.tomon.core.network.socket.GatewayOp
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import cn.troph.tomon.ui.chat.viewmodel.notifyObserver
 import cn.troph.tomon.ui.states.AppState
 import com.github.nisrulz.sensey.ProximityDetector
 import com.github.nisrulz.sensey.Sensey
@@ -92,6 +93,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+
                             VoiceBottomSheet().show(parentFragmentManager, null)
                             if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
@@ -108,8 +110,12 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                             } else {
-                                mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
-                                mChatSharedViewModel.switchingChannelVoiceLD.value = true
+                                if (mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id != channel.id) {
+                                    mChatSharedViewModel.voiceLeaveClick.value = true
+                                    mChatSharedViewModel.switchingChannelVoiceLD.value = true
+                                }else{
+                                    mChatSharedViewModel.selectedCurrentVoiceChannel.notifyObserver()
+                                }
                             }
                         }
 
@@ -131,24 +137,31 @@ class GuildChannelSelectorFragment : Fragment() {
             }
         }
 
-        mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
+        //接收socket leave
+        mChatSharedViewModel.voiceSocketLeaveLD.observe(viewLifecycleOwner, Observer {
             //disconnect voice ws
             Client.global.voiceSocket.close()
         })
 
-        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
-            if (it == null) {
-                Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
-            }
+        //接收socket join
+        mChatSharedViewModel.voiceSocketJoinLD.observe(viewLifecycleOwner, Observer {
+            Client.global.voiceSocket.open()
+            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
         })
 
+        //点击关闭voice panel
+        mChatSharedViewModel.voiceLeaveClick.observe(viewLifecycleOwner, Observer {
+            Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
+        })
+
+        //voice ws状态
         mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
             if (it) {//语音socket打开并鉴权
                 Client.global.voiceSocket.send(
                     GatewayOp.DISPATCH, Gson().toJsonTree(
                         VoiceIdentify(
                             sessionId = Client.global.socket.getSesstion()!!,
-                            voiceId = mChatSharedViewModel.voiceJoinLD.value?.voiceUserIdAgora!!,
+                            voiceId = mChatSharedViewModel.voiceSocketJoinLD.value?.voiceUserIdAgora!!,
                             userId = Client.global.me.id
                         )
                     )
@@ -157,27 +170,23 @@ class GuildChannelSelectorFragment : Fragment() {
                 mRtcEngine?.leaveChannel()
             }
         })
+    }
 
-        mChatSharedViewModel.voiceJoinLD.observe(viewLifecycleOwner, Observer {
-            Client.global.voiceSocket.open()
-            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
-        })
-
-        Sensey.getInstance().startProximityDetection(object : ProximityDetector.ProximityListener {
-            override fun onFar() {
-                if (!mWakeLock.isHeld) {
-                    mWakeLock.acquire(3600 * 1000)
-                }
-                mChatSharedViewModel.voiceSpeakerOnLD.value = true
+    private val mProximityListener = object : ProximityDetector.ProximityListener {
+        override fun onFar() {
+            if (!mWakeLock.isHeld) {
+                mWakeLock.acquire(3600 * 1000)
             }
+            mChatSharedViewModel.voiceSpeakerOnLD.value = true
+        }
 
-            override fun onNear() {
-                if (!mWakeLock.isHeld) {
-                    mWakeLock.release()
-                }
-                mChatSharedViewModel.voiceSpeakerOnLD.value = false
+        override fun onNear() {
+            if (!mWakeLock.isHeld) {
+                mWakeLock.release()
             }
-        })
+            mChatSharedViewModel.voiceSpeakerOnLD.value = false
+        }
+
     }
 
     fun update() {
@@ -215,7 +224,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         ) {
                             super.onAudioVolumeIndication(p0, p1)
                             p0?.forEach {
-                                if (it.vad==1) {
+                                if (it.vad == 1) {
                                     if (it.volume > 30) {
                                         Logger.d("speaking")
                                         Client.global.voiceSocket.send(
@@ -253,7 +262,6 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
-                                var isToastLeaveChannel = true
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
                                     if (it) {
                                         val audioManager =
@@ -268,15 +276,12 @@ class GuildChannelSelectorFragment : Fragment() {
                                                 )
                                             )
                                         )
-                                        isToastLeaveChannel = false
                                     }
                                 }
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
-                                if (isToastLeaveChannel)
-
-//                                    Toast.makeText(requireContext(), "离开频道成功", Toast.LENGTH_SHORT)
-//                                        .show()
-                                    Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
+                                mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
+                                Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
+                                Sensey.getInstance().stopProximityDetection(mProximityListener)
                                 Logger.d("Leave Success")
                             }
                         }
@@ -293,6 +298,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                             }
+                            Sensey.getInstance().startProximityDetection(mProximityListener)
                         }
 
                         override fun onError(p0: Int) {
@@ -313,7 +319,7 @@ class GuildChannelSelectorFragment : Fragment() {
                     }
                 )
                 mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
-                mRtcEngine?.enableAudioVolumeIndication(300, 3, false)
+                mRtcEngine?.enableAudioVolumeIndication(200, 3, true)
             }
         } catch (e: Exception) {
             Logger.d(e.message)

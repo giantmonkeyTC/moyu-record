@@ -73,6 +73,7 @@ class SocketClient : WebSocketListener(),
         _webSocket?.close(code, reason)
         _webSocket = null
         _state = SocketClientState.CLOSED
+        _emitter?.onNext(SocketEvent(SocketEventType.CLOSED))
         println("[ws] close:${reason}")
     }
 
