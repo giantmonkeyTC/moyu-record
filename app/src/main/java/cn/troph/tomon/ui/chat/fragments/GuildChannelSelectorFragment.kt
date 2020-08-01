@@ -113,9 +113,9 @@ class GuildChannelSelectorFragment : Fragment() {
                                     mChatSharedViewModel.switchingChannelVoiceLD.value = true
                                 } else {
                                     mChatSharedViewModel.selectedCurrentVoiceChannel.notifyObserver()
+                                    VoiceBottomSheet().show(parentFragmentManager, null)
                                 }
                             }
-                            VoiceBottomSheet().show(parentFragmentManager, null)
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -292,8 +292,14 @@ class GuildChannelSelectorFragment : Fragment() {
                                         mSelectedVoiceChannel.id
                                     )
                                 )
+                                VoiceBottomSheet().show(parentFragmentManager,null)
                             }
                             Sensey.getInstance().startProximityDetection(mProximityListener)
+                        }
+
+                        override fun onError(p0: Int) {
+                            super.onError(p0)
+                            Logger.d("Error:" + p0)
                         }
                     }
                 )
