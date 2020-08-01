@@ -224,7 +224,7 @@ class GuildChannelSelectorFragment : Fragment() {
                             super.onAudioVolumeIndication(p0, p1)
                             p0?.forEach {
                                 if (it.vad == 1) {
-                                    if (it.volume > 30) {
+                                    if (it.volume > 50) {
                                         Client.global.voiceSocket.send(
                                             GatewayOp.SPEAK,
                                             Gson().toJsonTree(Speaking(1))

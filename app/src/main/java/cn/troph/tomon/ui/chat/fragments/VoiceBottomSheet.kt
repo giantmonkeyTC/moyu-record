@@ -96,13 +96,13 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                 return@Observer
             }
 
-            it?.let {
+            it.let {
                 voice_channel_id.text = "#${it.name}"
                 voice_guild_name_tv.text =
                     "${it.guild?.name}"
             }
 
-            it?.let {
+            it.let {
                 mVoiceUserList.clear()
                 (it as VoiceChannel).voiceStates.forEach {
                     Client.global.users[it.userId]?.let { user ->
@@ -161,7 +161,7 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                 mAdapter.notifyDataSetChanged()
             }
             if (speaking.userId == Client.global.me.id) {
-                if (speaking.isSpeaking == 1) {
+                if (speaking.isSpeaking == 1 && !audioManager.isMicrophoneMute) {
                     voice_myself_state.borderColor = requireContext().getColor(R.color.speaking)
                 } else {
                     voice_myself_state.borderColor = requireContext().getColor(R.color.white)
