@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -85,15 +86,34 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             mChatSharedViewModel.switchingChannelVoiceLD.value = false
             dismiss()
         }
+
+        //加载频道
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             it?.let {
                 voice_channel_id.text = "#${it.name}"
                 voice_guild_name_tv.text =
                     "${it.guild?.name}"
             }
+
+            it?.let {
+                mVoiceUserList.clear()
+                (it as VoiceChannel).voiceStates.forEach {
+                    Client.global.users[it.userId]?.let { user ->
+                        if (user.id != Client.global.me.id) {
+                            user.isSelfMute = it.isSelfMute
+                            user.isSelfDeaf = it.isSelfDeaf
+                            mVoiceUserList.add(user)
+                        }
+                    }
+                }
+                mAdapter.notifyDataSetChanged()
+            }
         })
 
+
+        //通话更新信息
         mChatSharedViewModel.voiceStateUpdateLD.observe(viewLifecycleOwner, Observer {
+
             mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let { channel ->
                 if (!it.channelId.isNullOrEmpty() && !it.guildId.isNullOrEmpty() && !it.sessionId.isNullOrEmpty() && channel.id == it.channelId) {//add
                     mVoiceUserList.removeIf { user ->
@@ -118,39 +138,20 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
         })
 
-        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
-            voice_channel_id.text = "#${it.name}"
-        }
-
-        mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
-            voice_guild_name_tv.text = it.guild?.name
-        }
-
+        //自己话筒变化
         mChatSharedViewModel.voiceSpeakerOnLD.observe(viewLifecycleOwner, Observer {
             button6.isChecked = it
         })
 
+        //频道离开
         mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
             voice_channel_id.text = "语音已断开"
+            voice_guild_name_tv.text = ""
+            mVoiceUserList.clear()
+            mAdapter.notifyDataSetChanged()
         })
 
-        mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                mVoiceUserList.clear()
-                (it as VoiceChannel).voiceStates.forEach {
-                    Client.global.users[it.userId]?.let { user ->
-                        if (user.id != Client.global.me.id) {
-                            user.isSelfMute = it.isSelfMute
-                            user.isSelfDeaf = it.isSelfDeaf
-                            mVoiceUserList.add(user)
-                        }
-
-                    }
-                }
-                mAdapter.notifyDataSetChanged()
-            }
-        })
-
+        //自己说话
         mChatSharedViewModel.voiceSpeakLD.observe(viewLifecycleOwner, Observer { speaking ->
 
             if (speaking.userId.isNotEmpty()) {
@@ -171,10 +172,6 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
 
         voice_avatar_rr.layoutManager = LinearLayoutManager(requireContext())
         voice_avatar_rr.adapter = mAdapter
-
         voice_myself.user = Client.global.me
-        audioManager.microphones.forEach {
-            it.maxSpl
-        }
     }
 }
