@@ -45,7 +45,6 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.mode = AudioManager.MODE_CURRENT
         button4.isChecked = audioManager.isMicrophoneMute
-        button6.isChecked = audioManager.isSpeakerphoneOn
 
         button4.setOnCheckedChangeListener { buttonView, isChecked ->
             audioManager.isMicrophoneMute = isChecked
@@ -63,21 +62,13 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        button6.setOnCheckedChangeListener { buttonView, isChecked ->
-            audioManager.isSpeakerphoneOn = isChecked
-            mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
-                Client.global.socket.send(
-                    GatewayOp.VOICE,
-                    Gson().toJsonTree(
-                        VoiceConnectSend(
-                            it.id,
-                            isChecked,
-                            audioManager.isMicrophoneMute
-                        )
-                    )
-                )
-            }
+        button6.setOnCheckedChangeListener { _, isChecked ->
+            mChatSharedViewModel.voiceSelfDeafLD.value = isChecked
         }
+
+        mChatSharedViewModel.voiceSelfDeafLD.observe(viewLifecycleOwner, Observer {
+            button6.isChecked  = it
+        })
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
             mChatSharedViewModel.voiceLeaveClick.value = true
@@ -88,10 +79,6 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         //加入或者离开频道
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-//                voice_channel_id.text="语音已断开"
-//                voice_guild_name_tv.text=""
-//                mVoiceUserList.clear()
-//                mAdapter.notifyDataSetChanged()
                 dismiss()
                 return@Observer
             }
@@ -143,11 +130,6 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                     mAdapter.notifyDataSetChanged()
                 }
             }
-        })
-
-        //自己话筒变化
-        mChatSharedViewModel.voiceSpeakerOnLD.observe(viewLifecycleOwner, Observer {
-            button6.isChecked = it
         })
 
         //自己说话

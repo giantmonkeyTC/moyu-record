@@ -75,14 +75,14 @@
         android:id="@+id/button6"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:checked="true"
+        android:checked="false"
         app:layout_constraintBottom_toTopOf="@+id/voice_avatar_rr"
         app:layout_constraintEnd_toStartOf="@+id/button7"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button4"
         app:layout_constraintTop_toBottomOf="@id/voice_guild_name_tv"
-        app:tib_drawable_off="@drawable/baseline_hearing_white_48"
-        app:tib_drawable_on="@drawable/baseline_volume_up_white_48" />
+        app:tib_drawable_off="@drawable/baseline_volume_up_white_48"
+        app:tib_drawable_on="@drawable/baseline_volume_mute_white_48" />
 
     <net.colindodd.toggleimagebutton.ToggleImageButton
         android:id="@+id/button7"

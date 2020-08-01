@@ -142,6 +142,25 @@ class GuildChannelSelectorFragment : Fragment() {
             Client.global.voiceSocket.close()
         })
 
+        mChatSharedViewModel.voiceSelfDeafLD.observe(viewLifecycleOwner, Observer { isDeaf ->
+            mRtcEngine?.muteAllRemoteAudioStreams(isDeaf)
+
+            mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
+                val audioManager =
+                    requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                Client.global.socket.send(
+                    GatewayOp.VOICE,
+                    Gson().toJsonTree(
+                        VoiceConnectSend(
+                            it.id,
+                            isDeaf,
+                            audioManager.isMicrophoneMute
+                        )
+                    )
+                )
+            }
+        })
+
         //接收socket join
         mChatSharedViewModel.voiceSocketJoinLD.observe(viewLifecycleOwner, Observer {
             Client.global.voiceSocket.open()
@@ -176,14 +195,18 @@ class GuildChannelSelectorFragment : Fragment() {
             if (!mWakeLock.isHeld) {
                 mWakeLock.acquire(3600 * 1000)
             }
-            mChatSharedViewModel.voiceSpeakerOnLD.value = true
+            val audioManager =
+                requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.isSpeakerphoneOn = true
         }
 
         override fun onNear() {
             if (!mWakeLock.isHeld) {
                 mWakeLock.release()
             }
-            mChatSharedViewModel.voiceSpeakerOnLD.value = false
+            val audioManager =
+                requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.isSpeakerphoneOn = false
         }
 
     }
@@ -292,7 +315,7 @@ class GuildChannelSelectorFragment : Fragment() {
                                         mSelectedVoiceChannel.id
                                     )
                                 )
-                                VoiceBottomSheet().show(parentFragmentManager,null)
+                                VoiceBottomSheet().show(parentFragmentManager, null)
                             }
                             Sensey.getInstance().startProximityDetection(mProximityListener)
                         }
