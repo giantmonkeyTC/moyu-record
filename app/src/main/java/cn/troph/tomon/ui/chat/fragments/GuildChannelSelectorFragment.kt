@@ -93,8 +93,6 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-
-                            VoiceBottomSheet().show(parentFragmentManager, null)
                             if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
                                 val audioManager =
@@ -113,10 +111,11 @@ class GuildChannelSelectorFragment : Fragment() {
                                 if (mChatSharedViewModel.selectedCurrentVoiceChannel.value?.id != channel.id) {
                                     mChatSharedViewModel.voiceLeaveClick.value = true
                                     mChatSharedViewModel.switchingChannelVoiceLD.value = true
-                                }else{
+                                } else {
                                     mChatSharedViewModel.selectedCurrentVoiceChannel.notifyObserver()
                                 }
                             }
+                            VoiceBottomSheet().show(parentFragmentManager, null)
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -226,7 +225,6 @@ class GuildChannelSelectorFragment : Fragment() {
                             p0?.forEach {
                                 if (it.vad == 1) {
                                     if (it.volume > 30) {
-                                        Logger.d("speaking")
                                         Client.global.voiceSocket.send(
                                             GatewayOp.SPEAK,
                                             Gson().toJsonTree(Speaking(1))
@@ -240,7 +238,6 @@ class GuildChannelSelectorFragment : Fragment() {
                                             )
                                         )
                                     } else {
-                                        Logger.d("no speaking")
                                         Client.global.voiceSocket.send(
                                             GatewayOp.SPEAK,
                                             Gson().toJsonTree(Speaking(0))
@@ -282,14 +279,12 @@ class GuildChannelSelectorFragment : Fragment() {
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
                                 Client.global.eventBus.postEvent(GuildVoiceSelectorEvent(""))
                                 Sensey.getInstance().stopProximityDetection(mProximityListener)
-                                Logger.d("Leave Success")
                             }
                         }
 
                         override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             mHandler.post {
-                                Logger.d("Join Success")
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
                                     mSelectedVoiceChannel
                                 Client.global.eventBus.postEvent(
@@ -299,22 +294,6 @@ class GuildChannelSelectorFragment : Fragment() {
                                 )
                             }
                             Sensey.getInstance().startProximityDetection(mProximityListener)
-                        }
-
-                        override fun onError(p0: Int) {
-                            super.onError(p0)
-                            Logger.d("Error Voice:${p0}")
-                            if (p0 == Constants.ERR_JOIN_CHANNEL_REJECTED) {
-                                mHandler.post {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "请先退出之前的语音频道再加入",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                }
-                            }
-
                         }
                     }
                 )

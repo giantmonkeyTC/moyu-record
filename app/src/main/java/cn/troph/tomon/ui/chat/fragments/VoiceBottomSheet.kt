@@ -85,8 +85,16 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        //加载频道
+        //加入或者离开频道
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
+            if (it == null) {
+                voice_channel_id.text="语音已断开"
+                voice_guild_name_tv.text=""
+                mVoiceUserList.clear()
+                mAdapter.notifyDataSetChanged()
+                return@Observer
+            }
+
             it?.let {
                 voice_channel_id.text = "#${it.name}"
                 voice_guild_name_tv.text =
@@ -139,14 +147,6 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         //自己话筒变化
         mChatSharedViewModel.voiceSpeakerOnLD.observe(viewLifecycleOwner, Observer {
             button6.isChecked = it
-        })
-
-        //频道离开
-        mChatSharedViewModel.voiceSocketLeaveLD.observe(viewLifecycleOwner, Observer {
-            voice_channel_id.text = "语音已断开"
-            voice_guild_name_tv.text = ""
-            mVoiceUserList.clear()
-            mAdapter.notifyDataSetChanged()
         })
 
         //自己说话
