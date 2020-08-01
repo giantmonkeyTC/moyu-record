@@ -316,10 +316,7 @@ class GuildChannelSelectorFragment : Fragment() {
         RtcEngine.destroy()
         mRtcEngine = null
         Sensey.getInstance().stop()
+        Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
     }
 
-}
-
-interface SwitchChannelVoiceCallback {
-    fun onSwitchFinish()
 }
