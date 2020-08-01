@@ -88,10 +88,11 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
         //加入或者离开频道
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             if (it == null) {
-                voice_channel_id.text="语音已断开"
-                voice_guild_name_tv.text=""
-                mVoiceUserList.clear()
-                mAdapter.notifyDataSetChanged()
+//                voice_channel_id.text="语音已断开"
+//                voice_guild_name_tv.text=""
+//                mVoiceUserList.clear()
+//                mAdapter.notifyDataSetChanged()
+                dismiss()
                 return@Observer
             }
 
