@@ -69,6 +69,10 @@ class GuildChannelSelectorFragment : Fragment() {
         Sensey.getInstance().init(requireContext())
     }
 
+    private fun getEngine():RtcEngine?{
+        return mRtcEngine
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -144,7 +148,6 @@ class GuildChannelSelectorFragment : Fragment() {
 
         mChatSharedViewModel.voiceSelfDeafLD.observe(viewLifecycleOwner, Observer { isDeaf ->
             mRtcEngine?.muteAllRemoteAudioStreams(isDeaf)
-
             mChatSharedViewModel.selectedCurrentVoiceChannel.value?.let {
                 val audioManager =
                     requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -232,6 +235,8 @@ class GuildChannelSelectorFragment : Fragment() {
         ) // if you do not specify the uid, we will generate the uid for you
     }
 
+
+
     private fun initializeAgoraEngine() {
         try {
             if (mRtcEngine == null) {
@@ -308,6 +313,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onJoinChannelSuccess(p0: String?, p1: Int, p2: Int) {
                             super.onJoinChannelSuccess(p0, p1, p2)
                             mHandler.post {
+                                getEngine()?.setEnableSpeakerphone(true)
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value =
                                     mSelectedVoiceChannel
                                 Client.global.eventBus.postEvent(

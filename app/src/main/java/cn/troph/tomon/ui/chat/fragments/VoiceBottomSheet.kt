@@ -62,13 +62,10 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        // do not change order 1
         button6.setOnCheckedChangeListener { _, isChecked ->
             mChatSharedViewModel.voiceSelfDeafLD.value = isChecked
         }
-
-        mChatSharedViewModel.voiceSelfDeafLD.observe(viewLifecycleOwner, Observer {
-            button6.isChecked  = it
-        })
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
             mChatSharedViewModel.voiceLeaveClick.value = true
