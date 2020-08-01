@@ -92,10 +92,11 @@ class GuildChannelSelectorFragment : Fragment() {
                     .withPermission(Manifest.permission.RECORD_AUDIO)
                     .withListener(object : PermissionListener {
                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                            val audioManager =
-                                requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                            VoiceBottomSheet().show(parentFragmentManager, null)
                             if (mChatSharedViewModel.selectedCurrentVoiceChannel.value == null) {
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = false
+                                val audioManager =
+                                    requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
                                 Client.global.socket.send(
                                     GatewayOp.VOICE,
                                     Gson().toJsonTree(
@@ -110,7 +111,6 @@ class GuildChannelSelectorFragment : Fragment() {
                                 mChatSharedViewModel.selectedCurrentVoiceChannel.value = null
                                 mChatSharedViewModel.switchingChannelVoiceLD.value = true
                             }
-
                         }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -134,33 +134,33 @@ class GuildChannelSelectorFragment : Fragment() {
         mChatSharedViewModel.voiceLeaveLD.observe(viewLifecycleOwner, Observer {
             //disconnect voice ws
             Client.global.voiceSocket.close()
-            mRtcEngine?.leaveChannel()
         })
 
         mChatSharedViewModel.selectedCurrentVoiceChannel.observe(viewLifecycleOwner, Observer {
             if (it == null) {
                 Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
-            } else {
-                //switch channel
             }
         })
-        mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                val voice = VoiceIdentify(
-                    sessionId = Client.global.socket.getSesstion()!!,
-                    voiceId = mChatSharedViewModel.voiceJoinLD.value?.voiceUserIdAgora!!,
-                    userId = Client.global.me.id
-                )
-                Client.global.voiceSocket.send(GatewayOp.DISPATCH, Gson().toJsonTree(voice))
-            } else {
 
+        mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
+            if (it) {//语音socket打开并鉴权
+                Client.global.voiceSocket.send(
+                    GatewayOp.DISPATCH, Gson().toJsonTree(
+                        VoiceIdentify(
+                            sessionId = Client.global.socket.getSesstion()!!,
+                            voiceId = mChatSharedViewModel.voiceJoinLD.value?.voiceUserIdAgora!!,
+                            userId = Client.global.me.id
+                        )
+                    )
+                )
+            } else {//语音socket关闭
+                mRtcEngine?.leaveChannel()
             }
         })
 
         mChatSharedViewModel.voiceJoinLD.observe(viewLifecycleOwner, Observer {
-            VoiceBottomSheet().show(parentFragmentManager, null)
-            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
             Client.global.voiceSocket.open()
+            joinChannel(it.tokenAgora, it.voiceUserIdAgora, it.channelId!!)
         })
 
         Sensey.getInstance().startProximityDetection(object : ProximityDetector.ProximityListener {
@@ -215,7 +215,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         ) {
                             super.onAudioVolumeIndication(p0, p1)
                             p0?.forEach {
-                                if (it.uid == 0) {
+                                if (it.vad==1) {
                                     if (it.volume > 30) {
                                         Logger.d("speaking")
                                         Client.global.voiceSocket.send(
