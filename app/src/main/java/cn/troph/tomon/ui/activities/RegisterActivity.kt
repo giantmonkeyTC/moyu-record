@@ -91,16 +91,18 @@ class RegisterActivity : AppCompatActivity() {
                     GeneralSnackbar.make(
                         GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                         "注册成功",
-                        Snackbar.LENGTH_LONG
+                        Snackbar.LENGTH_SHORT
                     ).show()
                     gotoEntryOption()
                 }, {
                     GeneralSnackbar.make(
                         GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                        "注册失败",
-                        Snackbar.LENGTH_LONG
+                        "注册失败:${it.message}",
+                        Snackbar.LENGTH_SHORT
                     ).show()
-                }, {})
+                }, {
+
+                })
         }
 
         val ss = SpannableString(getString(R.string.privacy_agreement))
