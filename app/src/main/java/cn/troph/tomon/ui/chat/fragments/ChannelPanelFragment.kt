@@ -300,6 +300,14 @@ class ChannelPanelFragment : BaseFragment() {
                     callMentionBottomSheet(it)
             }
         })
+        mChatSharedVM.stampSendedLiveData.observe(viewLifecycleOwner, Observer {
+            if (it.state) {
+                mMsgList.add(it.emptyMsg)
+                mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                scrollToBottom()
+            }
+
+        })
 
         mChatSharedVM.channelSelectionLD.observe(viewLifecycleOwner, Observer {
             if (it.channelId == null) {
@@ -989,7 +997,7 @@ class ChannelPanelFragment : BaseFragment() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun createEmptyMsg(content: String): Message {
+    private fun createEmptyMsg(content: String?): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())

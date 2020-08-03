@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val stampSendedLiveData = MutableLiveData<StampSendedState>()
+
     val stampsLiveData = MutableLiveData<MutableList<StampPack>>()
 
     val voiceSelfDeafLD = MutableLiveData<Boolean>()
@@ -45,6 +47,11 @@ class ChatSharedViewModel : ViewModel() {
     data class MentionState(
         @SerializedName("state") val state: Boolean,
         @SerializedName("start") val start: Int
+    )
+
+    data class StampSendedState(
+        @SerializedName("state") val state: Boolean,
+        @SerializedName("emptyMsg") val emptyMsg: Message
     )
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
