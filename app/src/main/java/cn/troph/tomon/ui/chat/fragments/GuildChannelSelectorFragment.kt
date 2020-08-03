@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.chat.fragments
 import android.Manifest
 import android.content.Context
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.PowerManager
@@ -69,7 +70,7 @@ class GuildChannelSelectorFragment : Fragment() {
         Sensey.getInstance().init(requireContext())
     }
 
-    private fun getEngine():RtcEngine?{
+    private fun getEngine(): RtcEngine? {
         return mRtcEngine
     }
 
@@ -236,7 +237,6 @@ class GuildChannelSelectorFragment : Fragment() {
     }
 
 
-
     private fun initializeAgoraEngine() {
         try {
             if (mRtcEngine == null) {
@@ -284,9 +284,27 @@ class GuildChannelSelectorFragment : Fragment() {
                             }
                         }
 
+                        override fun onUserJoined(p0: Int, p1: Int) {
+                            super.onUserJoined(p0, p1)
+                            mHandler.post {
+                                val mp = MediaPlayer.create(requireContext(), R.raw.decision7)
+                                mp.start()
+                            }
+                        }
+
+                        override fun onUserOffline(p0: Int, p1: Int) {
+                            super.onUserOffline(p0, p1)
+                            mHandler.post {
+                                val mp = MediaPlayer.create(requireContext(), R.raw.decision17)
+                                mp.start()
+                            }
+                        }
+
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
+                                val mp = MediaPlayer.create(requireContext(), R.raw.waterdrop)
+                                mp.start()
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
                                     if (it) {
                                         val audioManager =
@@ -322,6 +340,8 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                                 VoiceBottomSheet().show(parentFragmentManager, null)
+                                val mp = MediaPlayer.create(requireContext(), R.raw.waterdrop)
+                                mp.start()
                             }
                             Sensey.getInstance().startProximityDetection(mProximityListener)
                         }
