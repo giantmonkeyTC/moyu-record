@@ -303,7 +303,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
-                                val mp = MediaPlayer.create(requireContext(), R.raw.waterdrop)
+                                val mp = MediaPlayer.create(requireContext(), R.raw.decision17)
                                 mp.start()
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
                                     if (it) {
@@ -340,8 +340,6 @@ class GuildChannelSelectorFragment : Fragment() {
                                     )
                                 )
                                 VoiceBottomSheet().show(parentFragmentManager, null)
-                                val mp = MediaPlayer.create(requireContext(), R.raw.waterdrop)
-                                mp.start()
                             }
                             Sensey.getInstance().startProximityDetection(mProximityListener)
                         }
