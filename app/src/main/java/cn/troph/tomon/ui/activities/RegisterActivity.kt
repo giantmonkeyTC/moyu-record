@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
@@ -27,26 +28,40 @@ import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
+import java.util.*
 
 
 class RegisterActivity : AppCompatActivity() {
 
+    private val timer = object : CountDownTimer(30000, 1000) {
+        override fun onFinish() {
+            button_confirmation.text = getString(R.string.register_confirmation)
+            button_confirmation.isEnabled = true
+        }
+
+        override fun onTick(millisUntilFinished: Long) {
+            button_confirmation.text = "${millisUntilFinished / 1000} s"
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
         button_confirmation.setOnClickListener {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(button_confirmation.windowToken, 0)
-            if (Validator.isPhone(register_input_union_id.text.toString()))
+            if (Validator.isPhone(register_input_union_id.text.toString())) {
+                timer.start()
+                it.isEnabled = false
                 Client.global.rest.authService.verify(
                     AuthService.VerifyRequest(
                         phone = register_input_union_id.text.toString(),
                         type = "register"
                     )
                 ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe {
-
                 }
-            else
+            } else
                 GeneralSnackbar.make(
                     GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                     "请输入正确的手机号",
