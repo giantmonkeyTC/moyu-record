@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.content.Context
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -60,11 +61,15 @@ class VoiceBottomSheet : BottomSheetDialogFragment() {
                     )
                 )
             }
+            val mp = MediaPlayer.create(requireContext(), R.raw.button_press)
+            mp.start()
         }
 
         // do not change order 1
         button6.setOnCheckedChangeListener { _, isChecked ->
             mChatSharedViewModel.voiceSelfDeafLD.value = isChecked
+            val mp = MediaPlayer.create(requireContext(), R.raw.button_press)
+            mp.start()
         }
 
         button7.setOnCheckedChangeListener { buttonView, isChecked ->
