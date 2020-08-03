@@ -139,23 +139,23 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mention_panel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/edit_pannel_view"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:visibility="gone"
-            />
+            app:layout_constraintBottom_toTopOf="@id/edit_pannel_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
 
         <cn.troph.tomon.ui.chat.ui.NestedViewPager
             android:id="@+id/reaction_stamp_viewpager"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            app:layout_constraintStart_toStartOf="parent"
             android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/edit_pannel_view" />
 
         <com.cruxlab.sectionedrecyclerview.lib.SectionHeaderLayout
