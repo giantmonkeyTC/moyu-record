@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.structures.StampPack
 import cn.troph.tomon.ui.chat.emoji.CustomGuildStamp
 import cn.troph.tomon.ui.chat.emoji.EmojiAdapter
 import cn.troph.tomon.ui.chat.messages.STAMP_URL
@@ -18,7 +19,7 @@ import kotlinx.android.synthetic.main.stamp_image.view.*
 import kotlinx.android.synthetic.main.stamp_item.view.*
 
 class StampAdapter(
-    private val stampSectionObj: CustomGuildStamp,
+    private val stampPack: StampPack,
     private val stampClickListener: OnStampClickListener
 
 ) :
@@ -43,35 +44,35 @@ class StampAdapter(
     }
 
     override fun onBindHeaderViewHolder(holder: StampHeaderViewHolder) {
-        holder?.itemView?.guild_name_stamp?.text = "${stampSectionObj.name.toUpperCase()}"
+        holder?.itemView?.guild_name_stamp?.text = "${stampPack.name.toUpperCase()}"
         holder?.itemView?.guild_name_stamp?.typeface = Typeface.DEFAULT_BOLD
     }
 
     override fun getItemCount(): Int {
-        return if (stampSectionObj.isBuildIn) stampSectionObj.systemStampListData.size else stampSectionObj.stampList.size
+        return stampPack.stamps.size
     }
 
     override fun onBindItemViewHolder(holder: StampItemViewHolder?, position: Int) {
         holder?.let {
             it.itemView?.let {
                 it.imageview_stamp?.visibility = View.VISIBLE
-                val item = stampSectionObj.stampList[position]
+                val item = stampPack.stamps[position]
                 Glide.with(holder.itemView)
                     .load(
                         if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(
                             item.hash
                         )
                     )
-                    .placeholder(R.drawable.loadinglogo)
                     .override(item.width, item.height)
                     .into(it.imageview_stamp)
                 it.imageview_stamp.setOnClickListener {
-                    stampClickListener.onStampSelected(item.hash)
+                    stampClickListener.onStampSelected(mutableListOf(item.id))
                 }
             }
         }
     }
 }
+class BottomStampAdapter()
 
 interface OnBottomGuildSelectedListener {
     fun onGuildSelected(position: Int)
@@ -79,6 +80,5 @@ interface OnBottomGuildSelectedListener {
 
 
 interface OnStampClickListener {
-    fun onStampSelected(stampCode: String)
-    fun onSystemStampSelected(unicode: String)
+    fun onStampSelected(stamps: MutableList<String>)
 }

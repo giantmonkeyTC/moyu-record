@@ -920,6 +920,7 @@ class MessageAdapter(
                     Logger.d(it.message)
                 }
                 .subscribe(Consumer {
+                    notifyDataSetChanged()
                     dialog.dismiss()
                 })
         }

@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val stampsLiveData = MutableLiveData<MutableList<StampPack>>()
+
     val voiceSelfDeafLD = MutableLiveData<Boolean>()
 
     val voiceLeaveClick = MutableLiveData<Boolean>()
@@ -208,6 +210,9 @@ class ChatSharedViewModel : ViewModel() {
         })
     }
 
+    fun loadStamps() {
+        stampsLiveData.value = Client.global.stamps
+    }
 
     fun loadTextChannelMessage(channelId: String) {
         messageLoadingLiveData.value = true

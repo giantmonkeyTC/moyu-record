@@ -9,13 +9,5 @@ data class CustomGuildStamp(
     val name: String = "",
     val code: String = "",
     val isBuildIn: Boolean = false,
-    val stampList: MutableList<Stamp> = mutableListOf(),
-    val systemStampList: MutableList<Int> = mutableListOf(),
-    val systemStampListData: MutableList<SystemStampData> = mutableListOf()
-)
-
-data class SystemStampData(
-    @SerializedName("unified") val code: String,
-    @SerializedName("category") val category: String,
-    @SerializedName("image")val image:String
+    val stampList: MutableList<Stamp> = mutableListOf()
 )
