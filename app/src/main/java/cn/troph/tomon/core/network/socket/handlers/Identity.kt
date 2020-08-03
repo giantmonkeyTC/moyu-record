@@ -48,6 +48,5 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     data["stamp_packs"].asJsonArray.forEach { s ->
         val stampPack = s.asJsonObject
         client.stamps.add(Gson().fromJson(stampPack, StampPack::class.java))
-        client.stamps.forEach { println("helloworld" + it.authorId + it.stamps) }
     }
 }

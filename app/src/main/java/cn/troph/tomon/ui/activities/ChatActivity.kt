@@ -20,12 +20,17 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.StampPack
+import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
+import com.google.gson.Gson
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
@@ -39,9 +44,17 @@ class ChatActivity : BaseActivity() {
 
         val map = HashMap<String, Int>()
 
+        Client.global.rest.guildEmojiService.fetchStampPack(
+            Assets.defaultStampPackId,
+            Client.global.auth
+        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java))
+        }
+
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount
         }
+        Client.global.dmChannels
 
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)

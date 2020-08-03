@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.network.services
 
+import cn.troph.tomon.ui.chat.fragments.StampFragment
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -7,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -55,7 +57,7 @@ interface MessageService {
 
     data class CreateStampRequest(
         @SerializedName("content")
-        var content: String,
+        var content: String?,
         @SerializedName("nonce")
         var nonce: String,
         @SerializedName("stamps")
@@ -64,7 +66,7 @@ interface MessageService {
 
     @POST("channels/{channelId}/messages")
     fun createStampMessage(
-        @Path("channelId") channelId: String, @Body request: CreateStampRequest, @Header(
+        @Path("channelId") channelId: String, @Body jsonObject: JsonObject, @Header(
             "Authorization"
         ) token: String
     ): Observable<JsonObject>
