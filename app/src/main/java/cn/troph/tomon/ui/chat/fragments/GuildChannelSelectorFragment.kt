@@ -35,7 +35,6 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.orhanobut.logger.Logger
-import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -287,7 +286,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onUserJoined(p0: Int, p1: Int) {
                             super.onUserJoined(p0, p1)
                             mHandler.post {
-                                val mp = MediaPlayer.create(requireContext(), R.raw.decision7)
+                                val mp = MediaPlayer.create(requireContext(), R.raw.user_join)
                                 mp.start()
                             }
                         }
@@ -295,7 +294,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onUserOffline(p0: Int, p1: Int) {
                             super.onUserOffline(p0, p1)
                             mHandler.post {
-                                val mp = MediaPlayer.create(requireContext(), R.raw.decision17)
+                                val mp = MediaPlayer.create(requireContext(), R.raw.user_offline)
                                 mp.start()
                             }
                         }
@@ -303,7 +302,7 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
-                                val mp = MediaPlayer.create(requireContext(), R.raw.decision17)
+                                val mp = MediaPlayer.create(requireContext(), R.raw.user_offline)
                                 mp.start()
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
                                     if (it) {
