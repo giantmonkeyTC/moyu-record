@@ -23,6 +23,7 @@ import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.UserAvatar
 import com.nex3z.flowlayout.FlowLayout
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
@@ -48,8 +49,9 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         var disposable: Disposable? = null
         var channel: GuildChannel? = null
 
-        fun bind(channel: GuildChannel) {
+        fun bind(channel: GuildChannel, mAdapter: GuildChannelSelectorAdapter) {
             itemView.isActivated = AppState.global.channelSelection.value.channelId == channel.id
+            text.text = channel.name
             when (channel.type) {
                 ChannelType.TEXT -> {
                     if (channel.isPrivate) {
@@ -57,12 +59,33 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     } else {
                         image.setImageResource(R.drawable.ic_channel_text_unlock)
                     }
+                    voiceUserContainerLayout.visibility = View.GONE
                 }
                 ChannelType.VOICE -> {
                     if (channel.isPrivate) {
                         image.setImageResource(R.drawable.ic_channel_voice_lock)
                     } else {
                         image.setImageResource(R.drawable.ic_channel_voice)
+                    }
+                    (channel as VoiceChannel)
+                    if (channel.voiceStates.size > 0) {
+                        for (index in 0 until voiceUserContainerLayout.childCount) {
+                            val avatar = voiceUserContainerLayout[index] as UserAvatar
+                            try {
+                                avatar.user = Client.global.users[channel.voiceStates[index].userId]
+                                avatar.visibility = View.VISIBLE
+                            } catch (e: Exception) {
+                                avatar.visibility = View.GONE
+                            }
+                        }
+                        voiceUserContainerLayout.visibility = View.VISIBLE
+                    } else {
+                        voiceUserContainerLayout.visibility = View.GONE
+                    }
+                    if (channel.voiceStates.size > 0) {
+                        text.text = "${channel.name} ${channel.voiceStates.size}人"
+                    } else {
+                        text.text = channel.name
                     }
                 }
                 ChannelType.CATEGORY -> {
@@ -103,29 +126,12 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                 }
             } else if (channel is VoiceChannel) {
                 itemView.channel_unread_mention_notification.visibility = View.GONE
-            }
-
-            text.text = channel.name
-            if (channel is VoiceChannel) {
-                if (channel.voiceStates.size > 0) {
-                    for (index in 0 until voiceUserContainerLayout.childCount) {
-                        val avatar = voiceUserContainerLayout[index] as UserAvatar
-                        try {
-                            avatar.user = Client.global.users[channel.voiceStates[index].userId]
-                            avatar.visibility = View.VISIBLE
-                        } catch (e: Exception) {
-                            avatar.visibility = View.GONE
-                        }
-                    }
-                    voiceUserContainerLayout.visibility = View.VISIBLE
-                } else {
-                    voiceUserContainerLayout.visibility = View.GONE
-                }
-                if (channel.voiceStates.size > 0) {
-                    text.text = "${channel.name} ${channel.voiceStates.size}人"
-                } else {
-                    text.text = channel.name
-                }
+                text.typeface = if (channel.isJoined) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+                text.setTextColor(
+                    if (channel.isJoined) Color.parseColor("#FFFFFF") else Color.parseColor(
+                        "#969696"
+                    )
+                )
             }
             disposable?.dispose()
             disposable =
@@ -160,19 +166,14 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                 }
             })
             Client.global.eventBus.observeEventOnUi<GuildVoiceSelectorEvent>().subscribe(Consumer {
-                if (channel is VoiceChannel) {
-                    if (channel.id == it.channelId) {
-                        text.typeface = Typeface.DEFAULT_BOLD
-                        text.setTextColor(Color.parseColor("#FFFFFF"))
-                    } else {
-                        text.typeface = Typeface.DEFAULT
-                        text.setTextColor(Color.parseColor("#969696"))
-                    }
+                if (channel is VoiceChannel && channel.type == ChannelType.VOICE) {
+                    channel.isJoined = channel.id == it.channelId
+                    mAdapter.notifyDataSetChanged()
                 }
             })
             Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>()
                 .subscribe(Consumer { event ->
-                    if (channel is VoiceChannel) {
+                    if (channel is VoiceChannel && channel.type == ChannelType.VOICE) {
                         if (!event.voiceUpdate.channelId.isNullOrEmpty() && channel.id == event.voiceUpdate.channelId && channel.guildId == event.voiceUpdate.guildId) {//加入
                             val user = channel.voiceStates.find {
                                 it.userId == event.voiceUpdate.userId
@@ -185,24 +186,25 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                                 it.userId == event.voiceUpdate.userId
                             }
                         }
+                        mAdapter.notifyDataSetChanged()
                         //update UI
-                        if (channel.voiceStates.size > 0) {
-                            for (index in 0 until voiceUserContainerLayout.childCount) {
-                                val avatar = voiceUserContainerLayout[index] as UserAvatar
-                                try {
-                                    avatar.visibility = View.VISIBLE
-                                    avatar.user =
-                                        Client.global.users[channel.voiceStates[index].userId]
-                                } catch (e: Exception) {
-                                    avatar.visibility = View.GONE
-                                }
-                            }
-                            voiceUserContainerLayout.visibility = View.VISIBLE
-                            text.text = "${channel.name} ${channel.voiceStates.size}人"
-                        } else {
-                            text.text = channel.name
-                            voiceUserContainerLayout.visibility = View.GONE
-                        }
+//                        if (channel.voiceStates.size > 0) {
+//                            for (index in 0 until voiceUserContainerLayout.childCount) {
+//                                val avatar = voiceUserContainerLayout[index] as UserAvatar
+//                                try {
+//                                    avatar.visibility = View.VISIBLE
+//                                    avatar.user =
+//                                        Client.global.users[channel.voiceStates[index].userId]
+//                                } catch (e: Exception) {
+//                                    avatar.visibility = View.GONE
+//                                }
+//                            }
+//                            voiceUserContainerLayout.visibility = View.VISIBLE
+//                            text.text = "${channel.name} ${channel.voiceStates.size}人"
+//                        } else {
+//                            text.text = channel.name
+//                            voiceUserContainerLayout.visibility = View.GONE
+//                        }
                     }
                 })
 
@@ -231,9 +233,6 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
                     }
                 }
 
-            }
-            if (channel !is VoiceChannel) {
-                voiceUserContainerLayout.visibility = View.GONE
             }
         }
     }
@@ -373,7 +372,7 @@ class GuildChannelSelectorAdapter : RecyclerView.Adapter<GuildChannelSelectorAda
         val id = list[position]
         val channel = Client.global.channels[id] as? GuildChannel
         if (channel != null) {
-            holder.bind(channel)
+            holder.bind(channel, this)
         } else {
             println("need clear or hide")
         }

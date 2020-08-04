@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "953019368506",
+    "firebase_url": "https://tomon-a291f.firebaseio.com",
+    "project_id": "tomon-a291f",
+    "storage_bucket": "tomon-a291f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953019368506:android:cd4a18b9c18ce72f062103",
+        "android_client_info": {
+          "package_name": "cn.troph.tomon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953019368506-jfvemn00br0hnjc72mutgf8dkamgsa89.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJCmuoAKkPUCeEUtkBR7sdOp9BGnF9v58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953019368506-jfvemn00br0hnjc72mutgf8dkamgsa89.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

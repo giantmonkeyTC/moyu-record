@@ -13,6 +13,8 @@ class VoiceChannel(client: Client, data: JsonObject) :
 
     val voiceStates = mutableListOf<VoiceUpdate>()
 
+    var isJoined = false
+
     init {
         patchSelf(data)
     }

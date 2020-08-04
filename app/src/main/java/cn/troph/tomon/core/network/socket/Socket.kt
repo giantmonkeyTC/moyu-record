@@ -4,12 +4,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.network.Configs
+import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.network.socket.handlers.*
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -73,7 +72,7 @@ class Socket : Observer<SocketEvent> ,LifecycleObserver{
     }
 
     fun open() {
-        _socketClient.open(Configs.wss)
+        _socketClient.open(NetworkConfigs.wss)
     }
 
     fun close(code: Int = 1000, reason: String? = null) {

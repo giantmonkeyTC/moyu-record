@@ -2,12 +2,10 @@ package cn.troph.tomon.core.network.socket
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.VoiceSocketStateEvent
-import cn.troph.tomon.core.network.Configs
+import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.network.socket.handlers.*
-import cn.troph.tomon.core.structures.VoiceIdentify
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -31,7 +29,7 @@ class VoiceSocket : Observer<SocketEvent> {
     private var timer = Timer()
 
     fun open() {
-        _socketClient.open(Configs.wssVoice)
+        _socketClient.open(NetworkConfigs.wssVoice)
     }
 
     fun close() {
