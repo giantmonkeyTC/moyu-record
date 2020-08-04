@@ -38,16 +38,16 @@
     <TextView
         android:id="@+id/dm_read_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:background="@drawable/shape_guild_mention_notification"
         android:paddingHorizontal="5dp"
-        android:paddingVertical="3dp"
+        android:paddingTop="2dp"
         android:textColor="@android:color/holo_red_light"
         android:textSize="12sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/btn_dm_channel_entry"
-        app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry"
-        app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry" />
+        android:layout_marginTop="32dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="@id/btn_dm_channel_entry"
+        app:layout_constraintEnd_toEndOf="@id/btn_dm_channel_entry" />
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar

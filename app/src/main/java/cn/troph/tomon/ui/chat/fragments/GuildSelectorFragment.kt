@@ -281,12 +281,10 @@ class GuildSelectorFragment : Fragment() {
             )
         view.cancel.setOnClickListener { dialog.dismiss() }
         view.confirm.setOnClickListener {
-            if (textField.text.toString().matches(Regex("[A-Za-z0-9]+"))) {
+            if (textField.text.toString().matches(Regex("[A-Za-z0-9]{6}"))) {
                 Client.global.guilds.fetchInvite(
-                    if (textField.text.toString().contains(Url.inviteUrl))
-                        Url.parseInviteCode(textField.text.toString())
-                    else textField.text.toString()
-                ).observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    textField.text.toString()
+                ).observeOn(AndroidSchedulers.mainThread()).subscribe({
                     if (it != null) {
                         val invite = it
                         if (invite.joined) {
@@ -298,27 +296,67 @@ class GuildSelectorFragment : Fragment() {
                             textField.setText("")
                         } else {
                             Client.global.guilds.join(
-                                if (textField.text.toString().contains(Url.inviteUrl))
-                                    Url.parseInviteCode(textField.text.toString())
-                                else textField.text.toString()
+                                textField.text.toString()
                             )
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
                                     { guild ->
-                                        if (guild != null) {
-                                            dialog.dismiss()
-                                            GeneralSnackbar.make(
-                                                GeneralSnackbar.findSuitableParent(viewBase)!!,
-                                                "加入成功",
-                                                Snackbar.LENGTH_LONG
-                                            ).show()
-                                        }
+                                        dialog.dismiss()
+                                        GeneralSnackbar.make(
+                                            GeneralSnackbar.findSuitableParent(view)!!,
+                                            "加入成功",
+                                            Snackbar.LENGTH_LONG
+                                        ).show()
                                     }, { error -> println(error) }, { }
                                 )
                         }
                     }
-                }
+                }, { _ ->
+                    GeneralSnackbar.make(
+                        GeneralSnackbar.findSuitableParent(viewBase)!!,
+                        "无效邀请码",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                })
 
+            } else if (textField.text.toString().contains(Url.inviteUrl)) {
+                Client.global.guilds.fetchInvite(
+                    Url.parseInviteCode(textField.text.toString())
+                ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                    if (it != null) {
+                        val invite = it
+                        if (invite.joined) {
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(viewBase)!!,
+                                "你已经在该群组中",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                            textField.setText("")
+                        } else {
+                            Client.global.guilds.join(
+                                Url.parseInviteCode(textField.text.toString())
+                            )
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                    { guild ->
+                                        dialog.dismiss()
+                                        GeneralSnackbar.make(
+                                            GeneralSnackbar.findSuitableParent(view)!!,
+                                            "加入成功",
+                                            Snackbar.LENGTH_LONG
+                                        ).show()
+
+                                    }, { error -> println(error) }, { }
+                                )
+                        }
+                    }
+                }, { _ ->
+                    GeneralSnackbar.make(
+                        GeneralSnackbar.findSuitableParent(viewBase)!!,
+                        "无效邀请吗",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                })
             }
         }
         dialog.show()
