@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.SortedList
 import cn.troph.tomon.ui.chat.fragments.Invite
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.core.Observable
@@ -49,7 +50,7 @@ class GuildCollection(client: Client) :
 
     fun join(code: String): Observable<Guild?> {
         return client.rest.inviteService.join(code, client.auth).subscribeOn(Schedulers.io()).map {
-            client.actions.guildCreate(it)
+            Gson().fromJson(it, Guild::class.java)
         }
     }
 
