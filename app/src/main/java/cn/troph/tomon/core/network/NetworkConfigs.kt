@@ -1,6 +1,6 @@
 package cn.troph.tomon.core.network
 
-object Configs {
+object NetworkConfigs {
     //const val baseUrl: String = "https://10.1.26.65:3000/api/v1/"
 
 
