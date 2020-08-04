@@ -75,7 +75,8 @@
     <string name="leaving_channel_btn">退出中…</string>
     <string name="join_voice_fail">加入语音频道失败</string>
     <string name="join_permission_msg">加入语音频道失败,无麦克风权限</string>
-    <string name="privacy_agreement">注册即同意《用户服务协议》</string>
+    <string name="privacy_agreement">注册即同意《Tomon用户协议》和</string>
+    <string name="privacy_agreement_pri">《Tomon隐私协议》</string>
     <string name="multi">多选</string>
 
 

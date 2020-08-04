@@ -17,10 +17,9 @@ class ApplicationObserver : LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
         Logger.d("app start")
-        if (Client.global.socket.state != SocketClientState.OPEN){
+        if (Client.global.socket.state != SocketClientState.OPEN || Client.global.socket.state != SocketClientState.CONNECTING) {
             Client.global.socket.open()
         }
-
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

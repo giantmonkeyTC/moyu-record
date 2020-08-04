@@ -302,8 +302,15 @@ class GuildChannelSelectorFragment : Fragment() {
                         override fun onLeaveChannel(p0: RtcStats?) {
                             super.onLeaveChannel(p0)
                             mHandler.post {
-                                val mp = MediaPlayer.create(requireContext(), R.raw.user_offline)
-                                mp.start()
+                                try {
+                                    val mp =
+                                        MediaPlayer.create(requireContext(), R.raw.user_offline)
+                                    mp.start()
+                                } catch (e: Exception) {
+                                    Logger.d(e.message)
+                                }
+
+
                                 mChatSharedViewModel.switchingChannelVoiceLD.value?.let {
                                     if (it) {
                                         val audioManager =

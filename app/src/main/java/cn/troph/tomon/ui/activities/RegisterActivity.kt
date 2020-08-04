@@ -106,12 +106,13 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         val ss = SpannableString(getString(R.string.privacy_agreement))
+        val ss2 = SpannableString(getString(R.string.privacy_agreement_pri))
         val clickableSpan: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 val alert: AlertDialog.Builder = AlertDialog.Builder(this@RegisterActivity)
                 alert.setTitle("TOMON")
                 val wv = WebView(this@RegisterActivity)
-                wv.loadUrl("https://beta.tomon.co")
+                wv.loadUrl("https://www.tomon.co/terms")
                 wv.webViewClient = object : WebViewClient() {
                     override fun shouldOverrideUrlLoading(
                         view: WebView,
@@ -121,7 +122,7 @@ class RegisterActivity : AppCompatActivity() {
                         return true
                     }
                 }
-
+                wv.settings.javaScriptEnabled = true
                 alert.setView(wv)
                 alert.setNegativeButton("关闭", { dialog, id -> dialog.dismiss() })
                 alert.show()
@@ -133,11 +134,47 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        ss.setSpan(clickableSpan, 5, 13, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        val clickableSpan2: ClickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                val alert: AlertDialog.Builder = AlertDialog.Builder(this@RegisterActivity)
+                alert.setTitle("TOMON")
+                val wv = WebView(this@RegisterActivity)
+                wv.loadUrl("https://www.tomon.co/privacy")
+                wv.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView,
+                        url: String
+                    ): Boolean {
+                        view.loadUrl(url)
+                        return true
+                    }
+
+                }
+                wv.settings.javaScriptEnabled = true
+                alert.setView(wv)
+                alert.setNegativeButton("关闭", { dialog, id -> dialog.dismiss() })
+                alert.show()
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.isUnderlineText = false
+            }
+        }
+
+        ss.setSpan(clickableSpan, 5, 16, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        ss2.setSpan(clickableSpan2, 0, 11, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+
 
         private_agreement_tv.text = ss
         private_agreement_tv.movementMethod = LinkMovementMethod.getInstance()
         private_agreement_tv.highlightColor = Color.TRANSPARENT
+
+        private_agreement_tv2.text = ss2
+        private_agreement_tv2.movementMethod = LinkMovementMethod.getInstance()
+        private_agreement_tv2.highlightColor = Color.TRANSPARENT
+
+
     }
 
 
