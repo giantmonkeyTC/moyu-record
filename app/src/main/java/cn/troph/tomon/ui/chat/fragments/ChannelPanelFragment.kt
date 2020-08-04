@@ -90,7 +90,7 @@ const val LAST_CHANNEL_ID = "last_channel_id"
 const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
-
+    private val mSwitchChannelMap = HashMap<String, Editable>()
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
     private lateinit var mGridLayoutManager: GridLayoutManager
@@ -120,8 +120,8 @@ class ChannelPanelFragment : BaseFragment() {
             if (changed && value != null) {
                 mHeaderMsg.isEnd = false
                 isFetchingMore = false
-                editText?.let {
-                    it.text = null
+                editText?.let { input ->
+                    input.text = mSwitchChannelMap[value]
                 }
                 val channel = Client.global.channels[value]
                 val count = mMsgList.size
@@ -138,7 +138,6 @@ class ChannelPanelFragment : BaseFragment() {
                     mChatSharedVM.loadDmChannelMessage(value)
                     editText?.let {
                         it.isEnabled = true
-
                         it.hint = getString(R.string.emoji_et_hint)
                     }
                     btn_message_menu?.let {
@@ -281,7 +280,6 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-
             }
         })
         mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
@@ -313,6 +311,11 @@ class ChannelPanelFragment : BaseFragment() {
             if (it.channelId == null) {
                 mChannelId = Client.global.preferences.getString(LAST_CHANNEL_ID, null)
             } else {
+
+                mChannelId?.let {
+                    mSwitchChannelMap[it] = editText.text
+                }
+
                 mChannelId = it.channelId
             }
         })
@@ -355,6 +358,12 @@ class ChannelPanelFragment : BaseFragment() {
                 else
                     editText.text.toString()
             editText.text.clear()
+            mSwitchChannelMap
+
+            mChannelId?.let {
+                mSwitchChannelMap.remove(it)
+            }
+
             if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
                 val emptyMsg = createEmptyMsg(textToSend)
