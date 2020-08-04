@@ -122,6 +122,7 @@ class ChannelPanelFragment : BaseFragment() {
                 isFetchingMore = false
                 editText?.let { input ->
                     input.text = mSwitchChannelMap[value]
+                    input.setSelection(input.text.length)
                 }
                 val channel = Client.global.channels[value]
                 val count = mMsgList.size
