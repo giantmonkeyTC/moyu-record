@@ -210,7 +210,7 @@ class MessageAdapter(
 
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
-                        messageList[position].author?.name
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -315,7 +315,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_image.text =
-                        messageList[position].author?.name
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -456,7 +456,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
-                        messageList[position].author?.name
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -590,7 +590,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_stamp.text =
-                        messageList[position].author?.name
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -735,7 +735,9 @@ class MessageAdapter(
             if (message.type == MessageType.SYSTEM) {
                 itemView.widget_message_author_name_text.text = "T🐱"
             } else {
-                itemView.widget_message_author_name_text.text = message.author?.name
+                itemView.widget_message_author_name_text.text =
+                    "${message.author?.name} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
+
                 if (member != null) {
                     itemView.widget_message_author_name_text.setTextColor(
                         (if (member.roles.color == null)

@@ -27,6 +27,8 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     var isSelfDeaf = false
 
+    var type = 0
+
     init {
         patchSelf(data)
     }
@@ -34,6 +36,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
     private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].asString
+        }
+        if(data.has("type")){
+            type = data["type"].asInt
         }
         if (data.has("username")) {
             username = data["username"].asString
