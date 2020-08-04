@@ -12,6 +12,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
     <style name="AppTheme.NoTitle">
@@ -54,5 +55,4 @@
         <item name="background">@color/actionBarBackground</item>
         <item name="titleTextStyle">@style/AppTheme.ActionBar.Title</item>
     </style>
-
 </resources>
