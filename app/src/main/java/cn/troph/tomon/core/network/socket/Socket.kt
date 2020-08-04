@@ -1,5 +1,8 @@
 package cn.troph.tomon.core.network.socket
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.Configs
 import cn.troph.tomon.core.network.socket.handlers.*
@@ -31,7 +34,7 @@ enum class GatewayOp(val value: Int) {
     }
 }
 
-class Socket : Observer<SocketEvent> {
+class Socket : Observer<SocketEvent> ,LifecycleObserver{
     fun getSesstion(): String? {
         return _sessionId
     }
@@ -90,6 +93,7 @@ class Socket : Observer<SocketEvent> {
 
     private fun heartbeat() {
         println("heartbeat")
+        println("ws state" + state.value)
         send(GatewayOp.HEARTBEAT)
         _heartbeatTimerTask = _heartbeatTimer.schedule(_heartbeatInterval) {
             heartbeat()

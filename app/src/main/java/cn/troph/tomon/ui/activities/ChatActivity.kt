@@ -110,6 +110,8 @@ class ChatActivity : BaseActivity() {
     }
 
 
+
+
     private fun hideKeyboard() {
         val imm: InputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager

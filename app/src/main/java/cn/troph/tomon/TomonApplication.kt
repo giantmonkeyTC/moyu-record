@@ -10,7 +10,9 @@ import android.os.Build
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
+import androidx.lifecycle.ProcessLifecycleOwner
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.ui.states.ApplicationObserver
 import com.alibaba.sdk.android.push.CommonCallback
 import com.alibaba.sdk.android.push.huawei.HuaWeiRegister
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory
@@ -43,6 +45,7 @@ class TomonApplication : Application() {
         sTracker = sAnalytics.newTracker(R.xml.global_tracker)
         sTracker.enableAutoActivityTracking(true)
         initPushService(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationObserver())
     }
 
     private fun initChannel() {
