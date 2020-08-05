@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Environment
+import android.provider.Settings
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -57,8 +58,13 @@ import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlin.random.Random
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
@@ -801,12 +807,16 @@ class MessageAdapter(
         message: Message,
         itemView: View
     ) {
-
+        val tag = "<img src=\"%s\" />"
+        val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
         val contentSpan = Assets.contentParser(message.content!!)
 
         val span = SpannableString(contentSpan.parseContent)
 
         contentSpan.contentEmoji.forEach {
+            val link = Assets.emojiURL(it.id)
+            tag.format(link)
+            it.start
             Glide.with(itemView.context).asDrawable()
                 .load(Assets.emojiURL(it.id))
                 .into(
@@ -815,27 +825,32 @@ class MessageAdapter(
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            val width =
-                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
-                                    itemView.context,
-                                    15f
-                                ).toFloat()
-                            resource.setBounds(
-                                0,
-                                0,
-                                width.toInt(),
-                                DensityUtil.dip2px(itemView.context, 15f)
-                            )
-                            span.setSpan(
-                                ImageSpan(resource),
-                                it.start,
-                                (it.end + 1),
-                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                            )
-                            itemView.widget_message_text.text = span
+                            pool.submit {
+                                val width =
+                                    (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
+                                        itemView.context,
+                                        15f
+                                    ).toFloat()
+                                resource.setBounds(
+                                    0,
+                                    0,
+                                    width.toInt(),
+                                    DensityUtil.dip2px(itemView.context, 15f)
+                                )
+                                span.setSpan(
+                                    ImageSpan(resource),
+                                    it.start,
+                                    (it.end + 1),
+                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                                )
+                                itemView.widget_message_text.post {
+                                    itemView.widget_message_text.text = span
+                                }
+                            }
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {
+
                         }
                     })
         }
