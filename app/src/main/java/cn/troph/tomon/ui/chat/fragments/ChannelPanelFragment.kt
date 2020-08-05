@@ -4,11 +4,9 @@ import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,22 +14,18 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.text.Editable
-import android.text.Spannable
 import android.text.TextWatcher
-import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
+import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -40,16 +34,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
-import cn.troph.tomon.core.utils.color
-import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
@@ -59,7 +49,6 @@ import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.*
-import com.cruxlab.sectionedrecyclerview.lib.PositionManager
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -119,6 +108,7 @@ class ChannelPanelFragment : BaseFragment() {
             val changed = field != value
             field = value
             if (changed && value != null) {
+                btn_scroll_to_bottom.visibility = View.GONE
                 mHeaderMsg.isEnd = false
                 isFetchingMore = false
                 editText?.let { input ->
@@ -587,6 +577,20 @@ class ChannelPanelFragment : BaseFragment() {
             view_messages,
             OverScrollDecoratorHelper.ORIENTATION_VERTICAL
         )
+        val animOut = TranslateAnimation(0f, 0f, 0f, 450f)
+        animOut.setInterpolator(LinearInterpolator())
+        animOut.duration = 400
+        val animIn = TranslateAnimation(0f, 0f, 450f, 0f)
+        animIn.setInterpolator(LinearInterpolator())
+        animIn.duration = 400
+
+
+        btn_scroll_to_bottom.setOnClickListener {
+            view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)
+            btn_scroll_to_bottom.startAnimation(animOut)
+            btn_scroll_to_bottom.visibility = View.GONE
+        }
+
         view_messages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -598,6 +602,17 @@ class ChannelPanelFragment : BaseFragment() {
                 }
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING && mLayoutManager.findFirstVisibleItemPosition() == 0) {
                     fetchMore()
+                }
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && mLayoutManager.findLastVisibleItemPosition() < mMsgListAdapter.itemCount - 16) {
+                    if (btn_scroll_to_bottom.visibility == View.GONE) {
+                        btn_scroll_to_bottom.visibility = View.VISIBLE
+                        btn_scroll_to_bottom.startAnimation(animIn)
+                    }
+                } else if (newState == RecyclerView.SCROLL_STATE_IDLE && mLayoutManager.findLastVisibleItemPosition() >= mMsgListAdapter.itemCount - 16) {
+                    if (btn_scroll_to_bottom.visibility == View.VISIBLE) {
+                        btn_scroll_to_bottom.startAnimation(animOut)
+                        btn_scroll_to_bottom.visibility = View.GONE
+                    }
                 }
             }
 

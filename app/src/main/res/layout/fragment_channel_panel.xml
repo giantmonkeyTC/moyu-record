@@ -16,6 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout" />
 
+    <ImageView
+        android:id="@+id/btn_scroll_to_bottom"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="28dp"
+        android:src="@drawable/ic_chevron_circle_down_solid"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/view_messages"
+        app:layout_constraintEnd_toEndOf="@id/view_messages" />
+
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
@@ -44,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/background4"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView

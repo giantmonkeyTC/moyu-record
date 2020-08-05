@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.LayoutInflater
@@ -913,6 +914,15 @@ class MessageAdapter(
                 (it.end) + 1,
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
+//            span.setSpan(
+//                object : ClickableSpan() {
+//                    override fun onClick(widget: View) {
+//                       Logger.d("click success")
+//                    }
+//                }, it.start,
+//                (it.end) + 1,
+//                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+//            )
             itemView.widget_message_text.text = span
         }
     }
