@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -31,6 +32,7 @@ import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -66,13 +68,13 @@ const val STAMP_URL_GIF = "https://cdn.tomon.co/stamps/%s.gif"
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
-    private val reactionSelectorListener: ReactionSelectorListener
+    private val reactionSelectorListener: ReactionSelectorListener,
+    private val avatarLongClickListener: OnAvatarLongClickListener
 ) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     var onItemClickListner: OnItemClickListener? = null
     private var markdown: Markwon? = null
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         if (markdown == null) {
@@ -187,6 +189,16 @@ class MessageAdapter(
 
                     }
                 }
+                holder.itemView.message_avatar.setOnLongClickListener {
+                    messageList[holder.adapterPosition].authorId?.let {
+                        if (it != Client.global.me.id) {
+                            messageList[holder.adapterPosition].author?.let { author ->
+                                avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                            }
+                        }
+                    }
+                    true
+                }
                 if (position > 1) {
                     bind(holder.itemView, msg, messageList[position - 1], holder)
                 } else {
@@ -212,7 +224,16 @@ class MessageAdapter(
                     }
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
-
+                    holder.itemView.message_avatar_file.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
                         "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
@@ -307,6 +328,16 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.message_avatar_image.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
@@ -448,6 +479,16 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.message_avatar_invite.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
@@ -590,6 +631,17 @@ class MessageAdapter(
                                 GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
                             }
                         }
+                    }
+                    holder.itemView.message_avatar_stamp.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+
+                            }
+                        }
+                        true
                     }
                     holder.itemView.widget_message_author_name_text_stamp.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.VISIBLE
@@ -972,4 +1024,8 @@ interface ReactionSelectorListener {
 
 interface OnItemClickListener {
     fun onItemClick(position: Int)
+}
+
+interface OnAvatarLongClickListener {
+    fun onAvatarLongClick(identifier: String)
 }

@@ -53,6 +53,7 @@ import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
+import cn.troph.tomon.ui.chat.messages.OnAvatarLongClickListener
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
@@ -227,6 +228,21 @@ class ChannelPanelFragment : BaseFragment() {
                 val bs = ReactionFragment()
                 bs.show(childFragmentManager, "reaction")
                 bs.setMessage(msg)
+            }
+        }, object : OnAvatarLongClickListener {
+            override fun onAvatarLongClick(identifier: String) {
+                val start = editText.selectionStart
+                editText.text.insert(
+                    start,
+                    mentionFormat(identifier)
+                )
+                editText.text.setSpan(
+                    ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
+                    start,
+                    start + mentionFormat(identifier).length,
+                    0x11
+                )
+
             }
         })
 
