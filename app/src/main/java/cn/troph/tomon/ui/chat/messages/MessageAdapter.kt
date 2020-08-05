@@ -44,6 +44,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
+import io.noties.markwon.Markwon
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -70,9 +71,13 @@ class MessageAdapter(
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     var onItemClickListner: OnItemClickListener? = null
+    private var markdown: Markwon? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        if (markdown == null) {
+            markdown = Markwon.create(parent.context)
+        }
         when (viewType) {
             0 -> {
                 return MessageViewHolder(
@@ -757,8 +762,11 @@ class MessageAdapter(
             ))
         ) {
             richText(message, itemView)
-        } else
-            itemView.widget_message_text.text = message.content
+        } else {
+            markdown?.setMarkdown(itemView.widget_message_text, message.content ?: "")
+        }
+
+
         if (if (prevMessage == null) true
             else
                 message.authorId != prevMessage.authorId ||
