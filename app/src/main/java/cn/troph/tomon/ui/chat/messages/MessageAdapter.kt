@@ -62,6 +62,7 @@ import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import kotlin.random.Random
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
 const val STAMP_URL = "https://cdn.tomon.co/stamps/%s.png?x-oss-process=image/resize,p_80"
@@ -578,8 +579,6 @@ class MessageAdapter(
                                     holder.itemView.default_avatar_text.text =
                                         it.guild.name.substring(0, 1)
                                 }
-
-
                             }, {
                                 holder.itemView.default_avatar_text.visibility = View.GONE
                                 holder.itemView.join_image.setImageResource(R.drawable.invalidation)
@@ -598,26 +597,12 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             5 -> {
-                val name = SpannableString(messageList[position].author?.name)
-                holder.itemView.system_txt_welcome.text = spannable {
-                    color(
-                        holder.itemView.context.getColor(R.color.secondaryText),
-                        holder.itemView.context.getString(R.string.welcome_msg1)
-                    )
-                } + spannable {
-                    size(
-                        1.15f, color(
-                            holder.itemView.context.getColor(R.color.primaryText),
-                            name
-                        )
-                    )
-
-                } + spannable {
-                    color(
-                        holder.itemView.context.getColor(R.color.secondaryText),
-                        holder.itemView.context.getString(R.string.welcome_msg2)
-                    )
-                }
+                val welcomeArray =
+                    holder.itemView.context.resources.getStringArray(R.array.welcome_array)
+                val index = Random.nextInt(0, welcomeArray.size)
+                val welMsg = welcomeArray[index]
+                val name = "**" + messageList[position].author?.name + "**"
+                markdown?.setMarkdown(holder.itemView.system_txt_welcome, welMsg.format(name))
             }
             6 -> {
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
