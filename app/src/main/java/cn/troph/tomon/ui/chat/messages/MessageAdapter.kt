@@ -807,15 +807,9 @@ class MessageAdapter(
         message: Message,
         itemView: View
     ) {
-        val tag = "<img src=\"%s\" />"
-        val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
         val contentSpan = Assets.contentParser(message.content!!)
-
         val span = SpannableString(contentSpan.parseContent)
-
         contentSpan.contentEmoji.forEach {
-            val link = Assets.emojiURL(it.id)
-            tag.format(link)
             it.start
             Glide.with(itemView.context).asDrawable()
                 .load(Assets.emojiURL(it.id))
@@ -825,7 +819,7 @@ class MessageAdapter(
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            pool.submit {
+                            GlobalScope.launch {
                                 val width =
                                     (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
                                         itemView.context,
