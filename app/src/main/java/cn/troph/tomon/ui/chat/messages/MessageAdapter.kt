@@ -536,8 +536,6 @@ class MessageAdapter(
                                     holder.itemView.default_avatar_text.text =
                                         it.guild.name.substring(0, 1)
                                 }
-
-
                             }, {
                                 holder.itemView.default_avatar_text.visibility = View.GONE
                                 holder.itemView.join_image.setImageResource(R.drawable.invalidation)
