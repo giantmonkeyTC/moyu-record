@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.provider.Settings
+import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -137,7 +138,6 @@ class MessageAdapter(
         } else if (messageList[position].type == MessageType.GUILD_MEMBER_JOIN) {
             return 5
         } else if (messageList[position].type == MessageType.DEFAULT && messageList[position].attachments.size > 0) {
-
             var type = 0
             for (item in messageList[position].attachments.values) {
                 if (isImage(item.type)) {
