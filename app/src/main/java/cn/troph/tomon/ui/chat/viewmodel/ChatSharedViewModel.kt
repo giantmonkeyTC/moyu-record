@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val botCommandSelectedLD = MutableLiveData<String>()
+
     val stampSendedLiveData = MutableLiveData<StampSendedState>()
 
     val stampsLiveData = MutableLiveData<MutableList<StampPack>>()

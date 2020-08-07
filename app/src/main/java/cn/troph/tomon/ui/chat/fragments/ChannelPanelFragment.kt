@@ -81,8 +81,6 @@ const val LAST_CHANNEL_ID = "last_channel_id"
 const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
-    private val mBotCommandList = mutableListOf<String>()
-    private val mBotCommandAdapter = BotCommandAdapter(mBotCommandList)
     private val mSwitchChannelMap = HashMap<String, Editable>()
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
@@ -291,22 +289,10 @@ class ChannelPanelFragment : BaseFragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
-                    if (it.toString().indexOf('/') >= 0) {
-                        mHandler.post{
-                            mBotCommandList.add("123")
-                            mBotCommandList.add("123")
-                            mBotCommandList.add("123")
-                            mBotCommandList.add("123")
-                            mBotCommandList.add("123")
-                            mBotCommandList.add("123")
-                            bot_command_rr.visibility = View.VISIBLE
-                            bot_command_rr.layoutManager = LinearLayoutManager(requireContext())
-                            bot_command_rr.adapter = mBotCommandAdapter
-                        }
-
+                    if (it.toString().length >= 0 && it.toString().endsWith('/')) {
+                        BotCommandBottomSheet().show(parentFragmentManager, null)
                     }
                 }
-
             }
         })
         mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
@@ -703,6 +689,10 @@ class ChannelPanelFragment : BaseFragment() {
                 hideKeyboard()
             }
         }
+        mChatSharedVM.botCommandSelectedLD.observe(viewLifecycleOwner, Observer {
+            editText.append(it)
+            btn_message_send.performClick()
+        })
     }
 
 

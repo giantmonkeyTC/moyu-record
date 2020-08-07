@@ -78,6 +78,7 @@
     <string name="privacy_agreement">注册即同意《Tomon用户协议》和</string>
     <string name="privacy_agreement_pri">《Tomon隐私协议》</string>
     <string name="multi">多选</string>
+    <string name="seach_bot_hint">输入Bot命令</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

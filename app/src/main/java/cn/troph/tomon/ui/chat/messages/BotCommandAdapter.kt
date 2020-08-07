@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import kotlinx.android.synthetic.main.item_bot_command.view.*
 
-class BotCommandAdapter(private val commandList: MutableList<String>) :
+class BotCommandAdapter(
+    private val commandList: MutableList<String>,
+    private val onItemClickListener: OnItemClickListener
+) :
     RecyclerView.Adapter<CommandViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommandViewHolder {
         return CommandViewHolder(
@@ -20,7 +23,10 @@ class BotCommandAdapter(private val commandList: MutableList<String>) :
     }
 
     override fun onBindViewHolder(holder: CommandViewHolder, position: Int) {
-        holder.itemView.bot_command_tv.text = commandList[position]
+        holder.itemView.bot_command_tv.text = "${"\uD83E\uDD16 /" + commandList[position]}"
+        holder.itemView.setOnClickListener {
+            onItemClickListener.onItemClick(holder.adapterPosition)
+        }
     }
 
 }

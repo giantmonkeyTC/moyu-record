@@ -1,60 +1,83 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
+import cn.troph.tomon.ui.chat.messages.BotCommandAdapter
+import cn.troph.tomon.ui.chat.messages.OnItemClickListener
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.android.synthetic.main.bot_command_fragment.*
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import net.andreinc.jasuggest.JaCacheConfig
+import net.andreinc.jasuggest.JaSuggest
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [BotCommandBottomSheet.newInstance] factory method to
- * create an instance of this fragment.
- */
-class BotCommandBottomSheet : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class BotCommandBottomSheet : BottomSheetDialogFragment() {
+    private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
+    private val mBotCommandList = mutableListOf<String>()
+    private val mBotSearchCommandList = mutableListOf<String>()
+    private val mBotCommandAdapter =
+        BotCommandAdapter(mBotSearchCommandList, object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                mChatSharedViewModel.botCommandSelectedLD.value = mBotSearchCommandList[position]
+                dismiss()
+            }
+        })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.bot_command_fragment, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BotCommandBottomSheet.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            BotCommandBottomSheet().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val jaCacheConfig = JaCacheConfig.defaultConfig()
+        mBotCommandList.add("123")
+        mBotCommandList.add("You")
+        mBotCommandList.add("help")
+        mBotCommandList.add("test")
+        mBotCommandList.add("bot")
+        mBotCommandList.add("123123")
+        mBotCommandList.add("123abc")
+        mBotCommandList.add("qwer1")
+        mBotCommandList.add("qwerty")
+
+        val jaSuggest =
+            JaSuggest.builder().ignoreCase().withCache(jaCacheConfig).buildFrom(mBotCommandList)
+        bot_command_rr.layoutManager = LinearLayoutManager(requireContext())
+        mBotSearchCommandList.addAll(mBotCommandList)
+        bot_command_rr.adapter = mBotCommandAdapter
+        OverScrollDecoratorHelper.setUpOverScroll(
+            bot_command_rr,
+            OverScrollDecoratorHelper.ORIENTATION_VERTICAL
+        )
+        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
             }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    mBotSearchCommandList.clear()
+                    mBotSearchCommandList.addAll(jaSuggest.findSuggestions(it))
+                    mBotCommandAdapter.notifyDataSetChanged()
+                }
+                return true
+            }
+        })
     }
 }
