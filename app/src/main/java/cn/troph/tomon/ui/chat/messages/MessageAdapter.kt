@@ -10,6 +10,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
+import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ClickableSpan
@@ -42,6 +43,7 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -150,7 +152,6 @@ class MessageAdapter(
         } else if (messageList[position].type == MessageType.GUILD_MEMBER_JOIN) {
             return 5
         } else if (messageList[position].type == MessageType.DEFAULT && messageList[position].attachments.size > 0) {
-
             var type = 0
             for (item in messageList[position].attachments.values) {
                 if (isImage(item.type)) {
@@ -987,35 +988,34 @@ class MessageAdapter(
         contentSpan.contentEmoji.forEach {
             it.start
             Glide.with(itemView.context).asDrawable()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .load(Assets.emojiURL(it.id))
+                .placeholder(R.drawable.image_circle_grey)
+                .override(20)
                 .into(
                     object : CustomTarget<Drawable>() {
                         override fun onResourceReady(
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            GlobalScope.launch {
-                                val width =
-                                    (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
-                                        itemView.context,
-                                        15f
-                                    ).toFloat()
-                                resource.setBounds(
-                                    0,
-                                    0,
-                                    width.toInt(),
-                                    DensityUtil.dip2px(itemView.context, 15f)
-                                )
-                                span.setSpan(
-                                    ImageSpan(resource),
-                                    it.start,
-                                    (it.end + 1),
-                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                                )
-                                itemView.widget_message_text.post {
-                                    itemView.widget_message_text.text = span
-                                }
-                            }
+                            val width =
+                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
+                                    itemView.context,
+                                    15f
+                                ).toFloat()
+                            resource.setBounds(
+                                0,
+                                0,
+                                width.toInt(),
+                                DensityUtil.dip2px(itemView.context, 15f)
+                            )
+                            span.setSpan(
+                                ImageSpan(resource),
+                                it.start,
+                                (it.end + 1),
+                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                            )
+                            itemView.widget_message_text.text = span
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {

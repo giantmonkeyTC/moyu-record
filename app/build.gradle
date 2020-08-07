@@ -174,10 +174,12 @@ dependencies {
     implementation 'com.aliyun.ams:meizu-push:3.8.7.1'
     implementation 'com.aliyun.ams:third_vivopush:2.9.0.1'
     implementation 'com.github.nisrulz:sensey:1.8.0'
-    implementation "io.noties.markwon:core:4.4.0"
+    implementation 'io.noties.markwon:core:4.5.0'
+    implementation 'io.noties.markwon:html:4.5.0'
     implementation 'io.agora.rtc:voice-sdk:3.0.1'
     implementation 'com.karumi:dexter:6.2.1'
     implementation 'com.kartik.stackimageview:stackimageview:0.0.2'
+    implementation 'net.andreinc.jasuggest:jasuggest:0.0.1'
 
     implementation 'com.aliyun.sdk.android:AliyunPlayer:4.5.0-full'
     implementation 'com.alivc.conan:AlivcConan:0.9.5'

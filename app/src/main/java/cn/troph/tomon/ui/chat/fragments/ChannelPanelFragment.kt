@@ -42,6 +42,7 @@ import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
+import cn.troph.tomon.ui.chat.messages.BotCommandAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnAvatarLongClickListener
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
@@ -266,7 +267,7 @@ class ChannelPanelFragment : BaseFragment() {
                 s?.let {
                     mChannelId?.let {
                         if (Client.global.channels[it] is TextChannel)
-                            if (s.length > 0 && start < s.length)
+                            if (s.isNotEmpty() && start < s.length)
                                 mChatSharedVM.mentionState.value =
                                     ChatSharedViewModel.MentionState(
                                         state = s[start].toString() == "@" && count == 1,
@@ -287,6 +288,11 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.toString().length >= 0 && it.toString().endsWith('/')) {
+                        BotCommandBottomSheet().show(parentFragmentManager, null)
+                    }
+                }
             }
         })
         mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
@@ -469,7 +475,7 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce
+                    event.message.nonce == msgInList.nonce && event.message.authorId==msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
@@ -683,6 +689,10 @@ class ChannelPanelFragment : BaseFragment() {
                 hideKeyboard()
             }
         }
+        mChatSharedVM.botCommandSelectedLD.observe(viewLifecycleOwner, Observer {
+            editText.append(it)
+            btn_message_send.performClick()
+        })
     }
 
 
