@@ -752,7 +752,7 @@ class ChannelPanelFragment : BaseFragment() {
 
                             }
                             2 -> {
-                                builder.setCheckPermission(true).setShowFiles(true)
+                                builder.setCheckPermission(true).setShowFiles(true).setSuffixes()
                                     .setSingleChoiceMode(true).setSingleClickSelection(true)
                                     .setShowImages(false).setShowVideos(false)
                                     .setShowAudios(false)

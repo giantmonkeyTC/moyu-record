@@ -5,6 +5,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.text.SpannableString
@@ -58,6 +61,7 @@ import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_message_stamp.view.*
+import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
@@ -125,6 +129,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_message_stamp, parent, false)
                 )
             }
+            7 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_video, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -145,6 +155,8 @@ class MessageAdapter(
             for (item in messageList[position].attachments.values) {
                 if (isImage(item.type)) {
                     type = 2
+                } else if (isVideo(item.type)) {
+                    type = 7
                 } else {
                     type = 1
                 }
@@ -169,6 +181,14 @@ class MessageAdapter(
             "gif",
             true
         ) || name.endsWith("png", true) || name.endsWith("jpeg", true)
+    }
+
+    private fun isVideo(name: String): Boolean {
+        return name.endsWith("mp4", true) || name.endsWith("avi", true) || name.endsWith(
+            "3gp",
+            true
+        )
+
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
@@ -630,7 +650,6 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
-
                             }
                         }
                         true
@@ -705,6 +724,109 @@ class MessageAdapter(
                     holder.itemView.chat_iv_stamp.startAnimation(apl)
                 } else {
                     holder.itemView.chat_iv_stamp.clearAnimation()
+                }
+                showReaction(holder, messageList[position])
+            }
+            7 -> {
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
+                ) {
+                    holder.itemView.message_avatar_video.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
+                    holder.itemView.message_avatar_video.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_video.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
+                    holder.itemView.widget_message_author_name_text_video.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_video.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_video.user = messageList[position].author
+                    holder.itemView.widget_message_author_name_text_video.text =
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    val message = messageList[position]
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_video.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_video.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    if (messageList[position].type == MessageType.SYSTEM) {
+                        holder.itemView.widget_message_author_name_text_video.text = "T🐱"
+                    }
+
+                    holder.itemView.widget_message_timestamp_text_video.text =
+                        timestampConverter(messageList[position].timestamp)
+                } else {
+                    holder.itemView.message_avatar_video.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_video.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_video.visibility = View.GONE
+                }
+
+                holder.itemView.video_player.setOnLongClickListener {
+                    callBottomSheet(holder, 2)
+                    true
+                }
+                for (item in messageList[position].attachments.values) {
+//                    holder.itemView.chat_iv.updateLayoutParams {
+//                        item.height?.let {
+//                            val calHeight =
+//                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
+//                            height = if (calHeight > 300) {
+//                                DensityUtil.dip2px(holder.itemView.context, 300f)
+//                            } else {
+//                                it
+//                            }
+//                        }
+//                    }
+                    val uri = Uri.parse(item.url)
+                    holder.itemView.video_player.updateLayoutParams {
+
+                    }
+
+                    holder.itemView.video_player.setVideoURI(uri)
+                    holder.itemView.video_player.start()
+                    holder.itemView.video_player.setOnPreparedListener {
+                    }
+                    holder.itemView.video_player.setOnCompletionListener {
+                        holder.itemView.video_player.start()
+                    }
+                    holder.itemView.video_player.setOnClickListener{
+
+                    }
+                    break
+                }
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.video_player.startAnimation(apl)
+                } else {
+                    holder.itemView.video_player.clearAnimation()
                 }
                 showReaction(holder, messageList[position])
             }
