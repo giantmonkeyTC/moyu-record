@@ -46,15 +46,15 @@ class BotCommandBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val jaCacheConfig = JaCacheConfig.defaultConfig()
-        mBotCommandList.add("123")
-        mBotCommandList.add("You")
+        mBotCommandList.add("cat")
+        mBotCommandList.add("gakki")
         mBotCommandList.add("help")
-        mBotCommandList.add("test")
-        mBotCommandList.add("bot")
-        mBotCommandList.add("123123")
-        mBotCommandList.add("123abc")
-        mBotCommandList.add("qwer1")
-        mBotCommandList.add("qwerty")
+        mBotCommandList.add("bird")
+        mBotCommandList.add("waifu")
+        mBotCommandList.add("about")
+        mBotCommandList.add("dice")
+        mBotCommandList.add("duilian")
+        mBotCommandList.add("anime")
 
         val jaSuggest =
             JaSuggest.builder().ignoreCase().withCache(jaCacheConfig).buildFrom(mBotCommandList)
