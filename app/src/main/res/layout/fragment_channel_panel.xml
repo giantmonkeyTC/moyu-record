@@ -30,6 +30,16 @@
         <include layout="@layout/shimmer_placeholder" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bot_command_rr"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/layout_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_input"
         android:layout_width="match_parent"

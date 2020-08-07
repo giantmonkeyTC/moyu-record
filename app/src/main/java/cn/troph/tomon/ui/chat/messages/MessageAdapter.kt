@@ -37,6 +37,7 @@ import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -807,46 +808,31 @@ class MessageAdapter(
         message: Message,
         itemView: View
     ) {
-        val tag = "<img src=\"%s\" />"
-        val pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
         val contentSpan = Assets.contentParser(message.content!!)
 
         val span = SpannableString(contentSpan.parseContent)
 
         contentSpan.contentEmoji.forEach {
-            val link = Assets.emojiURL(it.id)
-            tag.format(link)
             it.start
             Glide.with(itemView.context).asDrawable()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .load(Assets.emojiURL(it.id))
+                .placeholder(R.drawable.image_circle_grey)
+                .override(20)
                 .into(
                     object : CustomTarget<Drawable>() {
                         override fun onResourceReady(
                             resource: Drawable,
                             transition: Transition<in Drawable>?
                         ) {
-                            pool.submit {
-                                val width =
-                                    (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
-                                        itemView.context,
-                                        15f
-                                    ).toFloat()
-                                resource.setBounds(
-                                    0,
-                                    0,
-                                    width.toInt(),
-                                    DensityUtil.dip2px(itemView.context, 15f)
-                                )
-                                span.setSpan(
-                                    ImageSpan(resource),
-                                    it.start,
-                                    (it.end + 1),
-                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                                )
-                                itemView.widget_message_text.post {
-                                    itemView.widget_message_text.text = span
-                                }
-                            }
+                            span.setSpan(
+                                ImageSpan(resource),
+                                it.start,
+                                (it.end + 1),
+                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                            )
+                            itemView.widget_message_text.text = span
+
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {

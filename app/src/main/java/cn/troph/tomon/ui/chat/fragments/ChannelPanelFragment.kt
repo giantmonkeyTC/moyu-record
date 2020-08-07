@@ -52,6 +52,7 @@ import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
+import cn.troph.tomon.ui.chat.messages.BotCommandAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
@@ -90,6 +91,8 @@ const val LAST_CHANNEL_ID = "last_channel_id"
 const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
+    private val mBotCommandList = mutableListOf<String>()
+    private val mBotCommandAdapter = BotCommandAdapter(mBotCommandList)
     private val mSwitchChannelMap = HashMap<String, Editable>()
     private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
     private lateinit var mSectionDataManager: SectionDataManager
@@ -260,7 +263,7 @@ class ChannelPanelFragment : BaseFragment() {
                 s?.let {
                     mChannelId?.let {
                         if (Client.global.channels[it] is TextChannel)
-                            if (s.length > 0 && start < s.length)
+                            if (s.isNotEmpty() && start < s.length)
                                 mChatSharedVM.mentionState.value =
                                     ChatSharedViewModel.MentionState(
                                         state = s[start].toString() == "@" && count == 1,
@@ -281,6 +284,23 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.toString().indexOf('/') >= 0) {
+                        mHandler.post{
+                            mBotCommandList.add("123")
+                            mBotCommandList.add("123")
+                            mBotCommandList.add("123")
+                            mBotCommandList.add("123")
+                            mBotCommandList.add("123")
+                            mBotCommandList.add("123")
+                            bot_command_rr.visibility = View.VISIBLE
+                            bot_command_rr.layoutManager = LinearLayoutManager(requireContext())
+                            bot_command_rr.adapter = mBotCommandAdapter
+                        }
+
+                    }
+                }
+
             }
         })
         mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
