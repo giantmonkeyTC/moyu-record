@@ -825,6 +825,7 @@ class MessageAdapter(
                             this.height = item.height!!
                         }
                     }
+                    var status: Int = 0
                     val vidPlayer =
                         AliPlayerFactory.createAliPlayer(holder.itemView.context).apply {
                             setOnPreparedListener {
@@ -834,27 +835,27 @@ class MessageAdapter(
                                 holder.itemView.play_status.visibility = View.VISIBLE
                             }
                             setOnStateChangedListener {
-                                when (it) {
-                                    3 -> {
-                                        holder.itemView.play_pause.visibility = View.VISIBLE1
-                                    }
-                                    4 -> {
-
-                                    }
-                                    6 -> {
-
-                                    }
-                                }
+                                status = it
                             }
                         }
 
                     holder.itemView.play_status.setOnClickListener {
-                        val urlSource = UrlSource()
-                        urlSource.uri = Uri.parse(item.url).toString()
-                        vidPlayer?.setDataSource(urlSource)
-                        vidPlayer?.prepare()
-                        holder.itemView.play_status.visibility = View.GONE
-                        videoPreview.visibility = View.GONE
+                        if (status == 4) {
+                            vidPlayer.start()
+                            holder.itemView.play_status.visibility = View.GONE
+                        } else if (status == 6) {
+                            vidPlayer?.prepare()
+                            vidPlayer.start()
+                            holder.itemView.play_status.visibility = View.GONE
+                        } else {
+                            val urlSource = UrlSource()
+                            urlSource.uri = Uri.parse(item.url).toString()
+                            vidPlayer?.setDataSource(urlSource)
+                            vidPlayer?.prepare()
+                            holder.itemView.play_status.visibility = View.GONE
+                            videoPreview.visibility = View.GONE
+                        }
+
                     }
                     videoPreview.setBackgroundColor(holder.itemView.context.resources.getColor(R.color.primaryColor))
                     videoPlayer.surfaceTextureListener =
@@ -890,7 +891,18 @@ class MessageAdapter(
                         holder.itemView.play_status.visibility = View.VISIBLE
                     }
                     holder.itemView.video_player.setOnClickListener {
+                        when (status) {
+                            3 -> {
+                                holder.itemView.play_pause.visibility = View.VISIBLE
+                            }
+                            4 -> {
 
+                            }
+                            6 -> {
+
+                            }
+
+                        }
                     }
                     break
                 }
