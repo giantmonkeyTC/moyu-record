@@ -833,6 +833,19 @@ class MessageAdapter(
                             setOnCompletionListener {
                                 holder.itemView.play_status.visibility = View.VISIBLE
                             }
+                            setOnStateChangedListener {
+                                when (it) {
+                                    3 -> {
+                                        holder.itemView.play_pause.visibility = View.VISIBLE1
+                                    }
+                                    4 -> {
+
+                                    }
+                                    6 -> {
+
+                                    }
+                                }
+                            }
                         }
 
                     holder.itemView.play_status.setOnClickListener {
@@ -871,6 +884,11 @@ class MessageAdapter(
                                 vidPlayer?.setSurface(Surface(surface))
                             }
                         }
+                    holder.itemView.play_pause.setOnClickListener {
+                        vidPlayer?.pause()
+                        holder.itemView.play_pause.visibility = View.GONE
+                        holder.itemView.play_status.visibility = View.VISIBLE
+                    }
                     holder.itemView.video_player.setOnClickListener {
 
                     }

@@ -67,6 +67,17 @@
         app:layout_constraintStart_toStartOf="@id/video_player"
         app:layout_constraintTop_toTopOf="@id/video_player" />
 
+    <ImageView
+        android:id="@+id/play_pause"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_pause_solid"
+        app:layout_constraintBottom_toBottomOf="@id/video_player"
+        app:layout_constraintEnd_toEndOf="@id/video_player"
+        app:layout_constraintStart_toStartOf="@id/video_player"
+        app:layout_constraintTop_toTopOf="@id/video_player"
+        />
     <include
         layout="@layout/item_reaction_view"
         android:layout_width="0dp"
