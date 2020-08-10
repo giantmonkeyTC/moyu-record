@@ -7,6 +7,10 @@ buildscript {
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
+        mavenCentral()
+        maven {
+            url 'https://maven.aliyun.com/repository/releases'
+        }
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.3'
@@ -24,6 +28,10 @@ allprojects {
         jcenter()
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
+        }
+        mavenCentral()
+        maven {
+            url 'https://maven.aliyun.com/repository/releases'
         }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         maven { url "https://jitpack.io" }
