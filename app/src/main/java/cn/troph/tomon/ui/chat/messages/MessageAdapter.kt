@@ -42,8 +42,12 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import coil.Coil
+import coil.request.GetRequest
+import coil.request.LoadRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.downloader.Error
@@ -816,7 +820,7 @@ class MessageAdapter(
                     holder.itemView.video_player.setOnCompletionListener {
                         holder.itemView.video_player.start()
                     }
-                    holder.itemView.video_player.setOnClickListener{
+                    holder.itemView.video_player.setOnClickListener {
 
                     }
                     break
@@ -921,9 +925,6 @@ class MessageAdapter(
             itemView.widget_message_author_name_text.text = message.author?.name
             itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
-
-
-
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
                 message.content!!
             ))
@@ -984,45 +985,36 @@ class MessageAdapter(
         itemView: View
     ) {
         val contentSpan = Assets.contentParser(message.content!!)
-        val span = SpannableString(contentSpan.parseContent)
+
+        var tempMsg = message.content
         contentSpan.contentEmoji.forEach {
-            it.start
-            Glide.with(itemView.context).asDrawable()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .load(Assets.emojiURL(it.id))
-                .placeholder(R.drawable.image_circle_grey)
-                .override(20)
-                .into(
-                    object : CustomTarget<Drawable>() {
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            transition: Transition<in Drawable>?
-                        ) {
-                            val width =
-                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
-                                    itemView.context,
-                                    15f
-                                ).toFloat()
-                            resource.setBounds(
-                                0,
-                                0,
-                                width.toInt(),
-                                DensityUtil.dip2px(itemView.context, 15f)
-                            )
-                            span.setSpan(
-                                ImageSpan(resource),
-                                it.start,
-                                (it.end + 1),
-                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                            )
-                            itemView.widget_message_text.text = span
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {
-
-                        }
-                    })
+            tempMsg = tempMsg?.replaceFirst(
+                it.raw,
+                "<img src=\"%s\" ></img>".format(Assets.emojiURL(it.id))
+            )
         }
+
+        itemView.widget_message_text.text = Html.fromHtml(
+            tempMsg, Html.FROM_HTML_MODE_COMPACT,
+            Html.ImageGetter {
+                val resource = itemView.context.getDrawable(R.drawable.app_logo_sqr)!!
+                val width =
+                    (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
+                        itemView.context,
+                        15f
+                    ).toFloat()
+                resource.setBounds(
+                    0,
+                    0,
+                    width.toInt(),
+                    DensityUtil.dip2px(itemView.context, 15f)
+                )
+                resource
+            },
+            null
+        )
+        val span = SpannableString(tempMsg)
+        //@人
         contentSpan.contentAtUser.forEach {
             span.setSpan(
                 ForegroundColorSpan(Color.parseColor("#5996b8")),
@@ -1030,15 +1022,6 @@ class MessageAdapter(
                 (it.end) + 1,
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE
             )
-//            span.setSpan(
-//                object : ClickableSpan() {
-//                    override fun onClick(widget: View) {
-//                       Logger.d("click success")
-//                    }
-//                }, it.start,
-//                (it.end) + 1,
-//                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-//            )
             itemView.widget_message_text.text = span
         }
     }

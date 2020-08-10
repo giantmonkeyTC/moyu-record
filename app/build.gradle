@@ -17,6 +17,14 @@ repositories {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/yazhoujiang/Desktop/troph-android/release-key')
+            storePassword 'qwer1234'
+            keyAlias 'release'
+            keyPassword 'qwer1234'
+        }
+    }
     compileSdkVersion 29
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -32,7 +40,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库
-            abiFilters 'armeabi', 'x86','arm64-v8a','armeabi-v7a','x86_64'
+            abiFilters 'armeabi', 'x86', 'arm64-v8a', 'armeabi-v7a', 'x86_64'
         }
 
     }
@@ -41,6 +49,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
 
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
@@ -113,6 +122,9 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.github.bumptech.glide:annotations:4.11.0'
+    implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation "androidx.activity:activity:1.1.0"
     implementation "androidx.activity:activity-ktx:1.1.0"
     implementation "androidx.fragment:fragment:1.2.5"
@@ -183,4 +195,6 @@ dependencies {
 
     implementation 'com.aliyun.sdk.android:AliyunPlayer:4.5.0-full'
     implementation 'com.alivc.conan:AlivcConan:0.9.5'
+
+    implementation("io.coil-kt:coil:0.11.0")
 }
