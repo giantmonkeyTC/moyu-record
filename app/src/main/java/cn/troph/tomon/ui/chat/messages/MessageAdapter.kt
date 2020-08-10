@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
+import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -16,9 +17,7 @@ import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -42,6 +41,9 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import com.aliyun.player.AliPlayer
+import com.aliyun.player.AliPlayerFactory
+import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
@@ -90,10 +92,12 @@ class MessageAdapter(
     var onItemClickListner: OnItemClickListener? = null
     private var markdown: Markwon? = null
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         if (markdown == null) {
             markdown = Markwon.create(parent.context)
         }
+
         when (viewType) {
             0 -> {
                 return MessageViewHolder(
@@ -805,18 +809,69 @@ class MessageAdapter(
 //                        }
 //                    }
                     val uri = Uri.parse(item.url)
+                    val videoPlayer = holder.itemView.video_player
+                    val videoPreview = holder.itemView.video_preview
+                    videoPreview.updateLayoutParams {
+                        item.width?.let {
+                            this.width =
+                                item.width!!
+                            this.height =
+                                item.height!!
+                        }
+                    }
                     holder.itemView.video_player.updateLayoutParams {
+                        item.width?.let {
+                            this.width = item.width!!
+                            this.height = item.height!!
+                        }
+                    }
+                    val vidPlayer =
+                        AliPlayerFactory.createAliPlayer(holder.itemView.context).apply {
+                            setOnPreparedListener {
+                                this.start()
+                            }
+                            setOnCompletionListener {
+                                holder.itemView.play_status.visibility = View.VISIBLE
+                            }
+                        }
 
+                    holder.itemView.play_status.setOnClickListener {
+                        val urlSource = UrlSource()
+                        urlSource.uri = Uri.parse(item.url).toString()
+                        vidPlayer?.setDataSource(urlSource)
+                        vidPlayer?.prepare()
+                        holder.itemView.play_status.visibility = View.GONE
+                        videoPreview.visibility = View.GONE
                     }
+                    videoPreview.setBackgroundColor(holder.itemView.context.resources.getColor(R.color.primaryColor))
+                    videoPlayer.surfaceTextureListener =
+                        object : TextureView.SurfaceTextureListener {
+                            override fun onSurfaceTextureSizeChanged(
+                                surface: SurfaceTexture?,
+                                width: Int,
+                                height: Int
+                            ) {
 
-                    holder.itemView.video_player.setVideoURI(uri)
-                    holder.itemView.video_player.start()
-                    holder.itemView.video_player.setOnPreparedListener {
-                    }
-                    holder.itemView.video_player.setOnCompletionListener {
-                        holder.itemView.video_player.start()
-                    }
-                    holder.itemView.video_player.setOnClickListener{
+                            }
+
+                            override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+
+                            }
+
+                            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+                                return true
+                            }
+
+                            override fun onSurfaceTextureAvailable(
+                                surface: SurfaceTexture?,
+                                width: Int,
+                                height: Int
+                            ) {
+                                holder.itemView.play_status.visibility = View.VISIBLE
+                                vidPlayer?.setSurface(Surface(surface))
+                            }
+                        }
+                    holder.itemView.video_player.setOnClickListener {
 
                     }
                     break

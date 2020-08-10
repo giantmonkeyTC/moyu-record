@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="16dp"
-    >
+    android:paddingHorizontal="16dp">
+
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/message_avatar_video"
         android:layout_width="36dp"
@@ -37,7 +36,7 @@
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_video"
         app:layout_constraintTop_toTopOf="@id/message_avatar_video" />
 
-    <VideoView
+    <TextureView
         android:id="@+id/video_player"
         android:layout_width="250dp"
         android:layout_height="350dp"
@@ -46,9 +45,27 @@
         android:maxWidth="250dp"
         android:maxHeight="350dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_video"
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_video" />
 
-        />
+    <ImageView
+        android:id="@+id/video_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/video_player"
+        app:layout_constraintEnd_toEndOf="@id/video_player"
+        app:layout_constraintStart_toStartOf="@id/video_player"
+        app:layout_constraintTop_toTopOf="@id/video_player" />
+
+    <ImageView
+        android:id="@+id/play_status"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_play_solid"
+        app:layout_constraintBottom_toBottomOf="@id/video_player"
+        app:layout_constraintEnd_toEndOf="@id/video_player"
+        app:layout_constraintStart_toStartOf="@id/video_player"
+        app:layout_constraintTop_toTopOf="@id/video_player" />
 
     <include
         layout="@layout/item_reaction_view"
