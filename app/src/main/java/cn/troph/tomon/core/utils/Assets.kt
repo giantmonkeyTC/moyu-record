@@ -41,6 +41,8 @@ object Assets {
     val regexEmoji: Regex = Regex("""<%[\w\u4e00-\u9fa5]+:[0-9]+>""")
     val regexAtUser: Regex = Regex("""<@[0-9]+>""")
     val regexMention: Regex = Regex("""@[\w\u4e00-\u9fa5]+#[0-9]{4}""")
+    val regexLink: Regex = Regex("""http:\/\/\S+""")
+    val regexLinkHttps: Regex = Regex("""https:\/\/\S+""")
     fun contentParser(content: String): ContentSpan {
         val regexRaw = Regex("""\:""")
         val users = mutableListOf<ContentUser>()
@@ -99,5 +101,6 @@ object Assets {
             }
         return parserContent
     }
+
 
 }

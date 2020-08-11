@@ -3,21 +3,17 @@ package cn.troph.tomon.ui.chat.messages
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Environment
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.TypedArrayUtils.getText
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
@@ -37,10 +33,7 @@ import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
-import com.aliyun.conan.AliVcPlayerConan
-import com.aliyun.player.AliPlayer
 import com.aliyun.player.AliPlayerFactory
-import com.aliyun.player.IPlayer
 import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -52,24 +45,35 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.xiaomi.push.ed
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableEmitter
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
+import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
+import kotlinx.android.synthetic.main.item_message_link.view.*
 import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
+import java.io.IOException
+import java.net.URL
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.random.Random
@@ -151,6 +155,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_message_video, parent, false)
                 )
             }
+            8 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_link, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -185,6 +195,11 @@ class MessageAdapter(
             messageList[position].content?.let {
                 if (it.contains(INVITE_LINK))
                     return 4
+                else if (Assets.regexLink.containsMatchIn(it) || Assets.regexLinkHttps.containsMatchIn(
+                        it
+                    )
+                )
+                    return 8
             }
             return 0
         }
@@ -818,7 +833,6 @@ class MessageAdapter(
 //                            }
 //                        }
 //                    }
-                    val uri = Uri.parse(item.url)
                     val videoPlayer = holder.itemView.video_player
                     val videoPreview = holder.itemView.video_preview
                     videoPreview.updateLayoutParams {
@@ -827,6 +841,11 @@ class MessageAdapter(
                                 item.width!!
                             this.height =
                                 item.height!!
+                            if (item.width!! > item.height!!) {
+                                videoPreview.setImageResource(R.drawable.sixty_nine_horizontal)
+                            } else {
+                                videoPreview.setImageResource(R.drawable.sixty_nine_vertical)
+                            }
                         }
                     }
                     holder.itemView.video_player.updateLayoutParams {
@@ -835,7 +854,7 @@ class MessageAdapter(
                             this.height = item.height!!
                         }
                     }
-                    var status: Int = 0
+                    var status = 0
                     val vidPlayer =
                         AliPlayerFactory.createAliPlayer(holder.itemView.context).apply {
                             setOnPreparedListener {
@@ -868,7 +887,6 @@ class MessageAdapter(
                         }
 
                     }
-                    videoPreview.setBackgroundColor(holder.itemView.context.resources.getColor(R.color.primaryColor))
                     videoPlayer.surfaceTextureListener =
                         object : TextureView.SurfaceTextureListener {
                             override fun onSurfaceTextureSizeChanged(
@@ -925,6 +943,120 @@ class MessageAdapter(
                     holder.itemView.video_player.clearAnimation()
                 }
                 showReaction(holder, messageList[position])
+            }
+            8 -> {
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
+                ) {
+                    holder.itemView.message_avatar_link.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
+                    holder.itemView.message_avatar_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_link.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
+                    holder.itemView.widget_message_author_name_text_link.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_link.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_link.user = messageList[position].author
+                    holder.itemView.widget_message_author_name_text_link.text =
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    val message = messageList[position]
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_link.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_link.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    if (messageList[position].type == MessageType.SYSTEM) {
+                        holder.itemView.widget_message_author_name_text_link.text = "T🐱"
+                    }
+
+                    holder.itemView.widget_message_timestamp_text_link.text =
+                        timestampConverter(messageList[position].timestamp)
+                } else {
+                    holder.itemView.message_avatar_link.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_link.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_link.visibility = View.GONE
+                }
+
+                holder.itemView.message_link_section.setOnLongClickListener {
+                    callBottomSheet(holder, 2)
+                    true
+                }
+
+//                Observable.create(object : ObservableOnSubscribe<Map?>() {
+//                    @Throws(Exception::class)
+//                    override fun subscribe(emitter: ObservableEmitter<Map?>) {
+//                        var map: Map? = null
+//                        try {
+//                            //这里开始是做一个解析，需要在非UI线程进行
+//                            var imgStr = ""
+//                            val document: Document =
+//                                Jsoup.parse(URL(messageList[position].content.toString().trim()), 5000)
+//                            val title: String =
+//                                document.head().getElementsByTag("title").text()
+//                            val imgs: Elements = document.getElementsByTag("img") //取得所有Img标签的值
+//                            if (imgs.size > 0) {
+//                                imgStr = imgs.get(0).attr("abs:src") //默认取第一个为图片
+//                            }
+//                            map = HashMap()
+//                            map.put("code", "1")
+//                            map.put("title", title)
+//                            map.put("url",messageList[position].content)
+//                            map.put("img", imgStr)
+//                            emitter.onNext(map)
+//                        } catch (e: IOException) {
+//                            map = HashMap()
+//                            map.put("code", "0")
+//                            emitter.onNext(map)
+//                            e.printStackTrace()
+//                        }
+//                    }
+//                }).subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(Consumer<Any> { map -> //以下操作是在主线程中进行，也就是在handler中
+//
+//                    })
+
+                holder.itemView.link_text.text = messageList[position].content
+                holder.itemView.link_text.setOnClickListener {
+
+                }
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.link_text.startAnimation(apl)
+                } else {
+                    holder.itemView.link_text.clearAnimation()
+                }
+                showReaction(holder, messageList[position])
+
             }
         }
     }

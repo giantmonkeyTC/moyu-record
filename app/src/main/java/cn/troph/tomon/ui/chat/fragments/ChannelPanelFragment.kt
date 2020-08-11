@@ -372,7 +372,6 @@ class ChannelPanelFragment : BaseFragment() {
                     editText.text.toString()
             editText.text.clear()
             mSwitchChannelMap
-
             mChannelId?.let {
                 mSwitchChannelMap.remove(it)
             }
