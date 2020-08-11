@@ -6,27 +6,23 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
-import android.provider.Settings
-import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.text.style.ImageSpan
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -35,9 +31,11 @@ import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
 import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.utils.*
+import cn.troph.tomon.core.utils.Assets
+import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.core.utils.FileUtils
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
-import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -47,9 +45,8 @@ import com.aliyun.player.AliPlayerFactory
 import com.aliyun.player.IPlayer
 import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
@@ -58,6 +55,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.noties.markwon.Markwon
+import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.AsyncDrawable
+import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -71,13 +72,8 @@ import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import kotlin.random.Random
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
@@ -97,7 +93,21 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         if (markdown == null) {
-            markdown = Markwon.create(parent.context)
+            markdown = Markwon.builder(parent.context) // automatically create Glide instance
+                .usePlugin(ImagesPlugin.create())
+                .usePlugin(HtmlPlugin.create())
+                .usePlugin(GlideImagesPlugin.create(parent.context)) // use supplied Glide instance
+                .usePlugin(GlideImagesPlugin.create(Glide.with(parent.context))) // if you need more control
+                .usePlugin(GlideImagesPlugin.create(object : GlideImagesPlugin.GlideStore {
+                    override fun cancel(target: Target<*>) {
+                        Glide.with(parent.context).clear(target)
+                    }
+
+                    override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable> {
+                        return Glide.with(parent.context).load(drawable.destination)
+                    }
+                }))
+                .build()
         }
 
         when (viewType) {
@@ -902,7 +912,6 @@ class MessageAdapter(
 
                             }
                             6 -> {
-
                             }
 
                         }
@@ -1009,9 +1018,6 @@ class MessageAdapter(
             itemView.widget_message_author_name_text.text = message.author?.name
             itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
-
-
-
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
                 message.content!!
             ))
@@ -1072,63 +1078,22 @@ class MessageAdapter(
         itemView: View
     ) {
         val contentSpan = Assets.contentParser(message.content!!)
-        val span = SpannableString(contentSpan.parseContent)
+        var tempMsg = message.content
         contentSpan.contentEmoji.forEach {
-            it.start
-            Glide.with(itemView.context).asDrawable()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .load(Assets.emojiURL(it.id))
-                .placeholder(R.drawable.image_circle_grey)
-                .override(20)
-                .into(
-                    object : CustomTarget<Drawable>() {
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            transition: Transition<in Drawable>?
-                        ) {
-                            val width =
-                                (resource.intrinsicWidth.toFloat() / resource.intrinsicHeight.toFloat()) * DensityUtil.dip2px(
-                                    itemView.context,
-                                    15f
-                                ).toFloat()
-                            resource.setBounds(
-                                0,
-                                0,
-                                width.toInt(),
-                                DensityUtil.dip2px(itemView.context, 15f)
-                            )
-                            span.setSpan(
-                                ImageSpan(resource),
-                                it.start,
-                                (it.end + 1),
-                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                            )
-                            itemView.widget_message_text.text = span
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {
-
-                        }
-                    })
-        }
-        contentSpan.contentAtUser.forEach {
-            span.setSpan(
-                ForegroundColorSpan(Color.parseColor("#5996b8")),
-                it.start,
-                (it.end) + 1,
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+            tempMsg = tempMsg?.replaceFirst(
+                it.raw,
+                "<img src=\"%s\" width=\"70\" height=\"70\" />".format(Assets.emojiURL(it.id))
             )
-//            span.setSpan(
-//                object : ClickableSpan() {
-//                    override fun onClick(widget: View) {
-//                       Logger.d("click success")
-//                    }
-//                }, it.start,
-//                (it.end) + 1,
-//                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-//            )
-            itemView.widget_message_text.text = span
         }
+
+        val contentSpanAtUser = Assets.contentParser(tempMsg!!)
+        val atUserTemplate =
+            "<blockquote style=\"color:blue; background-color:#3b404b; font-size:12px; font-weight:bold \">%s</blockquote>"
+
+        contentSpanAtUser.contentAtUser.forEach {
+            tempMsg = tempMsg?.replaceFirst("<@${it.id}>", atUserTemplate.format("@${it.name}"))
+        }
+        markdown?.setMarkdown(itemView.widget_message_text, tempMsg!!)
     }
 
     private fun timestampConverter(timestamp: LocalDateTime): String {
@@ -1157,12 +1122,9 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
-
         view.quote_button.visibility = View.GONE
         //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
-
         view.share_button.visibility = View.GONE
-
 //        view.share_button.visibility =
 //            if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
         view.reaction_message_button.visibility =

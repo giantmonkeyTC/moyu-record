@@ -17,6 +17,14 @@ repositories {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/yazhoujiang/Desktop/troph-android/release-key')
+            storePassword 'qwer1234'
+            keyAlias 'release'
+            keyPassword 'qwer1234'
+        }
+    }
     compileSdkVersion 29
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -27,12 +35,12 @@ android {
         applicationId "cn.troph.tomon"
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 1
+        versionCode 3
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             //选择要添加的对应cpu类型的.so库
-            abiFilters 'armeabi', 'x86','arm64-v8a','armeabi-v7a','x86_64'
+            abiFilters 'armeabi', 'x86', 'arm64-v8a', 'armeabi-v7a', 'x86_64'
         }
 
     }
@@ -41,6 +49,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
 
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
@@ -113,6 +122,9 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.github.bumptech.glide:annotations:4.11.0'
+    implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation "androidx.activity:activity:1.1.0"
     implementation "androidx.activity:activity-ktx:1.1.0"
     implementation "androidx.fragment:fragment:1.2.5"
@@ -176,6 +188,9 @@ dependencies {
     implementation 'com.github.nisrulz:sensey:1.8.0'
     implementation 'io.noties.markwon:core:4.5.0'
     implementation 'io.noties.markwon:html:4.5.0'
+    implementation 'io.noties.markwon:image:4.5.0'
+    implementation 'io.noties.markwon:image-glide:4.5.0'
+
     implementation 'io.agora.rtc:voice-sdk:3.0.1'
     implementation 'com.karumi:dexter:6.2.1'
     implementation 'com.kartik.stackimageview:stackimageview:0.0.2'
@@ -185,4 +200,5 @@ dependencies {
     implementation 'com.alivc.conan:AlivcConan:0.9.5'
 
     implementation 'org.jsoup:jsoup:1.13.1'
+    implementation("io.coil-kt:coil:0.11.0")
 }
