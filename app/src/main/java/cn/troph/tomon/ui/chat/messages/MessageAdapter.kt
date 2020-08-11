@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.chat.messages
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -13,7 +14,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.TypedArrayUtils.getText
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
@@ -45,7 +45,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
-import com.xiaomi.push.ed
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.AsyncDrawable
@@ -53,7 +52,6 @@ import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -1039,15 +1037,20 @@ class MessageAdapter(
                     }
                 }).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        if (it?.get("title") == null) {
+                    .subscribe { map ->
+                        if (map?.get("title") == null) {
                             holder.itemView.message_link_section.visibility = View.GONE
-                        }
-                        else{
+                        } else {
                             val image = holder.itemView.imageView_link
-                            holder.itemView.textView.text = it?.get("title") ?: ""
-                            Glide.with(holder.itemView.context).load(it?.get("img") ?: "")
+                            holder.itemView.textView.text = map?.get("title") ?: ""
+                            Glide.with(holder.itemView.context).load(map?.get("img") ?: "")
                                 .into(image)
+                            holder.itemView.btn_link_goto.setOnClickListener {
+                                val url = map?.get("url") ?: ""
+                                val i = Intent(Intent.ACTION_VIEW)
+                                i.setData(Uri.parse(url))
+                                holder.itemView.context.startActivity(i)
+                            }
                         }
 
                     }
@@ -1056,6 +1059,7 @@ class MessageAdapter(
                 holder.itemView.link_text.setOnClickListener {
 
                 }
+
                 if (messageList[position].isSending) {
                     val apl = AlphaAnimation(0.1f, 0.78f)
                     apl.duration = 1000

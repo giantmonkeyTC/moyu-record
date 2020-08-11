@@ -87,14 +87,14 @@
             android:singleLine="true"
             android:textColor="@color/primaryText"
             android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@id/btn_link_save"
+            app:layout_constraintEnd_toStartOf="@id/btn_link_goto"
             app:layout_constraintStart_toEndOf="@id/imageView_link"
             app:layout_constraintTop_toTopOf="@id/imageView_link" />
 
 
 
         <ImageView
-            android:id="@+id/btn_link_save"
+            android:id="@+id/btn_link_goto"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="8dp"
