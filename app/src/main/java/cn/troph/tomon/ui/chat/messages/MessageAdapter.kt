@@ -1009,39 +1009,48 @@ class MessageAdapter(
                     true
                 }
 
-//                Observable.create(object : ObservableOnSubscribe<Map?>() {
-//                    @Throws(Exception::class)
-//                    override fun subscribe(emitter: ObservableEmitter<Map?>) {
-//                        var map: Map? = null
-//                        try {
-//                            //这里开始是做一个解析，需要在非UI线程进行
-//                            var imgStr = ""
-//                            val document: Document =
-//                                Jsoup.parse(URL(messageList[position].content.toString().trim()), 5000)
-//                            val title: String =
-//                                document.head().getElementsByTag("title").text()
-//                            val imgs: Elements = document.getElementsByTag("img") //取得所有Img标签的值
-//                            if (imgs.size > 0) {
-//                                imgStr = imgs.get(0).attr("abs:src") //默认取第一个为图片
-//                            }
-//                            map = HashMap()
-//                            map.put("code", "1")
-//                            map.put("title", title)
-//                            map.put("url",messageList[position].content)
-//                            map.put("img", imgStr)
-//                            emitter.onNext(map)
-//                        } catch (e: IOException) {
-//                            map = HashMap()
-//                            map.put("code", "0")
-//                            emitter.onNext(map)
-//                            e.printStackTrace()
-//                        }
-//                    }
-//                }).subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(Consumer<Any> { map -> //以下操作是在主线程中进行，也就是在handler中
-//
-//                    })
+                Observable.create(ObservableOnSubscribe<HashMap<String, String>?> { emitter ->
+                    var map: HashMap<String, String>?
+                    try {
+                        //这里开始是做一个解析，需要在非UI线程进行
+                        var imgStr = ""
+                        val document: Document =
+                            Jsoup.parse(
+                                URL(messageList[position].content.toString().trim()),
+                                5000
+                            )
+                        val title: String =
+                            document.head().getElementsByTag("title").text()
+                        val imgs: Elements = document.getElementsByTag("img") //取得所有Img标签的值
+                        if (imgs.size > 0) {
+                            imgStr = imgs.get(0).attr("abs:src") //默认取第一个为图片
+                        }
+                        map = HashMap()
+                        map.put("code", "1")
+                        map.put("title", title)
+                        map.put("url", messageList[position].content.toString())
+                        map.put("img", imgStr)
+                        emitter.onNext(map)
+                    } catch (e: IOException) {
+                        map = HashMap()
+                        map.put("code", "0")
+                        emitter.onNext(map)
+                        e.printStackTrace()
+                    }
+                }).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        if (it?.get("title") == null) {
+                            holder.itemView.message_link_section.visibility = View.GONE
+                        }
+                        else{
+                            val image = holder.itemView.imageView_link
+                            holder.itemView.textView.text = it?.get("title") ?: ""
+                            Glide.with(holder.itemView.context).load(it?.get("img") ?: "")
+                                .into(image)
+                        }
+
+                    }
 
                 holder.itemView.link_text.text = messageList[position].content
                 holder.itemView.link_text.setOnClickListener {
