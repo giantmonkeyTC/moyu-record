@@ -1086,10 +1086,12 @@ class MessageAdapter(
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate =
-            "<span style=\"color:#85A3EA; background-color:#3B404B; font-weight:bold\">%s</span>"
+            "<span style=\"color: green\">%s</span>"
 
         contentSpanAtUser.contentAtUser.forEach {
-            tempMsg = tempMsg?.replaceFirst("<@${it.id}>", atUserTemplate.format("@${it.name}"))
+            tempMsg = tempMsg?.replaceFirst(
+                "<@${it.id}>", atUserTemplate.format("@${it.name}")
+            )
         }
         markdown?.setMarkdown(itemView.widget_message_text, tempMsg!!)
     }
