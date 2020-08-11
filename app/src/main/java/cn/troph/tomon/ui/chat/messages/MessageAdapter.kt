@@ -1212,16 +1212,18 @@ class MessageAdapter(
         contentSpan.contentEmoji.forEach {
             tempMsg = tempMsg?.replaceFirst(
                 it.raw,
-                "<img src=\"%s\" width=\"70\" height=\"70\" />".format(Assets.emojiURL(it.id))
+                "<img src=\"%s\" height='70' />".format(Assets.emojiURL(it.id))
             )
         }
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate =
-            "<span style='color:blue; background-color:#3b404b; font-size:12px; font-weight:bold' >%s</span>"
+            "<span style=\"color: green\">%s</span>"
 
         contentSpanAtUser.contentAtUser.forEach {
-            tempMsg = tempMsg?.replaceFirst("<@${it.id}>", atUserTemplate.format("@${it.name}"))
+            tempMsg = tempMsg?.replaceFirst(
+                "<@${it.id}>", atUserTemplate.format("@${it.name}")
+            )
         }
         markdown?.setMarkdown(itemView.widget_message_text, tempMsg!!)
     }
