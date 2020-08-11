@@ -11,9 +11,7 @@ import android.os.Environment
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -1088,7 +1086,7 @@ class MessageAdapter(
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate =
-            "<blockquote style=\"color:blue; background-color:#3b404b; font-size:12px; font-weight:bold \">%s</blockquote>"
+            "<span style='color:blue; background-color:#3b404b; font-size:12px; font-weight:bold' >%s</span>"
 
         contentSpanAtUser.contentAtUser.forEach {
             tempMsg = tempMsg?.replaceFirst("<@${it.id}>", atUserTemplate.format("@${it.name}"))
