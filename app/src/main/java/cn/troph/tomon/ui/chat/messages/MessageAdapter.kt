@@ -1080,13 +1080,13 @@ class MessageAdapter(
         contentSpan.contentEmoji.forEach {
             tempMsg = tempMsg?.replaceFirst(
                 it.raw,
-                "<img src=\"%s\" width=\"70\" height=\"70\" />".format(Assets.emojiURL(it.id))
+                "<img src=\"%s\" height='70' />".format(Assets.emojiURL(it.id))
             )
         }
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate =
-            "<span style='color:blue; background-color:#3b404b; font-size:12px; font-weight:bold' >%s</span>"
+            "<span style=\"color:#85A3EA; background-color:#3B404B; font-weight:bold\">%s</span>"
 
         contentSpanAtUser.contentAtUser.forEach {
             tempMsg = tempMsg?.replaceFirst("<@${it.id}>", atUserTemplate.format("@${it.name}"))
