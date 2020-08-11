@@ -41,8 +41,10 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import com.aliyun.conan.AliVcPlayerConan
 import com.aliyun.player.AliPlayer
 import com.aliyun.player.AliPlayerFactory
+import com.aliyun.player.IPlayer
 import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -852,6 +854,7 @@ class MessageAdapter(
                             urlSource.uri = Uri.parse(item.url).toString()
                             vidPlayer?.setDataSource(urlSource)
                             vidPlayer?.prepare()
+
                             holder.itemView.play_status.visibility = View.GONE
                             videoPreview.visibility = View.GONE
                         }

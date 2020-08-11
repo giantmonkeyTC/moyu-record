@@ -366,7 +366,7 @@ class ChannelPanelFragment : BaseFragment() {
                 return@setOnClickListener
             }
             val textToSend =
-                if (editText.text.toString().matches(Assets.regexMention))
+                if (Assets.regexMention.containsMatchIn(editText.text.toString()))
                     Assets.mentionSendParser(editText.text.toString())
                 else
                     editText.text.toString()
@@ -475,7 +475,7 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce && event.message.authorId==msgInList.authorId
+                    event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
