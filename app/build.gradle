@@ -35,7 +35,7 @@ android {
         applicationId "cn.troph.tomon"
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 1
+        versionCode 3
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -188,6 +188,9 @@ dependencies {
     implementation 'com.github.nisrulz:sensey:1.8.0'
     implementation 'io.noties.markwon:core:4.5.0'
     implementation 'io.noties.markwon:html:4.5.0'
+    implementation 'io.noties.markwon:image:4.5.0'
+    implementation 'io.noties.markwon:image-glide:4.5.0'
+
     implementation 'io.agora.rtc:voice-sdk:3.0.1'
     implementation 'com.karumi:dexter:6.2.1'
     implementation 'com.kartik.stackimageview:stackimageview:0.0.2'
