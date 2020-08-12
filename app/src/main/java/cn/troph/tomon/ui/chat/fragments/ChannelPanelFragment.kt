@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -858,6 +859,8 @@ class ChannelPanelFragment : BaseFragment() {
                     )
                     val outputStream = FileOutputStream(file)
                     IOUtils.copy(requireContext().contentResolver.openInputStream(it), outputStream)
+
+
                     val msgObject = JsonObject()
                     msgObject.addProperty("id", "")
                     msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
@@ -891,8 +894,14 @@ class ChannelPanelFragment : BaseFragment() {
                             "type",
                             file.absolutePath.substringAfterLast(".", "")
                         )
-                        attachmentObj.addProperty("width", 100)
-                        attachmentObj.addProperty("height", 100)
+                        val op = BitmapFactory.Options()
+                        op.inJustDecodeBounds = true
+                        val bitmap = BitmapFactory.decodeStream(
+                            requireContext().contentResolver.openInputStream(it), null, op
+                        )
+                        attachmentObj.addProperty("width", bitmap?.height)
+                        attachmentObj.addProperty("height", bitmap?.width)
+                        bitmap?.recycle()
                     } else {
                         attachmentObj.addProperty(
                             "type",
