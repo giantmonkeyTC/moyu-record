@@ -125,7 +125,7 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
                 if (channel is DmChannel) {
-                    backgroundView?.visibility = View.INVISIBLE
+                    backgroundView?.visibility = View.GONE
                     mHeaderMsg.isGuild = false
                     channel.recipient?.let {
                         mHeaderMsg.channelText = it.name
@@ -159,8 +159,24 @@ class ChannelPanelFragment : BaseFragment() {
                     mChatSharedVM.loadTextChannelMessage(value)
                     channel.guild?.let { g ->
                         if (g.backgroundUrl.isNotEmpty()) {
-                            backgroundView?.load(g.backgroundUrl)
-                            backgroundView?.visibility = View.VISIBLE
+                            val imageLoader = Coil.imageLoader(requireContext())
+                            val request = LoadRequest.Builder(requireContext())
+                                .data(g.backgroundUrl)
+                                .target(
+                                    onStart = { placeholder ->
+                                        // Handle the placeholder drawable.
+                                    },
+                                    onSuccess = { result ->
+                                        backgroundView?.setImageDrawable(result)
+                                        backgroundView?.visibility = View.VISIBLE
+                                    },
+                                    onError = { error ->
+                                        backgroundView?.visibility = View.GONE
+                                    }
+                                )
+                                .build()
+                            imageLoader.execute(request)
+
                         } else {
                             backgroundView?.visibility = View.INVISIBLE
                         }

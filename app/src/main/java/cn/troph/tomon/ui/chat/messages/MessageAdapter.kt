@@ -33,10 +33,14 @@ import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import coil.api.load
+import coil.transform.RoundedCornersTransformation
 import com.aliyun.player.AliPlayerFactory
 import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
@@ -70,6 +74,7 @@ import kotlinx.android.synthetic.main.widget_message_item.view.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.time.LocalDateTime
@@ -463,6 +468,7 @@ class MessageAdapter(
                                 )
                             ) "" else "?x-oss-process=image/resize,p_50"}"
                         )
+                        .transform(RoundedCorners(25))
                         .placeholder(R.drawable.loadinglogo)
                         .override(
                             if (item.width != null) item.width!! else DensityUtil.dip2px(

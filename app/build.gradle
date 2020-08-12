@@ -200,5 +200,7 @@ dependencies {
     implementation 'com.alivc.conan:AlivcConan:0.9.5'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation("io.coil-kt:coil:0.11.0")
+    implementation 'io.coil-kt:coil:0.11.0'
+
+    implementation 'com.github.tylersuehr7:social-text-view:1.0.0'
 }
