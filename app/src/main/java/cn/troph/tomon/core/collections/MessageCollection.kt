@@ -7,10 +7,18 @@ import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.SortedList
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
+import io.reactivex.rxjava3.annotations.NonNull
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
+import java.io.IOException
+import java.net.URL
 
 class MessageCollection(client: Client, val channel: Channel) :
     BaseCollection<Message>(client) {

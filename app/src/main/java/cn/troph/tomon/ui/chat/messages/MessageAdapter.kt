@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
+import cn.troph.tomon.core.events.LinkParseReadyEvent
 import cn.troph.tomon.core.structures.HeaderMessage
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageAttachment
@@ -29,6 +30,7 @@ import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.FileUtils
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -1011,7 +1013,6 @@ class MessageAdapter(
                 Observable.create(ObservableOnSubscribe<HashMap<String, String>?> { emitter ->
                     var map: HashMap<String, String>?
                     try {
-                        //这里开始是做一个解析，需要在非UI线程进行
                         var imgStr = ""
                         val document: Document =
                             Jsoup.parse(
@@ -1020,12 +1021,13 @@ class MessageAdapter(
                             )
                         val title: String =
                             document.head().getElementsByTag("title").text()
-                        val imgs: Elements = document.getElementsByTag("img") //取得所有Img标签的值
+                        val imgs: Elements = document.getElementsByTag("img")
                         if (imgs.size > 0) {
-                            imgStr = imgs.get(0).attr("abs:src") //默认取第一个为图片
+                            imgStr = imgs.get(0).attr("abs:src")
                         }
                         map = HashMap()
                         map.put("code", "1")
+                        map.put("position",position.toString())
                         map.put("title", title)
                         map.put("url", messageList[position].content.toString())
                         map.put("img", imgStr)
@@ -1053,9 +1055,7 @@ class MessageAdapter(
                                 holder.itemView.context.startActivity(i)
                             }
                         }
-
                     }
-
                 holder.itemView.link_text.text = messageList[position].content
                 holder.itemView.link_text.setOnClickListener {
 
