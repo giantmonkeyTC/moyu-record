@@ -203,4 +203,5 @@ dependencies {
     implementation 'io.coil-kt:coil:0.11.0'
 
     implementation 'com.github.tylersuehr7:social-text-view:1.0.0'
+    implementation "net.gotev:uploadservice:4.3.1"
 }

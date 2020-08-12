@@ -27,6 +27,7 @@ import com.google.android.gms.analytics.Tracker
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import io.sentry.android.core.SentryAndroid
+import net.gotev.uploadservice.UploadServiceConfig
 
 
 class TomonApplication : Application() {
@@ -47,6 +48,7 @@ class TomonApplication : Application() {
         sTracker.enableAutoActivityTracking(true)
         initPushService(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationObserver())
+        UploadServiceConfig.initialize(this,"1",BuildConfig.DEBUG)
     }
 
     private fun initChannel() {
@@ -98,6 +100,8 @@ class TomonApplication : Application() {
         MeizuRegister.register(applicationContext, "132848", "e36250ebb8fe48e3b4c52636a19c28cb")
         VivoRegister.register(applicationContext)
     }
+
+
 
     @Synchronized
     fun getDefaultTracker(): Tracker {

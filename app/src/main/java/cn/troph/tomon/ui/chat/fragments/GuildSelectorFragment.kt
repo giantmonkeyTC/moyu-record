@@ -26,7 +26,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
 
+const val FILE_REQUEST_CODE = 717
+const val IMAGE_REQUEST_CODE = 7179
+
 class GuildSelectorFragment : Fragment() {
+
 
     private val mChatVM: ChatSharedViewModel by activityViewModels()
     private val mGuildList = mutableListOf<Guild>()

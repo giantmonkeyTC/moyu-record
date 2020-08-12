@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
@@ -12,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
+import android.provider.DocumentsProvider
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,7 +27,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.core.content.edit
+import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -37,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
+import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
@@ -68,6 +73,11 @@ import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import net.gotev.uploadservice.data.UploadInfo
+import net.gotev.uploadservice.network.ServerResponse
+import net.gotev.uploadservice.observer.request.RequestObserver
+import net.gotev.uploadservice.observer.request.RequestObserverDelegate
+import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import okhttp3.MultipartBody
@@ -772,39 +782,40 @@ class ChannelPanelFragment : BaseFragment() {
                         val builder = Configurations.Builder()
                         when (index) {
                             0 -> {
-                                builder.setCheckPermission(true).setShowImages(true)
-                                    .setShowVideos(false).setShowFiles(false)
-                                    .setShowAudios(false)
-                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
-                                    .enableImageCapture(true)
-                                intent.putExtra(
-                                    FilePickerActivity.CONFIGS,
-                                    builder.build()
-                                )
+                                pickFile(IMAGE_REQUEST_CODE)
+//                                builder.setCheckPermission(true).setShowImages(true)
+//                                    .setShowVideos(false).setShowFiles(false)
+//                                    .setShowAudios(false)
+//                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
+//                                    .enableImageCapture(true)
+//                                intent.putExtra(
+//                                    FilePickerActivity.CONFIGS,
+//                                    builder.build()
+//                                )
                             }
                             1 -> {
-                                builder.setCheckPermission(true).setShowVideos(true)
-                                    .setShowImages(false).setShowFiles(false)
-                                    .setShowAudios(false)
-                                    .setMaxSelection(1).enableVideoCapture(false)
-                                intent.putExtra(
-                                    FilePickerActivity.CONFIGS,
-                                    builder.build()
-                                )
+//                                builder.setCheckPermission(true).setShowVideos(true)
+//                                    .setShowImages(false).setShowFiles(false)
+//                                    .setShowAudios(false)
+//                                    .setMaxSelection(1).enableVideoCapture(false)
+//                                intent.putExtra(
+//                                    FilePickerActivity.CONFIGS,
+//                                    builder.build()
+//                                )
 
                             }
                             2 -> {
-                                builder.setCheckPermission(true).setShowFiles(true).setSuffixes()
-                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
-                                    .setShowImages(false).setShowVideos(false)
-                                    .setShowAudios(false)
-                                intent.putExtra(
-                                    FilePickerActivity.CONFIGS,
-                                    builder.build()
-                                )
+                                pickFile(FILE_REQUEST_CODE)
+//                                builder.setCheckPermission(true).setShowFiles(true).setSuffixes()
+//                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
+//                                    .setShowImages(false).setShowVideos(false)
+//                                    .setShowAudios(false)
+//                                intent.putExtra(
+//                                    FilePickerActivity.CONFIGS,
+//                                    builder.build()
+//                                )
                             }
                         }
-                        startActivityForResult(intent, FILE_REQUEST_CODE_FILE)
                         mBottomSheet.dismiss(true)
 
                     }
@@ -815,92 +826,88 @@ class ChannelPanelFragment : BaseFragment() {
         }
     }
 
+    fun pickFile(code: Int) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            // Filter to only show results that can be "opened", such as files
+            addCategory(Intent.CATEGORY_OPENABLE)
+            // search for all documents available via installed storage providers
+            type = if (code == FILE_REQUEST_CODE) "*/*" else "image/*"
+        }
+        startActivityForResult(intent, code)
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == FILE_REQUEST_CODE_FILE && resultCode == Activity.RESULT_OK) {
+        if ((requestCode == FILE_REQUEST_CODE || requestCode == IMAGE_REQUEST_CODE) && resultCode == Activity.RESULT_OK) {
             data?.let {
-                it.getParcelableArrayListExtra<MediaFile>(FilePickerActivity.MEDIA_FILES)
-                    ?.let { fileList ->
-                        for (item in fileList) {
-                            Logger.d("width:${item.width} height:${item.height}")
-                            if (item.size > 8 * 1024 * 1024) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    R.string.over_size,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                break
-                            }
-                            val parcelFileDescriptor =
-                                requireContext().contentResolver.openFileDescriptor(
-                                    item.uri,
-                                    "r",
-                                    null
-                                )
-
-                            parcelFileDescriptor?.let {
-                                val inputStream =
-                                    FileInputStream(parcelFileDescriptor.fileDescriptor)
-                                val file =
-                                    File(
-                                        requireContext().cacheDir,
-                                        getFileName(item.uri)
-                                    )
-                                val outputStream = FileOutputStream(file)
-                                IOUtils.copy(inputStream, outputStream)
-                                val msgObject = JsonObject()
-                                msgObject.addProperty("id", "")
-                                msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-                                msgObject.addProperty("channelId", mChannelId)
-                                msgObject.addProperty(
-                                    "timestamp",
-                                    LocalDateTime.now().minusHours(8).toString()
-                                )
-                                msgObject.addProperty("authorId", Client.global.me.id)
-
-
-                                val userObject = JsonObject()
-                                userObject.addProperty("id", Client.global.me.id)
-                                userObject.addProperty("username", Client.global.me.username)
-                                userObject.addProperty(
-                                    "discriminator",
-                                    Client.global.me.discriminator
-                                )
-                                userObject.addProperty("name", Client.global.me.name)
-                                userObject.addProperty("avatar", Client.global.me.avatar)
-                                userObject.addProperty("avatar_url", Client.global.me.avatarURL)
-
-                                msgObject.add("author", userObject)
-
-                                val msg = Message(client = Client.global, data = msgObject)
-                                val attachmentObj = JsonObject()
-                                attachmentObj.addProperty("id", "new_image")
-                                attachmentObj.addProperty("filename", file.absolutePath)
-                                if (item.mediaType == MediaFile.TYPE_IMAGE) {
-                                    attachmentObj.addProperty(
-                                        "type",
-                                        file.absolutePath.substringAfterLast(".", "")
-                                    )
-                                    attachmentObj.addProperty("width", item.width)
-                                    attachmentObj.addProperty("height", item.height)
-                                } else {
-                                    attachmentObj.addProperty(
-                                        "type",
-                                        file.absolutePath.substringAfterLast(".", "")
-                                    )
-                                }
-                                val attachment = MessageAttachment(Client.global, attachmentObj)
-                                msg.attachments["new_attachment"] = attachment
-                                msg.isSending = true
-                                mMsgList.add(msg)
-                                mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
-                                scrollToBottom()
-                                uploadFile(file, msg)
-                            }
-                        }
+                it.data?.let {
+                    var size = 0L
+                    requireContext().contentResolver.query(it, null, null, null)?.use { cursor ->
+                        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                        cursor.moveToFirst()
+                        Logger.d(cursor.getString(nameIndex))
+                        size = cursor.getLong(sizeIndex)
+                        cursor.close()
                     }
+                    val file = File(
+                        requireContext().cacheDir,
+                        requireContext().contentResolver.getFileName(it)
+                    )
+                    val outputStream = FileOutputStream(file)
+                    IOUtils.copy(requireContext().contentResolver.openInputStream(it), outputStream)
+                    val msgObject = JsonObject()
+                    msgObject.addProperty("id", "")
+                    msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+                    msgObject.addProperty("channel_id", mChannelId)
+                    msgObject.addProperty(
+                        "timestamp",
+                        LocalDateTime.now().minusHours(8).toString()
+                    )
+                    msgObject.addProperty("authorId", Client.global.me.id)
+
+
+                    val userObject = JsonObject()
+                    userObject.addProperty("id", Client.global.me.id)
+                    userObject.addProperty("username", Client.global.me.username)
+                    userObject.addProperty(
+                        "discriminator",
+                        Client.global.me.discriminator
+                    )
+                    userObject.addProperty("name", Client.global.me.name)
+                    userObject.addProperty("avatar", Client.global.me.avatar)
+                    userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+
+                    msgObject.add("author", userObject)
+
+                    val msg = Message(client = Client.global, data = msgObject)
+                    val attachmentObj = JsonObject()
+                    attachmentObj.addProperty("id", "new_image")
+                    attachmentObj.addProperty("filename", file.absolutePath)
+                    if (requestCode == IMAGE_REQUEST_CODE) {
+                        attachmentObj.addProperty(
+                            "type",
+                            file.absolutePath.substringAfterLast(".", "")
+                        )
+                        attachmentObj.addProperty("width", 100)
+                        attachmentObj.addProperty("height", 100)
+                    } else {
+                        attachmentObj.addProperty(
+                            "type",
+                            file.absolutePath.substringAfterLast(".", "")
+                        )
+                    }
+                    attachmentObj.addProperty("size", size.toInt())
+                    val attachment = MessageAttachment(Client.global, attachmentObj)
+                    msg.attachments["new_attachment"] = attachment
+                    msg.isSending = true
+                    mMsgList.add(msg)
+                    mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                    scrollToBottom()
+                    uploadFile(file, msg)
+                }
             }
         }
     }
@@ -945,29 +952,69 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
     private fun uploadFile(file: File, msg: Message) {
-        val requestFile = file.asRequestBody()
-        val requestBody =
-            "{\"content\":null,\"nonce\":\"${msg.nonce}\"}".toRequestBody()
-        val map = mutableMapOf<String, RequestBody>()
-        map["payload_json"] = requestBody
-        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-        (Client.global.channels[mChannelId!!] as TextChannelBase).messages.uploadAttachments(
-            partMap = map,
-            files = body
-        ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        MultipartUploadRequest(
+            requireContext(),
+            serverUrl = NetworkConfigs.baseUrl + "channels/${msg.channelId}/messages"
+        )
+            .setMethod("POST")
+            .setUploadID(msg.nonce!!)
+            .addParameter("payload_json", "{\"content\":null,\"nonce\":\"${msg.nonce}\"}")
+            .addHeader("Authorization", Client.global.auth)
+            .addFileToUpload(file.absolutePath, parameterName = file.name, fileName = file.name)
+            .subscribe(requireContext(), viewLifecycleOwner, object : RequestObserverDelegate {
+                override fun onCompleted(context: Context, uploadInfo: UploadInfo) {
 
-        }, {
-            val deletedMsg = mMsgList.find {
-                it.nonce == msg.nonce
-            }
-            deletedMsg?.let {
-                val index = mMsgList.indexOf(it)
-                mMsgList.remove(it)
-                mMsgListAdapter.notifyItemRemoved(index)
-                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
-            }
+                }
 
-        })
+                override fun onCompletedWhileNotObserving() {
+
+                }
+
+                override fun onError(
+                    context: Context,
+                    uploadInfo: UploadInfo,
+                    exception: Throwable
+                ) {
+                    Logger.d(exception.message)
+                }
+
+                override fun onProgress(context: Context, uploadInfo: UploadInfo) {
+
+                }
+
+                override fun onSuccess(
+                    context: Context,
+                    uploadInfo: UploadInfo,
+                    serverResponse: ServerResponse
+                ) {
+
+                }
+            })
+
+
+//        val requestFile = file.asRequestBody()
+//        val requestBody =
+//            "{\"content\":null,\"nonce\":\"${msg.nonce}\"}".toRequestBody()
+//        val map = mutableMapOf<String, RequestBody>()
+//        map["payload_json"] = requestBody
+//        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
+//        (Client.global.channels[mChannelId!!] as TextChannelBase).messages.uploadAttachments(
+//            partMap = map,
+//            files = body
+//        ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+//
+//        }, {
+//            val deletedMsg = mMsgList.find {
+//                it.nonce == msg.nonce
+//            }
+//            deletedMsg?.let {
+//                val index = mMsgList.indexOf(it)
+//                mMsgList.remove(it)
+//                mMsgListAdapter.notifyItemRemoved(index)
+//                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
+//            }
+//
+//        })
     }
 
     private fun hideKeyboard() {
@@ -986,7 +1033,7 @@ class ChannelPanelFragment : BaseFragment() {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-        msgObject.addProperty("channelId", mChannelId)
+        msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().minusHours(8).toString())
         msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)
