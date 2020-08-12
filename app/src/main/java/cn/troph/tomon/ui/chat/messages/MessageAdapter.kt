@@ -474,7 +474,7 @@ class MessageAdapter(
                             ) "" else "?x-oss-process=image/resize,p_100"}"
                         )
                         .transform(RoundedCorners(25))
-                        .placeholder(R.drawable.loadinglogo)
+                        .placeholder(R.drawable.loading_solid_gray)
                         .override(holder.itemView.chat_iv.width, holder.itemView.chat_iv.height)
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
