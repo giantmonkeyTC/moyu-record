@@ -88,9 +88,6 @@ const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
     private val mSwitchChannelMap = HashMap<String, Editable>()
-    private lateinit var mBottomEmojiAdapter: BottomEmojiAdapter
-    private lateinit var mSectionDataManager: SectionDataManager
-    private lateinit var mGridLayoutManager: GridLayoutManager
     private val mChatSharedVM: ChatSharedViewModel by activityViewModels()
     private lateinit var mLayoutManager: LinearLayoutManager
     private val mHandler = Handler()
@@ -859,7 +856,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 msgObject.addProperty("channelId", mChannelId)
                                 msgObject.addProperty(
                                     "timestamp",
-                                    LocalDateTime.now().toString()
+                                    LocalDateTime.now().minusHours(8).toString()
                                 )
                                 msgObject.addProperty("authorId", Client.global.me.id)
 
@@ -990,7 +987,7 @@ class ChannelPanelFragment : BaseFragment() {
         msgObject.addProperty("id", "")
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
         msgObject.addProperty("channelId", mChannelId)
-        msgObject.addProperty("timestamp", LocalDateTime.now().toString())
+        msgObject.addProperty("timestamp", LocalDateTime.now().minusHours(8).toString())
         msgObject.addProperty("authorId", Client.global.me.id)
         msgObject.addProperty("content", content)
         val userObject = JsonObject()
