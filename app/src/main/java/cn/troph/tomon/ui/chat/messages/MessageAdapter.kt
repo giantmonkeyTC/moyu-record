@@ -449,37 +449,32 @@ class MessageAdapter(
                     true
                 }
                 for (item in messageList[position].attachments.values) {
-//                    holder.itemView.chat_iv.updateLayoutParams {
-//                        item.height?.let {
-//                            val calHeight =
-//                                DensityUtil.px2dip(holder.itemView.context, it.toFloat())
-//                            height = if (calHeight > 300) {
-//                                DensityUtil.dip2px(holder.itemView.context, 300f)
-//                            } else {
-//                                it
-//                            }
-//                        }
-//                    }
+                    holder.itemView.chat_iv.updateLayoutParams {
+                        item.width?.let { imgWidth ->
+                            val w = DensityUtil.px2dip(holder.itemView.context, imgWidth.toFloat())
+                            width = if (w > 200) DensityUtil.dip2px(
+                                holder.itemView.context,
+                                200f
+                            ) else imgWidth
+
+
+                            item.height?.let { imgHeight ->
+                                height = imgHeight * (width / imgWidth)
+                            }
+                        }
+                    }
                     Glide.with(holder.itemView)
                         .load(
                             if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
                                     ".gif",
                                     true
                                 )
-                            ) "" else "?x-oss-process=image/resize,p_50"}"
+                            ) "" else "?x-oss-process=image/resize,p_100"}"
                         )
                         .transform(RoundedCorners(25))
-                        .placeholder(R.drawable.loadinglogo)
-                        .override(
-                            if (item.width != null) item.width!! else DensityUtil.dip2px(
-                                holder.itemView.context,
-                                200f
-                            ),
-                            if (item.height != null) item.height!! else DensityUtil.dip2px(
-                                holder.itemView.context,
-                                200f
-                            )
-                        )
+                        .placeholder(R.drawable.loadinglogo).apply {
+                            RequestOptions().centerCrop()
+                        }
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
