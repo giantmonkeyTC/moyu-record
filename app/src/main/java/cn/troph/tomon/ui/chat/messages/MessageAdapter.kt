@@ -474,9 +474,8 @@ class MessageAdapter(
                             ) "" else "?x-oss-process=image/resize,p_100"}"
                         )
                         .transform(RoundedCorners(25))
-                        .placeholder(R.drawable.loadinglogo).apply {
-                            RequestOptions().centerCrop()
-                        }
+                        .placeholder(R.drawable.loadinglogo)
+                        .override(holder.itemView.chat_iv.width, holder.itemView.chat_iv.height)
                         .into(holder.itemView.chat_iv)
                     holder.itemView.chat_iv.setOnClickListener {
                         val msg = messageList[holder.adapterPosition]
@@ -1027,7 +1026,7 @@ class MessageAdapter(
                         }
                         map = HashMap()
                         map.put("code", "1")
-                        map.put("position",position.toString())
+                        map.put("position", position.toString())
                         map.put("title", title)
                         map.put("url", messageList[position].content.toString())
                         map.put("img", imgStr)
