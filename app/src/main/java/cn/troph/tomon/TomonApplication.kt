@@ -29,12 +29,10 @@ import com.orhanobut.logger.Logger
 import io.sentry.android.core.SentryAndroid
 
 
-class TomonApplication : Application(), Application.ActivityLifecycleCallbacks {
+class TomonApplication : Application() {
 
     private lateinit var sAnalytics: GoogleAnalytics
     private lateinit var sTracker: Tracker
-    private var activityReferences = 0
-    private var isActivityChangingConfigurations = false
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {
@@ -104,38 +102,5 @@ class TomonApplication : Application(), Application.ActivityLifecycleCallbacks {
     @Synchronized
     fun getDefaultTracker(): Tracker {
         return sTracker
-    }
-
-    override fun onActivityPaused(activity: Activity) {
-
-    }
-
-    override fun onActivityStarted(activity: Activity) {
-        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            // App enters foreground
-        }
-    }
-
-    override fun onActivityDestroyed(activity: Activity) {
-
-    }
-
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-
-    }
-
-    override fun onActivityStopped(activity: Activity) {
-        isActivityChangingConfigurations = activity.isChangingConfigurations
-        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-            // App enters background
-        }
-    }
-
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-
-    }
-
-    override fun onActivityResumed(activity: Activity) {
-
     }
 }
