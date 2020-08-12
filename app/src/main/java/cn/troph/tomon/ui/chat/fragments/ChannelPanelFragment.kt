@@ -125,7 +125,7 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
                 if (channel is DmChannel) {
-                    backgroundView?.visibility = View.GONE
+                    backgroundView?.visibility = View.INVISIBLE
                     mHeaderMsg.isGuild = false
                     channel.recipient?.let {
                         mHeaderMsg.channelText = it.name
@@ -159,10 +159,10 @@ class ChannelPanelFragment : BaseFragment() {
                     mChatSharedVM.loadTextChannelMessage(value)
                     channel.guild?.let { g ->
                         if (g.backgroundUrl.isNotEmpty()) {
-                            backgroundView?.visibility = View.VISIBLE
                             backgroundView?.load(g.backgroundUrl)
+                            backgroundView?.visibility = View.VISIBLE
                         } else {
-                            backgroundView?.visibility = View.GONE
+                            backgroundView?.visibility = View.INVISIBLE
                         }
                     }
                     if (channel.members[Client.global.me.id]?.roles?.collection?.none {

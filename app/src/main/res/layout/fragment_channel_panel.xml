@@ -8,7 +8,7 @@
     android:background="@color/background2">
     <ImageView
         android:foreground="@color/mask"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintTop_toTopOf="@id/view_messages"
         app:layout_constraintBottom_toBottomOf="@id/view_messages"
         app:layout_constraintStart_toStartOf="@id/view_messages"
