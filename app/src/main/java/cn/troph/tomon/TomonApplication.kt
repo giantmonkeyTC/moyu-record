@@ -1,13 +1,14 @@
 package cn.troph.tomon
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import android.util.Log
+import android.os.Bundle
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -28,10 +29,12 @@ import com.orhanobut.logger.Logger
 import io.sentry.android.core.SentryAndroid
 
 
-class TomonApplication : Application() {
+class TomonApplication : Application(), Application.ActivityLifecycleCallbacks {
 
     private lateinit var sAnalytics: GoogleAnalytics
     private lateinit var sTracker: Tracker
+    private var activityReferences = 0
+    private var isActivityChangingConfigurations = false
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {
@@ -101,5 +104,38 @@ class TomonApplication : Application() {
     @Synchronized
     fun getDefaultTracker(): Tracker {
         return sTracker
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
+            // App enters foreground
+        }
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        isActivityChangingConfigurations = activity.isChangingConfigurations
+        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
+            // App enters background
+        }
+    }
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+
     }
 }
