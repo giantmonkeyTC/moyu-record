@@ -40,6 +40,7 @@ import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.emoji.*
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
 import cn.troph.tomon.ui.chat.messages.BotCommandAdapter
@@ -63,6 +64,7 @@ import com.jaiselrahman.filepicker.config.Configurations
 import com.jaiselrahman.filepicker.model.MediaFile
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
@@ -331,6 +333,11 @@ class ChannelPanelFragment : BaseFragment() {
                 scrollToBottom()
             }
 
+        })
+        Client.global.eventBus.observeEventOnUi<LinkParseReadyEvent>().subscribe(Consumer {
+            it.map?.get("position")?.let {
+                mMsgListAdapter.notifyItemChanged(it.toInt())
+            }
         })
 
         mChatSharedVM.channelSelectionLD.observe(viewLifecycleOwner, Observer {
