@@ -47,6 +47,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     var isSelected = false
     var isVoiceChatting = false
     val voiceStates = mutableListOf<VoiceUpdate>()
+    var backgroundUrl = ""
 
     init {
         patchSelf(data)
@@ -75,7 +76,9 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     }
 
     private fun patchSelf(data: JsonObject) {
-
+        if (data.has("background_url")) {
+            backgroundUrl = data["background_url"].asString
+        }
         if (data.has("id")) {
             id = data["id"].asString
         }

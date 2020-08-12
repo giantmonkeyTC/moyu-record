@@ -50,6 +50,10 @@ import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.*
+import coil.Coil
+import coil.api.load
+import coil.request.LoadRequest
+import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -121,6 +125,7 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
                 if (channel is DmChannel) {
+                    backgroundView?.visibility = View.GONE
                     mHeaderMsg.isGuild = false
                     channel.recipient?.let {
                         mHeaderMsg.channelText = it.name
@@ -152,6 +157,14 @@ class ChannelPanelFragment : BaseFragment() {
                         putString(LAST_CHANNEL_ID, value)
                     }
                     mChatSharedVM.loadTextChannelMessage(value)
+                    channel.guild?.let { g ->
+                        if (g.backgroundUrl.isNotEmpty()) {
+                            backgroundView?.visibility = View.VISIBLE
+                            backgroundView?.load(g.backgroundUrl)
+                        } else {
+                            backgroundView?.visibility = View.GONE
+                        }
+                    }
                     if (channel.members[Client.global.me.id]?.roles?.collection?.none {
                             it.permissions.has(Permissions.SEND_MESSAGES)
                         }!! || channel.members[Client.global.me.id]?.roles?.collection?.any {

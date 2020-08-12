@@ -33,7 +33,7 @@ enum class GatewayOp(val value: Int) {
     }
 }
 
-class Socket : Observer<SocketEvent> ,LifecycleObserver{
+class Socket : Observer<SocketEvent>, LifecycleObserver {
     fun getSesstion(): String? {
         return _sessionId
     }
