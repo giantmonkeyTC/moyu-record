@@ -1,20 +1,16 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.SystemClock
-import android.provider.DocumentsProvider
+import android.os.*
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
@@ -28,70 +24,65 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.FileProvider
 import androidx.core.content.edit
-import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.events.*
+import cn.troph.tomon.core.events.LinkParseReadyEvent
+import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.event.observeEventOnUi
-import cn.troph.tomon.ui.chat.emoji.*
+import cn.troph.tomon.ui.chat.emoji.EmojiFragment
+import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
+import cn.troph.tomon.ui.chat.emoji.ReactionFragment
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
-import cn.troph.tomon.ui.chat.messages.BotCommandAdapter
 import cn.troph.tomon.ui.chat.messages.MessageAdapter
 import cn.troph.tomon.ui.chat.messages.OnAvatarLongClickListener
 import cn.troph.tomon.ui.chat.messages.OnItemClickListener
 import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
-import cn.troph.tomon.ui.states.*
+import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.NetworkChangeReceiver
+import cn.troph.tomon.ui.states.UpdateEnabled
 import coil.Coil
-import coil.api.load
 import coil.request.LoadRequest
-import com.bumptech.glide.Glide
-import com.cruxlab.sectionedrecyclerview.lib.SectionDataManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.JsonObject
 import com.jaiselrahman.filepicker.activity.FilePickerActivity
 import com.jaiselrahman.filepicker.config.Configurations
-import com.jaiselrahman.filepicker.model.MediaFile
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
-import kotlinx.android.synthetic.main.guild_user_info.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.network.ServerResponse
-import net.gotev.uploadservice.observer.request.RequestObserver
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.apache.commons.io.IOUtils
-import retrofit2.http.Header
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicBoolean
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -828,13 +819,30 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
     fun pickFile(code: Int) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            // Filter to only show results that can be "opened", such as files
-            addCategory(Intent.CATEGORY_OPENABLE)
-            // search for all documents available via installed storage providers
-            type = if (code == FILE_REQUEST_CODE) "*/*" else "image/*"
-        }
-        startActivityForResult(intent, code)
+        Dexter.withContext(requireContext())
+            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        // Filter to only show results that can be "opened", such as files
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        // search for all documents available via installed storage providers
+                        type = if (code == FILE_REQUEST_CODE) "*/*" else "image/*"
+                    }
+                    startActivityForResult(intent, code)
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?,
+                    p1: PermissionToken?
+                ) {
+
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+
+                }
+            }).check()
     }
 
 
@@ -843,23 +851,32 @@ class ChannelPanelFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == FILE_REQUEST_CODE || requestCode == IMAGE_REQUEST_CODE) && resultCode == Activity.RESULT_OK) {
             data?.let {
-                it.data?.let {
+                it.data?.let { uri ->
+
                     var size = 0L
-                    requireContext().contentResolver.query(it, null, null, null)?.use { cursor ->
+                    var name = ""
+                    requireContext().contentResolver.query(uri, null, null, null)?.use { cursor ->
                         val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                         val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                         cursor.moveToFirst()
-                        Logger.d(cursor.getString(nameIndex))
                         size = cursor.getLong(sizeIndex)
+                        name = cursor.getString(nameIndex)
                         cursor.close()
                     }
-                    val file = File(
-                        requireContext().cacheDir,
-                        requireContext().contentResolver.getFileName(it)
-                    )
-                    val outputStream = FileOutputStream(file)
-                    IOUtils.copy(requireContext().contentResolver.openInputStream(it), outputStream)
 
+                    if (size > 8000000) {
+                        Toast.makeText(requireContext(), "附件大小不能超过8MB", Toast.LENGTH_SHORT).show()
+                        return@let
+                    }
+
+                    val cacheFile = File(requireContext().cacheDir, name)
+
+                    val outputStream = FileOutputStream(cacheFile)
+
+                    IOUtils.copy(
+                        requireContext().contentResolver.openInputStream(uri),
+                        outputStream
+                    )
 
                     val msgObject = JsonObject()
                     msgObject.addProperty("id", "")
@@ -870,8 +887,6 @@ class ChannelPanelFragment : BaseFragment() {
                         LocalDateTime.now().minusHours(8).toString()
                     )
                     msgObject.addProperty("authorId", Client.global.me.id)
-
-
                     val userObject = JsonObject()
                     userObject.addProperty("id", Client.global.me.id)
                     userObject.addProperty("username", Client.global.me.username)
@@ -882,22 +897,20 @@ class ChannelPanelFragment : BaseFragment() {
                     userObject.addProperty("name", Client.global.me.name)
                     userObject.addProperty("avatar", Client.global.me.avatar)
                     userObject.addProperty("avatar_url", Client.global.me.avatarURL)
-
                     msgObject.add("author", userObject)
-
                     val msg = Message(client = Client.global, data = msgObject)
                     val attachmentObj = JsonObject()
                     attachmentObj.addProperty("id", "new_image")
-                    attachmentObj.addProperty("filename", file.absolutePath)
+                    attachmentObj.addProperty("filename", cacheFile.absolutePath)
                     if (requestCode == IMAGE_REQUEST_CODE) {
                         attachmentObj.addProperty(
                             "type",
-                            file.absolutePath.substringAfterLast(".", "")
+                            cacheFile.absolutePath.substringAfterLast(".", "")
                         )
                         val op = BitmapFactory.Options()
                         op.inJustDecodeBounds = true
                         val bitmap = BitmapFactory.decodeStream(
-                            requireContext().contentResolver.openInputStream(it), null, op
+                            requireContext().contentResolver.openInputStream(uri), null, op
                         )
                         attachmentObj.addProperty("width", bitmap?.height)
                         attachmentObj.addProperty("height", bitmap?.width)
@@ -905,7 +918,7 @@ class ChannelPanelFragment : BaseFragment() {
                     } else {
                         attachmentObj.addProperty(
                             "type",
-                            file.absolutePath.substringAfterLast(".", "")
+                            cacheFile.absolutePath.substringAfterLast(".", "")
                         )
                     }
                     attachmentObj.addProperty("size", size.toInt())
@@ -915,7 +928,7 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgList.add(msg)
                     mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                     scrollToBottom()
-                    uploadFile(file, msg)
+                    uploadFile(cacheFile, msg)
                 }
             }
         }
@@ -923,6 +936,122 @@ class ChannelPanelFragment : BaseFragment() {
 
     private fun mentionFormat(identifier: String): String {
         return "@${identifier}"
+    }
+
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @author paulburke
+     */
+    fun getPath(context: Context, uri: Uri): String? {
+
+        // DocumentProvider
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split = docId.split(":".toRegex()).toTypedArray()
+                val type = split[0]
+                if ("primary".equals(type, ignoreCase = true)) {
+                    return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                }
+
+                // TODO handle non-primary volumes
+            } else if (isDownloadsDocument(uri)) {
+                val id = DocumentsContract.getDocumentId(uri)
+                val contentUri: Uri = ContentUris.withAppendedId(
+                    Uri.parse("content://downloads/public_downloads"),
+                    java.lang.Long.valueOf(id)
+                )
+                return getDataColumn(context, contentUri, null, null)
+            } else if (isMediaDocument(uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                val split = docId.split(":".toRegex()).toTypedArray()
+                val type = split[0]
+                var contentUri: Uri? = null
+                if ("image" == type) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                } else if ("video" == type) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                } else if ("audio" == type) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                }
+                val selection = "_id=?"
+                val selectionArgs = arrayOf(
+                    split[1]
+                )
+                return getDataColumn(context, contentUri, selection, selectionArgs)
+            }
+        } else if ("content".equals(uri.scheme, ignoreCase = true)) {
+            return getDataColumn(context, uri, null, null)
+        } else if ("file".equals(uri.scheme, ignoreCase = true)) {
+            return uri.path
+        }
+        return null
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @param selection (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    fun getDataColumn(
+        context: Context, uri: Uri?, selection: String?,
+        selectionArgs: Array<String>?
+    ): String? {
+        var cursor: Cursor? = null
+        val column = "_data"
+        val projection = arrayOf(
+            column
+        )
+        try {
+            cursor = context.contentResolver.query(
+                uri!!, projection, selection, selectionArgs,
+                null
+            )
+            if (cursor != null && cursor.moveToFirst()) {
+                val column_index = cursor.getColumnIndexOrThrow(column)
+                return cursor.getString(column_index)
+            }
+        } finally {
+            cursor?.close()
+        }
+        return null
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    fun isExternalStorageDocument(uri: Uri): Boolean {
+        return "com.android.externalstorage.documents" == uri.authority
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    fun isDownloadsDocument(uri: Uri): Boolean {
+        return "com.android.providers.downloads.documents" == uri.authority
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    fun isMediaDocument(uri: Uri): Boolean {
+        return "com.android.providers.media.documents" == uri.authority
     }
 
     private fun callMentionBottomSheet(mentionList: MutableList<GuildMember>) {
@@ -984,7 +1113,16 @@ class ChannelPanelFragment : BaseFragment() {
                     uploadInfo: UploadInfo,
                     exception: Throwable
                 ) {
-                    Logger.d(exception.message)
+                    val deletedMsg = mMsgList.find {
+                        it.nonce == uploadInfo.uploadId
+                    }
+                    deletedMsg?.let {
+                        val index = mMsgList.indexOf(it)
+                        mMsgList.remove(it)
+                        mMsgListAdapter.notifyItemRemoved(index)
+                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
 
                 override fun onProgress(context: Context, uploadInfo: UploadInfo) {
