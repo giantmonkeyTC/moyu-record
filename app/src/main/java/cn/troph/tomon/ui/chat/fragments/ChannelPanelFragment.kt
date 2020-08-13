@@ -72,7 +72,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
+import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadInfo
+import net.gotev.uploadservice.data.UploadNotificationConfig
+import net.gotev.uploadservice.data.UploadNotificationStatusConfig
 import net.gotev.uploadservice.network.ServerResponse
 import net.gotev.uploadservice.observer.request.RequestObserverDelegate
 import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
@@ -1090,12 +1093,43 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
     private fun uploadFile(file: File, msg: Message) {
+
         MultipartUploadRequest(
             requireContext(),
             serverUrl = NetworkConfigs.baseUrl + "channels/${msg.channelId}/messages"
         )
             .setMethod("POST")
             .setUploadID(msg.nonce!!)
+            .setNotificationConfig { _: Context, _: String ->
+                UploadNotificationConfig(
+                    notificationChannelId = "1",
+                    isRingToneEnabled = false,
+                    progress = UploadNotificationStatusConfig(
+                        title = "上传中",
+                        message = "请稍候",
+                        iconColorResourceID = R.color.background4,
+                        iconResourceID = R.drawable.app_logo
+                    ),
+                    success = UploadNotificationStatusConfig(
+                        title = "上传成功",
+                        message = "恭喜上传成功啦!",
+                        iconColorResourceID = R.color.background4,
+                        iconResourceID = R.drawable.app_logo
+                    ),
+                    error = UploadNotificationStatusConfig(
+                        title = "上传失败",
+                        message = "上传失败,嘤嘤嘤！",
+                        iconColorResourceID = R.color.background4,
+                        iconResourceID = R.drawable.app_logo
+                    ),
+                    cancelled = UploadNotificationStatusConfig(
+                        title = "上传取消",
+                        message = "上传已取消,嘤嘤嘤!",
+                        iconColorResourceID = R.color.background4,
+                        iconResourceID = R.drawable.app_logo
+                    )
+                )
+            }
             .addParameter("payload_json", "{\"content\":null,\"nonce\":\"${msg.nonce}\"}")
             .addHeader("Authorization", Client.global.auth)
             .addFileToUpload(file.absolutePath, parameterName = file.name, fileName = file.name)

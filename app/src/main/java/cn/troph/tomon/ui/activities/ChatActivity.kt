@@ -33,6 +33,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
+import java.util.logging.Logger
 
 class ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
@@ -47,9 +48,12 @@ class ChatActivity : BaseActivity() {
         Client.global.rest.guildEmojiService.fetchStampPack(
             Assets.defaultStampPackId,
             Client.global.auth
-        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java))
-        }
+        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java)) }, {
+                com.orhanobut.logger.Logger.d(it.message)
+            })
+
+
 
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount
@@ -108,8 +112,6 @@ class ChatActivity : BaseActivity() {
         mChatSharedViewModel.dmUnReadLiveData.value = map
 
     }
-
-
 
 
     private fun hideKeyboard() {
