@@ -359,8 +359,22 @@ class ChannelPanelFragment : BaseFragment() {
 
         })
         Client.global.eventBus.observeEventOnUi<LinkParseReadyEvent>().subscribe(Consumer {
-            it.map?.get("position")?.let {
-                mMsgListAdapter.notifyItemChanged(it.toInt())
+            if (it.linkList.size > 0) {
+                mMsgList.find { message ->
+                    return@find message.id == it.linkList.first().messageId
+                }.apply {
+                    this?.let { mes ->
+                        mes.links.clear()
+                        mes.links.addAll(it.linkList)
+                        mMsgList.forEachIndexed { index, message ->
+                            if (message.id == mes.id){
+                                val position = index
+                                mMsgListAdapter.notifyItemChanged(position)
+                            }
+                        }
+
+                    }
+                }
             }
         })
 

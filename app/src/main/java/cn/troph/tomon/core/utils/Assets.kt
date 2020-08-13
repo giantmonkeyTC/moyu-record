@@ -20,6 +20,12 @@ object Assets {
         val name: String
     )
 
+    data class ContentLink(
+        val start: Int,
+        val end: Int,
+        val url: String
+    )
+
     data class ContentAtUser(
         val start: Int,
         val end: Int,
@@ -41,8 +47,7 @@ object Assets {
     val regexEmoji: Regex = Regex("""<%[\w\u4e00-\u9fa5]+:[0-9]+>""")
     val regexAtUser: Regex = Regex("""<@[0-9]+>""")
     val regexMention: Regex = Regex("""@[\w\u4e00-\u9fa5]+#[0-9]{4}""")
-    val regexLink: Regex = Regex("""http:\/\/\S+""")
-    val regexLinkHttps: Regex = Regex("""https:\/\/\S+""")
+    val regexLink: Regex = Regex("""https?:\/\/\S+""")
     fun contentParser(content: String): ContentSpan {
         val regexRaw = Regex("""\:""")
         val users = mutableListOf<ContentUser>()
@@ -100,6 +105,19 @@ object Assets {
                 "<@$id>"
             }
         return parserContent
+    }
+
+    fun linkParser(content: String): MutableList<ContentLink> {
+        val links = mutableListOf<ContentLink>()
+        regexLink.findAll(content).iterator().forEach {
+            val contentLink = ContentLink(
+                start = it.range.first,
+                end = it.range.last,
+                url = it.value
+            )
+            links.add(contentLink)
+        }
+       return links
     }
 
 
