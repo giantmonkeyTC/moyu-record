@@ -288,7 +288,8 @@ class ChannelPanelFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        mEasyImage = EasyImage.Builder(requireContext())
+            .allowMultiple(false).build()
         viewPagerCollectionAdapter =
             ViewPagerCollectionAdapter(mEmojiClickListener, requireFragmentManager())
         viewPager = view.findViewById(R.id.reaction_stamp_viewpager)
@@ -787,8 +788,7 @@ class ChannelPanelFragment : BaseFragment() {
                                     )
                                     .withListener(object : PermissionListener {
                                         override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                                            mEasyImage = EasyImage.Builder(requireContext())
-                                                .allowMultiple(false).build()
+
                                             mEasyImage.openCameraForImage(this@ChannelPanelFragment)
                                         }
 
@@ -935,11 +935,58 @@ class ChannelPanelFragment : BaseFragment() {
                         outputStream
                     )
 
-                    val newMsg = createEmptyMessageWithAttachment(requestCode, cacheFile, size)
-                    mMsgList.add(newMsg)
+                    val msgObject = JsonObject()
+                    msgObject.addProperty("id", "")
+                    msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+                    msgObject.addProperty("channel_id", mChannelId)
+                    msgObject.addProperty(
+                        "timestamp",
+                        LocalDateTime.now().minusHours(8).toString()
+                    )
+                    msgObject.addProperty("authorId", Client.global.me.id)
+                    val userObject = JsonObject()
+                    userObject.addProperty("id", Client.global.me.id)
+                    userObject.addProperty("username", Client.global.me.username)
+                    userObject.addProperty(
+                        "discriminator",
+                        Client.global.me.discriminator
+                    )
+                    userObject.addProperty("name", Client.global.me.name)
+                    userObject.addProperty("avatar", Client.global.me.avatar)
+                    userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+                    msgObject.add("author", userObject)
+                    val msg = Message(client = Client.global, data = msgObject)
+                    val attachmentObj = JsonObject()
+                    attachmentObj.addProperty("id", "new_image")
+                    attachmentObj.addProperty("filename", cacheFile.absolutePath)
+                    if (requestCode == IMAGE_REQUEST_CODE) {
+                        attachmentObj.addProperty(
+                            "type",
+                            cacheFile.absolutePath.substringAfterLast(".", "")
+                        )
+                        val op = BitmapFactory.Options()
+                        op.inJustDecodeBounds = true
+                        val bitmap = BitmapFactory.decodeStream(
+                            requireContext().contentResolver.openInputStream(uri), null, op
+                        )
+                        attachmentObj.addProperty("width", bitmap?.height)
+                        attachmentObj.addProperty("height", bitmap?.width)
+                        bitmap?.recycle()
+                    } else {
+                        attachmentObj.addProperty(
+                            "type",
+                            cacheFile.absolutePath.substringAfterLast(".", "")
+                        )
+                    }
+                    attachmentObj.addProperty("size", size.toInt())
+                    val attachment = MessageAttachment(Client.global, attachmentObj)
+                    msg.attachments["new_attachment"] = attachment
+                    msg.isSending = true
+
+                    mMsgList.add(msg)
                     mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                     scrollToBottom()
-                    uploadFile(cacheFile, newMsg)
+                    uploadFile(cacheFile, msg)
                 }
             }
         }
