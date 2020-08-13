@@ -35,7 +35,7 @@ android {
         applicationId "cn.troph.tomon"
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 3
+        versionCode 4
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -201,6 +201,7 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'io.coil-kt:coil:0.11.0'
+    implementation 'com.github.jkwiecien:EasyImage:3.0.4'
 
     implementation 'com.github.tylersuehr7:social-text-view:1.0.0'
     implementation "net.gotev:uploadservice:4.3.1"

@@ -59,8 +59,6 @@ import coil.Coil
 import coil.request.LoadRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.JsonObject
-import com.jaiselrahman.filepicker.activity.FilePickerActivity
-import com.jaiselrahman.filepicker.config.Configurations
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -72,7 +70,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
-import net.gotev.uploadservice.UploadServiceConfig
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
 import net.gotev.uploadservice.data.UploadNotificationStatusConfig
@@ -82,6 +79,10 @@ import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.apache.commons.io.IOUtils
+import pl.aprilapps.easyphotopicker.DefaultCallback
+import pl.aprilapps.easyphotopicker.EasyImage
+import pl.aprilapps.easyphotopicker.MediaFile
+import pl.aprilapps.easyphotopicker.MediaSource
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -101,6 +102,7 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var viewPager: NestedViewPager
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
+    private lateinit var mEasyImage: EasyImage
 
     private val mEmojiClickListener = object : OnEmojiClickListener {
         override fun onEmojiSelected(emojiCode: String) {
@@ -773,42 +775,38 @@ class ChannelPanelFragment : BaseFragment() {
                 requireActivity(),
                 onBottomSheetSelect = object : OnBottomSheetSelect {
                     override fun onItemSelected(index: Int) {
-                        val intent = Intent(requireContext(), FilePickerActivity::class.java)
-                        val builder = Configurations.Builder()
+
                         when (index) {
                             0 -> {
                                 pickFile(IMAGE_REQUEST_CODE)
-//                                builder.setCheckPermission(true).setShowImages(true)
-//                                    .setShowVideos(false).setShowFiles(false)
-//                                    .setShowAudios(false)
-//                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
-//                                    .enableImageCapture(true)
-//                                intent.putExtra(
-//                                    FilePickerActivity.CONFIGS,
-//                                    builder.build()
-//                                )
                             }
                             1 -> {
-//                                builder.setCheckPermission(true).setShowVideos(true)
-//                                    .setShowImages(false).setShowFiles(false)
-//                                    .setShowAudios(false)
-//                                    .setMaxSelection(1).enableVideoCapture(false)
-//                                intent.putExtra(
-//                                    FilePickerActivity.CONFIGS,
-//                                    builder.build()
-//                                )
+                                Dexter.withContext(requireContext())
+                                    .withPermission(
+                                        Manifest.permission.CAMERA
+                                    )
+                                    .withListener(object : PermissionListener {
+                                        override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                                            mEasyImage = EasyImage.Builder(requireContext())
+                                                .allowMultiple(false).build()
+                                            mEasyImage.openCameraForImage(this@ChannelPanelFragment)
+                                        }
+
+                                        override fun onPermissionRationaleShouldBeShown(
+                                            p0: PermissionRequest?,
+                                            p1: PermissionToken?
+                                        ) {
+
+                                        }
+
+                                        override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+
+                                        }
+                                    }).check()
 
                             }
                             2 -> {
                                 pickFile(FILE_REQUEST_CODE)
-//                                builder.setCheckPermission(true).setShowFiles(true).setSuffixes()
-//                                    .setSingleChoiceMode(true).setSingleClickSelection(true)
-//                                    .setShowImages(false).setShowVideos(false)
-//                                    .setShowAudios(false)
-//                                intent.putExtra(
-//                                    FilePickerActivity.CONFIGS,
-//                                    builder.build()
-//                                )
                             }
                         }
                         mBottomSheet.dismiss(true)
@@ -849,6 +847,62 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
 
+    fun createEmptyMessageWithAttachment(
+        requestCode: Int,
+        cacheFile: File,
+        size: Long
+    ): Message {
+        val msgObject = JsonObject()
+        msgObject.addProperty("id", "")
+        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+        msgObject.addProperty("channel_id", mChannelId)
+        msgObject.addProperty(
+            "timestamp",
+            LocalDateTime.now().minusHours(8).toString()
+        )
+        msgObject.addProperty("authorId", Client.global.me.id)
+        val userObject = JsonObject()
+        userObject.addProperty("id", Client.global.me.id)
+        userObject.addProperty("username", Client.global.me.username)
+        userObject.addProperty(
+            "discriminator",
+            Client.global.me.discriminator
+        )
+        userObject.addProperty("name", Client.global.me.name)
+        userObject.addProperty("avatar", Client.global.me.avatar)
+        userObject.addProperty("avatar_url", Client.global.me.avatarURL)
+        msgObject.add("author", userObject)
+        val msg = Message(client = Client.global, data = msgObject)
+        val attachmentObj = JsonObject()
+        attachmentObj.addProperty("id", "new_image")
+        attachmentObj.addProperty("filename", cacheFile.absolutePath)
+        if (requestCode == IMAGE_REQUEST_CODE) {
+            attachmentObj.addProperty(
+                "type",
+                cacheFile.absolutePath.substringAfterLast(".", "")
+            )
+            val op = BitmapFactory.Options()
+            op.inJustDecodeBounds = true
+            val bitmap = BitmapFactory.decodeStream(
+                FileInputStream(cacheFile), null, op
+            )
+            attachmentObj.addProperty("width", bitmap?.height)
+            attachmentObj.addProperty("height", bitmap?.width)
+            bitmap?.recycle()
+        } else {
+            attachmentObj.addProperty(
+                "type",
+                cacheFile.absolutePath.substringAfterLast(".", "")
+            )
+        }
+        attachmentObj.addProperty("size", size.toInt())
+        val attachment = MessageAttachment(Client.global, attachmentObj)
+        msg.attachments["new_attachment"] = attachment
+        msg.isSending = true
+        return msg
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -881,180 +935,46 @@ class ChannelPanelFragment : BaseFragment() {
                         outputStream
                     )
 
-                    val msgObject = JsonObject()
-                    msgObject.addProperty("id", "")
-                    msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-                    msgObject.addProperty("channel_id", mChannelId)
-                    msgObject.addProperty(
-                        "timestamp",
-                        LocalDateTime.now().minusHours(8).toString()
-                    )
-                    msgObject.addProperty("authorId", Client.global.me.id)
-                    val userObject = JsonObject()
-                    userObject.addProperty("id", Client.global.me.id)
-                    userObject.addProperty("username", Client.global.me.username)
-                    userObject.addProperty(
-                        "discriminator",
-                        Client.global.me.discriminator
-                    )
-                    userObject.addProperty("name", Client.global.me.name)
-                    userObject.addProperty("avatar", Client.global.me.avatar)
-                    userObject.addProperty("avatar_url", Client.global.me.avatarURL)
-                    msgObject.add("author", userObject)
-                    val msg = Message(client = Client.global, data = msgObject)
-                    val attachmentObj = JsonObject()
-                    attachmentObj.addProperty("id", "new_image")
-                    attachmentObj.addProperty("filename", cacheFile.absolutePath)
-                    if (requestCode == IMAGE_REQUEST_CODE) {
-                        attachmentObj.addProperty(
-                            "type",
-                            cacheFile.absolutePath.substringAfterLast(".", "")
-                        )
-                        val op = BitmapFactory.Options()
-                        op.inJustDecodeBounds = true
-                        val bitmap = BitmapFactory.decodeStream(
-                            requireContext().contentResolver.openInputStream(uri), null, op
-                        )
-                        attachmentObj.addProperty("width", bitmap?.height)
-                        attachmentObj.addProperty("height", bitmap?.width)
-                        bitmap?.recycle()
-                    } else {
-                        attachmentObj.addProperty(
-                            "type",
-                            cacheFile.absolutePath.substringAfterLast(".", "")
-                        )
-                    }
-                    attachmentObj.addProperty("size", size.toInt())
-                    val attachment = MessageAttachment(Client.global, attachmentObj)
-                    msg.attachments["new_attachment"] = attachment
-                    msg.isSending = true
-                    mMsgList.add(msg)
+                    val newMsg = createEmptyMessageWithAttachment(requestCode, cacheFile, size)
+                    mMsgList.add(newMsg)
                     mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                     scrollToBottom()
-                    uploadFile(cacheFile, msg)
+                    uploadFile(cacheFile, newMsg)
                 }
             }
         }
+
+        mEasyImage.handleActivityResult(
+            requestCode,
+            resultCode,
+            data,
+            requireActivity(),
+            object : EasyImage.Callbacks {
+                override fun onCanceled(source: MediaSource) {
+
+                }
+
+                override fun onImagePickerError(error: Throwable, source: MediaSource) {
+
+                }
+
+                override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
+                    val newMsg = createEmptyMessageWithAttachment(
+                        IMAGE_REQUEST_CODE,
+                        imageFiles[0].file,
+                        imageFiles[0].file.length()
+                    )
+
+                    mMsgList.add(newMsg)
+                    mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                    scrollToBottom()
+                    uploadFile(imageFiles[0].file, newMsg)
+                }
+            })
     }
 
     private fun mentionFormat(identifier: String): String {
         return "@${identifier}"
-    }
-
-
-    /**
-     * Get a file path from a Uri. This will get the the path for Storage Access
-     * Framework Documents, as well as the _data field for the MediaStore and
-     * other file-based ContentProviders.
-     *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @author paulburke
-     */
-    fun getPath(context: Context, uri: Uri): String? {
-
-        // DocumentProvider
-        if (DocumentsContract.isDocumentUri(context, uri)) {
-            // ExternalStorageProvider
-            if (isExternalStorageDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split(":".toRegex()).toTypedArray()
-                val type = split[0]
-                if ("primary".equals(type, ignoreCase = true)) {
-                    return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
-                }
-
-                // TODO handle non-primary volumes
-            } else if (isDownloadsDocument(uri)) {
-                val id = DocumentsContract.getDocumentId(uri)
-                val contentUri: Uri = ContentUris.withAppendedId(
-                    Uri.parse("content://downloads/public_downloads"),
-                    java.lang.Long.valueOf(id)
-                )
-                return getDataColumn(context, contentUri, null, null)
-            } else if (isMediaDocument(uri)) {
-                val docId = DocumentsContract.getDocumentId(uri)
-                val split = docId.split(":".toRegex()).toTypedArray()
-                val type = split[0]
-                var contentUri: Uri? = null
-                if ("image" == type) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                } else if ("video" == type) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                } else if ("audio" == type) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                }
-                val selection = "_id=?"
-                val selectionArgs = arrayOf(
-                    split[1]
-                )
-                return getDataColumn(context, contentUri, selection, selectionArgs)
-            }
-        } else if ("content".equals(uri.scheme, ignoreCase = true)) {
-            return getDataColumn(context, uri, null, null)
-        } else if ("file".equals(uri.scheme, ignoreCase = true)) {
-            return uri.path
-        }
-        return null
-    }
-
-    /**
-     * Get the value of the data column for this Uri. This is useful for
-     * MediaStore Uris, and other file-based ContentProviders.
-     *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
-     * @param selectionArgs (Optional) Selection arguments used in the query.
-     * @return The value of the _data column, which is typically a file path.
-     */
-    fun getDataColumn(
-        context: Context, uri: Uri?, selection: String?,
-        selectionArgs: Array<String>?
-    ): String? {
-        var cursor: Cursor? = null
-        val column = "_data"
-        val projection = arrayOf(
-            column
-        )
-        try {
-            cursor = context.contentResolver.query(
-                uri!!, projection, selection, selectionArgs,
-                null
-            )
-            if (cursor != null && cursor.moveToFirst()) {
-                val column_index = cursor.getColumnIndexOrThrow(column)
-                return cursor.getString(column_index)
-            }
-        } finally {
-            cursor?.close()
-        }
-        return null
-    }
-
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    fun isExternalStorageDocument(uri: Uri): Boolean {
-        return "com.android.externalstorage.documents" == uri.authority
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    fun isDownloadsDocument(uri: Uri): Boolean {
-        return "com.android.providers.downloads.documents" == uri.authority
-    }
-
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    fun isMediaDocument(uri: Uri): Boolean {
-        return "com.android.providers.media.documents" == uri.authority
     }
 
     private fun callMentionBottomSheet(mentionList: MutableList<GuildMember>) {
@@ -1171,31 +1091,6 @@ class ChannelPanelFragment : BaseFragment() {
 
                 }
             })
-
-
-//        val requestFile = file.asRequestBody()
-//        val requestBody =
-//            "{\"content\":null,\"nonce\":\"${msg.nonce}\"}".toRequestBody()
-//        val map = mutableMapOf<String, RequestBody>()
-//        map["payload_json"] = requestBody
-//        val body = MultipartBody.Part.createFormData(file.name, file.name, requestFile)
-//        (Client.global.channels[mChannelId!!] as TextChannelBase).messages.uploadAttachments(
-//            partMap = map,
-//            files = body
-//        ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-//
-//        }, {
-//            val deletedMsg = mMsgList.find {
-//                it.nonce == msg.nonce
-//            }
-//            deletedMsg?.let {
-//                val index = mMsgList.indexOf(it)
-//                mMsgList.remove(it)
-//                mMsgListAdapter.notifyItemRemoved(index)
-//                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT).show()
-//            }
-//
-//        })
     }
 
     private fun hideKeyboard() {
