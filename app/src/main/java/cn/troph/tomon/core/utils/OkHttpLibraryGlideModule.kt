@@ -27,6 +27,6 @@ class MyGlideModule : AppGlideModule() {
         context: Context,
         builder: GlideBuilder
     ) {
-        builder.setLogLevel(Log.VERBOSE)
+        builder.setLogLevel(Log.ERROR)
     }
 }

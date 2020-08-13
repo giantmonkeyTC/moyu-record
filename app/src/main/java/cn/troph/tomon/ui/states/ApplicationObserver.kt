@@ -15,8 +15,8 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-        Logger.d("App in foreground")
-        Client.global.socket.open()
+//        Logger.d("App in foreground")
+//        Client.global.socket.open()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -31,8 +31,8 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStop() {
-        Logger.d("App in background")
-        Client.global.socket.close()
+//        Logger.d("App in background")
+//        Client.global.socket.close()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
