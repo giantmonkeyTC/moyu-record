@@ -69,3 +69,4 @@ data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate):Event()
 data class GuildVoiceSelectorEvent(val channelId:String):Event()
 
 data class LinkParseReadyEvent(val linkList:MutableList<Link>):Event()
+data class ShowUserProfileEvent(val user: User):Event()
