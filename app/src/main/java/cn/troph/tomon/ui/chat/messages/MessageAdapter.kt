@@ -1298,7 +1298,7 @@ class MessageAdapter(
             dialog.dismiss()
         }
 
-        viewHolder.itemView.setBackgroundColor(viewHolder.itemView.context.getColor(R.color.channelSelectBackground))
+        viewHolder.itemView.setBackgroundColor(viewHolder.itemView.context.getColor(R.color.channelSelectBackground30))
 
         dialog.show()
 

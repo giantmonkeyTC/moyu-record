@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.url
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
@@ -67,6 +68,7 @@ class EmojiAdapter(
                     Glide.with(it.context).load(emojiSectionObj.emojiList[position].url)
                         .into(it.imageview_emoji)
                     it.imageview_emoji.setOnClickListener {
+
                         emojiClickListener.onEmojiSelected("<%${emojiSectionObj.emojiList[holder.sectionAdapterPosition].name}:${emojiSectionObj.emojiList[holder.sectionAdapterPosition].id}>")
                     }
                 }
