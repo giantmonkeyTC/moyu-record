@@ -1015,20 +1015,24 @@ class MessageAdapter(
                         it.visibility = View.GONE
                     }
                     message.links.forEachIndexed { index, link ->
-                        val consl = holder.itemView.link_list.getChildAt(index) as ConstraintLayout
-                        consl.visibility = View.VISIBLE
-                        val preImg = consl.getChildAt(0) as ImageView
-                        val title = consl.getChildAt(1) as TextView
-                        val jumpBtn = consl.getChildAt(2) as ImageView
-                        Glide.with(holder.itemView.context).load(link.img)
-                            .into(preImg)
-                        title.text = link.title
-                        jumpBtn.setOnClickListener {
-                            val url = link.url
-                            val i = Intent(Intent.ACTION_VIEW)
-                            i.setData(Uri.parse(url))
-                            holder.itemView.context.startActivity(i)
+                        if (index < 5) {
+                            val consl =
+                                holder.itemView.link_list.getChildAt(index) as ConstraintLayout
+                            consl.visibility = View.VISIBLE
+                            val preImg = consl.getChildAt(0) as ImageView
+                            val title = consl.getChildAt(1) as TextView
+                            val jumpBtn = consl.getChildAt(2) as ImageView
+                            Glide.with(holder.itemView.context).load(link.img)
+                                .into(preImg)
+                            title.text = link.title
+                            jumpBtn.setOnClickListener {
+                                val url = link.url
+                                val i = Intent(Intent.ACTION_VIEW)
+                                i.setData(Uri.parse(url))
+                                holder.itemView.context.startActivity(i)
+                            }
                         }
+
                     }
                 } else
                     holder.itemView.link_list.visibility = View.GONE
@@ -1330,7 +1334,12 @@ interface OnAvatarLongClickListener {
 interface ParseLink {
     fun parseLink()
 }
-class LinkParseWorker(context: Context, workerParameters: WorkerParameters, private val parseLink: ParseLink):Worker(context,workerParameters){
+
+class LinkParseWorker(
+    context: Context,
+    workerParameters: WorkerParameters,
+    private val parseLink: ParseLink
+) : Worker(context, workerParameters) {
     override fun doWork(): Result {
         parseLink.parseLink()
         return Result.success()
