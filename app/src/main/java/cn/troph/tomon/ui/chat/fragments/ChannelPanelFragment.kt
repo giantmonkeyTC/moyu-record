@@ -751,11 +751,13 @@ class ChannelPanelFragment : BaseFragment() {
         }
         )
         setUpBottomSheet()
+
         mMsgListAdapter.onItemClickListner = object : OnItemClickListener {
             override fun onItemClick(position: Int) {
                 hideKeyboard()
             }
         }
+
         mChatSharedVM.botCommandSelectedLD.observe(viewLifecycleOwner, Observer {
             editText.append(it)
             btn_message_send.performClick()

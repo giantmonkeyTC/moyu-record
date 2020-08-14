@@ -221,7 +221,6 @@ class MessageAdapter(
             "3gp",
             true
         )
-
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
@@ -230,13 +229,10 @@ class MessageAdapter(
                 it.onItemClick(holder.adapterPosition)
             }
         }
+
         when (getItemViewType(position)) {
             0 -> {
                 val msg = messageList[position]
-                holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder, 0)
-                    true
-                }
                 holder.itemView.message_avatar.setOnClickListener {
                     messageList[holder.adapterPosition].authorId?.let {
                         if (it != Client.global.me.id) {
@@ -247,9 +243,9 @@ class MessageAdapter(
                                 guildUserInfoFragment.tag
                             )
                         }
-
                     }
                 }
+
                 holder.itemView.message_avatar.setOnLongClickListener {
                     messageList[holder.adapterPosition].authorId?.let {
                         if (it != Client.global.me.id) {
@@ -260,6 +256,16 @@ class MessageAdapter(
                     }
                     true
                 }
+
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(holder, 0)
+                    true
+                }
+                holder.itemView.widget_message_text.setOnLongClickListener {
+                    callBottomSheet(holder, 0)
+                    true
+                }
+
                 if (position > 1) {
                     bind(holder.itemView, msg, messageList[position - 1], holder)
                 } else {
@@ -530,7 +536,7 @@ class MessageAdapter(
                     holder.itemView.animation_view.visibility = View.VISIBLE
                 }
             }
-            4 -> {
+            4 -> {//邀请链接
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
@@ -593,7 +599,7 @@ class MessageAdapter(
                     true
                 }
 
-                holder.itemView.setOnClickListener {
+                holder.itemView.join_image.setOnClickListener {
                     Client.global.guilds.join(Url.parseInviteCode(messageList[holder.adapterPosition].content!!))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe(
@@ -1049,9 +1055,13 @@ class MessageAdapter(
                     holder.itemView.link_text.clearAnimation()
                 }
                 showReaction(holder, messageList[position])
-
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(holder, 4)
+                    true
+                }
             }
         }
+
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
@@ -1181,21 +1191,6 @@ class MessageAdapter(
         return messageList.size
     }
 
-    private fun callPhotoBottomSheet(parent: ViewGroup) {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_image, null)
-        val dialog = BottomSheetDialog(parent.context)
-        dialog.setContentView(view)
-        dialog.show()
-    }
-
-    private fun isMoreThanFiveMins(fromDate: LocalDateTime, toDate: LocalDateTime): Boolean {
-        val min =
-            (toDate.toInstant(ZoneOffset.UTC).toEpochMilli() - fromDate.toInstant(ZoneOffset.UTC)
-                .toEpochMilli()) / (1000 * 60)
-        return min > 5
-    }
-
     private fun richText(
         message: Message,
         itemView: View
@@ -1253,7 +1248,7 @@ class MessageAdapter(
 //        view.share_button.visibility =
 //            if (viewType == 0 || viewType == 1 || viewType == 2) View.VISIBLE else View.GONE
         view.reaction_message_button.visibility =
-            if (viewType == 0 || viewType == 2 || viewType == 1 || viewType == 4) View.VISIBLE else View.GONE
+            if (viewType == 0 || viewType == 1 || viewType == 2 || viewType == 4 || viewType == 7 || viewType == 8) View.VISIBLE else View.GONE
         view.copy_message_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
 
         view.delete_button.visibility =
@@ -1310,7 +1305,7 @@ class MessageAdapter(
         dialog.setOnDismissListener {
             viewHolder.itemView.setBackgroundColor(
                 viewHolder.itemView.context.getColor(
-                    R.color.background2
+                    android.R.color.transparent
                 )
             )
         }
