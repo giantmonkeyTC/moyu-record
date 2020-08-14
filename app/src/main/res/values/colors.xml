@@ -32,6 +32,7 @@
     <color name="guildSelectBackground">#5996b8</color>
     <color name="channelCategoryText">#828282</color>
     <color name="channelSelectBackground">#3A3A3A</color>
+    <color name="channelSelectBackground30">#503A3A3A</color>
     <color name="inputPanelBackground">#343536</color>
     <color name="background1">#171717</color>
     <color name="background2">#2E2E2E</color>
