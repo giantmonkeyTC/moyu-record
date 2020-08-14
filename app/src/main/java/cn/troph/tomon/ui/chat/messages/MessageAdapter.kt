@@ -1207,7 +1207,7 @@ class MessageAdapter(
         }
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
-        val atUserTemplate = "<tomon>%s</tomon>"
+        val atUserTemplate = "<tomonandroid>%s</tomonandroid>"
         contentSpanAtUser.contentAtUser.forEach {
             tempMsg = tempMsg?.replaceFirst(
                 "<@${it.id}>", atUserTemplate.format("@${it.name}")
@@ -1333,16 +1333,16 @@ class TomonTagHandler : SimpleTagHandler() {
         renderProps: RenderProps,
         tag: HtmlTag
     ): Any? {
-        return ForegroundColorSpan(Color.parseColor("#86A5ED"))
+        return MentionClickableSpan()
     }
 
     override fun supportedTags(): MutableCollection<String> {
-        return Collections.singleton("tomon")
+        return Collections.singleton("tomonandroid")
     }
 
 }
 
-class MemtionClickUserSpan : ClickableSpan() {
+class MentionClickableSpan : ClickableSpan() {
 
     override fun onClick(widget: View) {
 
@@ -1350,7 +1350,8 @@ class MemtionClickUserSpan : ClickableSpan() {
 
     override fun updateDrawState(ds: TextPaint) {
         super.updateDrawState(ds)
-
+        ds.isUnderlineText = false
+        ds.setColor(Color.argb(255, 134, 165, 237))
     }
 
 }
