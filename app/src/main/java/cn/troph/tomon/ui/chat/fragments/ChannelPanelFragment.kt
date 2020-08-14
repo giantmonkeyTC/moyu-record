@@ -67,7 +67,10 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.gotev.uploadservice.data.UploadInfo
@@ -79,6 +82,9 @@ import net.gotev.uploadservice.protocols.multipart.MultipartUploadRequest
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.apache.commons.io.IOUtils
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import pl.aprilapps.easyphotopicker.DefaultCallback
 import pl.aprilapps.easyphotopicker.EasyImage
 import pl.aprilapps.easyphotopicker.MediaFile
@@ -86,6 +92,8 @@ import pl.aprilapps.easyphotopicker.MediaSource
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
+import java.net.URL
 import java.time.LocalDateTime
 
 const val FILE_REQUEST_CODE_FILE = 323
@@ -364,7 +372,7 @@ class ChannelPanelFragment : BaseFragment() {
                         mes.links.clear()
                         mes.links.addAll(it.linkList)
                         mMsgList.forEachIndexed { index, message ->
-                            if (message.id == mes.id){
+                            if (message.id == mes.id) {
                                 val position = index
                                 mMsgListAdapter.notifyItemChanged(position)
                             }
@@ -482,6 +490,7 @@ class ChannelPanelFragment : BaseFragment() {
                         mHeaderMsg.isEnd = true
                         mMsgList.add(mHeaderMsg)
                     }
+                    fetchLink()
                     mMsgListAdapter.notifyDataSetChanged()
 
                     scrollToBottom()
@@ -533,6 +542,10 @@ class ChannelPanelFragment : BaseFragment() {
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
+                    event.message.content?.let {
+                        if (Assets.regexLink.containsMatchIn(it))
+                            fetchLink()
+                    }
                     mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
@@ -1188,6 +1201,60 @@ class ChannelPanelFragment : BaseFragment() {
         return msg
     }
 
+    fun fetchLink() {
+        mMsgList.forEachIndexed { index, mes ->
+            mes.content?.let { content ->
+                if (Assets.regexLink.containsMatchIn(content)) {
+                    val links = Assets.linkParser(content)
+                    val disposable =
+                        Observable.create(ObservableOnSubscribe<MutableList<Link>> { emitter ->
+                            val linkList = mutableListOf<Link>()
+                            linkList.clear()
+                            try {
+                                links?.let {
+                                    it.forEach { link ->
+                                        var imgStr = ""
+                                        val document: Document =
+                                            Jsoup.parse(
+                                                URL(link.url.trim()),
+                                                5000
+                                            )
+                                        val title: String =
+                                            document.head().getElementsByTag("title").text()
+                                        val imgs: Elements = document.getElementsByTag("img")
+                                        if (imgs.size > 0) {
+                                            imgStr = imgs.get(0).attr("abs:src")
+                                        }
+                                        val link = Link(
+                                            title = title,
+                                            url = link.url.trim(),
+                                            code = 1,
+                                            img = imgStr,
+                                            messageId = mes?.id.toString(),
+                                            position = index,
+                                            content = null
+                                        )
+                                        linkList.add(link)
+                                    }
+                                }
+                                emitter.onNext(linkList)
+                            } catch (e: IOException) {
+                                linkList.clear()
+                                emitter.onNext(linkList)
+                                e.printStackTrace()
+                            }
+                        }).subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe { linkList ->
+                                Client.global.eventBus.postEvent(LinkParseReadyEvent(linkList = linkList))
+                            }
+                }
+
+            }
+
+        }
+    }
+
     fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
@@ -1238,6 +1305,7 @@ class ViewPagerCollectionAdapter(
     }
 
 }
+
 
 fun ContentResolver.getFileName(fileUri: Uri): String {
 

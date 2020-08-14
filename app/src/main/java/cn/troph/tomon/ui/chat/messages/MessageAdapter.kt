@@ -1009,49 +1009,6 @@ class MessageAdapter(
                 }
                 val linkParseRequest = OneTimeWorkRequestBuilder<LinkParseWorker>().build()
 //                WorkManager.getInstance(holder.itemView.context).enqueue(linkParseRequest)
-                disposable = Observable.create(ObservableOnSubscribe<MutableList<Link>> { emitter ->
-                    val linkList = mutableListOf<Link>()
-                    linkList.clear()
-                    try {
-                        links?.let {
-                            it.forEach { link ->
-                                var imgStr = ""
-                                val document: Document =
-                                    Jsoup.parse(
-                                        URL(link.url.trim()),
-                                        5000
-                                    )
-                                val title: String =
-                                    document.head().getElementsByTag("title").text()
-                                val imgs: Elements = document.getElementsByTag("img")
-                                if (imgs.size > 0) {
-                                    imgStr = imgs.get(0).attr("abs:src")
-                                }
-                                val link = Link(
-                                    title = title,
-                                    url = link.url.trim(),
-                                    code = 1,
-                                    img = imgStr,
-                                    messageId = message.id.toString(),
-                                    position = position,
-                                    content = null
-                                )
-                                linkList.add(link)
-                            }
-                        }
-                        emitter.onNext(linkList)
-                    } catch (e: IOException) {
-                        linkList.clear()
-                        emitter.onNext(linkList)
-                        e.printStackTrace()
-                    }
-                }).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { linkList ->
-                        Client.global.eventBus.postEvent(LinkParseReadyEvent(linkList = linkList))
-                        this.disposable?.dispose()
-                    }
-
                 if (message.links.size > 0) {
                     holder.itemView.link_list.visibility = View.VISIBLE
                     holder.itemView.link_list.children.forEach {
