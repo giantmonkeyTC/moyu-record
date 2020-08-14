@@ -247,6 +247,7 @@ class MessageAdapter(
                         }
                     }
                 }
+
                 holder.itemView.message_avatar.setOnLongClickListener {
                     messageList[holder.adapterPosition].authorId?.let {
                         if (it != Client.global.me.id) {
@@ -257,10 +258,16 @@ class MessageAdapter(
                     }
                     true
                 }
+
                 holder.itemView.setOnLongClickListener {
                     callBottomSheet(holder, 0)
                     true
                 }
+                holder.itemView.widget_message_text.setOnLongClickListener {
+                    callBottomSheet(holder, 0)
+                    true
+                }
+
                 if (position > 1) {
                     bind(holder.itemView, msg, messageList[position - 1], holder)
                 } else {
