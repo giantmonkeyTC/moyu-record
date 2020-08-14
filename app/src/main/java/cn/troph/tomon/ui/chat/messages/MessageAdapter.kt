@@ -1009,10 +1009,6 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.GONE
                 }
 
-                holder.itemView.link_list.setOnLongClickListener {
-                    callBottomSheet(holder, 2)
-                    true
-                }
                 val linkParseRequest = OneTimeWorkRequestBuilder<LinkParseWorker>().build()
 //                WorkManager.getInstance(holder.itemView.context).enqueue(linkParseRequest)
                 if (message.links.size > 0) {
@@ -1056,7 +1052,7 @@ class MessageAdapter(
                 }
                 showReaction(holder, messageList[position])
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder, 4)
+                    callBottomSheet(holder, 0)
                     true
                 }
             }
