@@ -55,6 +55,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
 
     val stamps = mutableListOf<Stamp>()
 
+    val links = mutableListOf<Link>()
+
     init {
         patchSelf(data)
     }
@@ -187,12 +189,22 @@ data class Stamp(
     @SerializedName("animated") val animated: Boolean,
     @SerializedName("author_id") val author_id: String,
     @SerializedName("hash") val hash: String,
-    @SerializedName("height") val height: Int=0,
-    @SerializedName("width") val width: Int=0,
+    @SerializedName("height") val height: Int = 0,
+    @SerializedName("width") val width: Int = 0,
     @SerializedName("id") val id: String,
     @SerializedName("pack_id") val pack_id: String,
     @SerializedName("position") val position: Int,
     @SerializedName("updated_at") val updatedAt: String
+)
+
+data class Link(
+    @SerializedName("messageId") val messageId: String,
+    @SerializedName("title") val title: String?,
+    @SerializedName("content") val content: String?,
+    @SerializedName("url") val url: String?,
+    @SerializedName("img") val img: String?,
+    @SerializedName("position") val position: Int,
+    @SerializedName("code") val code:Int
 )
 
 class HeaderMessage(

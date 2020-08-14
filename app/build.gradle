@@ -205,4 +205,6 @@ dependencies {
 
     implementation 'com.github.tylersuehr7:social-text-view:1.0.0'
     implementation "net.gotev:uploadservice:4.3.1"
+
+    implementation "androidx.work:work-runtime-ktx:2.3.4"
 }

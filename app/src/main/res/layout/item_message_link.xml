@@ -47,63 +47,266 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:textColor="#DDFFFFFF"
+        android:textColorLink="@android:color/holo_blue_dark"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_link"
-        android:textColorLink="@android:color/holo_blue_dark"
-        />
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/message_link_section"
-        android:layout_width="0dp"
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_link" />
+
+    <LinearLayout
+        android:id="@+id/link_list"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="4dp"
+        android:orientation="vertical"
+        android:visibility="gone"
         android:layout_marginStart="48dp"
-        android:background="@drawable/shape_message_file"
-        android:paddingVertical="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/link_text">
 
-        <ImageView
-            android:id="@+id/imageView_link"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_browser_solid" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/message_link_section1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/primaryText"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toStartOf="@id/btn_link_goto"
-            app:layout_constraintStart_toEndOf="@id/imageView_link"
-            app:layout_constraintTop_toTopOf="@id/imageView_link" />
+            android:layout_marginVertical="4dp"
+            android:visibility="gone"
+            android:background="@drawable/shape_message_file"
+            android:paddingVertical="4dp">
+
+            <ImageView
+                android:id="@+id/imageView_link"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_browser_solid" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_link_goto"
+                app:layout_constraintStart_toEndOf="@id/imageView_link"
+                app:layout_constraintTop_toTopOf="@id/imageView_link" />
+
+            <ImageView
+                android:id="@+id/btn_link_goto"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_chevron_right_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/message_link_section2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:background="@drawable/shape_message_file"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView_link2"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_browser_solid" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_link_goto2"
+                app:layout_constraintStart_toEndOf="@id/imageView_link2"
+                app:layout_constraintTop_toTopOf="@id/imageView_link2" />
 
 
+            <ImageView
+                android:id="@+id/btn_link_goto2"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_chevron_right_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/btn_link_goto"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_chevron_right_solid"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/message_link_section3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:background="@drawable/shape_message_file"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView_link3"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_browser_solid" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_link_goto3"
+                app:layout_constraintStart_toEndOf="@id/imageView_link3"
+                app:layout_constraintTop_toTopOf="@id/imageView_link3" />
+
+
+            <ImageView
+                android:id="@+id/btn_link_goto3"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_chevron_right_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/message_link_section4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:background="@drawable/shape_message_file"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView_link4"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_browser_solid" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_link_goto4"
+                app:layout_constraintStart_toEndOf="@id/imageView_link4"
+                app:layout_constraintTop_toTopOf="@id/imageView_link4" />
+
+
+            <ImageView
+                android:id="@+id/btn_link_goto4"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_chevron_right_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/message_link_section5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="4dp"
+            android:background="@drawable/shape_message_file"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView_link5"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_browser_solid" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/primaryText"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/btn_link_goto5"
+                app:layout_constraintStart_toEndOf="@id/imageView_link5"
+                app:layout_constraintTop_toTopOf="@id/imageView_link5" />
+
+
+            <ImageView
+                android:id="@+id/btn_link_goto5"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_chevron_right_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 
     <include
@@ -114,9 +317,9 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/message_link_section"
-        app:layout_constraintStart_toStartOf="@id/message_link_section"
-        app:layout_constraintTop_toBottomOf="@id/message_link_section" />
+        app:layout_constraintEnd_toEndOf="@id/link_list"
+        app:layout_constraintStart_toStartOf="@id/link_list"
+        app:layout_constraintTop_toBottomOf="@id/link_list" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

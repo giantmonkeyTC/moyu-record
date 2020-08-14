@@ -68,4 +68,4 @@ data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate):Event()
 
 data class GuildVoiceSelectorEvent(val channelId:String):Event()
 
-data class LinkParseReadyEvent(val map:HashMap<String,String>?):Event()
+data class LinkParseReadyEvent(val linkList:MutableList<Link>):Event()

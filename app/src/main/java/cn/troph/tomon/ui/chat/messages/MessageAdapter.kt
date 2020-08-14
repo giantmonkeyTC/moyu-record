@@ -12,24 +12,23 @@ import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.text.toSpannable
+import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.events.LinkParseReadyEvent
-import cn.troph.tomon.core.structures.HeaderMessage
-import cn.troph.tomon.core.structures.Message
-import cn.troph.tomon.core.structures.MessageAttachment
-import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.utils.Assets
-import cn.troph.tomon.core.utils.DensityUtil
-import cn.troph.tomon.core.utils.FileUtils
-import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
 import cn.troph.tomon.ui.states.AppState
@@ -59,6 +58,7 @@ import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
@@ -96,6 +96,7 @@ class MessageAdapter(
 
     var onItemClickListner: OnItemClickListener? = null
     private var markdown: Markwon? = null
+    private var disposable: Disposable? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -200,10 +201,7 @@ class MessageAdapter(
             messageList[position].content?.let {
                 if (it.contains(INVITE_LINK))
                     return 4
-                else if (Assets.regexLink.containsMatchIn(it) || Assets.regexLinkHttps.containsMatchIn(
-                        it
-                    )
-                )
+                else if (Assets.regexLink.containsMatchIn(it))
                     return 8
             }
             return 0
@@ -951,6 +949,8 @@ class MessageAdapter(
                 showReaction(holder, messageList[position])
             }
             8 -> {
+                val message = messageList[position]
+                val links = message.content?.let { Assets.linkParser(it) }
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
@@ -979,7 +979,6 @@ class MessageAdapter(
                     holder.itemView.message_avatar_link.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_link.text =
                         "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
-                    val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
                             (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
@@ -1010,60 +1009,37 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.GONE
                 }
 
-                holder.itemView.message_link_section.setOnLongClickListener {
+                holder.itemView.link_list.setOnLongClickListener {
                     callBottomSheet(holder, 2)
                     true
                 }
-
-                Observable.create(ObservableOnSubscribe<HashMap<String, String>?> { emitter ->
-                    var map: HashMap<String, String>?
-                    try {
-                        var imgStr = ""
-                        val document: Document =
-                            Jsoup.parse(
-                                URL(messageList[position].content.toString().trim()),
-                                5000
-                            )
-                        val title: String =
-                            document.head().getElementsByTag("title").text()
-                        val imgs: Elements = document.getElementsByTag("img")
-                        if (imgs.size > 0) {
-                            imgStr = imgs.get(0).attr("abs:src")
-                        }
-                        map = HashMap()
-                        map.put("code", "1")
-                        map.put("position", position.toString())
-                        map.put("title", title)
-                        map.put("url", messageList[position].content.toString())
-                        map.put("img", imgStr)
-                        emitter.onNext(map)
-                    } catch (e: IOException) {
-                        map = HashMap()
-                        map.put("code", "0")
-                        emitter.onNext(map)
-                        e.printStackTrace()
+                val linkParseRequest = OneTimeWorkRequestBuilder<LinkParseWorker>().build()
+//                WorkManager.getInstance(holder.itemView.context).enqueue(linkParseRequest)
+                if (message.links.size > 0) {
+                    holder.itemView.link_list.visibility = View.VISIBLE
+                    holder.itemView.link_list.children.forEach {
+                        it.visibility = View.GONE
                     }
-                }).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { map ->
-                        if (map?.get("title") == null) {
-                            holder.itemView.message_link_section.visibility = View.GONE
-                        } else {
-                            val image = holder.itemView.imageView_link
-                            holder.itemView.textView.text = map?.get("title") ?: ""
-                            Glide.with(holder.itemView.context).load(map?.get("img") ?: "")
-                                .into(image)
-                            holder.itemView.btn_link_goto.setOnClickListener {
-                                val url = map?.get("url") ?: ""
-                                val i = Intent(Intent.ACTION_VIEW)
-                                i.setData(Uri.parse(url))
-                                holder.itemView.context.startActivity(i)
-                            }
+                    message.links.forEachIndexed { index, link ->
+                        val consl = holder.itemView.link_list.getChildAt(index) as ConstraintLayout
+                        consl.visibility = View.VISIBLE
+                        val preImg = consl.getChildAt(0) as ImageView
+                        val title = consl.getChildAt(1) as TextView
+                        val jumpBtn = consl.getChildAt(2) as ImageView
+                        Glide.with(holder.itemView.context).load(link.img)
+                            .into(preImg)
+                        title.text = link.title
+                        jumpBtn.setOnClickListener {
+                            val url = link.url
+                            val i = Intent(Intent.ACTION_VIEW)
+                            i.setData(Uri.parse(url))
+                            holder.itemView.context.startActivity(i)
                         }
                     }
+                } else
+                    holder.itemView.link_list.visibility = View.GONE
                 holder.itemView.link_text.text = messageList[position].content
                 holder.itemView.link_text.setOnClickListener {
-
                 }
 
                 if (messageList[position].isSending) {
@@ -1344,4 +1320,14 @@ interface OnItemClickListener {
 
 interface OnAvatarLongClickListener {
     fun onAvatarLongClick(identifier: String)
+}
+
+interface ParseLink {
+    fun parseLink()
+}
+class LinkParseWorker(context: Context, workerParameters: WorkerParameters, private val parseLink: ParseLink):Worker(context,workerParameters){
+    override fun doWork(): Result {
+        parseLink.parseLink()
+        return Result.success()
+    }
 }
