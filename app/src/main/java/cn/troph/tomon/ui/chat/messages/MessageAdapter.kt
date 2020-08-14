@@ -845,6 +845,12 @@ class MessageAdapter(
 //                    }
                     val videoPlayer = holder.itemView.video_player
                     val videoPreview = holder.itemView.video_preview
+                    holder.itemView.video_card.updateLayoutParams {
+                        item.width?.let {
+                            this.width = item.width!!
+                            this.height = item.height!!
+                        }
+                    }
                     videoPreview.updateLayoutParams {
                         item.width?.let {
                             this.width =
@@ -858,6 +864,7 @@ class MessageAdapter(
                             }
                         }
                     }
+
                     holder.itemView.video_player.updateLayoutParams {
                         item.width?.let {
                             this.width = item.width!!
@@ -871,6 +878,7 @@ class MessageAdapter(
                                 this.start()
                             }
                             setOnCompletionListener {
+                                holder.itemView.play_pause.visibility = View.GONE
                                 holder.itemView.play_status.visibility = View.VISIBLE
                             }
                             setOnStateChangedListener {
@@ -895,7 +903,15 @@ class MessageAdapter(
                             holder.itemView.play_status.visibility = View.GONE
                             videoPreview.visibility = View.GONE
                         }
+                    }
+                    videoPreview.setOnClickListener {
+                        val urlSource = UrlSource()
+                        urlSource.uri = Uri.parse(item.url).toString()
+                        vidPlayer?.setDataSource(urlSource)
+                        vidPlayer?.prepare()
 
+                        holder.itemView.play_status.visibility = View.GONE
+                        videoPreview.visibility = View.GONE
                     }
                     videoPlayer.surfaceTextureListener =
                         object : TextureView.SurfaceTextureListener {
@@ -1041,7 +1057,24 @@ class MessageAdapter(
                                 i.setData(Uri.parse(url))
                                 holder.itemView.context.startActivity(i)
                             }
+                        } else {
+                            val consl = LayoutInflater.from(holder.itemView.context)
+                                .inflate(R.layout.message_link_section, null) as ConstraintLayout
+                            val preImg = consl.getChildAt(0) as ImageView
+                            val title = consl.getChildAt(1) as TextView
+                            val jumpBtn = consl.getChildAt(2) as ImageView
+                            Glide.with(holder.itemView.context).load(link.img)
+                                .into(preImg)
+                            title.text = link.title
+                            jumpBtn.setOnClickListener {
+                                val url = link.url
+                                val i = Intent(Intent.ACTION_VIEW)
+                                i.setData(Uri.parse(url))
+                                holder.itemView.context.startActivity(i)
+                            }
+                            holder.itemView.link_list.addView(consl)
                         }
+
 
                     }
                 } else
@@ -1060,7 +1093,7 @@ class MessageAdapter(
                 }
                 showReaction(holder, messageList[position])
                 holder.itemView.setOnLongClickListener {
-                    callBottomSheet(holder, 4)
+                    callBottomSheet(holder, 0)
                     true
                 }
             }
