@@ -72,6 +72,9 @@ class EmojiFragment(val onEmojiClickListener: OnEmojiClickListener) : Fragment()
             }
         }
         reaction_rr.layoutManager = mGridLayoutManager
+        //load frequently used emoji
+        guildIcon.add(GuildIcon(null, null, resources.getDrawable(R.drawable.ic_clock_solid)))
+
         //load guild emoji
         for (item in Client.global.guilds.list) {
             if (item.emojis.values.toMutableList().size == 0)
