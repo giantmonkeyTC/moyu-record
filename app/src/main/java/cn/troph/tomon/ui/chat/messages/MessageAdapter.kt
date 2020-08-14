@@ -4,10 +4,14 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Environment
+import android.text.TextPaint
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
@@ -22,7 +26,6 @@ import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.*
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
@@ -50,14 +53,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
-import io.noties.markwon.Markwon
+import io.noties.markwon.*
 import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.html.HtmlTag
+import io.noties.markwon.html.tag.SimpleTagHandler
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -73,14 +76,8 @@ import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
-import java.io.File
-import java.io.IOException
-import java.net.URL
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.util.*
 import kotlin.random.Random
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
@@ -115,6 +112,13 @@ class MessageAdapter(
                         return Glide.with(parent.context).load(drawable.destination)
                     }
                 }))
+                .usePlugin(object : AbstractMarkwonPlugin() {
+                    override fun configure(registry: MarkwonPlugin.Registry) {
+                        registry.require(HtmlPlugin::class.java) {
+                            it.addHandler(TomonTagHandler())
+                        }
+                    }
+                })
                 .build()
         }
 
@@ -1013,8 +1017,6 @@ class MessageAdapter(
                     callBottomSheet(holder, 2)
                     true
                 }
-                val linkParseRequest = OneTimeWorkRequestBuilder<LinkParseWorker>().build()
-//                WorkManager.getInstance(holder.itemView.context).enqueue(linkParseRequest)
                 if (message.links.size > 0) {
                     holder.itemView.link_list.visibility = View.VISIBLE
                     holder.itemView.link_list.children.forEach {
@@ -1205,9 +1207,7 @@ class MessageAdapter(
         }
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
-        val atUserTemplate =
-            "<span style=\"color: green\">%s</span>"
-
+        val atUserTemplate = "<tomon>%s</tomon>"
         contentSpanAtUser.contentAtUser.forEach {
             tempMsg = tempMsg?.replaceFirst(
                 "<@${it.id}>", atUserTemplate.format("@${it.name}")
@@ -1326,17 +1326,31 @@ interface OnAvatarLongClickListener {
     fun onAvatarLongClick(identifier: String)
 }
 
-interface ParseLink {
-    fun parseLink()
+class TomonTagHandler : SimpleTagHandler() {
+
+    override fun getSpans(
+        configuration: MarkwonConfiguration,
+        renderProps: RenderProps,
+        tag: HtmlTag
+    ): Any? {
+        return ForegroundColorSpan(Color.parseColor("#86A5ED"))
+    }
+
+    override fun supportedTags(): MutableCollection<String> {
+        return Collections.singleton("tomon")
+    }
+
 }
 
-class LinkParseWorker(
-    context: Context,
-    workerParameters: WorkerParameters,
-    private val parseLink: ParseLink
-) : Worker(context, workerParameters) {
-    override fun doWork(): Result {
-        parseLink.parseLink()
-        return Result.success()
+class MemtionClickUserSpan : ClickableSpan() {
+
+    override fun onClick(widget: View) {
+
     }
+
+    override fun updateDrawState(ds: TextPaint) {
+        super.updateDrawState(ds)
+
+    }
+
 }
