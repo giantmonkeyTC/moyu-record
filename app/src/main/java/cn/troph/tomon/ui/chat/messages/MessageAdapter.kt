@@ -9,6 +9,7 @@ import android.graphics.SurfaceTexture
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Environment
+import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -30,6 +31,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.events.LinkParseReadyEvent
+import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -1240,10 +1242,11 @@ class MessageAdapter(
         }
 
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
-        val atUserTemplate = "<tomon>%s</tomon>"
+        val atUserTemplate = "<tomonandroid>%s</tomonandroid>"
         contentSpanAtUser.contentAtUser.forEach {
             tempMsg = tempMsg?.replaceFirst(
-                "<@${it.id}>", atUserTemplate.format("@${it.name}")
+                "<@${it.id}>",
+                atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
             )
         }
         markdown?.setMarkdown(itemView.widget_message_text, tempMsg!!)
@@ -1366,24 +1369,35 @@ class TomonTagHandler : SimpleTagHandler() {
         renderProps: RenderProps,
         tag: HtmlTag
     ): Any? {
-        return ForegroundColorSpan(Color.parseColor("#86A5ED"))
+        return MentionClickableSpan()
     }
 
     override fun supportedTags(): MutableCollection<String> {
-        return Collections.singleton("tomon")
+        return Collections.singleton("tomonandroid")
     }
 
 }
 
-class MemtionClickUserSpan : ClickableSpan() {
+class MentionClickableSpan : ClickableSpan() {
 
     override fun onClick(widget: View) {
-
+        val tv = widget as EmojiTextView
+        val spanned = tv.text as Spanned
+        val start = spanned.getSpanStart(this)
+        val end = spanned.getSpanEnd(this)
+        val name = spanned.subSequence(start, end)
+        Client.global.users.forEach {
+            val matchName = "@${it.name}#${it.discriminator}"
+            if (matchName == name) {
+                Client.global.eventBus.postEvent(ShowUserProfileEvent(it))
+            }
+        }
     }
 
     override fun updateDrawState(ds: TextPaint) {
         super.updateDrawState(ds)
-
+        ds.isUnderlineText = false
+        ds.setColor(Color.argb(255, 134, 165, 237))
     }
 
 }

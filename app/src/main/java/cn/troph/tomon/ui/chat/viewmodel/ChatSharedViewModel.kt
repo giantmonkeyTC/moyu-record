@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
+    val showUserProfileLD = MutableLiveData<User>()
+
     val botCommandSelectedLD = MutableLiveData<String>()
 
     val stampSendedLiveData = MutableLiveData<StampSendedState>()
@@ -132,6 +134,10 @@ class ChatSharedViewModel : ViewModel() {
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
             messageAtMeLD.value = it
         })
+
+        Client.global.eventBus.observeEventOnUi<ShowUserProfileEvent>().subscribe {
+            showUserProfileLD.value = it.user
+        }
 
         Client.global.eventBus.observeEventOnUi<ChannelUpdateEvent>().subscribe(Consumer {
             channelUpdateLD.value = it
