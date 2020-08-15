@@ -26,6 +26,7 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -36,6 +37,7 @@ import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -89,7 +91,8 @@ const val STAMP_URL_GIF = "https://cdn.tomon.co/stamps/%s.gif"
 class MessageAdapter(
     private val messageList: MutableList<Message>,
     private val reactionSelectorListener: ReactionSelectorListener,
-    private val avatarLongClickListener: OnAvatarLongClickListener
+    private val avatarLongClickListener: OnAvatarLongClickListener,
+    private val replyClickListener: OnReplyClickListener
 ) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
@@ -1290,7 +1293,7 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
-        view.reply_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
+        view.reply_button.visibility = View.GONE
         //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         view.share_button.visibility = View.GONE
 //        view.share_button.visibility =
@@ -1321,7 +1324,8 @@ class MessageAdapter(
         }
 
         view.reply_button.setOnClickListener {
-
+            replyClickListener.onReplyClick(message = messageList[viewHolder.adapterPosition])
+            dialog.dismiss()
         }
 
         view.delete_button.setOnClickListener {
@@ -1376,6 +1380,10 @@ interface OnItemClickListener {
 
 interface OnAvatarLongClickListener {
     fun onAvatarLongClick(identifier: String)
+}
+
+interface OnReplyClickListener {
+    fun onReplyClick(message: Message?)
 }
 
 class TomonTagHandler : SimpleTagHandler() {
