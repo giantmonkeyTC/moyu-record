@@ -46,14 +46,12 @@ import cn.troph.tomon.ui.chat.emoji.EmojiFragment
 import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
 import cn.troph.tomon.ui.chat.emoji.ReactionFragment
 import cn.troph.tomon.ui.chat.mention.MentionListAdapter
-import cn.troph.tomon.ui.chat.messages.MessageAdapter
-import cn.troph.tomon.ui.chat.messages.OnAvatarLongClickListener
-import cn.troph.tomon.ui.chat.messages.OnItemClickListener
-import cn.troph.tomon.ui.chat.messages.ReactionSelectorListener
+import cn.troph.tomon.ui.chat.messages.*
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.NetworkChangeReceiver
+import cn.troph.tomon.ui.states.ReplyEnabled
 import cn.troph.tomon.ui.states.UpdateEnabled
 import coil.Coil
 import coil.request.LoadRequest
@@ -72,6 +70,7 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import kotlinx.android.synthetic.main.fragment_channel_panel.view.*
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
@@ -278,6 +277,10 @@ class ChannelPanelFragment : BaseFragment() {
                 )
 
             }
+        }, object : OnReplyClickListener {
+            override fun onReplyClick(message: Message?) {
+                mChatSharedVM.replyLd.value = ReplyEnabled(flag = true, message = message)
+            }
         })
 
     override fun onCreateView(
@@ -307,8 +310,16 @@ class ChannelPanelFragment : BaseFragment() {
             isUpdateEnabled = it.flag
         })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
+            if (it.flag)
+                bar_reply_message.visibility = View.VISIBLE
+            else
+                bar_reply_message.visibility = View.GONE
+            bar_reply_message.message_reply_to.text = it.message?.content ?: ""
 
         })
+        bar_reply_message.btn_reply_message_cancel.setOnClickListener {
+            mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
+        }
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
