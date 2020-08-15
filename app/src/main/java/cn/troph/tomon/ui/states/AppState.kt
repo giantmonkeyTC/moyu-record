@@ -8,6 +8,8 @@ data class ChannelSelection(val guildId: String? = null, val channelId: String? 
 
 data class UpdateEnabled(val flag: Boolean = false, val message: Message? = null)
 
+data class ReplyEnabled(val flag: Boolean = false, val message: Message? = null)
+
 data class AppUIEvent(val type: AppUIEventType, val value: Any? = null)
 
 

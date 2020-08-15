@@ -10,6 +10,7 @@ import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.states.ReplyEnabled
 import cn.troph.tomon.ui.states.UpdateEnabled
 
 import com.google.gson.annotations.SerializedName
@@ -72,6 +73,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val updateLD = MutableLiveData<UpdateEnabled>()
 
+    val replyLd = MutableLiveData<ReplyEnabled>()
+
     val messageCreateLD: MutableLiveData<MessageCreateEvent> = MutableLiveData()
 
     val reactionAddLD = MutableLiveData<ReactionAddEvent>()
@@ -126,6 +129,7 @@ class ChatSharedViewModel : ViewModel() {
             .subscribe(Consumer {
                 updateLD.value = it
             })
+
 
         Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
             voiceStateUpdateLD.value = it.voiceUpdate
