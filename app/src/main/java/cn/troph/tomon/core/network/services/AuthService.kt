@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.POST
 
 interface AuthService {
@@ -21,6 +22,9 @@ interface AuthService {
         @SerializedName("token")
         val token: String? = null
     )
+
+    @DELETE("users/@me")
+    fun deleteAccount()
 
     @POST("auth/login")
     fun login(
@@ -40,7 +44,7 @@ interface AuthService {
         val password: String?,
         @SerializedName("invite")
         val invite: String?,
-        @SerializedName("force")var force:Boolean=true
+        @SerializedName("force") var force: Boolean = true
     )
 
     @POST("auth/register")
