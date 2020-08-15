@@ -1385,7 +1385,7 @@ class MentionClickableSpan : ClickableSpan() {
         val spanned = tv.text as Spanned
         val start = spanned.getSpanStart(this)
         val end = spanned.getSpanEnd(this)
-        val name = spanned.subSequence(start, end)
+        val name = spanned.substring(start, end)
         Client.global.users.forEach {
             val matchName = "@${it.name}#${it.discriminator}"
             if (matchName == name) {
@@ -1398,6 +1398,7 @@ class MentionClickableSpan : ClickableSpan() {
         super.updateDrawState(ds)
         ds.isUnderlineText = false
         ds.setColor(Color.argb(255, 134, 165, 237))
+        //ds.bgColor = Color.argb(255, 82, 84, 97)
     }
 
 }
