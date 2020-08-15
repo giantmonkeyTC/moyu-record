@@ -1293,7 +1293,7 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
-        view.reply_button.visibility = View.GONE
+        view.reply_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         view.share_button.visibility = View.GONE
 //        view.share_button.visibility =
