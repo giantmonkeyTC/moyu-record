@@ -33,7 +33,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "cn.troph.tomon"
-        minSdkVersion 26
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 5
         versionName "1.0"
