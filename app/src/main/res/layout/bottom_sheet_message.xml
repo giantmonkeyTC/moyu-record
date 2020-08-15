@@ -26,12 +26,12 @@
         android:textColor="@color/white" />
 
     <Button
-        android:id="@+id/quote_button"
+        android:id="@+id/reply_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@color/frameworkSelectorDark"
-        android:text="引用"
+        android:text="回复"
         android:textColor="@color/white" />
 
     <Button

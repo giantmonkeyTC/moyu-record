@@ -306,6 +306,9 @@ class ChannelPanelFragment : BaseFragment() {
             message = it.message
             isUpdateEnabled = it.flag
         })
+        mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
+
+        })
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {

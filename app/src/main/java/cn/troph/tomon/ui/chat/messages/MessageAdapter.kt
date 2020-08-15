@@ -1194,7 +1194,19 @@ class MessageAdapter(
         ) {
             richText(message, itemView)
         } else {
-            markdown?.setMarkdown(itemView.widget_message_text, message.content ?: "")
+            if (Assets.regexReturn.containsMatchIn(message.content ?: "")) {
+                val display = message.content
+                markdown?.setMarkdown(
+                    itemView.widget_message_text,
+                    Assets.regexReturn.replace(display ?: "") {
+                        "<br>"
+                    })
+            } else
+                markdown?.setMarkdown(
+                    itemView.widget_message_text,
+                    message.content ?: ""
+                )
+
         }
 
 
@@ -1278,7 +1290,7 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
-        view.quote_button.visibility = View.GONE
+        view.reply_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         view.share_button.visibility = View.GONE
 //        view.share_button.visibility =
@@ -1306,6 +1318,10 @@ class MessageAdapter(
 
         view.cancel_button.setOnClickListener {
             dialog.dismiss()
+        }
+
+        view.reply_button.setOnClickListener {
+
         }
 
         view.delete_button.setOnClickListener {

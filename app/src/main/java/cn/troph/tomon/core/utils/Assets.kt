@@ -48,6 +48,7 @@ object Assets {
     val regexAtUser: Regex = Regex("""<@[0-9]+>""")
     val regexMention: Regex = Regex("""@[\w\u4e00-\u9fa5]+#[0-9]{4}""")
     val regexLink: Regex = Regex("""https?:\/\/\S+""")
+    val regexReturn:Regex = Regex("""\n""")
     fun contentParser(content: String): ContentSpan {
         val regexRaw = Regex("""\:""")
         val users = mutableListOf<ContentUser>()
