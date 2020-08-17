@@ -25,7 +25,7 @@ android {
             keyPassword 'qwer1234'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 26
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,7 +33,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "cn.troph.tomon"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode 5
         versionName "1.0"
@@ -60,8 +60,8 @@ android {
         }
 
         debug {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
