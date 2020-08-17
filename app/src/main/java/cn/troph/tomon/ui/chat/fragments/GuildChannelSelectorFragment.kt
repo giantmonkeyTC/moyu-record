@@ -41,6 +41,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_guild_channel_selector.*
 
+
 class GuildChannelSelectorFragment : Fragment() {
     private val mHandler = Handler()
     private val mChatSharedViewModel: ChatSharedViewModel by activityViewModels()
