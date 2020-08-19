@@ -25,7 +25,7 @@ android {
             keyPassword 'qwer1234'
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion 29
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,7 +33,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "cn.troph.tomon"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 5
         versionName "1.0"

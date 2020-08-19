@@ -906,6 +906,15 @@ class ChannelPanelFragment : BaseFragment() {
     ): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
+        mChannelId?.let {
+            val channel = Client.global.channels[it]
+            if (channel is TextChannel) {
+                channel.messages.
+                //msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+            } else if (channel is DmChannel) {
+
+            }
+        }
         msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
         msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty(
