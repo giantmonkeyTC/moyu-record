@@ -568,7 +568,10 @@ class ChannelPanelFragment : BaseFragment() {
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
-                    mMsgListAdapter.notifyItemChanged(index)
+                    mMsgList.sortWith(Comparator<Message> { o1, o2 ->
+                        o1.sortKey.compareTo(o2.sortKey)
+                    })
+                    mMsgListAdapter.notifyDataSetChanged()
                 }
             }
         })
@@ -910,13 +913,15 @@ class ChannelPanelFragment : BaseFragment() {
             result = if (channel.lastMessageId == null) {
                 channelId.toLong().plus(1)
             } else {
-                channel.lastMessageId!!.toLong().plus(1)
+                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
+                channel.newMessageCounter.plus(1L)
             }
         } else if (channel is DmChannel) {
             result = if (channel.lastMessageId != null) {
                 channelId.toLong().plus(1)
             } else {
-                channel.lastMessageId!!.toLong().plus(1)
+                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
+                channel.newMessageCounter.plus(1L)
             }
         }
 

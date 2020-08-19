@@ -9,15 +9,19 @@ import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.orhanobut.logger.Logger
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicLong
 
 class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextChannelBase {
 
     var recipientId: String = ""
         private set
+
     override var lastMessageId: String? = null
         private set
+
     override var ackMessageId: String? = null
         private set
+
     override var localAckMessageId: String? = null
         private set
 
@@ -26,11 +30,16 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
     }
 
     override val messages: MessageCollection = MessageCollection(client, this)
+
     override val typings: Collection<LocalDateTime> = Collection()
 
     override val unread get() = getUnread()
+
     override val messageNotifications get() = getMessageNotifications()
+
     override val muted get() = getMuted()
+
+    var newMessageCounter = 1L
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("recipients")) {
@@ -45,6 +54,7 @@ class DmChannel(client: Client, data: JsonObject) : Channel(client, data), TextC
         }
         if (data.has("last_message_id")) {
             lastMessageId = data["last_message_id"].optString
+            newMessageCounter=1L
         }
         if (data.has("ack_message_id")) {
             ackMessageId = data["ack_message_id"].optString
