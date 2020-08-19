@@ -22,6 +22,7 @@
 -keep class cn.troph.tomon.core.actions.*
 -keep class cn.troph.tomon.ui.chat.messages.*
 -keep class cn.troph.tomon.core.structures.*
+
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
@@ -113,4 +114,11 @@
 #glide
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
 -keep class com.bumptech.glide.GeneratedAppGlideModuleImpl
+#aliPlayer SDK
+-keep class com.alivc.**{*;}
+-keep class com.aliyun.**{*;}
+-keep class com.cicada.**{*;}
+-dontwarn com.alivc.**
+-dontwarn com.aliyun.**
+-dontwarn com.cicada.**
 
