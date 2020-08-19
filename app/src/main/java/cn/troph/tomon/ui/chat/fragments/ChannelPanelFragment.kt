@@ -346,11 +346,12 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                s?.let {
-                    if (it.toString().length >= 0 && it.toString().endsWith('/')) {
-                        BotCommandBottomSheet().show(parentFragmentManager, null)
-                    }
-                }
+                //先注释掉，之后再上线bot功能
+//                s?.let {
+//                    if (it.toString().length >= 0 && it.toString().endsWith('/')) {
+//                        BotCommandBottomSheet().show(parentFragmentManager, null)
+//                    }
+//                }
             }
         })
         mChatSharedVM.mentionState.observe(viewLifecycleOwner, Observer {
@@ -556,11 +557,14 @@ class ChannelPanelFragment : BaseFragment() {
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
+                    mMsgList.sortWith(Comparator<Message> { o1, o2 ->
+                        o1.sortKey.compareTo(o2.sortKey)
+                    })
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
                             fetchLink()
                     }
-                    mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                    mMsgListAdapter.notifyDataSetChanged()
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
@@ -899,6 +903,27 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
 
+    fun getNonce(channelId: String): String {
+        var result = 0L
+        val channel = Client.global.channels[channelId]
+        if (channel is TextChannel) {
+            result = if (channel.lastMessageId == null) {
+                channelId.toLong().plus(1)
+            } else {
+                channel.lastMessageId!!.toLong().plus(1)
+            }
+        } else if (channel is DmChannel) {
+            result = if (channel.lastMessageId != null) {
+                channelId.toLong().plus(1)
+            } else {
+                channel.lastMessageId!!.toLong().plus(1)
+            }
+        }
+
+        return result.toString()
+    }
+
+
     fun createEmptyMessageWithAttachment(
         requestCode: Int,
         cacheFile: File,
@@ -906,16 +931,7 @@ class ChannelPanelFragment : BaseFragment() {
     ): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
-        mChannelId?.let {
-            val channel = Client.global.channels[it]
-            if (channel is TextChannel) {
-                channel.messages.
-                //msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
-            } else if (channel is DmChannel) {
-
-            }
-        }
-        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+        msgObject.addProperty("nonce", getNonce(mChannelId!!))
         msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty(
             "timestamp",
@@ -998,7 +1014,7 @@ class ChannelPanelFragment : BaseFragment() {
 
                     val msgObject = JsonObject()
                     msgObject.addProperty("id", "")
-                    msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+                    msgObject.addProperty("nonce", getNonce(mChannelId!!))
                     msgObject.addProperty("channel_id", mChannelId)
                     msgObject.addProperty(
                         "timestamp",
@@ -1216,7 +1232,7 @@ class ChannelPanelFragment : BaseFragment() {
     private fun createEmptyMsg(content: String?): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
-        msgObject.addProperty("nonce", SnowFlakesGenerator(1).nextId())
+        msgObject.addProperty("nonce", getNonce(mChannelId!!))
         msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().minusHours(8).toString())
         msgObject.addProperty("authorId", Client.global.me.id)
