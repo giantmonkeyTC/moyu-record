@@ -69,12 +69,10 @@ class RegisterActivity : AppCompatActivity() {
                 ).show()
         }
         button_register.setOnClickListener {
-
-
-            val username = register_input_user_name.text.toString()
-            val code = register_confirmation_code.text.toString()
-            val invite = register_input_invite_code.text.toString()
-            val unionId = register_input_union_id.text.toString()
+            val username = register_input_user_name.text.toString().trim()
+            val code = register_confirmation_code.text.toString().trim()
+            val invite = register_input_invite_code.text.toString().trim()
+            val unionId = register_input_union_id.text.toString().trim()
             if (!Validator.isUserName(username))
                 GeneralSnackbar.make(
                     GeneralSnackbar.findSuitableParent(button_confirmation)!!,
