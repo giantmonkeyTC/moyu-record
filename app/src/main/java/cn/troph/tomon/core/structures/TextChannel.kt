@@ -41,7 +41,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
 
     override val muted get() = getMuted()
 
-    var newMessageCounter = 1L
+    var newMessageCounter = 0L
 
     init {
         patchSelf(data)
@@ -54,7 +54,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
 
         if (data.has("last_message_id")) {
             lastMessageId = data["last_message_id"].optString
-            newMessageCounter=1L
+            newMessageCounter=0L
         }
 
         if (data.has("ack_message_id")) {

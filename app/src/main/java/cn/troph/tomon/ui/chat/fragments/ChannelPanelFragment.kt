@@ -252,7 +252,7 @@ class ChannelPanelFragment : BaseFragment() {
         }
 
     private var message: Message? = null
-    private val mHeaderMsg = HeaderMessage(Client.global, JsonObject())
+    private lateinit var mHeaderMsg: HeaderMessage
     private var isFetchingMore = false
     private val mMsgList = mutableListOf<Message>()
     private val mMsgListAdapter: MessageAdapter =
@@ -291,6 +291,12 @@ class ChannelPanelFragment : BaseFragment() {
         return inflater.inflate(R.layout.fragment_channel_panel, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val obj = JsonObject()
+        obj.addProperty("id", "0")
+        mHeaderMsg = HeaderMessage(Client.global, obj)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -570,10 +576,7 @@ class ChannelPanelFragment : BaseFragment() {
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
-                    mMsgList.sortWith(Comparator<Message> { o1, o2 ->
-                        o1.sortKey.compareTo(o2.sortKey)
-                    })
-                    mMsgListAdapter.notifyDataSetChanged()
+                    mMsgListAdapter.notifyItemChanged(index)
                 }
             }
         })
@@ -915,15 +918,15 @@ class ChannelPanelFragment : BaseFragment() {
             result = if (channel.lastMessageId == null) {
                 channelId.toLong().plus(1)
             } else {
-                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
                 channel.newMessageCounter.plus(1L)
+                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
             }
         } else if (channel is DmChannel) {
             result = if (channel.lastMessageId != null) {
                 channelId.toLong().plus(1)
             } else {
-                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
                 channel.newMessageCounter.plus(1L)
+                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
             }
         }
 
