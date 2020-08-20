@@ -469,6 +469,8 @@ class ChannelPanelFragment : BaseFragment() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ ->
                         mHandler.postDelayed({
+                            emptyMsg.isSending = false;
+                            mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
                             scrollToBottom()
                         }, 300)
                     }
