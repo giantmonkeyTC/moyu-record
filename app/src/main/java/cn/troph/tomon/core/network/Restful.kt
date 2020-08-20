@@ -18,7 +18,7 @@ class Restful {
                     "debug",
                     true
                 )
-            ) HttpLoggingInterceptor.Level.HEADERS else HttpLoggingInterceptor.Level.NONE
+            ) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         OkHttpClient.Builder().addInterceptor(interceptor).callTimeout(5, TimeUnit.MINUTES).build()
     }
 

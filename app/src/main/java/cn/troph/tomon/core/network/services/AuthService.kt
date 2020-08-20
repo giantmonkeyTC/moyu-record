@@ -43,8 +43,7 @@ interface AuthService {
         @SerializedName("password")
         val password: String?,
         @SerializedName("invite")
-        val invite: String?,
-        @SerializedName("force") var force: Boolean = true
+        val invite: String?
     )
 
     @POST("auth/register")
