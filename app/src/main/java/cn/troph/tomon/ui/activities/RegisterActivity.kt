@@ -93,11 +93,23 @@ class RegisterActivity : AppCompatActivity() {
                     ).show()
                     gotoEntryOption()
                 }, {
-                    GeneralSnackbar.make(
-                        GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                        "注册失败:${it.message}",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    it.message?.let {
+                        if (it.contains("422")) {
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                                "注册失败:邀请码或验证码错误",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            GeneralSnackbar.make(
+                                GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                                "注册失败:未知错误",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    }
+
                 }, {
 
                 })
