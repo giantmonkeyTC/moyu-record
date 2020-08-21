@@ -133,7 +133,10 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
 
     // 排序用的key
     val sortKey get() = id?.snowflake?.aligned ?: nonceSortKey
-    val nonceSortKey get() = "${nonce?.snowflake?.aligned}N"
+    val nonceSortKey get() = when(nonce?.snowflake?.aligned) {
+        null -> ""
+        else -> nonce?.snowflake?.aligned + "N"
+    }
 
     // 唯一确定用的id
     val nonceId get() = getNonceId(nonce ?: "")

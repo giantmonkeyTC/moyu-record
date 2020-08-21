@@ -511,7 +511,7 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgList.addAll(it)
                     if (mMsgList.size == 0) {
                         mHeaderMsg.isEnd = true
-                        mMsgList.add(mHeaderMsg)
+                        mMsgList.add(0, mHeaderMsg)
                     }
                     fetchLink()
                     mMsgListAdapter.notifyDataSetChanged()
@@ -566,7 +566,7 @@ class ChannelPanelFragment : BaseFragment() {
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
                     mMsgList.sortWith(Comparator<Message> { o1, o2 ->
-                        o1.sortKey.compareTo(o2.sortKey)
+                        o1.compareTo(o2)
                     })
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
@@ -827,7 +827,7 @@ class ChannelPanelFragment : BaseFragment() {
             } else {
                 isFetchingMore = false
                 if (mMsgList[0] !is HeaderMessage) {
-                    mMsgList.add(mHeaderMsg)
+                    mMsgList.add(0, mHeaderMsg)
                     mMsgListAdapter.notifyItemInserted(0)
                 }
             }
@@ -918,15 +918,17 @@ class ChannelPanelFragment : BaseFragment() {
             result = if (channel.lastMessageId == null) {
                 channelId.toLong().plus(1)
             } else {
+                val newLastMessageId = channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
                 channel.newMessageCounter.plus(1L)
-                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
+                newLastMessageId
             }
         } else if (channel is DmChannel) {
             result = if (channel.lastMessageId != null) {
                 channelId.toLong().plus(1)
             } else {
+                val newLastMessageId = channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
                 channel.newMessageCounter.plus(1L)
-                channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
+                newLastMessageId
             }
         }
 
