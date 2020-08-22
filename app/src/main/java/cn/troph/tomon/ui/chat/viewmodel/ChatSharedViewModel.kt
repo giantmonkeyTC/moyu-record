@@ -87,6 +87,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val mChannelCreateLD = MutableLiveData<ChannelCreateEvent>()
 
+    val mChannelMemberUpdateLD = MutableLiveData<ChannelMemberUpdateEvent>()
+
     val dmChannelLiveData = MutableLiveData<MutableList<DmChannel>>()
 
     val memberLiveData: MutableLiveData<MutableList<GuildMember>> = MutableLiveData()
@@ -203,6 +205,9 @@ class ChatSharedViewModel : ViewModel() {
                 dmUnReadLiveData.value?.put(it.channel.id, it.channel.unReadCount)
                 dmUnReadLiveData.notifyObserver()
             }
+        })
+        Client.global.eventBus.observeEventOnUi<ChannelMemberUpdateEvent>().subscribe(Consumer {
+            mChannelMemberUpdateLD.value = it
         })
         Client.global.eventBus.observeEventOnUi<PresenceUpdateEvent>().subscribe(Consumer {
             presenceUpdateLV.value = it

@@ -2,15 +2,19 @@ package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
 import android.app.Activity
-import android.content.*
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.*
-import android.provider.DocumentsContract
-import android.provider.MediaStore
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
@@ -38,7 +42,6 @@ import cn.troph.tomon.core.events.LinkParseReadyEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -84,7 +87,6 @@ import org.apache.commons.io.IOUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
-import pl.aprilapps.easyphotopicker.DefaultCallback
 import pl.aprilapps.easyphotopicker.EasyImage
 import pl.aprilapps.easyphotopicker.MediaFile
 import pl.aprilapps.easyphotopicker.MediaSource
@@ -94,6 +96,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 const val FILE_REQUEST_CODE_FILE = 323
 const val LAST_CHANNEL_ID = "last_channel_id"
@@ -194,50 +197,66 @@ class ChannelPanelFragment : BaseFragment() {
                             backgroundView?.visibility = View.INVISIBLE
                         }
                     }
-                    if (channel.members[Client.global.me.id]?.roles?.collection?.none {
-                            it.permissions.has(Permissions.SEND_MESSAGES)
-                        }!! || channel.members[Client.global.me.id]?.roles?.collection?.any {
-                            val po = channel.permissionOverwrites[it.id]
-                            if (po != null)
-                                po.denyPermission(Permissions.SEND_MESSAGES)!!
-                            else false
-                        }!!) {
-                        editText?.let {
-                            it.hint = getString(R.string.ed_msg_hint_no_permisson)
-                            it.isEnabled = false
-                        }
-                        btn_message_menu?.let {
-                            it.visibility = View.GONE
-                            it.isEnabled = false
-                        }
-                        emoji_tv?.let {
-                            it.visibility = View.GONE
-                            it.isEnabled = false
-                        }
-                        btn_message_send?.let {
-                            it.visibility = View.GONE
-                        }
+                    if (channel.members[Client.global.me.id] == null) {
+                        mChatSharedVM.mChannelMemberUpdateLD.observe(viewLifecycleOwner, Observer {
+                            if (channel == it.channel) {
+                                setNoPermissionViewIfNeeded(channel)
+                            }
+                        })
                     } else {
-                        editText?.let {
-                            it.hint = getString(R.string.emoji_et_hint)
-                            editText.isEnabled = true
-                        }
-                        btn_message_menu?.let {
-                            it.visibility = View.VISIBLE
-                            it.isEnabled = true
-                        }
-                        emoji_tv?.let {
-                            it.visibility = View.VISIBLE
-                            it.isEnabled = true
-                        }
-                        btn_message_send?.let {
-                            it.visibility = View.VISIBLE
-                        }
+                        setNoPermissionViewIfNeeded(channel)
                     }
                 }
 
             }
         }
+
+    private fun setNoPermissionViewIfNeeded(channel: TextChannel) {
+        val meCollectionNone = channel.members[Client.global.me.id]?.roles?.collection?.none {
+            it.permissions.has(Permissions.SEND_MESSAGES)
+        }
+
+        val meCollectionAny = channel.members[Client.global.me.id]?.roles?.collection?.any {
+            val po = channel.permissionOverwrites[it.id]
+            if (po != null)
+                po.denyPermission(Permissions.SEND_MESSAGES)!!
+            else false
+        }
+
+        if (meCollectionNone!! || meCollectionAny!!) {
+            editText?.let {
+                it.hint = getString(R.string.ed_msg_hint_no_permisson)
+                it.isEnabled = false
+            }
+            btn_message_menu?.let {
+                it.visibility = View.GONE
+                it.isEnabled = false
+            }
+            emoji_tv?.let {
+                it.visibility = View.GONE
+                it.isEnabled = false
+            }
+            btn_message_send?.let {
+                it.visibility = View.GONE
+            }
+        } else {
+            editText?.let {
+                it.hint = getString(R.string.emoji_et_hint)
+                editText.isEnabled = true
+            }
+            btn_message_menu?.let {
+                it.visibility = View.VISIBLE
+                it.isEnabled = true
+            }
+            emoji_tv?.let {
+                it.visibility = View.VISIBLE
+                it.isEnabled = true
+            }
+            btn_message_send?.let {
+                it.visibility = View.VISIBLE
+            }
+        }
+    }
 
     private var isUpdateEnabled: Boolean = false
         set(value) {
@@ -565,9 +584,6 @@ class ChannelPanelFragment : BaseFragment() {
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
-                    mMsgList.sortWith(Comparator<Message> { o1, o2 ->
-                        o1.compareTo(o2)
-                    })
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
                             fetchLink()
@@ -911,28 +927,10 @@ class ChannelPanelFragment : BaseFragment() {
     }
 
 
-    fun getNonce(channelId: String): String {
-        var result = 0L
-        val channel = Client.global.channels[channelId]
-        if (channel is TextChannel) {
-            result = if (channel.lastMessageId == null) {
-                channelId.toLong().plus(1)
-            } else {
-                val newLastMessageId = channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
-                channel.newMessageCounter.plus(1L)
-                newLastMessageId
-            }
-        } else if (channel is DmChannel) {
-            result = if (channel.lastMessageId != null) {
-                channelId.toLong().plus(1)
-            } else {
-                val newLastMessageId = channel.lastMessageId!!.toLong().plus(channel.newMessageCounter)
-                channel.newMessageCounter.plus(1L)
-                newLastMessageId
-            }
-        }
-
-        return result.toString()
+    fun getNonce(): Long {
+        return SnowFlakesGenerator(
+            Random(System.currentTimeMillis()).nextInt(SnowFlakesGenerator.MAX_MACHINE_ID)
+        ).nextId()
     }
 
 
@@ -943,7 +941,7 @@ class ChannelPanelFragment : BaseFragment() {
     ): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
-        msgObject.addProperty("nonce", getNonce(mChannelId!!))
+        msgObject.addProperty("nonce", getNonce())
         msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty(
             "timestamp",
@@ -1026,7 +1024,7 @@ class ChannelPanelFragment : BaseFragment() {
 
                     val msgObject = JsonObject()
                     msgObject.addProperty("id", "")
-                    msgObject.addProperty("nonce", getNonce(mChannelId!!))
+                    msgObject.addProperty("nonce", getNonce())
                     msgObject.addProperty("channel_id", mChannelId)
                     msgObject.addProperty(
                         "timestamp",
@@ -1244,7 +1242,7 @@ class ChannelPanelFragment : BaseFragment() {
     private fun createEmptyMsg(content: String?): Message {
         val msgObject = JsonObject()
         msgObject.addProperty("id", "")
-        msgObject.addProperty("nonce", getNonce(mChannelId!!))
+        msgObject.addProperty("nonce", getNonce())
         msgObject.addProperty("channel_id", mChannelId)
         msgObject.addProperty("timestamp", LocalDateTime.now().minusHours(8).toString())
         msgObject.addProperty("authorId", Client.global.me.id)
