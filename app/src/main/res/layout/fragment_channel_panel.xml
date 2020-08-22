@@ -22,6 +22,8 @@
         android:id="@+id/view_messages"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/new_msg_padding_bottom"
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
