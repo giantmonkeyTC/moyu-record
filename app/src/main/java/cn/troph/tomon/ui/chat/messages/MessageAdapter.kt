@@ -12,7 +12,6 @@ import android.os.Environment
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.ImageView
@@ -21,34 +20,26 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.text.toSpannable
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
-import cn.troph.tomon.core.events.LinkParseReadyEvent
 import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
-import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
-import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
-import coil.api.load
-import coil.transform.RoundedCornersTransformation
 import com.aliyun.player.AliPlayerFactory
 import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
@@ -543,6 +534,7 @@ class MessageAdapter(
                 } else {
                     holder.itemView.loading_text_header.visibility = View.GONE
                     holder.itemView.animation_view.visibility = View.VISIBLE
+                    Glide.with(holder.itemView.animation_view).load(R.drawable.gif_msglist_loading).into(holder.itemView.animation_view)
                 }
             }
             4 -> {//邀请链接
