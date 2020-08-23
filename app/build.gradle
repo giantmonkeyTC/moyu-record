@@ -19,7 +19,7 @@ repositories {
 android {
     signingConfigs {
         release {
-            storeFile file('/Users/yazhoujiang/Desktop/troph-android/release-key')
+            storeFile file('../release-key')
             storePassword 'qwer1234'
             keyAlias 'release'
             keyPassword 'qwer1234'
