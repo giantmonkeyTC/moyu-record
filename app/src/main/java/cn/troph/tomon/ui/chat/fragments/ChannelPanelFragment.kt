@@ -609,15 +609,22 @@ class ChannelPanelFragment : BaseFragment() {
         //删除消息
         mChatSharedVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {
             if (it.message.channelId == mChannelId) {
-                var removeIndex = 0
+                var removeIndex = -1
                 for ((index, value) in mMsgList.withIndex()) {
                     if (value.id == it.message.id) {
                         removeIndex = index
                         break
                     }
                 }
-                mMsgList.removeAt(removeIndex)
-                mMsgListAdapter.notifyItemRemoved(removeIndex)
+                if (removeIndex > -1) {
+                    mMsgList.removeAt(removeIndex)
+                    mMsgListAdapter.notifyItemRemoved(removeIndex)
+                }
+                if (removeIndex == 1) {
+                    view_messages.post(Runnable {
+                        view_messages.scrollToPosition(0)
+                    })
+                }
             }
         })
 
