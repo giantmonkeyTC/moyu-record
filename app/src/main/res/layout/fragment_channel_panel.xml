@@ -148,27 +148,27 @@
 
             <net.colindodd.toggleimagebutton.ToggleImageButton
                 android:id="@+id/btn_message_menu"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="16dp"
-                android:checked="false"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tib_drawable_off="@drawable/ic_add_circle_black_24dp"
-                app:tib_drawable_on="@drawable/ic_add_circle_black_24dp" />
-
-            <net.colindodd.toggleimagebutton.ToggleImageButton
-                android:id="@+id/emoji_tv"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="16dp"
                 android:checked="false"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/btn_message_menu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tib_drawable_off="@drawable/btn_plus"
+                app:tib_drawable_on="@drawable/btn_plus" />
+
+            <net.colindodd.toggleimagebutton.ToggleImageButton
+                android:id="@+id/emoji_tv"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="16dp"
+                android:checked="false"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_message_send"
                 app:tib_drawable_off="@drawable/ic_emoji_emotions_black_24dp"
                 app:tib_drawable_on="@drawable/ic_keyboard_black_24dp" />
 
@@ -176,27 +176,29 @@
                 android:id="@+id/editText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
-                android:layout_marginEnd="8dp"
-                android:background="@null"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="14dp"
+                android:layout_marginStart="14dp"
+                android:background="@drawable/shape_message_reply"
                 android:hint="@string/emoji_et_hint"
                 android:inputType="textMultiLine"
-                android:paddingStart="16dp"
+                android:paddingStart="12dp"
                 android:textColor="@color/white"
                 android:textColorHint="#6D6D6D"
+                app:layout_constraintEnd_toStartOf="@id/emoji_tv"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_message_send"
-                app:layout_constraintStart_toEndOf="@id/emoji_tv"
+                app:layout_constraintStart_toEndOf="@id/btn_message_menu"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/btn_message_send"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:layout_marginEnd="16dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="14dp"
                 android:layout_marginBottom="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:src="@drawable/ic_send_black_24dp"
+                android:src="@drawable/btn_send"
                 android:tag="@string/send_btn_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
