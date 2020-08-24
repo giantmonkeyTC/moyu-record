@@ -1226,6 +1226,8 @@ class MessageAdapter(
                 }
                 messageList[position].replySource?.let {
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
+                    holder.itemView.message_reply_section.setOnClickListener{
+                    }
                     holder.itemView.source_author_name.text = it.author?.name ?: ""
                     holder.itemView.source_content.text = it.content
 
