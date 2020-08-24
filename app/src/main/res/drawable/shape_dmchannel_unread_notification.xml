@@ -4,6 +4,10 @@
 
     <corners android:radius="90dp" />
 
-    <solid android:color="#4C3A3A" />
+    <solid android:color="@color/notification_dot" />
+
+    <stroke
+        android:width="2dp"
+        android:color="@color/background2" />
 
 </shape>

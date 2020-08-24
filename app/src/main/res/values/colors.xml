@@ -53,4 +53,5 @@
     <color name="speaking">#67D78E</color>
     <color name="system_pink">#FB9CC7</color>
     <color name="mask">#BF000000</color>
+    <color name="notification_dot">#CF5353</color>
 </resources>

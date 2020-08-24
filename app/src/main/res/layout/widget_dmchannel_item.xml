@@ -3,67 +3,61 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="12dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/sel_channel_item_background">
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/dmchannel_user_avatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="14dp"
         android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
-    <ImageView
-        android:id="@+id/offline_dmchannel_user_shadow"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:visibility="gone"
-        android:src="@drawable/shape_offline_shadow"
-        app:layout_constraintStart_toStartOf="@id/dmchannel_user_avatar"
-        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar"/>
-    <ImageView
-        android:id="@+id/dmchannel_user_online"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="26dp"
-        android:background="@drawable/shape_user_online"
-        android:paddingHorizontal="2dp"
-        android:paddingVertical="2dp"
-        app:layout_constraintStart_toStartOf="@id/dmchannel_user_avatar"
-        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar" />
 
     <TextView
         android:id="@+id/text_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/dmchannel_user_avatar"
+        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar"
+        />
+
+    <TextView
+        android:id="@+id/text_user_last_msg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textSize="14sp"
+        android:layout_marginTop="7dp"
         android:layout_marginEnd="16dp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/dm_user_unread_tv"
         app:layout_constraintStart_toEndOf="@+id/dmchannel_user_avatar"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/text_name" />
 
     <TextView
         android:id="@+id/dm_user_unread_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:paddingVertical="3dp"
-        android:paddingHorizontal="5dp"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
         android:background="@drawable/shape_dmchannel_unread_notification"
-        android:textColor="@android:color/holo_red_light"
+        android:gravity="center"
+        android:textColor="@color/primaryText"
+        android:textSize="8sp"
         android:visibility="visible"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/dmchannel_user_avatar"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/dmchannel_user_avatar"
+        app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

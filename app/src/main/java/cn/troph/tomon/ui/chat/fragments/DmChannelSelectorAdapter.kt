@@ -50,19 +50,6 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
                 )
             )
         }
-        if (Client.global.presences[dmChannel.recipientId]?.status == "offline") {
-            itemView.dmchannel_user_online.visibility = View.GONE
-            itemView.offline_dmchannel_user_shadow.visibility = View.VISIBLE
-            itemView.text_name.setTextColor(
-                0 or 0X60FFFFFF.toInt()
-            )
-        } else {
-            itemView.dmchannel_user_online.visibility = View.VISIBLE
-            itemView.offline_dmchannel_user_shadow.visibility = View.GONE
-            itemView.text_name.setTextColor(
-                0 or 0XFFFFFFFF.toInt()
-            )
-        }
         itemView.dmchannel_user_avatar.user = dmChannel.recipient
         itemView.text_name.text = dmChannel.recipient?.name
         itemView.dm_user_unread_tv.visibility =
