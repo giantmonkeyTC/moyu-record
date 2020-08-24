@@ -15,10 +15,7 @@ import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.view.*
 import android.view.animation.AlphaAnimation
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
@@ -544,7 +541,8 @@ class MessageAdapter(
                 } else {
                     holder.itemView.loading_text_header.visibility = View.GONE
                     holder.itemView.animation_view.visibility = View.VISIBLE
-                    Glide.with(holder.itemView.animation_view).load(R.drawable.gif_msglist_loading).into(holder.itemView.animation_view)
+                    Glide.with(holder.itemView.animation_view).load(R.drawable.gif_msglist_loading)
+                        .into(holder.itemView.animation_view)
                 }
             }
             4 -> {//邀请链接
@@ -1449,6 +1447,12 @@ class MessageAdapter(
         val view = layoutInflater.inflate(R.layout.bottom_sheet_message, null)
         val dialog = BottomSheetDialog(viewHolder.itemView.context)
         dialog.setContentView(view)
+        dialog.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+            ?.setBackgroundDrawable(
+                ColorDrawable(
+                    Color.TRANSPARENT
+                )
+            )
         view.reply_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         //view.quote_button.visibility = if (viewType == 0) View.VISIBLE else View.GONE
         view.share_button.visibility = View.GONE
