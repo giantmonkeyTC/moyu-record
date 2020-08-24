@@ -41,6 +41,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.LinkParseReadyEvent
 import cn.troph.tomon.core.events.MessageReadEvent
 import cn.troph.tomon.core.network.NetworkConfigs
+import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.SnowFlakesGenerator
@@ -59,7 +60,9 @@ import cn.troph.tomon.ui.states.UpdateEnabled
 import coil.Coil
 import coil.request.LoadRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -479,7 +482,30 @@ class ChannelPanelFragment : BaseFragment() {
                 mSwitchChannelMap.remove(it)
             }
 
-            if (!AppState.global.updateEnabled.value.flag) {
+            if (mChatSharedVM.replyLd.value?.flag!!) {
+                val emptyMsg = createEmptyMsg(textToSend)
+                mMsgList.add(emptyMsg)
+                mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
+                scrollToBottom()
+                Client.global.rest.messageService.createReplyMessage(
+                    channelId = mChannelId ?: "",
+                    jsonObject =
+                    JsonParser.parseString(
+                        Gson().toJson(
+                            MessageService.replyParams(
+                                nonce = emptyMsg.nonce.toString(),
+                                content = textToSend,
+                                reply = mChatSharedVM.replyLd.value!!.message?.id ?: ""
+                            )
+                        )
+                    ).asJsonObject
+                    ,
+                    token = Client.global.auth
+                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                            _ -> mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
+                    }, { error -> })
+            } else if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
                 val emptyMsg = createEmptyMsg(textToSend)
                 mMsgList.add(emptyMsg)

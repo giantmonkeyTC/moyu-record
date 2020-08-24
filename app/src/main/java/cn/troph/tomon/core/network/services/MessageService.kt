@@ -71,6 +71,19 @@ interface MessageService {
         ) token: String
     ): Observable<JsonObject>
 
+    data class replyParams(
+        @SerializedName("content") val content: String,
+        @SerializedName("nonce") val nonce: String,
+        @SerializedName("reply") val reply: String
+    )
+
+    @POST("channels/{channelId}/messages")
+    fun createReplyMessage(
+        @Path("channelId") channelId: String, @Body jsonObject: JsonObject, @Header(
+            "Authorization"
+        ) token: String
+    ): Observable<JsonObject>
+
     @DELETE("channels/{channelId}/messages/{messageId}")
     fun deleteMessage(
         @Path("channelId") channelId: String, @Path("messageId") messageId: String?, @Header(
