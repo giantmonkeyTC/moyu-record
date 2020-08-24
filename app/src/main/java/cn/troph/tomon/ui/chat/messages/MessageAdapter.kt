@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.SurfaceTexture
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Environment
@@ -1226,13 +1227,13 @@ class MessageAdapter(
                 }
                 messageList[position].replySource?.let {
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
-                    holder.itemView.message_reply_section.setOnClickListener{
+                    holder.itemView.message_reply_section.setOnClickListener {
                     }
                     holder.itemView.source_author_name.text = it.author?.name ?: ""
                     holder.itemView.source_content.text = it.content
 
                     holder.itemView.btn_goto_source.setOnClickListener { view ->
-                        replyClickListener.onSourceClick(it,position)
+                        replyClickListener.onSourceClick(it, position)
                     }
                 }
                 holder.itemView.widget_message_reply.setOnLongClickListener {
@@ -1476,10 +1477,6 @@ class MessageAdapter(
             reactionSelectorListener.OnReactionAddClicked(messageList[viewHolder.adapterPosition])
         }
 
-        view.cancel_button.setOnClickListener {
-            dialog.dismiss()
-        }
-
         view.reply_button.setOnClickListener {
             replyClickListener.onReplyClick(message = messageList[viewHolder.adapterPosition])
             dialog.dismiss()
@@ -1541,7 +1538,7 @@ interface OnAvatarLongClickListener {
 
 interface OnReplyClickListener {
     fun onReplyClick(message: Message?)
-    fun onSourceClick(message: Message?,position: Int)
+    fun onSourceClick(message: Message?, position: Int)
 }
 
 class TomonTagHandler : SimpleTagHandler() {

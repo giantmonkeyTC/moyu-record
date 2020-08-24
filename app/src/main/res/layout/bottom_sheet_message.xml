@@ -3,35 +3,37 @@
     android:id="@+id/bottom_sheet_message"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/frameworkSelectorDark"
+    style="@style/DialogStyle"
+    android:background="@drawable/shape_bottom_sheet"
     android:orientation="vertical">
-
-    <Button
-        android:id="@+id/reaction_message_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
-        android:text="添加反应"
-        android:textColor="@color/white" />
-
-    <Button
-        android:id="@+id/copy_message_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
-        android:text="复制文字"
-
-        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/reply_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
+        android:layout_marginTop="12dp"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_reply"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
         android:text="回复"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/repeat_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_repeat"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
+        android:text="+1"
         android:textColor="@color/white" />
 
     <Button
@@ -39,17 +41,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_edit"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
         android:text="编辑"
         android:textColor="@color/white" />
 
     <Button
-        android:id="@+id/delete_button"
+        android:id="@+id/copy_message_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
-        android:text="删除"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_copy"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
+        android:text="复制文字"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/reaction_message_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_reaction"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
+        android:text="添加反应"
         android:textColor="@color/white" />
 
     <Button
@@ -57,18 +83,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/frameworkSelectorDark"
+        android:background="@color/background3"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
         android:text="分享"
         android:textColor="@color/white" />
 
 
     <Button
-        android:id="@+id/cancel_button"
+        android:id="@+id/delete_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@color/frameworkSelectorDark"
-        android:text="取消"
-        android:textColor="@android:color/white" />
+        android:layout_gravity="center"
+        android:background="@color/background3"
+        android:drawableStart="@drawable/small_icon_delete"
+        android:drawablePadding="35dp"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:paddingStart="27dp"
+        android:text="删除"
+        android:textColor="@color/error" />
 
 </LinearLayout>
