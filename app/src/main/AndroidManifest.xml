@@ -34,7 +34,15 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.SecondActivity"></activity>
+
+        <activity android:name=".ui.activities.ChannelListActivity"
+            android:label="ChannelListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            />
+
+        <activity android:name=".ui.activities.SecondActivity" />
 
         <receiver
             android:name=".ui.states.NetworkChangeReceiver"
@@ -60,6 +68,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

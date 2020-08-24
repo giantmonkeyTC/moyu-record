@@ -90,6 +90,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="guild_list_search_hint">搜索群组名称</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>

@@ -27,10 +27,10 @@ class EntryActivity : BaseActivity() {
 
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
             if (it == true)
-                gotoChat()
+                gotoChannelList()
         })
         if (Client.global.loggedIn) {
-            gotoChat()
+            gotoChannelList()
         } else {
             Client.global
                 .login()
@@ -58,8 +58,8 @@ class EntryActivity : BaseActivity() {
         finish()
     }
 
-    private fun gotoChat() {
-        val intent = Intent(this, ChatActivity::class.java)
+    private fun gotoChannelList() {
+        val intent = Intent(this, ChannelListActivity::class.java)
         startActivity(
             intent,
             ActivityOptions.makeCustomAnimation(

@@ -2,15 +2,10 @@ package cn.troph.tomon.ui.activities
 
 import android.app.ActivityOptions
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.Html
 import android.view.inputmethod.InputMethodManager
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -97,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
         dataPullingViewModel.setUpFetchData()
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
             if (it == true) {
-                gotoChat()
+                gotoChannelList()
             }
         })
 
@@ -157,8 +152,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun gotoChat() {
-        val intent = Intent(this, ChatActivity::class.java)
+    private fun gotoChannelList() {
+        val intent = Intent(this, ChannelListActivity::class.java)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }

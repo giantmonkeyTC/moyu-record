@@ -14,4 +14,18 @@
     <dimen name="body_size">14dp</dimen>
     <dimen name="caption_size">12dp</dimen>
     <dimen name="message_content_margin_start">74dp</dimen>
+
+<!--    Sliding Menu     -->
+    <dimen name="shadow_width">0dp</dimen>
+    <dimen name="slidingmenu_offset">74dp</dimen>
+    <dimen name="guild_list_search_height">30dp</dimen>
+    <dimen name="margin_24dp">24dp</dimen>
+    <dimen name="margin_47dp">47dp</dimen>
+    <dimen name="text_size_guild_list">12dp</dimen>
+    <dimen name="guild_list_search_padding">4dp</dimen>
+    <dimen name="guild_list_search_left_padding">12dp</dimen>
+    <dimen name="margin_32dp">32dp</dimen>
+    <dimen name="join_guild_width">48dp</dimen>
+    <dimen name="join_guild_height">48dp</dimen>
+    <dimen name="margin_12dp">12dp</dimen>
 </resources>
