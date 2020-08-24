@@ -1227,7 +1227,9 @@ class MessageAdapter(
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
                     holder.itemView.source_author_name.text = it.author?.name ?: ""
                     holder.itemView.source_content.text = it.content
-                    holder.itemView.btn_goto_source.setOnClickListener {
+
+                    holder.itemView.btn_goto_source.setOnClickListener { view ->
+                        replyClickListener.onSourceClick(it,position)
                     }
                 }
                 holder.itemView.widget_message_reply.setOnLongClickListener {
@@ -1536,6 +1538,7 @@ interface OnAvatarLongClickListener {
 
 interface OnReplyClickListener {
     fun onReplyClick(message: Message?)
+    fun onSourceClick(message: Message?,position: Int)
 }
 
 class TomonTagHandler : SimpleTagHandler() {

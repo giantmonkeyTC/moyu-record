@@ -303,6 +303,14 @@ class ChannelPanelFragment : BaseFragment() {
             override fun onReplyClick(message: Message?) {
                 mChatSharedVM.replyLd.value = ReplyEnabled(flag = true, message = message)
             }
+            override fun onSourceClick(message: Message?, position: Int) {
+                mMsgList.forEachIndexed { index, mes ->
+                    if (message != null) {
+                        if (message.id == mes.id)
+                            view_messages.scrollToPosition(index)
+                    }
+                }
+            }
         })
 
     override fun onCreateView(
@@ -338,10 +346,14 @@ class ChannelPanelFragment : BaseFragment() {
             isUpdateEnabled = it.flag
         })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
-            if (it.flag)
+            if (it.flag) {
+                it.message?.let { mes ->
+                    editText.setText("@${mes.author?.identifier}")
+                }
                 bar_reply_message.visibility = View.VISIBLE
-            else
+            } else {
                 bar_reply_message.visibility = View.GONE
+            }
             bar_reply_message.message_reply_to.text = it.message?.content ?: ""
 
         })
