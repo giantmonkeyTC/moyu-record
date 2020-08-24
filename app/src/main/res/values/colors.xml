@@ -30,7 +30,7 @@
     <color name="frameworkMember">#292929</color>
     <color name="frameworkToolbar">#343536</color>
     <color name="guildBackground">#37393F</color>
-    <color name="mask0.2">#03000000</color>
+    <color name="mask0.2">#33FFFFFF</color>
     <color name="guildSelectBackground">#5996b8</color>
     <color name="channelCategoryText">#828282</color>
     <color name="channelSelectBackground">#3A3A3A</color>

@@ -538,6 +538,7 @@ class MessageAdapter(
                 }
             }
             4 -> {//邀请链接
+                val message = messageList[position]
                 if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
@@ -616,7 +617,6 @@ class MessageAdapter(
                 }
 
                 messageList[position].content?.let {
-                    holder.itemView.link_tv.text = it
                     Client.global.guilds.fetchInvite(Url.parseInviteCode(it))
                         .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
@@ -649,6 +649,26 @@ class MessageAdapter(
                                 holder.itemView.invite_guild_name.text = "无效邀请"
                                 holder.itemView.joined_cover.visibility = View.GONE
                             })
+                }
+                if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
+                        message.content!!
+                    ))
+                ) {
+                    richText(message, holder.itemView.link_tv)
+                } else {
+                    if (Assets.regexReturn.containsMatchIn(message.content ?: "")) {
+                        val display = message.content
+                        markdown?.setMarkdown(
+                            holder.itemView.link_tv,
+                            Assets.regexReturn.replace(display ?: "") {
+                                "<br>"
+                            })
+                    } else
+                        markdown?.setMarkdown(
+                            holder.itemView.link_tv,
+                            message.content ?: ""
+                        )
+
                 }
                 holder.itemView.message_avatar_invite.user = messageList[position].author
                 holder.itemView.widget_message_author_name_text_invite.text =
@@ -1030,6 +1050,26 @@ class MessageAdapter(
                     callBottomSheet(holder, 2)
                     true
                 }
+                if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
+                        message.content!!
+                    ))
+                ) {
+                    richText(message, holder.itemView.link_text)
+                } else {
+                    if (Assets.regexReturn.containsMatchIn(message.content ?: "")) {
+                        val display = message.content
+                        markdown?.setMarkdown(
+                            holder.itemView.link_text,
+                            Assets.regexReturn.replace(display ?: "") {
+                                "<br>"
+                            })
+                    } else
+                        markdown?.setMarkdown(
+                            holder.itemView.link_text,
+                            message.content ?: ""
+                        )
+
+                }
                 if (message.links.size > 0) {
                     holder.itemView.link_list.visibility = View.VISIBLE
                     holder.itemView.link_list.children.forEach {
@@ -1187,7 +1227,7 @@ class MessageAdapter(
                 message.content!!
             ))
         ) {
-            richText(message, itemView)
+            richText(message, itemView.widget_message_text)
         } else {
             if (Assets.regexReturn.containsMatchIn(message.content ?: "")) {
                 val display = message.content
@@ -1237,7 +1277,7 @@ class MessageAdapter(
 
     private fun richText(
         message: Message,
-        itemView: View
+        itemView: EmojiTextView
     ) {
         val contentSpan = Assets.contentParser(message.content!!)
         var tempMsg = message.content
@@ -1256,7 +1296,11 @@ class MessageAdapter(
                 atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
             )
         }
-        markdown?.setMarkdown(itemView.widget_message_text, tempMsg!!)
+        markdown?.setMarkdown(
+            itemView,
+            Assets.regexReturn.replace(tempMsg ?: "") {
+                "<br>"
+            })
     }
 
     private fun timestampConverter(timestamp: LocalDateTime): String {

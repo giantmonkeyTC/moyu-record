@@ -5,6 +5,7 @@
     android:id="@+id/layout1_link"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
     android:paddingHorizontal="16dp">
 
 
@@ -42,7 +43,7 @@
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_link"
         app:layout_constraintTop_toTopOf="@id/message_avatar_link" />
 
-    <TextView
+    <androidx.emoji.widget.EmojiTextView
         android:id="@+id/link_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

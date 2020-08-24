@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
     android:paddingHorizontal="16dp">
 
 
@@ -40,7 +41,7 @@
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_invite"
         app:layout_constraintTop_toTopOf="@id/message_avatar_invite" />
 
-    <TextView
+    <androidx.emoji.widget.EmojiTextView
         android:id="@+id/link_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
