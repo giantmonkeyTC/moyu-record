@@ -25,6 +25,9 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:maxWidth="150dp"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_link"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_link"
         app:layout_constraintTop_toTopOf="@id/message_avatar_link" />
