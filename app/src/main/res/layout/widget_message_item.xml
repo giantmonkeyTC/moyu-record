@@ -5,16 +5,16 @@
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
-    android:paddingHorizontal="16dp">
+    android:layout_marginBottom="12dp"
+    android:paddingEnd="20dp">
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/message_avatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -48,8 +48,9 @@
     <androidx.emoji.widget.EmojiTextView
         android:id="@+id/widget_message_text"
         android:layout_width="0dp"
+        android:layout_marginTop="4dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="74dp"
         android:textColor="#DDFFFFFF"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
