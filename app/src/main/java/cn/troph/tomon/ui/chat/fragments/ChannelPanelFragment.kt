@@ -354,7 +354,12 @@ class ChannelPanelFragment : BaseFragment() {
             } else {
                 bar_reply_message.visibility = View.GONE
             }
-            bar_reply_message.message_reply_to.text = it.message?.content ?: ""
+            bar_reply_message.message_reply_to.text =
+
+                "${if ((it.message?.author?.name ?: "").length > 6) (it.message?.author?.name?.substring(
+                    0,
+                    6
+                ) ?: "") + "···" else it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
