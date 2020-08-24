@@ -175,8 +175,8 @@
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_height="34dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="14dp"
                 android:layout_marginStart="14dp"
