@@ -167,6 +167,12 @@ class MessageAdapter(
                         .inflate(R.layout.item_message_link, parent, false)
                 )
             }
+            9 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_reply, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -195,7 +201,9 @@ class MessageAdapter(
             }
             return type
 
-        } else if (messageList[position].stamps.size > 0 && messageList[position].type == MessageType.DEFAULT) {
+        } else if (messageList[position].reply != null)
+            return 9
+        else if (messageList[position].stamps.size > 0 && messageList[position].type == MessageType.DEFAULT) {
             return 6
         } else if (messageList[position].type == MessageType.DEFAULT) {
             messageList[position].content?.let {
@@ -1125,6 +1133,114 @@ class MessageAdapter(
                     holder.itemView.link_text.startAnimation(apl)
                 } else {
                     holder.itemView.link_text.clearAnimation()
+                }
+                showReaction(holder, messageList[position])
+                holder.itemView.setOnLongClickListener {
+                    callBottomSheet(holder, 0)
+                    true
+                }
+            }
+            9 -> {
+                val message = messageList[position]
+                val reply = message.reply?.let { it }
+                if (position == 0 || messageList[position - 1].authorId != messageList[position].authorId || messageList[position].timestamp.isAfter(
+                        messageList[position - 1].timestamp.plusMinutes(5)
+                    )
+                ) {
+                    holder.itemView.message_avatar_reply.setOnLongClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                messageList[holder.adapterPosition].author?.let { author ->
+                                    avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
+                                }
+                            }
+                        }
+                        true
+                    }
+                    holder.itemView.message_avatar_reply.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_reply.setOnClickListener {
+                        messageList[holder.adapterPosition].authorId?.let {
+                            if (it != Client.global.me.id) {
+                                val context = holder.itemView.context as AppCompatActivity
+                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            }
+                        }
+                    }
+                    holder.itemView.message_reply_section.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_reply.visibility = View.VISIBLE
+                    holder.itemView.widget_message_timestamp_text_reply.visibility = View.VISIBLE
+                    holder.itemView.message_avatar_reply.user = messageList[position].author
+
+                    holder.itemView.widget_message_author_name_text_reply.text =
+                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    if (Client.global.channels[message.channelId] is TextChannel) {
+                        val member =
+                            (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                                ?: ""]
+                        if (member != null) {
+                            holder.itemView.widget_message_author_name_text_reply.setTextColor(
+                                (if (member.roles.color == null)
+                                    0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
+                            )
+                        }
+                    } else {
+                        holder.itemView.widget_message_author_name_text_reply.setTextColor(
+                            holder.itemView.context.getColor(
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    if (messageList[position].type == MessageType.SYSTEM) {
+                        holder.itemView.widget_message_author_name_text_reply.text = "T🐱"
+                    }
+
+                    holder.itemView.widget_message_timestamp_text_reply.text =
+                        timestampConverter(messageList[position].timestamp)
+                } else {
+                    holder.itemView.message_avatar_reply.visibility = View.GONE
+                    holder.itemView.widget_message_author_name_text_reply.visibility = View.GONE
+                    holder.itemView.widget_message_timestamp_text_reply.visibility = View.GONE
+                }
+
+                if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
+                        message.content!!
+                    ))
+                ) {
+                    richText(message, holder.itemView.widget_message_reply)
+                } else {
+                    if (Assets.regexReturn.containsMatchIn(message.content ?: "")) {
+                        val display = message.content
+                        markdown?.setMarkdown(
+                            holder.itemView.widget_message_reply,
+                            Assets.regexReturn.replace(display ?: "") {
+                                "<br>"
+                            })
+                    } else
+                        markdown?.setMarkdown(
+                            holder.itemView.widget_message_reply,
+                            message.content ?: ""
+                        )
+
+                }
+                messageList[position].replySource?.let {
+                    holder.itemView.message_reply_section.visibility = View.VISIBLE
+                    holder.itemView.source_author_name.text = it.author?.name ?: ""
+                    holder.itemView.source_content.text = it.content
+                    holder.itemView.btn_goto_source.setOnClickListener {
+                    }
+                }
+                holder.itemView.widget_message_reply.setOnLongClickListener {
+                    callBottomSheet(holder, 2)
+                    true
+                }
+                if (messageList[position].isSending) {
+                    val apl = AlphaAnimation(0.1f, 0.78f)
+                    apl.duration = 1000
+                    apl.repeatCount = -1
+                    holder.itemView.widget_message_reply.startAnimation(apl)
+                } else {
+                    holder.itemView.widget_message_reply.clearAnimation()
                 }
                 showReaction(holder, messageList[position])
                 holder.itemView.setOnLongClickListener {

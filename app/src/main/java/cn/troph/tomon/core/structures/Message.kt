@@ -50,6 +50,7 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         private set
     var mentions: Collection<User> = Collection()
         private set
+    var reply: Reply? = null
 
     val reactions: MessageReactionCollection = MessageReactionCollection(client, this)
 
@@ -124,6 +125,10 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
                 Gson().fromJson(data.get("stamps"), Array<Stamp>::class.java).toMutableList()
             )
         }
+        if (data.has("reply")) {
+            reply = null
+            reply = Gson().fromJson(data.get("reply"), Reply::class.java)
+        }
     }
 
     override fun patch(data: JsonObject) {
@@ -137,6 +142,12 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         null -> ""
         else -> nonce?.snowflake?.aligned + "N"
     }
+
+    val replySource
+        get() =
+            reply?.let {
+                (channel as TextChannel).messages[it.id]
+            }
 
     // 唯一确定用的id
     val nonceId get() = getNonceId(nonce ?: "")
@@ -201,13 +212,19 @@ data class Stamp(
 )
 
 data class Link(
-    @SerializedName("messageId") val messageId: String,
+    @SerializedName("message_id") val messageId: String,
     @SerializedName("title") val title: String?,
     @SerializedName("content") val content: String?,
     @SerializedName("url") val url: String?,
     @SerializedName("img") val img: String?,
     @SerializedName("position") val position: Int,
-    @SerializedName("code") val code:Int
+    @SerializedName("code") val code: Int
+)
+
+data class Reply(
+    @SerializedName("id") val id: String,
+    @SerializedName("channel_id") val channelId: String,
+    @SerializedName("author") val author: User
 )
 
 class HeaderMessage(
