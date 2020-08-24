@@ -47,6 +47,7 @@
     <androidx.emoji.widget.EmojiTextView
         android:id="@+id/widget_message_reply"
         android:layout_width="0dp"
+        app:layout_goneMarginTop="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/message_content_margin_start"
         android:layout_marginTop="@dimen/message_item_content_margin_top"

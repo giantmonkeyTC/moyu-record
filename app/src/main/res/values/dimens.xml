@@ -6,7 +6,7 @@
     <dimen name="message_item_avatar_margin_top">12dp</dimen>
     <dimen name="message_item_author_name_margin_start">16dp</dimen>
     <dimen name="message_item_timestamp_margin_start">8dp</dimen>
-    <dimen name="message_item_content_margin_top">6dp</dimen>
+    <dimen name="message_item_content_margin_top">10dp</dimen>
     <dimen name="message_item_padding_end">20dp</dimen>
     <dimen name="message_item_margin_bottom">8dp</dimen>
     <dimen name="message_item_avatar_width">46dp</dimen>
