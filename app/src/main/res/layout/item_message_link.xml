@@ -5,18 +5,17 @@
     android:id="@+id/layout1_link"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:paddingEnd="20dp"
+    android:layout_marginBottom="@dimen/message_item_margin_bottom"
+    android:paddingEnd="@dimen/message_item_padding_end"
     >
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/message_avatar_link"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="@dimen/message_item_avatar_width"
+        android:layout_height="@dimen/message_item_avatar_height"
+        android:layout_marginStart="@dimen/message_item_avatar_margin_start"
+        android:layout_marginTop="@dimen/message_item_avatar_margin_top"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_link"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,11 +25,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:textSize="@dimen/body_size"
         android:maxLines="1"
+        android:layout_marginStart="@dimen/message_item_author_name_margin_start"
         android:ellipsize="end"
         android:maxWidth="150dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_link"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_link"
         app:layout_constraintTop_toTopOf="@id/message_avatar_link" />
@@ -39,21 +39,21 @@
         android:id="@+id/widget_message_timestamp_text_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/message_item_timestamp_margin_start"
         android:textColor="@color/channelCategoryText"
-        android:textSize="15sp"
+        android:textSize="@dimen/caption_size"
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_link"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_link" />
+        app:layout_constraintBottom_toBottomOf="@id/widget_message_author_name_text_link" />
 
     <androidx.emoji.widget.EmojiTextView
         android:id="@+id/link_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="74dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="@dimen/message_content_margin_start"
+        android:layout_marginTop="@dimen/message_item_content_margin_top"
         android:textColor="#DDFFFFFF"
         android:textColorLink="@android:color/holo_blue_dark"
-        android:textSize="16sp"
+        android:textSize="@dimen/body_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_link" />
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        android:layout_marginStart="74dp"
+        android:layout_marginStart="@dimen/message_content_margin_start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/link_text">
@@ -320,7 +320,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/link_list"
         app:layout_constraintStart_toStartOf="@id/link_list"

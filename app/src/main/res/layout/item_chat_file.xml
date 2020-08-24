@@ -5,16 +5,16 @@
     android:id="@+id/layout1_file"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingEnd="20dp"
-    android:layout_marginBottom="12dp">
+    android:paddingEnd="@dimen/message_item_padding_end"
+    android:layout_marginBottom="@dimen/message_item_margin_bottom">
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/message_avatar_file"
-        android:layout_width="46dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="@dimen/message_item_avatar_width"
+        android:layout_height="@dimen/message_item_avatar_height"
+        android:layout_marginStart="@dimen/message_item_avatar_margin_start"
+        android:layout_marginTop="@dimen/message_item_avatar_margin_top"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_file"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,12 +23,12 @@
         android:id="@+id/widget_message_author_name_text_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/message_item_author_name_margin_start"
         android:ellipsize="end"
         android:maxWidth="150dp"
         android:maxLines="1"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="@dimen/body_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_file"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_file"
@@ -38,23 +38,24 @@
         android:id="@+id/widget_message_timestamp_text_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/message_item_timestamp_margin_start"
         android:textColor="@color/channelCategoryText"
-        android:textSize="15sp"
+        android:textSize="@dimen/caption_size"
         app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_file"
-        app:layout_constraintTop_toTopOf="@id/message_avatar_file" />
+        app:layout_constraintTop_toTopOf="@id/message_avatar_file"
+        app:layout_constraintBottom_toBottomOf="@id/widget_message_author_name_text_file"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_file_section"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="4dp"
-        android:layout_marginStart="74dp"
+        android:layout_marginTop="@dimen/message_item_content_margin_top"
+        android:layout_marginStart="@dimen/message_content_margin_start"
         android:background="@drawable/shape_message_file"
         android:paddingVertical="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_file">
+        app:layout_constraintTop_toBottomOf="@id/widget_message_author_name_text_file">
 
         <ImageView
             android:id="@+id/imageView"
@@ -110,7 +111,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/message_file_section"
         app:layout_constraintStart_toStartOf="@id/message_file_section"

@@ -1103,8 +1103,9 @@ class MessageAdapter(
                                 holder.itemView.context.startActivity(i)
                             }
                         } else {
-                            val consl = LayoutInflater.from(holder.itemView.context)
+                            val consl1 = LayoutInflater.from(holder.itemView.context)
                                 .inflate(R.layout.message_link_section, null) as ConstraintLayout
+                            val consl = consl1.getChildAt(0) as ConstraintLayout
                             val preImg = consl.getChildAt(0) as ImageView
                             val title = consl.getChildAt(1) as TextView
                             val jumpBtn = consl.getChildAt(2) as ImageView
@@ -1117,9 +1118,8 @@ class MessageAdapter(
                                 i.setData(Uri.parse(url))
                                 holder.itemView.context.startActivity(i)
                             }
-                            holder.itemView.link_list.addView(consl)
+                            holder.itemView.link_list.addView(consl1)
                         }
-
 
                     }
                 } else
@@ -1229,9 +1229,7 @@ class MessageAdapter(
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
                     holder.itemView.message_reply_section.setOnClickListener {
                     }
-                    holder.itemView.source_author_name.text = it.author?.name ?: ""
-                    holder.itemView.source_content.text = it.content
-
+                    holder.itemView.source_content.text = "${it.author?.name ?: ""}:${it.content}"
                     holder.itemView.btn_goto_source.setOnClickListener { view ->
                         replyClickListener.onSourceClick(it, position)
                     }
