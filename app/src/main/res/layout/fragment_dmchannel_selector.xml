@@ -11,17 +11,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_channel_header"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/shape_drawer"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/view_dmchannels_list">
 
         <TextView
             android:id="@+id/text_channel_header_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="12dp"
             android:layout_marginEnd="30dp"
             android:textColor="@color/white"
             android:textSize="24sp"

@@ -482,7 +482,10 @@ class ChannelPanelFragment : BaseFragment() {
                 mSwitchChannelMap.remove(it)
             }
 
-            if (mChatSharedVM.replyLd.value?.flag!!) {
+            if (
+                if (mChatSharedVM.replyLd.value != null)
+                    mChatSharedVM.replyLd.value!!.flag else false
+            ) {
                 val emptyMsg = createEmptyMsg(textToSend)
                 mMsgList.add(emptyMsg)
                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)

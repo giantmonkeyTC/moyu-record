@@ -21,8 +21,9 @@
     <color name="actionBarText">#FFFFFF</color>
     <color name="brand">#423981</color>
     <color name="white">#FFFFFF</color>
+    <color name="whiteAlpha87">#E0FFFFFF</color>
     <color name="whiteAlpha70">#B3FFFFFF</color>
-    <color name="whiteAlpha50">#20FFFFFF</color>
+    <color name="whiteAlpha50">#80FFFFFF</color>
     <color name="frameworkSelectorDark">#202020</color>
     <color name="frameworkSelector">#292929</color>
     <color name="frameworkPanel">#3A3A3A</color>

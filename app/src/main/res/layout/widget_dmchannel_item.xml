@@ -8,11 +8,11 @@
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/dmchannel_user_avatar"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="24dp"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="10dp"
         android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,23 +26,38 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/last_message_time"
         app:layout_constraintStart_toEndOf="@+id/dmchannel_user_avatar"
         app:layout_constraintTop_toTopOf="@id/dmchannel_user_avatar"
         />
+
+    <TextView
+        android:id="@+id/last_message_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:textColor="@color/whiteAlpha50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_user_last_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:textSize="14sp"
-        android:layout_marginTop="7dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/white"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/whiteAlpha50"
+        android:textSize="14sp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/dm_user_unread_tv"
+        app:layout_constraintEnd_toEndOf="@id/text_name"
         app:layout_constraintStart_toEndOf="@+id/dmchannel_user_avatar"
         app:layout_constraintTop_toBottomOf="@id/text_name" />
 
