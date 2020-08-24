@@ -66,6 +66,7 @@ import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_message_link.view.*
+import kotlinx.android.synthetic.main.item_message_reply.view.*
 import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
