@@ -2,12 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background3">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/info_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundMask"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -51,4 +53,131 @@
             app:layout_constraintTop_toBottomOf="@id/me_name"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/setting_section1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/shape_settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/info_section">
+
+        <ImageView
+            android:id="@+id/me_status_goto"
+            android:layout_width="7dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/setting_goto"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/me_mention_me_goto"
+            android:layout_width="7dp"
+            android:layout_height="12dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="17dp"
+            android:src="@drawable/setting_goto"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/me_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="13dp"
+            android:text="@string/status"
+            android:textColor="@color/primaryText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/status_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginEnd="17dp"
+            android:textColor="@color/primaryText"
+            app:layout_constraintEnd_toStartOf="@id/me_status_goto"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/mention_me_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="17dp"
+            android:textColor="@color/primaryText"
+            app:layout_constraintEnd_toStartOf="@id/me_mention_me_goto"
+            app:layout_constraintTop_toBottomOf="@id/me_status" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="13dp"
+            android:text="@string/mentionMe"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/me_status"
+            app:layout_constraintTop_toBottomOf="@id/me_status" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/setting_section2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/shape_settings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_section1">
+
+        <ImageView
+            android:id="@+id/me_setting_goto"
+            android:layout_width="7dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/setting_goto"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/system_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
+            android:text="@string/setting"
+            android:textColor="@color/primaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:layout_width="0dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/profile_logout"
+        android:background="@drawable/shape_settings"
+        android:layout_height="wrap_content"
+        android:textColor="@color/error"
+        android:paddingTop="13dp"
+        android:paddingBottom="13dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/setting_section2"
+        app:layout_constraintStart_toStartOf="@id/setting_section2"
+        app:layout_constraintEnd_toEndOf="@id/setting_section2"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
