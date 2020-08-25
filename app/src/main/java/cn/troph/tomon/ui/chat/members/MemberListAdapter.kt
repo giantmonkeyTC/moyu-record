@@ -62,8 +62,7 @@ class MemberListAdapter<T>(
     private fun bind(itemView: View, member: T) {
         if (member is GuildMember) {
             itemView.setOnClickListener {
-                if (member.id != Client.global.me.id)
-                    callMemberDetail(parent = itemView as ViewGroup, member = member)
+                callMemberDetail(parent = itemView as ViewGroup, member = member)
             }
             itemView.member_avatar.user = member.user
             itemView.widget_member_name_text.text = member.displayName

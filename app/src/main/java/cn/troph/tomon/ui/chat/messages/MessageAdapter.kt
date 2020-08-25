@@ -242,14 +242,13 @@ class MessageAdapter(
                 val msg = messageList[position]
                 holder.itemView.message_avatar.setOnClickListener {
                     messageList[holder.adapterPosition].authorId?.let {
-                        if (it != Client.global.me.id) {
-                            val context = holder.itemView.context as AppCompatActivity
-                            val guildUserInfoFragment = GuildUserInfoFragment(it)
-                            guildUserInfoFragment.show(
-                                context.supportFragmentManager,
-                                guildUserInfoFragment.tag
-                            )
-                        }
+                        val context = holder.itemView.context as AppCompatActivity
+                        val guildUserInfoFragment = GuildUserInfoFragment(it)
+                        guildUserInfoFragment.show(
+                            context.supportFragmentManager,
+                            guildUserInfoFragment.tag
+                        )
+
                     }
                 }
 
@@ -259,9 +258,10 @@ class MessageAdapter(
                             messageList[holder.adapterPosition].author?.let { author ->
                                 avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                             }
+                            true
                         }
                     }
-                    true
+                    false
                 }
 
                 holder.itemView.setOnLongClickListener {
@@ -290,21 +290,20 @@ class MessageAdapter(
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
+                            if (it != Client.global.me.id)
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
-                            }
                         }
                         true
                     }
@@ -415,10 +414,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
@@ -564,10 +563,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
@@ -701,10 +700,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.message_avatar_stamp.setOnLongClickListener {
@@ -808,10 +807,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_video.visibility = View.VISIBLE
@@ -893,6 +892,7 @@ class MessageAdapter(
                             }
                         }
                     }
+
                     var status = 0
                     val vidPlayer =
                         AliPlayerFactory.createAliPlayer(holder.itemView.context).apply {
@@ -1013,10 +1013,11 @@ class MessageAdapter(
                     holder.itemView.message_avatar_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_link.visibility = View.VISIBLE
@@ -1160,10 +1161,10 @@ class MessageAdapter(
                     holder.itemView.message_avatar_reply.visibility = View.VISIBLE
                     holder.itemView.message_avatar_reply.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.message_reply_section.visibility = View.GONE
