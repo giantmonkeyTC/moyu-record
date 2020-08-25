@@ -55,6 +55,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         private set
     var reply: Reply? = null
 
+    var editedTimestamp: LocalDateTime = LocalDateTime.now()
+
     val reactions: MessageReactionCollection = MessageReactionCollection(client, this)
 
     val stamps = mutableListOf<Stamp>()
@@ -88,6 +90,9 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         }
         if (data.has("nonce")) {
             nonce = data["nonce"].optString
+        }
+        if (data.has("edited_timestamp")) {
+            timestamp = Converter.toDate(data["edited_timestamp"].asString)
         }
         if (data.has("attachments")) {
             attachments = Collection()

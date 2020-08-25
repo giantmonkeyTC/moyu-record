@@ -248,7 +248,6 @@ class MessageAdapter(
                             context.supportFragmentManager,
                             guildUserInfoFragment.tag
                         )
-
                     }
                 }
 
