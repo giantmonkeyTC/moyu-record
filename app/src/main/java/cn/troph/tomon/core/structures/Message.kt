@@ -10,7 +10,10 @@ import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.core.utils.snowflake
 import cn.troph.tomon.ui.chat.fragments.Invite
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -138,10 +141,11 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
 
     // 排序用的key
     val sortKey get() = id?.snowflake?.aligned ?: nonceSortKey
-    val nonceSortKey get() = when(nonce?.snowflake?.aligned) {
-        null -> ""
-        else -> nonce?.snowflake?.aligned + "N"
-    }
+    val nonceSortKey
+        get() = when (nonce?.snowflake?.aligned) {
+            null -> ""
+            else -> nonce?.snowflake?.aligned + "N"
+        }
 
     val replySource
         get() =
