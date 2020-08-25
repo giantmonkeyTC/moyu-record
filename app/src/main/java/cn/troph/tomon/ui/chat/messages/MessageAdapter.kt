@@ -870,28 +870,27 @@ class MessageAdapter(
                     val videoPreview = holder.itemView.video_preview
                     holder.itemView.video_card.updateLayoutParams {
                         item.width?.let {
-                            this.width = item.width!!
-                            this.height = item.height!!
+                            this.width = (item.width!! * 0.5).toInt()
+                            this.height = (item.height!! * 0.5).toInt()
+                        }
+                    }
+                    holder.itemView.video_player.updateLayoutParams {
+                        item.width?.let {
+                            this.width = (item.width!! * 0.5).toInt()
+                            this.height = (item.height!! * 0.5).toInt()
                         }
                     }
                     videoPreview.updateLayoutParams {
                         item.width?.let {
                             this.width =
-                                item.width!!
+                                (item.width!! * 0.5).toInt()
                             this.height =
-                                item.height!!
+                                (item.height!! * 0.5).toInt()
                             if (item.width!! > item.height!!) {
                                 videoPreview.setImageResource(R.drawable.sixty_nine_horizontal)
                             } else {
                                 videoPreview.setImageResource(R.drawable.sixty_nine_vertical)
                             }
-                        }
-                    }
-
-                    holder.itemView.video_player.updateLayoutParams {
-                        item.width?.let {
-                            this.width = item.width!!
-                            this.height = item.height!!
                         }
                     }
                     var status = 0
@@ -908,6 +907,7 @@ class MessageAdapter(
                                 status = it
                             }
                         }
+
 
                     holder.itemView.play_status.setOnClickListener {
                         if (status == 4) {
