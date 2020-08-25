@@ -14,4 +14,5 @@
     <dimen name="body_size">14dp</dimen>
     <dimen name="caption_size">12dp</dimen>
     <dimen name="message_content_margin_start">74dp</dimen>
+    <dimen name="message_edittext_padding_vertical">6dp</dimen>
 </resources>

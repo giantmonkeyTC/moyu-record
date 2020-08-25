@@ -247,6 +247,9 @@ class ChatSharedViewModel : ViewModel() {
                     messageLoadingLiveData.value = false
                     messageLiveData.value = it.toMutableList()
                 }, {
+                    Logger.d(it.message)
+                    Logger.d(it.cause)
+                    Logger.d(it.stackTrace)
                     messageLoadingLiveData.value = false
                 })
     }

@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -22,6 +23,8 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
@@ -303,6 +306,7 @@ class ChannelPanelFragment : BaseFragment() {
             override fun onReplyClick(message: Message?) {
                 mChatSharedVM.replyLd.value = ReplyEnabled(flag = true, message = message)
             }
+
             override fun onSourceClick(message: Message?, position: Int) {
                 mMsgList.forEachIndexed { index, mes ->
                     if (message != null) {
@@ -369,7 +373,7 @@ class ChannelPanelFragment : BaseFragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
                     mChannelId?.let {
-                        if (Client.global.channels[it] is TextChannel)
+                        if (Client.global.channels[it] is TextChannel) {
                             if (s.isNotEmpty() && start < s.length)
                                 mChatSharedVM.mentionState.value =
                                     ChatSharedViewModel.MentionState(
@@ -382,12 +386,37 @@ class ChannelPanelFragment : BaseFragment() {
                                         state = false,
                                         start = start
                                     )
+                            if (s.isEmpty() && start >= 0) {
+                                val params = editText.layoutParams
+                                val animOut = ValueAnimator()
+                                animOut.setIntValues(300, 900)
+                                animOut.setInterpolator(LinearInterpolator())
+                                animOut.duration = 1000
+                                animOut.addUpdateListener { it ->
+                                    params.width = it.animatedValue as Int
+                                }
+                                animOut.start()
+                            }
+                        }
+
                     }
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                if (s != null) {
+                    if (s.isEmpty() && start >= 0) {
+                        val params = editText.layoutParams
+                        val animOut = ValueAnimator()
+                        animOut.setIntValues(900, 300)
+                        animOut.setInterpolator(LinearInterpolator())
+                        animOut.duration = 1000
+                        animOut.addUpdateListener { it ->
+                            params.width = it.animatedValue as Int
+                        }
+                        animOut.start()
+                    }
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -522,8 +551,8 @@ class ChannelPanelFragment : BaseFragment() {
                     ,
                     token = Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                            _ -> mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
+                    .subscribe({ _ ->
+                        mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
                     }, { error -> })
             } else if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
