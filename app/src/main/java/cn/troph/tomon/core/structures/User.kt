@@ -4,29 +4,45 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.ChannelService
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 open class User(client: Client, data: JsonObject) : Base(client, data) {
+    @Expose
     var id: String = ""
         protected set
+
+    @Expose
     var username: String = ""
         protected set
+
+    @Expose
     var discriminator: String = ""
         protected set
+
+    @Expose
     var name: String = ""
         protected set
+
+    @Expose
     var avatar: String? = null
         protected set
+
+    @Expose
     var avatarURL: String? = null
         protected set
 
+    @Expose
     var isSpeaking = false
 
+    @Expose
     var isSelfMute = false
 
+    @Expose
     var isSelfDeaf = false
 
+    @Expose
     var type = 0
 
     init {
@@ -37,7 +53,7 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         if (data.has("id")) {
             id = data["id"].asString
         }
-        if(data.has("type")){
+        if (data.has("type")) {
             type = data["type"].asInt
         }
         if (data.has("username")) {
