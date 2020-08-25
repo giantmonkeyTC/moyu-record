@@ -226,8 +226,11 @@ data class Link(
 )
 
 data class Reply(
+    @Expose
     @SerializedName("id") val id: String,
+    @Expose
     @SerializedName("channel_id") val channelId: String,
+    @Expose
     @SerializedName("author") val author: User
 )
 
