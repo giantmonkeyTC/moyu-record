@@ -130,7 +130,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         }
         if (data.has("reply")) {
             reply = null
-            reply = Gson().fromJson(data.get("reply"), Reply::class.java)
+            reply = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
+                .fromJson(data.get("reply"), Reply::class.java)
         }
     }
 
