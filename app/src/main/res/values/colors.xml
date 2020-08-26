@@ -65,4 +65,7 @@
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_50">#80ffffff</color>
     <color name="black_50">#80000000</color>
+    <color name="alert_dot">#FF7A6B</color>
+    <color name="no_icon_url_avatar">#4D4D4D</color>
+    <color name="text_color_white">#ffffff</color>
 </resources>

@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 
@@ -15,6 +16,12 @@ import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.Client;
+import cn.troph.tomon.core.events.Event;
+import cn.troph.tomon.core.events.MessageAtMeEvent;
+import cn.troph.tomon.core.events.MessageCreateEvent;
+import cn.troph.tomon.core.events.MessageDeleteEvent;
+import cn.troph.tomon.core.events.MessageReadEvent;
+import cn.troph.tomon.core.events.MessageUpdateEvent;
 import cn.troph.tomon.core.structures.Channel;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.StampPack;
@@ -28,13 +35,16 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ChannelListActivity extends BaseActivity {
 
+    public static final String NO_GUILD_ID = "";
+
+    private static final String SP_NAME_CHANNEL_LIST_CONFIG = "channel_list_config";
+    private static final String SP_KEY_GUILD_ID = "guild_id";
     private Channel mCurrentChannel;
     private ChatSharedViewModel mChatVM;
     private RecyclerView mGuildListRecyclerView;
     private GuildListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TomonDrawerLayout mDrawerLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +53,12 @@ public class ChannelListActivity extends BaseActivity {
         initViewModel();
         initGuildList();
         initGuildEmoji();
+    }
+
+    private String getLastGuildId() {
+        SharedPreferences spChannelListConfig = getSharedPreferences(
+                SP_NAME_CHANNEL_LIST_CONFIG, MODE_PRIVATE);
+        return spChannelListConfig.getString(SP_KEY_GUILD_ID, NO_GUILD_ID);
     }
 
     private void initViewModel() {
@@ -78,13 +94,118 @@ public class ChannelListActivity extends BaseActivity {
             public void onChanged(List<Guild> guilds) {
                 if (mAdapter == null) {
                     mAdapter = new GuildListAdapter(guilds);
+                    mAdapter.setCurrentGuildId(getLastGuildId());
                     mGuildListRecyclerView.setAdapter(mAdapter);
                 } else {
                     mAdapter.setDataAndNotifyChanged(guilds);
                 }
             }
         });
+        mChatVM.getMessageCreateLD().observe(this, new Observer<MessageCreateEvent>() {
+            @Override
+            public void onChanged(MessageCreateEvent msgCreateEv) {
+                if (mAdapter == null) {
+                    return;
+                }
+                List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
+                Guild msgFromGuild = msgCreateEv.getMessage().getGuild();
+                if (guildList.contains(msgFromGuild)) {
+                    if (
+                            msgFromGuild.updateUnread()
+                            &&
+                            !msgCreateEv.getMessage().getAuthorId().equals(getMyId())
+                    ) {
+                        mAdapter.notifyItemChanged(guildList.indexOf(msgFromGuild));
+                    }
+                }
+            }
+        });
+
+        mChatVM.getMessageReadLD().observe(this, new Observer<MessageReadEvent>() {
+            @Override
+            public void onChanged(MessageReadEvent msgReadEv) {
+                if (mAdapter == null) {
+                    return;
+                }
+                List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
+                Guild msgFromRead = msgReadEv.getMessage().getGuild();
+                if (guildList.contains(msgFromRead)) {
+                    if (!msgFromRead.updateUnread() || msgFromRead.updateMention()){
+                        mAdapter.notifyItemChanged(guildList.indexOf(msgFromRead));
+                    }
+                }
+            }
+        });
+
+        mChatVM.getMessageAtMeLD().observe(this, new Observer<MessageAtMeEvent>() {
+            @Override
+            public void onChanged(MessageAtMeEvent msgAtMeEv) {
+                if (mAdapter == null) {
+                    return;
+                }
+                Guild guildFromAtMe = msgAtMeEv.getMessage().getGuild();
+                List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
+                if (guildList.contains(guildFromAtMe)) {
+                    if (guildFromAtMe.updateMention()) {
+                        mAdapter.notifyItemChanged(guildList.indexOf(guildFromAtMe));
+                    }
+                }
+            }
+        });
+
+        mChatVM.getMessageDeleteLD().observe(this, new Observer<MessageDeleteEvent>() {
+            @Override
+            public void onChanged(MessageDeleteEvent msgDeleteEv) {
+                if (mAdapter == null) {
+                    return;
+                }
+                Guild guildFromAtMe = msgDeleteEv.getMessage().getGuild();
+                List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
+                if (guildList.contains(guildFromAtMe)) {
+                    if (guildFromAtMe.updateUnread()) {
+                        mAdapter.notifyItemChanged(guildList.indexOf(guildFromAtMe));
+                    }
+                }
+            }
+        });
+
+        mChatVM.getMessageUpdateLD().observe(this, new Observer<MessageUpdateEvent>() {
+            @Override
+            public void onChanged(MessageUpdateEvent msgUpdateEv) {
+                if (mAdapter == null) {
+                    return;
+                }
+                Guild guildFromUpdate = msgUpdateEv.getMessage().getGuild();
+                List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
+                if (guildList.contains(guildFromUpdate)) {
+                    if (guildFromUpdate.updateMention()) {
+                        mAdapter.notifyItemChanged(guildList.indexOf(guildFromUpdate));
+                    }
+                }
+            }
+        });
+
+/**
+ * mChatVM.guildPositionLD.observe(viewLifecycleOwner, Observer {
+ *             val rearrangedGuildList = mutableListOf<Guild>()
+ *             for (item in it.guilds) {
+ *                 val newGuild = mGuildList.find {
+ *                     it.id == item.id
+ *                 }
+ *                 newGuild?.let {
+ *                     rearrangedGuildList.add(item.position, it)
+ *                 }
+ *             }
+ *             mGuildList.clear()
+ *             mGuildList.addAll(rearrangedGuildList)
+ *             mAdapter.notifyDataSetChanged()
+ *         })
+ */
         mChatVM.loadGuildList();
+    }
+
+    private String getMyId () {
+        return Client.Companion.getGlobal().getMe().getId();
     }
 
     private void initRecyclerView() {

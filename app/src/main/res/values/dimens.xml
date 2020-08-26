@@ -20,6 +20,7 @@
     <dimen name="slidingmenu_offset">74dp</dimen>
     <dimen name="guild_list_search_height">30dp</dimen>
     <dimen name="margin_24dp">24dp</dimen>
+    <dimen name="margin_19dp">19dp</dimen>
     <dimen name="margin_47dp">47dp</dimen>
     <dimen name="text_size_guild_list">12dp</dimen>
     <dimen name="guild_list_search_padding">4dp</dimen>
@@ -31,12 +32,14 @@
     <dimen name="guild_list_selected_flag_height">28dp</dimen>
     <dimen name="guild_list_selected_flag_width">2dp</dimen>
     <dimen name="item_guild_list_height">48dp</dimen>
+    <dimen name="guild_list_avatar_dot_width">52dp</dimen>
+    <dimen name="guild_list_avatar_dot_height">52dp</dimen>
     <dimen name="guild_list_avatar_width">48dp</dimen>
     <dimen name="guild_list_avatar_height">48dp</dimen>
     <dimen name="guild_name_text_size">16dp</dimen>
     <dimen name="margin_10dp">10dp</dimen>
-    <dimen name="unread_dot_stroke_width">8dp</dimen>
-    <dimen name="unread_dot_stroke_height">8dp</dimen>
-    <dimen name="unread_dot_content_width">7dp</dimen>
-    <dimen name="unread_dot_content_height">7dp</dimen>
+    <dimen name="unread_dot_stroke_width">12dp</dimen>
+    <dimen name="unread_dot_stroke_height">12dp</dimen>
+    <dimen name="unread_dot_content_width">8dp</dimen>
+    <dimen name="unread_dot_content_height">8dp</dimen>
 </resources>
