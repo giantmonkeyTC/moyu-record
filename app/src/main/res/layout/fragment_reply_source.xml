@@ -35,9 +35,10 @@
     <ImageView
         android:id="@+id/reply_source_cancel"
         android:layout_width="@dimen/reply_source_cancel_size"
-        android:src="@drawable/reply_source_cancel"
         android:layout_height="@dimen/reply_source_cancel_size"
         android:layout_marginBottom="@dimen/reply_cancel_margin_bottom"
+        android:scaleType="fitCenter"
+        android:src="@drawable/reply_source_cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
