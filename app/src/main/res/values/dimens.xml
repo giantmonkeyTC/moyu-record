@@ -26,4 +26,11 @@
     <dimen name="content_margin_end">20dp</dimen>
     <dimen name="content_gone_margin_top">3dp</dimen>
     <dimen name="content_margin_bottom">4dp</dimen>
+    <dimen name="reply_author_margin_top">8dp</dimen>
+    <dimen name="reply_avatar_size">64dp</dimen>
+    <dimen name="reply_avatar_margin_top">32dp</dimen>
+    <dimen name="reply_content_margin_horizontal">42dp</dimen>
+    <dimen name="reply_content_margin_top">32dp</dimen>
+    <dimen name="reply_cancel_margin_bottom">35dp</dimen>
+    <dimen name="reply_source_cancel_size">32dp</dimen>
 </resources>

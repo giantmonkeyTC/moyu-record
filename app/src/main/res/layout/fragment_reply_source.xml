@@ -6,9 +6,9 @@
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/reply_source_avatar"
-        android:layout_width="78dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="54dp"
+        android:layout_width="@dimen/reply_avatar_size"
+        android:layout_height="@dimen/reply_avatar_size"
+        android:layout_marginTop="@dimen/reply_avatar_margin_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -17,7 +17,7 @@
         android:id="@+id/reply_source_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/reply_author_margin_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reply_source_avatar" />
@@ -26,18 +26,18 @@
         android:id="@+id/reply_source_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
+        android:layout_marginHorizontal="@dimen/reply_content_margin_horizontal"
+        android:layout_marginTop="@dimen/reply_content_margin_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reply_source_author" />
 
     <ImageView
         android:id="@+id/reply_source_cancel"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginBottom="36dp"
+        android:layout_width="@dimen/reply_source_cancel_size"
+        android:src="@drawable/reply_source_cancel"
+        android:layout_height="@dimen/reply_source_cancel_size"
+        android:layout_marginBottom="@dimen/reply_cancel_margin_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
