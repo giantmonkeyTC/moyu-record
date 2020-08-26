@@ -317,29 +317,34 @@ class ChannelPanelFragment : BaseFragment() {
                     if (message != null) {
                         if (message.id == mes.id) {
                             view_messages.scrollToPosition(index)
-                            val view =
-                                view_messages.findViewHolderForAdapterPosition(index)?.itemView
-                            view?.let {
-                                it.apply {
-                                    val transition = background as TransitionDrawable
-                                    transition.startTransition(0)
-                                    transition.reverseTransition(600)
-//                                    animate().alpha(0f).setDuration(
-//                                        resources.getInteger(android.R.integer.config_shortAnimTime)
-//                                            .toLong()
-//                                    ).setListener(null)
+                            val timer = Timer()
+                            val task: TimerTask = object : TimerTask() {
+                                override fun run() {
+                                    val view =
+                                        view_messages.findViewHolderForAdapterPosition(index)?.itemView
+                                    view?.let {
+                                        it.apply {
+                                            if (background is TransitionDrawable) {
+                                                (background as TransitionDrawable).startTransition(0)
+                                                (background as TransitionDrawable).reverseTransition(
+                                                    1000
+                                                )
+                                            } else {
+                                                background =
+                                                    resources.getDrawable(R.drawable.reply_source_transition)
+                                                (background as TransitionDrawable).startTransition(0)
+                                                (background as TransitionDrawable).reverseTransition(
+                                                    1000
+                                                )
+                                            }
+
+
+                                        }
+                                    }
                                 }
                             }
+                            timer.schedule(task, 100)
 
-//                            val timer: Timer = Timer()
-//                            val task: TimerTask = object : TimerTask() {
-//                                override fun run() {
-//                                    view_messages.findViewHolderForAdapterPosition(index)?.itemView?.background =
-//                                        resources.getDrawable(android.R.color.transparent)
-//                                }
-//
-//                            }
-//                            timer.schedule(task, 400)
                         }
                     }
                 }
