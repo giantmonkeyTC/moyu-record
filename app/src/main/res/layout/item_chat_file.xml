@@ -8,8 +8,11 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/message_item_margin_start"
     android:layout_marginEnd="@dimen/message_item_margin_end"
+    android:layout_marginTop="@dimen/message_item_avatar_margin_top"
+    android:paddingTop="@dimen/message_item_padding_top"
     android:paddingBottom="@dimen/message_item_padding_bottom"
     android:paddingEnd="@dimen/message_item_padding_end"
+
     android:layout_marginBottom="@dimen/message_item_margin_bottom">
 
 
@@ -18,7 +21,6 @@
         android:layout_width="@dimen/message_item_avatar_width"
         android:layout_height="@dimen/message_item_avatar_height"
         android:layout_marginStart="@dimen/message_item_avatar_margin_start"
-        android:layout_marginTop="@dimen/message_item_avatar_margin_top"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_file"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
