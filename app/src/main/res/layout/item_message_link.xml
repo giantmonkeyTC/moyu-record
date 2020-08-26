@@ -4,15 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout1_link"
     android:layout_width="match_parent"
-    android:layout_marginTop="@dimen/message_item_avatar_margin_top"
-    android:paddingTop="@dimen/message_item_padding_top"
-    android:background="@drawable/reply_source_transition"
-    android:layout_marginStart="@dimen/message_item_margin_start"
-    android:layout_marginEnd="@dimen/message_item_margin_end"
-    android:paddingBottom="@dimen/message_item_padding_bottom"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/message_item_margin_bottom"
-    android:paddingEnd="@dimen/message_item_padding_end">
+    android:layout_height="wrap_content">
+
+    <Space
+        android:id="@+id/space_link"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/reply_source_highlight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/reply_highlight_margin_horizontal"
+        android:layout_marginTop="@dimen/reply_highlight_margin_top"
+        android:layout_marginBottom="@dimen/reply_highlight_margin_bottom"
+        android:background="@drawable/reply_source_transition"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/space_link"
+        app:layout_goneMarginTop="0dp" />
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
@@ -20,6 +33,7 @@
         android:layout_width="@dimen/message_item_avatar_width"
         android:layout_height="@dimen/message_item_avatar_height"
         android:layout_marginStart="@dimen/message_item_avatar_margin_start"
+        android:layout_marginTop="@dimen/message_item_avatar_margin_top"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_link"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -55,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/message_content_margin_start"
         android:layout_marginTop="@dimen/message_item_content_margin_top"
+        android:layout_marginEnd="@dimen/content_margin_end"
         android:textColor="#DDFFFFFF"
         android:textColorLink="@android:color/holo_blue_dark"
         android:textSize="@dimen/body_size"
@@ -68,8 +83,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/message_content_margin_start"
+        android:layout_marginEnd="@dimen/content_margin_end"
+        android:layout_marginBottom="@dimen/content_margin_bottom"
         android:orientation="vertical"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/link_text">

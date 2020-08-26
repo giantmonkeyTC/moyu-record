@@ -2,23 +2,38 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:paddingBottom="@dimen/message_item_padding_bottom"
-    android:background="@drawable/reply_source_transition"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/message_item_avatar_margin_top"
-    android:paddingTop="@dimen/message_item_padding_top"
-    android:layout_marginStart="@dimen/message_item_margin_start"
-    android:layout_marginEnd="@dimen/message_item_margin_end"
-    android:layout_marginBottom="@dimen/message_item_margin_bottom">
+  >
+    <Space
+        android:id="@+id/space_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <View
+        android:id="@+id/reply_source_highlight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/reply_highlight_margin_horizontal"
+        android:layout_marginBottom="@dimen/reply_highlight_margin_bottom"
+        android:layout_marginTop="@dimen/reply_highlight_margin_top"
+        app:layout_goneMarginTop="0dp"
+        android:background="@drawable/reply_source_transition"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/space_image" />
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/message_avatar_image"
         android:layout_width="@dimen/message_item_avatar_width"
         android:layout_height="@dimen/message_item_avatar_height"
         android:layout_marginStart="@dimen/message_item_avatar_margin_start"
+        android:layout_marginTop="@dimen/message_item_avatar_margin_top"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_author_name_text_image"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/widget_message_author_name_text_image"
@@ -55,6 +70,7 @@
         android:scaleType="fitXY"
         android:src="@drawable/loadinglogo"
         app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="@dimen/content_margin_bottom"
         app:layout_constraintTop_toBottomOf="@id/widget_message_author_name_text_image" />
 
     <include

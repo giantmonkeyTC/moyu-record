@@ -286,6 +286,7 @@ class MessageAdapter(
                     )
 
                 ) {
+                    holder.itemView.space_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
@@ -335,6 +336,7 @@ class MessageAdapter(
                         timestampConverter(messageList[position].timestamp)
                 } else {
                     holder.itemView.message_avatar_file.visibility = View.GONE
+                    holder.itemView.space_file.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.GONE
                 }
@@ -410,6 +412,7 @@ class MessageAdapter(
                         }
                         true
                     }
+                    holder.itemView.space_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
@@ -450,6 +453,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_image.visibility = View.GONE
                     holder.itemView.message_avatar_image.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_image.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.GONE
@@ -549,6 +553,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -598,6 +603,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_invite.visibility = View.GONE
                     holder.itemView.message_avatar_invite.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.GONE
@@ -696,6 +702,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
@@ -746,6 +753,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_stamp.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_stamp.visibility = View.GONE
                     holder.itemView.message_avatar_stamp.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_stamp.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.GONE
@@ -793,6 +801,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -843,6 +852,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_video.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_video.visibility = View.GONE
                     holder.itemView.message_avatar_video.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_video.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_video.visibility = View.GONE
@@ -999,6 +1009,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -1049,6 +1060,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_link.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_link.visibility = View.GONE
                     holder.itemView.message_avatar_link.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_link.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.GONE
@@ -1147,6 +1159,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_reply.visibility = View.VISIBLE
                     holder.itemView.message_avatar_reply.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -1198,6 +1211,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_reply.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_reply.visibility = View.GONE
                     holder.itemView.message_avatar_reply.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_reply.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_reply.visibility = View.GONE
@@ -1374,10 +1388,12 @@ class MessageAdapter(
             itemView.message_avatar.visibility = View.VISIBLE
             itemView.widget_message_timestamp_text.visibility = View.VISIBLE
             itemView.widget_message_author_name_text.visibility = View.VISIBLE
+            itemView.space.visibility = View.VISIBLE
         } else {
             itemView.message_avatar.visibility = View.GONE
             itemView.widget_message_timestamp_text.visibility = View.GONE
             itemView.widget_message_author_name_text.visibility = View.GONE
+            itemView.space.visibility = View.GONE
         }
         if (message.isSending) {
             val apl = AlphaAnimation(0.1f, 0.78f)

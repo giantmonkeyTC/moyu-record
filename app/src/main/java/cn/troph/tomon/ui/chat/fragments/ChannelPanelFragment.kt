@@ -322,8 +322,8 @@ class ChannelPanelFragment : BaseFragment() {
                                 override fun run() {
                                     val view =
                                         view_messages.findViewHolderForAdapterPosition(index)?.itemView
-                                    view?.let {
-                                        it.apply {
+                                    view?.findViewById<View>(R.id.reply_source_highlight).let {
+                                        it?.apply {
                                             if (background is TransitionDrawable) {
                                                 (background as TransitionDrawable).startTransition(0)
                                                 (background as TransitionDrawable).reverseTransition(
