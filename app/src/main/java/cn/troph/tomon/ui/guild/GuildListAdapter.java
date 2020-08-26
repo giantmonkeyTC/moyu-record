@@ -1,5 +1,7 @@
 package cn.troph.tomon.ui.guild;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.structures.Guild;
+import cn.troph.tomon.ui.activities.ChannelListActivity;
 
 public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.ViewHolder> {
 
@@ -30,12 +33,19 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
     }
 
     public void setDataAndNotifyChanged(List<Guild> newGuilds) {
+        if (mGuildList != null) {
+            mGuildList.clear();
+        }
         mGuildList = newGuilds;
         notifyDataSetChanged();
     }
 
     public void setCurrentGuildId(String guildId) {
         mCurrentGuildId = guildId;
+    }
+
+    public List<Guild> getGuildList() {
+        return mGuildList;
     }
 
     @NonNull
@@ -81,6 +91,11 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
 
         if (TextUtils.isEmpty(mCurrentGuildId) && position == 0) {
             holder.ivSelectedFlag.setVisibility(View.VISIBLE);
+            mCurrentGuildId = guild.getId();
+            SharedPreferences sp = holder.ivSelectedFlag.getContext().
+                    getSharedPreferences(ChannelListActivity.SP_NAME_CHANNEL_LIST_CONFIG, Context.MODE_PRIVATE);
+            sp.edit().putString(ChannelListActivity.SP_KEY_GUILD_ID, mCurrentGuildId).apply();
+
         } else {
             if (guild.getId().equals(mCurrentGuildId)) {
                 holder.ivSelectedFlag.setVisibility(View.VISIBLE);

@@ -340,7 +340,7 @@ class ChatSharedViewModel : ViewModel() {
     }
 
     fun loadGuildList() {
-        guildListLiveData.value = Client.global.guilds.toMutableList()
+        guildListLiveData.value = Client.global.guilds.list.toMutableList()
     }
 
 }
