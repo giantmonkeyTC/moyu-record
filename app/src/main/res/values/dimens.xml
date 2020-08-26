@@ -28,4 +28,15 @@
     <dimen name="join_guild_width">48dp</dimen>
     <dimen name="join_guild_height">48dp</dimen>
     <dimen name="margin_12dp">12dp</dimen>
+    <dimen name="guild_list_selected_flag_height">28dp</dimen>
+    <dimen name="guild_list_selected_flag_width">2dp</dimen>
+    <dimen name="item_guild_list_height">48dp</dimen>
+    <dimen name="guild_list_avatar_width">48dp</dimen>
+    <dimen name="guild_list_avatar_height">48dp</dimen>
+    <dimen name="guild_name_text_size">16dp</dimen>
+    <dimen name="margin_10dp">10dp</dimen>
+    <dimen name="unread_dot_stroke_width">8dp</dimen>
+    <dimen name="unread_dot_stroke_height">8dp</dimen>
+    <dimen name="unread_dot_content_width">7dp</dimen>
+    <dimen name="unread_dot_content_height">7dp</dimen>
 </resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/item_guild_list_height"
+    android:layout_marginTop="@dimen/margin_24dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+    
+    <ImageView
+        android:id="@+id/iv_selected_flag"
+        android:background="@drawable/shape_guild_list_selected_flag"
+        android:layout_width="@dimen/guild_list_selected_flag_width"
+        android:layout_height="@dimen/guild_list_selected_flag_height"/>
+
+    <RelativeLayout
+        android:layout_width="@dimen/guild_list_avatar_width"
+        android:layout_height="@dimen/guild_list_avatar_height"
+        android:layout_marginStart="@dimen/margin_12dp">
+
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@null"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rl_unread_dot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/iv_avatar"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp">
+
+            <ImageView
+                android:id="@+id/iv_unread_dot_stroke"
+                android:layout_width="@dimen/unread_dot_stroke_width"
+                android:layout_height="@dimen/unread_dot_stroke_height"
+                android:background="@drawable/shape_unread_dot_stroke" />
+
+            <ImageView
+                android:id="@+id/iv_unread_dot_content"
+                android:layout_width="@dimen/unread_dot_content_width"
+                android:layout_height="@dimen/unread_dot_content_height"
+                android:layout_centerInParent="true"
+                android:background="@drawable/shape_unread_dot_content" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_guild_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_10dp"
+        android:layout_marginEnd="@dimen/margin_12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Troph 救援团救援团救援团救援团救援团救援团救援团"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/guild_name_text_size" />
+
+</LinearLayout>

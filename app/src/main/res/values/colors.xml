@@ -64,4 +64,5 @@
     <color name="blackPrimary">#2E2E2E</color>
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_50">#80ffffff</color>
+    <color name="black_50">#80000000</color>
 </resources>
