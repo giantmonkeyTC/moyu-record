@@ -2,13 +2,13 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="profile_peek_height">400dp</dimen>
     <dimen name="member_profile_peek_height">500dp</dimen>
-    <dimen name="message_item_avatar_margin_start">12dp</dimen>
+    <dimen name="message_item_avatar_margin_start">6dp</dimen>
     <dimen name="message_item_avatar_margin_top">12dp</dimen>
     <dimen name="message_item_author_name_margin_start">16dp</dimen>
     <dimen name="message_item_timestamp_margin_start">8dp</dimen>
     <dimen name="message_item_content_margin_top">10dp</dimen>
-    <dimen name="message_item_padding_end">20dp</dimen>
-    <dimen name="message_item_margin_bottom">8dp</dimen>
+    <dimen name="message_item_padding_end">14dp</dimen>
+    <dimen name="message_item_margin_bottom">4dp</dimen>
     <dimen name="message_item_avatar_width">46dp</dimen>
     <dimen name="message_item_avatar_height">46dp</dimen>
     <dimen name="body_size">14dp</dimen>
@@ -16,4 +16,7 @@
     <dimen name="message_content_margin_start">74dp</dimen>
     <dimen name="message_edittext_padding_vertical">6dp</dimen>
     <dimen name="member_name_margin_end">20dp</dimen>
+    <dimen name="message_item_padding_bottom">4dp</dimen>
+    <dimen name="message_item_margin_start">6dp</dimen>
+    <dimen name="message_item_margin_end">6dp</dimen>
 </resources>

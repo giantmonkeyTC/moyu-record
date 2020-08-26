@@ -11,6 +11,7 @@ import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +33,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -80,6 +82,7 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.view.*
+import kotlinx.coroutines.delay
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
@@ -102,6 +105,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
 import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.random.Random
 
 const val FILE_REQUEST_CODE_FILE = 323
@@ -310,8 +315,32 @@ class ChannelPanelFragment : BaseFragment() {
             override fun onSourceClick(message: Message?, position: Int) {
                 mMsgList.forEachIndexed { index, mes ->
                     if (message != null) {
-                        if (message.id == mes.id)
+                        if (message.id == mes.id) {
                             view_messages.scrollToPosition(index)
+                            val view =
+                                view_messages.findViewHolderForAdapterPosition(index)?.itemView
+                            view?.let {
+                                it.apply {
+                                    val transition = background as TransitionDrawable
+                                    transition.startTransition(0)
+                                    transition.reverseTransition(600)
+//                                    animate().alpha(0f).setDuration(
+//                                        resources.getInteger(android.R.integer.config_shortAnimTime)
+//                                            .toLong()
+//                                    ).setListener(null)
+                                }
+                            }
+
+//                            val timer: Timer = Timer()
+//                            val task: TimerTask = object : TimerTask() {
+//                                override fun run() {
+//                                    view_messages.findViewHolderForAdapterPosition(index)?.itemView?.background =
+//                                        resources.getDrawable(android.R.color.transparent)
+//                                }
+//
+//                            }
+//                            timer.schedule(task, 400)
+                        }
                     }
                 }
             }

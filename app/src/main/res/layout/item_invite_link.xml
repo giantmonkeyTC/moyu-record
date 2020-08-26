@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/reply_source_transition"
+    android:paddingBottom="@dimen/message_item_padding_bottom"
     android:layout_marginBottom="@dimen/message_item_margin_bottom"
+    android:layout_marginStart="@dimen/message_item_margin_start"
+    android:layout_marginEnd="@dimen/message_item_margin_end"
     android:paddingEnd="@dimen/message_item_padding_end">
 
 
