@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.utils.optInt
 import com.google.gson.JsonObject
 
 class VoiceChannel(client: Client, data: JsonObject) :
@@ -21,10 +22,10 @@ class VoiceChannel(client: Client, data: JsonObject) :
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("bitrate")) {
-            bitrate = data["bitrate"].asInt
+            bitrate = data["bitrate"].optInt ?: 36800
         }
         if (data.has("user_limit")) {
-            userLimit = data["user_limit"].asInt
+            userLimit = data["user_limit"].optInt ?: 0
         }
         guild?.let {
             it.voiceStates.forEach {

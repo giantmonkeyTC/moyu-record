@@ -8,7 +8,6 @@ import cn.troph.tomon.core.utils.optInt
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicLong
 
 class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data), TextChannelBase {
 
@@ -49,7 +48,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("topic")) {
-            topic = data["topic"].asString
+            topic = data["topic"].optString
         }
 
         if (data.has("last_message_id")) {

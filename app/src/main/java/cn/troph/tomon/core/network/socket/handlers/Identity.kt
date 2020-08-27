@@ -21,7 +21,8 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     }
     data["dm_channels"].asJsonArray.forEach { ele ->
         val channel = ele.asJsonObject
-        if (channel["guild_id"].optString == "0") {
+        val guildId = channel["guild_id"]?.optString
+        if (guildId == "0") {
             channel.addProperty("guild_id", "@me")
         }
     }

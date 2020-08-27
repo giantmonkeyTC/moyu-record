@@ -77,10 +77,10 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("background_url")) {
-            backgroundUrl = data["background_url"].asString
+            backgroundUrl = data["background_url"].optString ?: ""
         }
         if (data.has("id")) {
-            id = data["id"].asString
+            id = data["id"].optString ?: ""
         }
         if (data.has("name")) {
             name = data["name"].asString
