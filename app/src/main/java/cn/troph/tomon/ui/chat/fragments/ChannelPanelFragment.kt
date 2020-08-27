@@ -493,7 +493,8 @@ class ChannelPanelFragment : BaseFragment() {
         })
         mChatSharedVM.memberLiveData.observe(viewLifecycleOwner, Observer {
             it.let {
-                if (mChatSharedVM.mentionState.value?.state!!)
+
+                if (mChatSharedVM.mentionState.value?.state ?: false)
                     callMentionBottomSheet(it)
             }
         })

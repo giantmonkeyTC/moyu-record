@@ -6,6 +6,7 @@ import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.structures.MessageReaction
 import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 
@@ -61,8 +62,8 @@ class ReactionAddAction(client: Client) : Action<MessageReaction>(client) {
         if (message != null) {
             val emoji = obj["emoji"].asJsonObject
             var identifier: String =
-                if (message!!.reactions.has(emoji["id"].asString)) emoji["id"].asString else "_${emoji["name"].asString}"
-            if (emoji["id"].asString == "0") {
+                if (message!!.reactions.has(emoji["id"].optString?:"")) emoji["id"].optString?:"" else "_${emoji["name"].optString?:""}"
+            if (emoji["id"].optString == "0") {
                 identifier = "_${emoji["name"]}"
             } else {
                 identifier = "${emoji["id"]}"

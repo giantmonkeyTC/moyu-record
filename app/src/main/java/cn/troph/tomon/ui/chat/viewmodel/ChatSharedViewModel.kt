@@ -50,7 +50,7 @@ class ChatSharedViewModel : ViewModel() {
     val mentionState = MutableLiveData<MentionState>()
 
     data class MentionState(
-        @SerializedName("state") val state: Boolean,
+        @SerializedName("state") var state: Boolean,
         @SerializedName("start") val start: Int
     )
 
