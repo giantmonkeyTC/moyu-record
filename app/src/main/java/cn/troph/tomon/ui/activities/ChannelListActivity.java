@@ -164,7 +164,7 @@ public class ChannelListActivity extends BaseActivity {
                 Guild guildFromAtMe = msgAtMeEv.getMessage().getGuild();
                 List<Guild> guildList = mChatVM.getGuildListLiveData().getValue();
                 if (guildList.contains(guildFromAtMe)) {
-                    if (guildFromAtMe.updateMention()) {
+                    if (guildFromAtMe.updateMention() && !msgAtMeEv.getMessage().getAuthorId().equals(getMyId())) {
                         mAdapter.notifyItemChanged(guildList.indexOf(guildFromAtMe));
                     }
                 }

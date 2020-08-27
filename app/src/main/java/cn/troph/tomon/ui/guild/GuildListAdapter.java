@@ -19,7 +19,10 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import java.util.List;
 
 import cn.troph.tomon.R;
+import cn.troph.tomon.core.structures.Channel;
 import cn.troph.tomon.core.structures.Guild;
+import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.core.structures.TextChannel;
 import cn.troph.tomon.ui.activities.ChannelListActivity;
 
 public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.ViewHolder> {
@@ -81,8 +84,11 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
         boolean unread = guild.getUnread();
         if (unread) {
             holder.setNormalUnreadDot();
-            if (guild.getMention() > 0) {
-                holder.setAlertUnreadDot();
+            for (GuildChannel channel : guild.getChannels()) {
+                if (channel instanceof TextChannel && ((TextChannel) channel).getUnreadMention() > 0) {
+                    holder.setAlertUnreadDot();
+                    break;
+                }
             }
             holder.setUnreadDotVisibility(View.VISIBLE);
         } else {
