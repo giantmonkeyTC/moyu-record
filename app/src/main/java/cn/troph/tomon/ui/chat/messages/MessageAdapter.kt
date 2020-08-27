@@ -1242,7 +1242,79 @@ class MessageAdapter(
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
                     holder.itemView.message_reply_section.setOnClickListener {
                     }
-                    holder.itemView.source_content.text = "${it.author?.name ?: ""}:${it.content}"
+                    if (it.content != null) {
+                        holder.itemView.source_content.visibility = View.VISIBLE
+                        holder.itemView.source_content_image.visibility = View.GONE
+                        holder.itemView.source_content_author.visibility = View.VISIBLE
+                        holder.itemView.source_content_author.text = it.author?.name
+                        holder.itemView.source_content.text =
+                            "${it.author?.name ?: ""}:${it.content}"
+                    } else
+                        for (item in it.attachments.values) {
+                            if (isImage(item.type)) {
+                                holder.itemView.source_content_image.visibility = View.VISIBLE
+                                holder.itemView.source_content.visibility = View.GONE
+                                holder.itemView.source_content_author.text = it.author?.name
+                                for (item in it.attachments.values) {
+//                                    holder.itemView.source_content_image.updateLayoutParams {
+//                                        item.width?.let { imgWidth ->
+//                                            val w = DensityUtil.px2dip(
+//                                                holder.itemView.context,
+//                                                imgWidth.toFloat()
+//                                            )
+//                                            width = if (w > 200) DensityUtil.dip2px(
+//                                                holder.itemView.context,
+//                                                200f
+//                                            ) else imgWidth
+//                                            item.height?.let { imgHeight ->
+//                                                height = imgHeight * (width / imgWidth)
+//                                            }
+//                                        }
+//                                    }
+                                    Glide.with(holder.itemView)
+                                        .load(
+                                            if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
+                                                    ".gif",
+                                                    true
+                                                )
+                                            ) "" else "?x-oss-process=image/resize,p_100"}"
+                                        )
+                                        .transform(RoundedCorners(25))
+                                        .placeholder(R.drawable.loading_solid_gray)
+                                        .override(
+                                            holder.itemView.source_content_image.width,
+                                            holder.itemView.source_content_image.height
+                                        )
+                                        .into(holder.itemView.source_content_image)
+                                    holder.itemView.source_content_image.setOnClickListener { mView ->
+                                        val msg = it
+                                        for (image in msg.attachments.values) {
+                                            StfalconImageViewer.Builder<MessageAttachment>(
+                                                holder.itemView.context,
+                                                mutableListOf(image)
+                                            ) { view, images ->
+                                                Glide.with(view).load(images.url)
+                                                    .placeholder(R.drawable.loadinglogo).into(view)
+                                            }.apply {
+                                                this.allowSwipeToDismiss(true)
+                                                show()
+                                            }
+                                            break
+                                        }
+                                    }
+                                    break
+                                }
+                            } else if (isVideo(item.type)) {
+                                holder.itemView.source_content.visibility = View.GONE
+                                holder.itemView.source_content_author.text = it.author?.name
+                                holder.itemView.source_content.text = "[视频]"
+                            } else {
+                                holder.itemView.source_content.visibility = View.GONE
+                                holder.itemView.source_content_author.text = it.author?.name
+                                holder.itemView.source_content.text = "[文件]"
+                            }
+                            break
+                        }
                     holder.itemView.message_reply_section.setOnClickListener {
                         replyClickListener.onSourcePreviewClick(message)
                     }
