@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.guild;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,7 +86,7 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
         if (unread) {
             holder.setNormalUnreadDot();
             for (GuildChannel channel : guild.getChannels()) {
-                if (channel instanceof TextChannel && ((TextChannel) channel).getUnreadMention() > 0) {
+                if (channel instanceof TextChannel && hasUnreadAtMeMessage((TextChannel) channel)) {
                     holder.setAlertUnreadDot();
                     break;
                 }
@@ -111,6 +112,14 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
         }
 
 
+    }
+
+    private boolean hasUnreadAtMeMessage(TextChannel channel) {
+        String name = channel.getName();
+        int mention = channel.getMention();
+        int unreadMention = channel.getUnreadMention();
+        Log.d("Huan", "name: " + name + ", mention:" + mention + ", unreadMetion:" + unreadMention);
+        return false;
     }
 
     @Override
