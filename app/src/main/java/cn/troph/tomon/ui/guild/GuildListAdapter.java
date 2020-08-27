@@ -115,11 +115,8 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
     }
 
     private boolean hasUnreadAtMeMessage(TextChannel channel) {
-        String name = channel.getName();
         int mention = channel.getMention();
-        int unreadMention = channel.getUnreadMention();
-        Log.d("Huan", "name: " + name + ", mention:" + mention + ", unreadMetion:" + unreadMention);
-        return false;
+        return mention > 0;
     }
 
     @Override

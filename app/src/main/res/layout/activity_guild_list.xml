@@ -37,6 +37,7 @@
         android:id="@+id/iv_join_guild"
         android:background="@drawable/iv_src_join_guild"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="@dimen/margin_24dp"
         android:layout_marginStart="@dimen/margin_24dp"
         android:layout_width="@dimen/join_guild_width"

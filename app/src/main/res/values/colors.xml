@@ -68,4 +68,8 @@
     <color name="alert_dot">#FF7A6B</color>
     <color name="no_icon_url_avatar">#4D4D4D</color>
     <color name="text_color_white">#ffffff</color>
+    <color name="channel_list_tab_bg">#171717</color>
+    <color name="white_60">#99FFFFFF</color>
+    <color name="pinkPrimary">#FF7896</color>
+    <color name="status_online">#67D78E</color>
 </resources>

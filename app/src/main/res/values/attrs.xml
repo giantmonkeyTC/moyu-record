@@ -31,4 +31,9 @@
     <declare-styleable name="TomonDrawerLayout_Layout">
         <attr name="android:layout_gravity" />
     </declare-styleable>
+
+    <declare-styleable name="TomonTabButton">
+        <attr name="icon_background" format="reference"/>
+        <attr name="name_text" format="string"/>
+    </declare-styleable>
 </resources>
