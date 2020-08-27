@@ -1242,35 +1242,33 @@ class MessageAdapter(
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
                     holder.itemView.message_reply_section.setOnClickListener {
                     }
-                    if (it.content != null) {
-                        holder.itemView.source_content.visibility = View.VISIBLE
-                        holder.itemView.source_content_image.visibility = View.GONE
+                    if (it.stamps.size > 0) {
+                        holder.itemView.source_content_image.visibility = View.VISIBLE
+                        holder.itemView.source_content.visibility = View.GONE
                         holder.itemView.source_content_author.visibility = View.VISIBLE
-                        holder.itemView.source_content_author.text = it.author?.name
-                        holder.itemView.source_content.text =
-                            "${it.author?.name ?: ""}:${it.content}"
-                    } else
+                        holder.itemView.source_content_author.text =
+                            "${it.author?.name ?: ""}:"
+                        for (item in it.stamps) {
+                            Glide.with(holder.itemView)
+                                .load(
+                                    if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(
+                                        item.hash
+                                    )
+                                )
+                                .placeholder(R.drawable.loadinglogo)
+                                .override(item.width, item.height)
+                                .into(holder.itemView.source_content_image)
+                            break
+                        }
+                    } else if (it.attachments.size > 0) {
                         for (item in it.attachments.values) {
                             if (isImage(item.type)) {
                                 holder.itemView.source_content_image.visibility = View.VISIBLE
                                 holder.itemView.source_content.visibility = View.GONE
-                                holder.itemView.source_content_author.text = it.author?.name
+                                holder.itemView.source_content_author.visibility = View.VISIBLE
+                                holder.itemView.source_content_author.text =
+                                    "${it.author?.name ?: ""}:"
                                 for (item in it.attachments.values) {
-//                                    holder.itemView.source_content_image.updateLayoutParams {
-//                                        item.width?.let { imgWidth ->
-//                                            val w = DensityUtil.px2dip(
-//                                                holder.itemView.context,
-//                                                imgWidth.toFloat()
-//                                            )
-//                                            width = if (w > 200) DensityUtil.dip2px(
-//                                                holder.itemView.context,
-//                                                200f
-//                                            ) else imgWidth
-//                                            item.height?.let { imgHeight ->
-//                                                height = imgHeight * (width / imgWidth)
-//                                            }
-//                                        }
-//                                    }
                                     Glide.with(holder.itemView)
                                         .load(
                                             if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
@@ -1281,12 +1279,8 @@ class MessageAdapter(
                                         )
                                         .transform(RoundedCorners(25))
                                         .placeholder(R.drawable.loading_solid_gray)
-                                        .override(
-                                            holder.itemView.source_content_image.width,
-                                            holder.itemView.source_content_image.height
-                                        )
                                         .into(holder.itemView.source_content_image)
-                                    holder.itemView.source_content_image.setOnClickListener { mView ->
+                                    holder.itemView.message_reply_section.setOnClickListener { mView ->
                                         val msg = it
                                         for (image in msg.attachments.values) {
                                             StfalconImageViewer.Builder<MessageAttachment>(
@@ -1305,19 +1299,50 @@ class MessageAdapter(
                                     break
                                 }
                             } else if (isVideo(item.type)) {
-                                holder.itemView.source_content.visibility = View.GONE
-                                holder.itemView.source_content_author.text = it.author?.name
-                                holder.itemView.source_content.text = "[视频]"
+                                holder.itemView.source_content_image.visibility = View.GONE
+                                holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.source_content.visibility = View.VISIBLE
+                                holder.itemView.source_content.text =
+                                    "${it.author?.name ?: ""}:[视频]"
                             } else {
-                                holder.itemView.source_content.visibility = View.GONE
-                                holder.itemView.source_content_author.text = it.author?.name
-                                holder.itemView.source_content.text = "[文件]"
+                                holder.itemView.source_content_image.visibility = View.GONE
+                                holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.source_content.visibility = View.VISIBLE
+                                holder.itemView.source_content.text =
+                                    "${it.author?.name ?: ""}:[文件]"
                             }
                             break
                         }
-                    holder.itemView.message_reply_section.setOnClickListener {
-                        replyClickListener.onSourcePreviewClick(message)
+                    } else if (it.content != null) {
+                        holder.itemView.source_content.visibility = View.VISIBLE
+                        holder.itemView.source_content_image.visibility = View.GONE
+                        holder.itemView.source_content_author.visibility = View.GONE
+                        holder.itemView.source_content_author.text = it.author?.name
+                        Converter.toMarkdownTextView(
+                            Markwon.builder(holder.itemView.context) // automatically create Glide instance
+                                .usePlugin(ImagesPlugin.create())
+                                .usePlugin(HtmlPlugin.create())
+                                .usePlugin(GlideImagesPlugin.create(holder.itemView.context)) // use supplied Glide instance
+                                .usePlugin(GlideImagesPlugin.create(Glide.with(holder.itemView.context))) // if you need more control
+                                .usePlugin(GlideImagesPlugin.create(object :
+                                    GlideImagesPlugin.GlideStore {
+                                    override fun cancel(target: Target<*>) {
+                                        Glide.with(holder.itemView.context).clear(target)
+                                    }
+
+                                    override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable> {
+                                        return Glide.with(holder.itemView.context)
+                                            .load(drawable.destination)
+                                    }
+                                })).build(),
+                            "${it.author?.name ?: ""}:${it.content}",
+                            holder.itemView.source_content
+                        )
+                        holder.itemView.source_content.setOnClickListener {
+                            replyClickListener.onSourcePreviewClick(message)
+                        }
                     }
+
                     holder.itemView.btn_goto_source.setOnClickListener { view ->
                         replyClickListener.onSourceClick(it, position)
                     }
