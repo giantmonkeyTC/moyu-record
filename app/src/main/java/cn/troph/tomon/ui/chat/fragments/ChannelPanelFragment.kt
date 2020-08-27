@@ -34,6 +34,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
 import androidx.core.view.get
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -421,13 +422,15 @@ class ChannelPanelFragment : BaseFragment() {
                                         start = start
                                     )
                             if (s.isEmpty() && start >= 0) {
-                                val params = editText.layoutParams
+
                                 val animOut = ValueAnimator()
                                 animOut.setIntValues(300, 900)
                                 animOut.setInterpolator(LinearInterpolator())
                                 animOut.duration = 1000
                                 animOut.addUpdateListener { it ->
-                                    params.width = it.animatedValue as Int
+                                    editText.updateLayoutParams {
+                                        this.width = it.animatedValue as Int
+                                    }
                                 }
                                 animOut.start()
                             }
@@ -446,7 +449,9 @@ class ChannelPanelFragment : BaseFragment() {
                         animOut.setInterpolator(LinearInterpolator())
                         animOut.duration = 1000
                         animOut.addUpdateListener { it ->
-                            params.width = it.animatedValue as Int
+                            editText.updateLayoutParams {
+                                this.width = it.animatedValue as Int
+                            }
                         }
                         animOut.start()
                     }
@@ -478,6 +483,7 @@ class ChannelPanelFragment : BaseFragment() {
                     callMentionBottomSheet(it)
             }
         })
+
         mChatSharedVM.stampSendedLiveData.observe(viewLifecycleOwner, Observer {
             if (it.state) {
                 mMsgList.add(it.emptyMsg)

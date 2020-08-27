@@ -158,7 +158,14 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
     val replySource
         get() =
             reply?.let {
-                (channel as TextChannel).messages[it.id]
+                if ((channel as TextChannel).messages.has(it.id))
+                    (channel as TextChannel).messages[it.id]
+                else
+                    Message(client, JsonObject().apply {
+                        addProperty("content", "")
+                        addProperty("id", it.id)
+                        addProperty("author", Gson().toJson(it.author))
+                    })
             }
 
     // 唯一确定用的id
