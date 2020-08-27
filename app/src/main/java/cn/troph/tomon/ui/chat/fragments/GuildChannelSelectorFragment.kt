@@ -49,6 +49,11 @@ class GuildChannelSelectorFragment : Fragment() {
     private var mRtcEngine: RtcEngine? = null
     private lateinit var mWakeLock: PowerManager.WakeLock
     private lateinit var mSelectedVoiceChannel: GuildChannel
+    val voiceWsObserver = Observer<VoiceConnectStateReceive> {
+        //disconnect voice ws
+        Client.global.voiceSocket.close()
+    }
+
     var guildId: String? = null
         set(value) {
             field = value
@@ -141,11 +146,10 @@ class GuildChannelSelectorFragment : Fragment() {
             }
         }
 
+
+        mChatSharedViewModel.voiceSocketLeaveLD.removeObserver(voiceWsObserver)
         //接收socket leave
-        mChatSharedViewModel.voiceSocketLeaveLD.observe(viewLifecycleOwner, Observer {
-            //disconnect voice ws
-            Client.global.voiceSocket.close()
-        })
+        mChatSharedViewModel.voiceSocketLeaveLD.observe(viewLifecycleOwner, voiceWsObserver)
 
         mChatSharedViewModel.voiceSelfDeafLD.observe(viewLifecycleOwner, Observer { isDeaf ->
             mRtcEngine?.muteAllRemoteAudioStreams(isDeaf)
