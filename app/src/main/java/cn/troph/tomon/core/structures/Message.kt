@@ -3,6 +3,7 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
+import cn.troph.tomon.core.events.MessageReplySourceReadyEvent
 import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Converter
@@ -155,17 +156,32 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
             else -> nonce?.snowflake?.aligned + "N"
         }
 
-    val replySource
+    var replySource: Message? = null
         get() =
             reply?.let {
                 if ((channel as TextChannel).messages.has(it.id))
                     (channel as TextChannel).messages[it.id]
-                else
-                    Message(client, JsonObject().apply {
+                else {
+                    (channel as TextChannel).messages.fetchOne(it.id).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            Client.global.eventBus.postEvent(MessageReplySourceReadyEvent(it,id))
+                        }
+                    return@let Message(client, JsonObject().apply {
                         addProperty("content", "")
                         addProperty("id", it.id)
-                        addProperty("author", Gson().toJson(it.author))
+                        val userObject = JsonObject()
+                        userObject.addProperty("id", it.author.id)
+                        userObject.addProperty("username", it.author.username)
+                        userObject.addProperty(
+                            "discriminator",
+                            it.author.discriminator
+                        )
+                        userObject.addProperty("name", it.author.name)
+                        userObject.addProperty("avatar", it.author.avatar)
+                        userObject.addProperty("avatar_url", it.author.avatarURL)
+                        add("author", userObject)
                     })
+                }
             }
 
     // 唯一确定用的id

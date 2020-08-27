@@ -350,6 +350,14 @@ class ChannelPanelFragment : BaseFragment() {
                     }
                 }
             }
+
+            override fun onSourcePreviewClick(message: Message) {
+                val previewFragment = ReplySourcePreviewFragment(message)
+                previewFragment.show(
+                    requireActivity().supportFragmentManager,
+                    "ReplySourcePreviewFragment"
+                )
+            }
         })
 
     override fun onCreateView(
@@ -383,6 +391,12 @@ class ChannelPanelFragment : BaseFragment() {
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message
             isUpdateEnabled = it.flag
+        })
+        mChatSharedVM.replySourceReadyLD.observe(viewLifecycleOwner, Observer {
+            mMsgList.forEachIndexed { index, message ->
+                if (message.id == it.replyMesId)
+                    mMsgListAdapter.notifyItemChanged(index)
+            }
         })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
             if (it.flag) {
@@ -421,19 +435,19 @@ class ChannelPanelFragment : BaseFragment() {
                                         state = false,
                                         start = start
                                     )
-                            if (s.isEmpty() && start >= 0) {
-
-                                val animOut = ValueAnimator()
-                                animOut.setIntValues(300, 900)
-                                animOut.setInterpolator(LinearInterpolator())
-                                animOut.duration = 1000
-                                animOut.addUpdateListener { it ->
-                                    editText.updateLayoutParams {
-                                        this.width = it.animatedValue as Int
-                                    }
-                                }
-                                animOut.start()
-                            }
+//                            if (s.isEmpty() && start >= 0) {
+//
+//                                val animOut = ValueAnimator()
+//                                animOut.setIntValues(300, 900)
+//                                animOut.setInterpolator(LinearInterpolator())
+//                                animOut.duration = 1000
+//                                animOut.addUpdateListener { it ->
+//                                    editText.updateLayoutParams {
+//                                        this.width = it.animatedValue as Int
+//                                    }
+//                                }
+//                                animOut.start()
+//                            }
                         }
 
                     }
@@ -441,21 +455,21 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (s != null) {
-                    if (s.isEmpty() && start >= 0) {
-                        val params = editText.layoutParams
-                        val animOut = ValueAnimator()
-                        animOut.setIntValues(900, 300)
-                        animOut.setInterpolator(LinearInterpolator())
-                        animOut.duration = 1000
-                        animOut.addUpdateListener { it ->
-                            editText.updateLayoutParams {
-                                this.width = it.animatedValue as Int
-                            }
-                        }
-                        animOut.start()
-                    }
-                }
+//                if (s != null) {
+//                    if (s.isEmpty() && start >= 0) {
+//                        val params = editText.layoutParams
+//                        val animOut = ValueAnimator()
+//                        animOut.setIntValues(900, 300)
+//                        animOut.setInterpolator(LinearInterpolator())
+//                        animOut.duration = 1000
+//                        animOut.addUpdateListener { it ->
+//                            editText.updateLayoutParams {
+//                                this.width = it.animatedValue as Int
+//                            }
+//                        }
+//                        animOut.start()
+//                    }
+//                }
             }
 
             override fun afterTextChanged(s: Editable?) {

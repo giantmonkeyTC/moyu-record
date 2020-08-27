@@ -30,6 +30,7 @@ import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
+import cn.troph.tomon.ui.chat.fragments.ReplySourcePreviewFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -1242,6 +1243,9 @@ class MessageAdapter(
                     holder.itemView.message_reply_section.setOnClickListener {
                     }
                     holder.itemView.source_content.text = "${it.author?.name ?: ""}:${it.content}"
+                    holder.itemView.message_reply_section.setOnClickListener {
+                        replyClickListener.onSourcePreviewClick(message)
+                    }
                     holder.itemView.btn_goto_source.setOnClickListener { view ->
                         replyClickListener.onSourceClick(it, position)
                     }
@@ -1557,6 +1561,7 @@ interface OnAvatarLongClickListener {
 interface OnReplyClickListener {
     fun onReplyClick(message: Message?)
     fun onSourceClick(message: Message?, position: Int)
+    fun onSourcePreviewClick(message: Message)
 }
 
 class TomonTagHandler : SimpleTagHandler() {

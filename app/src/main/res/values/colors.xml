@@ -13,6 +13,7 @@
     <color name="secondaryLight"></color>
     <color name="accent">#6d6d6d</color>
     <color name="primaryText">#FFFFFF</color>
+    <color name="primaryTextAlpha70">#B2FFFFFF</color>
     <color name="captionText">#99FFFFFF</color>
     <color name="secondaryText">#828282</color>
     <color name="secondaryTextAlpha70">#B3828282</color>
