@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.activities
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
@@ -18,9 +19,11 @@ import kotlinx.android.synthetic.main.activity_entry.*
 class EntryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
         Glide.with(this).load(R.drawable.loading_splash_gif).into(loading_gif_iv)
+        loading_gif_iv.visibility = View.VISIBLE
         val dataPullingViewModel: DataPullingViewModel by viewModels()
 
         dataPullingViewModel.setUpFetchData()
@@ -41,8 +44,6 @@ class EntryActivity : BaseActivity() {
                     gotoEntryOption()
                 })
         }
-
-
     }
 
     private fun gotoEntryOption() {
