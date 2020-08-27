@@ -5,6 +5,7 @@ import cn.troph.tomon.core.events.ReactionRemoveEvent
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.MessageReaction
 import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 
@@ -27,7 +28,7 @@ class ReactionRemoveAction(client: Client) : Action<MessageReaction>(client) {
         if (message != null) {
             val emoji = obj["emoji"].asJsonObject
             val identifier: String =
-                if (message!!.reactions.has(emoji["id"].asString)) emoji["id"].asString else "_${emoji["name"].asString}"
+                if (message!!.reactions.has(emoji["id"].optString?:"")) emoji["id"].optString?:"" else "_${emoji["name"].optString?:""}"
             val reaction =
                 message.reactions[identifier]
             if (reaction != null) {
