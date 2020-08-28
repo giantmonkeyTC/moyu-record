@@ -1015,11 +1015,11 @@ class ChannelPanelFragment : BaseFragment() {
                                             p0: PermissionRequest?,
                                             p1: PermissionToken?
                                         ) {
-
+                                            p1?.continuePermissionRequest()
                                         }
 
                                         override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
-
+                                            mBottomSheet.dismiss()
                                         }
                                     }).check()
 
@@ -1056,7 +1056,7 @@ class ChannelPanelFragment : BaseFragment() {
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-
+                    p1?.continuePermissionRequest()
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
