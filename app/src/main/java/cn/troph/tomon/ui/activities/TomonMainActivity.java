@@ -42,6 +42,7 @@ import cn.troph.tomon.core.structures.Presence;
 import cn.troph.tomon.core.structures.StampPack;
 import cn.troph.tomon.core.utils.Assets;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
+import cn.troph.tomon.ui.fragments.ChannelListFragment;
 import cn.troph.tomon.ui.guild.GuildListAdapter;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
 import cn.troph.tomon.ui.widgets.TomonTabButton;
@@ -49,7 +50,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class ChannelListActivity extends BaseActivity {
+public class TomonMainActivity extends BaseActivity {
 
     public static final String NO_GUILD_ID = "";
     public static final String SP_NAME_CHANNEL_LIST_CONFIG = "channel_list_config";
@@ -67,6 +68,7 @@ public class ChannelListActivity extends BaseActivity {
     private ImageView mMeSelectedRing;
     private ImageView mAvatar;
     private RelativeLayout mMyStatus;
+    private String mCurrentFragmentTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,14 @@ public class ChannelListActivity extends BaseActivity {
         initGuildListAndRegistObserver();
         initGuildEmoji();
         initTab();
+        initChannelList(savedInstanceState);
+    }
+
+    private void initChannelList(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            return;
+        }
+        showGuildChannelList(getLastGuildId());
     }
 
     private void initTab() {
@@ -160,6 +170,13 @@ public class ChannelListActivity extends BaseActivity {
         SharedPreferences spChannelListConfig = getSharedPreferences(
                 SP_NAME_CHANNEL_LIST_CONFIG, MODE_PRIVATE);
         return spChannelListConfig.getString(SP_KEY_GUILD_ID, NO_GUILD_ID);
+    }
+
+    private void saveLastGuildId(String id) {
+        getSharedPreferences(SP_NAME_CHANNEL_LIST_CONFIG, MODE_PRIVATE)
+                .edit()
+                .putString(SP_KEY_GUILD_ID, id)
+                .apply();
     }
 
     private void initViewModel() {
@@ -386,6 +403,15 @@ public class ChannelListActivity extends BaseActivity {
                     mAdapter = new GuildListAdapter(guilds);
                     mAdapter.setCurrentGuildId(lastGuildId);
                     mGuildListRecyclerView.setAdapter(mAdapter);
+                    mAdapter.setOnItemClickListener(new GuildListAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(int position, Guild guild) {
+                            mAdapter.setCurrentGuildId(guild.getId());
+                            mAdapter.notifyDataSetChanged();
+                            mDrawerLayout.closeDrawer(true);
+                            showGuildChannelList(guild.getId());
+                        }
+                    });
                 } else {
                     mAdapter.setDataAndNotifyChanged(guilds);
                 }
@@ -400,6 +426,26 @@ public class ChannelListActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    private void showGuildChannelList(String guildId) {
+        ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager().findFragmentByTag(ChannelListFragment.TAG);
+        if (channelListFragment == null) {
+            channelListFragment = new ChannelListFragment();
+        }
+        Bundle extraData = new Bundle();
+        extraData.putString(ChannelListFragment.GUILD_ID, guildId);
+
+        if (ChannelListFragment.TAG.equals(mCurrentFragmentTag)) {
+            channelListFragment.updateGuildBanner(guildId);
+        } else {
+            channelListFragment.setArguments(extraData);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, channelListFragment, ChannelListFragment.TAG)
+                    .commit();
+        }
+        mCurrentFragmentTag = ChannelListFragment.TAG;
+        saveLastGuildId(guildId);
     }
 
     private void initJoinGuildView() {

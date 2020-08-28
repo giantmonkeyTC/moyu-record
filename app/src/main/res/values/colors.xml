@@ -38,7 +38,6 @@
     <color name="inputPanelBackground">#343536</color>
     <color name="background1">#171717</color>
     <color name="background2">#2E2E2E</color>
-    <color name="background3">#313131</color>
     <color name="background3alpha70">#B3313131</color>
     <color name="background4">#393939</color>
     <color name="backgroundMask">#272727</color>
@@ -61,7 +60,7 @@
     <color name="notification_dot">#CF5353</color>
 
 <!--    Use new color   -->
-    <color name="blackPrimary">#2E2E2E</color>
+    <color name="guildlist_bg">#2E2E2E</color>
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_50">#80ffffff</color>
     <color name="black_50">#80000000</color>
@@ -72,4 +71,7 @@
     <color name="white_60">#99FFFFFF</color>
     <color name="pinkPrimary">#FF7896</color>
     <color name="status_online">#67D78E</color>
+    <color name="blackPrimary">#313131</color>
+    <color name="black_20">#33000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

@@ -3,7 +3,6 @@ package cn.troph.tomon.ui.guild;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +19,23 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import java.util.List;
 
 import cn.troph.tomon.R;
-import cn.troph.tomon.core.structures.Channel;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.core.structures.TextChannel;
-import cn.troph.tomon.ui.activities.ChannelListActivity;
+import cn.troph.tomon.ui.activities.TomonMainActivity;
 
 public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.ViewHolder> {
 
     private List<Guild> mGuildList;
     private String mCurrentGuildId;
-    private static final int GUILD_AVATAR_CORNER_RADIUS = 25;
+    private OnItemClickListener mOnItemClickListener;
 
     public GuildListAdapter(List<Guild> guilds) {
         mGuildList = guilds;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
     }
 
     public void setDataAndNotifyChanged(List<Guild> newGuilds) {
@@ -46,6 +48,10 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
 
     public void setCurrentGuildId(String guildId) {
         mCurrentGuildId = guildId;
+    }
+
+    public String getCurrentGuildId() {
+        return mCurrentGuildId;
     }
 
     public List<Guild> getGuildList() {
@@ -63,22 +69,16 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
     @Override
     public void onBindViewHolder(@NonNull GuildListAdapter.ViewHolder holder, int position) {
         Guild guild = mGuildList.get(position);
-        holder.tvGuildName.setText(guild.getName());
-        String iconUrl = guild.getIconURL();
-        if (TextUtils.isEmpty(iconUrl)) {
-            Glide.with(holder.ivAvatar).load(R.drawable.guild_avatar_placeholder)
-                    .transform(new CenterCrop(), new RoundedCorners(GUILD_AVATAR_CORNER_RADIUS))
-                    .into(holder.ivAvatar);
-            holder.tvNoIconTextHolder.setText(guild.getName().substring(0,1));
-            holder.tvNoIconTextHolder.setVisibility(View.VISIBLE);
-
-        } else {
-            Glide.with(holder.ivAvatar).load(guild.getIconURL())
-                    .transform(new CenterCrop(), new RoundedCorners(GUILD_AVATAR_CORNER_RADIUS))
-                    .into(holder.ivAvatar);
-            holder.tvNoIconTextHolder.setVisibility(View.GONE);
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.onItemClick(position, guild);
+                }
+            });
         }
-
+        holder.tvGuildName.setText(guild.getName());
+        GuildAvatarUtils.setGuildAvatar(holder.ivAvatar, holder.tvNoIconTextHolder, guild);
         guild.updateMention();
         guild.updateUnread();
 
@@ -100,8 +100,8 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
             holder.ivSelectedFlag.setVisibility(View.VISIBLE);
             mCurrentGuildId = guild.getId();
             SharedPreferences sp = holder.ivSelectedFlag.getContext().
-                    getSharedPreferences(ChannelListActivity.SP_NAME_CHANNEL_LIST_CONFIG, Context.MODE_PRIVATE);
-            sp.edit().putString(ChannelListActivity.SP_KEY_GUILD_ID, mCurrentGuildId).apply();
+                    getSharedPreferences(TomonMainActivity.SP_NAME_CHANNEL_LIST_CONFIG, Context.MODE_PRIVATE);
+            sp.edit().putString(TomonMainActivity.SP_KEY_GUILD_ID, mCurrentGuildId).apply();
 
         } else {
             if (guild.getId().equals(mCurrentGuildId)) {
@@ -156,5 +156,9 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
             ivUnreadDotContent.setBackgroundResource(R.drawable.shape_unread_dot_content);
         }
 
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position, Guild guild);
     }
 }

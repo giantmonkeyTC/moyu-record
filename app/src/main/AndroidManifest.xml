@@ -35,7 +35,7 @@
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".ui.activities.ChannelListActivity"
+        <activity android:name=".ui.activities.TomonMainActivity"
             android:label="ChannelListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"

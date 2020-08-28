@@ -4,7 +4,7 @@
     android:layout_gravity="start"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blackPrimary">
+    android:background="@color/guildlist_bg">
 
     <EditText
         android:id="@+id/et_guild_list_search"
