@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.messages
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -9,6 +10,7 @@ import android.graphics.SurfaceTexture
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
 import android.text.Spanned
 import android.text.TextPaint
@@ -22,6 +24,7 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -30,6 +33,7 @@ import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
+import cn.troph.tomon.ui.chat.fragments.LogoutDialogFragment
 import cn.troph.tomon.ui.chat.fragments.ReplySourcePreviewFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
@@ -39,14 +43,17 @@ import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import io.noties.markwon.*
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.HtmlTag
@@ -60,6 +67,7 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
+import kotlinx.android.synthetic.main.image_view_overlay.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
@@ -500,7 +508,48 @@ class MessageAdapter(
                             ) { view, images ->
                                 Glide.with(view).load(images.url)
                                     .placeholder(R.drawable.loadinglogo).into(view)
-                            }.show()
+                            }
+                                .withOverlayView(
+                                    View.inflate(
+                                        holder.itemView.context,
+                                        R.layout.image_view_overlay,
+                                        null
+                                    ).apply {
+                                        this.findViewById<ImageView>(R.id.btn_image_save)
+                                            .setOnClickListener {
+                                                Toast.makeText(
+                                                    holder.itemView.context,
+                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
+                                                        Environment.DIRECTORY_DOWNLOADS
+                                                    )?.absolutePath}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                PRDownloader.download(
+                                                    image.url,
+                                                    holder.itemView.context.getExternalFilesDir(
+                                                        Environment.DIRECTORY_DOWNLOADS
+                                                    )?.absolutePath,
+                                                    image.fileName
+                                                )
+                                                    .build().start(object : OnDownloadListener {
+                                                        override fun onDownloadComplete() {
+                                                            Toast.makeText(
+                                                                holder.itemView.context,
+                                                                "下载完成",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+
+                                                        override fun onError(error: Error?) {
+                                                            Toast.makeText(
+                                                                holder.itemView.context,
+                                                                "下载失败",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    })
+                                            }
+                                    }).show()
                             break
                         }
                     }
@@ -1297,7 +1346,7 @@ class MessageAdapter(
                                     break
                                 }
                             } else if (isVideo(item.type)) {
-                                if (holder.itemView.source_content.hasOnClickListeners()){
+                                if (holder.itemView.source_content.hasOnClickListeners()) {
                                     holder.itemView.source_content.setOnClickListener(null)
                                 }
                                 holder.itemView.source_content_image.visibility = View.GONE
@@ -1306,7 +1355,7 @@ class MessageAdapter(
                                 holder.itemView.source_content.text =
                                     "${it.author?.name ?: ""}:[视频]"
                             } else {
-                                if (holder.itemView.source_content.hasOnClickListeners()){
+                                if (holder.itemView.source_content.hasOnClickListeners()) {
                                     holder.itemView.source_content.setOnClickListener(null)
                                 }
                                 holder.itemView.source_content_image.visibility = View.GONE
