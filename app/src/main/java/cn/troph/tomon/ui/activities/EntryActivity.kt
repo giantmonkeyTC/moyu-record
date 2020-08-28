@@ -19,31 +19,32 @@ import kotlinx.android.synthetic.main.activity_entry.*
 class EntryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_NoActionBar)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
         Glide.with(this).load(R.drawable.loading_splash_gif).into(loading_gif_iv)
-        loading_gif_iv.visibility = View.VISIBLE
-        val dataPullingViewModel: DataPullingViewModel by viewModels()
-
-        dataPullingViewModel.setUpFetchData()
-
-        dataPullingViewModel.dataFetchLD.observe(this, Observer {
-            if (it == true)
+        rl_root.postDelayed({
+            val dataPullingViewModel: DataPullingViewModel by viewModels()
+            dataPullingViewModel.dataFetchLD.observe(this, Observer {
+                if (it == true)
+                    gotoChat()
+            })
+            dataPullingViewModel.setUpFetchData()
+            if (Client.global.loggedIn) {
                 gotoChat()
-        })
-        if (Client.global.loggedIn) {
-            gotoChat()
-        } else {
-            Client.global
-                .login()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+            } else {
+                Client.global
+                    .login()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        rl_root.visibility = View.VISIBLE
+                        loading_gif_iv.visibility = View.VISIBLE
+                    }, {
+                        gotoEntryOption()
+                    })
+            }
 
-                }, {
-                    gotoEntryOption()
-                })
-        }
+        }, 1500);
+
     }
 
     private fun gotoEntryOption() {

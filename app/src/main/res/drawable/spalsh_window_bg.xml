@@ -10,7 +10,7 @@
     <item>
         <bitmap
             android:src="@drawable/window_bg"
-            android:gravity="center"/>
-
+            android:gravity="center_vertical|bottom"/>
     </item>
+
 </layer-list>
