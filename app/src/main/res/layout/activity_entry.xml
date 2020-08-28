@@ -4,20 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/activityBackground"
-    android:theme="@style/AppTheme.NoActionBar"
+    android:theme="@style/AppTheme.Splash"
     tools:context=".ui.activities.EntryActivity">
 
-    <ProgressBar
-        android:visibility="gone"
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.WhiteAccent"
+    <RelativeLayout
+        android:id="@+id/rl_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background3"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +24,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/loading_gif_iv"
+        android:visibility="invisible"
         android:layout_width="172dp"
         android:layout_height="172dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

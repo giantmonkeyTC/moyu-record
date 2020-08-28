@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.activities
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
@@ -21,27 +22,28 @@ class EntryActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
         Glide.with(this).load(R.drawable.loading_splash_gif).into(loading_gif_iv)
-        val dataPullingViewModel: DataPullingViewModel by viewModels()
-
-        dataPullingViewModel.setUpFetchData()
-
-        dataPullingViewModel.dataFetchLD.observe(this, Observer {
-            if (it == true)
+        rl_root.postDelayed({
+            val dataPullingViewModel: DataPullingViewModel by viewModels()
+            dataPullingViewModel.dataFetchLD.observe(this, Observer {
+                if (it == true)
+                    gotoChat()
+            })
+            dataPullingViewModel.setUpFetchData()
+            if (Client.global.loggedIn) {
                 gotoChat()
-        })
-        if (Client.global.loggedIn) {
-            gotoChat()
-        } else {
-            Client.global
-                .login()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+            } else {
+                Client.global
+                    .login()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        rl_root.visibility = View.VISIBLE
+                        loading_gif_iv.visibility = View.VISIBLE
+                    }, {
+                        gotoEntryOption()
+                    })
+            }
 
-                }, {
-                    gotoEntryOption()
-                })
-        }
-
+        }, 1500);
 
     }
 
