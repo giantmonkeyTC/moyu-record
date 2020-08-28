@@ -35,4 +35,6 @@
     <dimen name="reply_source_cancel_size">40dp</dimen>
     <dimen name="reply_source_text_size">18dp</dimen>
     <dimen name="reply_text_size">14dp</dimen>
+    <dimen name="image_overlay_save_margin">24dp</dimen>
+    <dimen name="btn_image_save_size">40dp</dimen>
 </resources>
