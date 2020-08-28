@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tool="http://schemas.android.com/tools"
-    android:layout_marginTop="@dimen/margin_19dp">
+    android:layout_marginBottom="@dimen/margin_10dp"
+    android:layout_marginTop="@dimen/margin_10dp">
 
     <ImageView
         android:id="@+id/iv_selected_flag"

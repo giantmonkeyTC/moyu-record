@@ -26,6 +26,7 @@
             android:layout_height="@dimen/channel_list_tab_height"
             android:layout_weight="0"
             android:background="@color/channel_list_tab_bg"
+            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 

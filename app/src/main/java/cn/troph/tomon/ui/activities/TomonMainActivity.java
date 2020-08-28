@@ -73,7 +73,7 @@ public class TomonMainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_channel_list);
+        setContentView(R.layout.activity_tomon_main);
         initViewModel();
         initGuildListAndRegistObserver();
         initGuildEmoji();

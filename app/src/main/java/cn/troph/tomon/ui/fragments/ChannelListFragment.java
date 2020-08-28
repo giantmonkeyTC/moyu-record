@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -36,6 +38,7 @@ public class ChannelListFragment extends Fragment {
     private ImageView mIvGuildBannerMask;
     private TextView mTvGuildName;
     private TextView mTvGuildAvaterTextHolder;
+    private RecyclerView mRvChannelList;
 
     @Nullable
     @Override
@@ -48,6 +51,7 @@ public class ChannelListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
         updateGuildBanner(getArguments().getString(GUILD_ID));
+        Client.Companion.getGlobal().getChannels().get
     }
 
     private void initView(@NonNull View view) {
@@ -57,6 +61,10 @@ public class ChannelListFragment extends Fragment {
         mIvGuildSetting = view.findViewById(R.id.iv_guild_setting);
         mTvGuildName = view.findViewById(R.id.tv_guild_name);
         mTvGuildAvaterTextHolder = view.findViewById(R.id.tv_no_icon_text);
+        mRvChannelList = view.findViewById(R.id.rv_channel_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        mRvChannelList.setLayoutManager(linearLayoutManager);
+
     }
 
     public void updateGuildBanner(String guildId) {
