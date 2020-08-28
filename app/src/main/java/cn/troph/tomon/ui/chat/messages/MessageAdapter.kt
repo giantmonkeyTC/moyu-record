@@ -1293,8 +1293,9 @@ class MessageAdapter(
                         holder.itemView.source_content_image.visibility = View.VISIBLE
                         holder.itemView.source_content.visibility = View.GONE
                         holder.itemView.source_content_author.visibility = View.VISIBLE
+                        holder.itemView.name_divider.visibility = View.VISIBLE
                         holder.itemView.source_content_author.text =
-                            "${it.author?.name ?: ""}:"
+                            "${it.author?.name ?: ""}"
                         for (item in it.stamps) {
                             Glide.with(holder.itemView)
                                 .load(
@@ -1313,8 +1314,9 @@ class MessageAdapter(
                                 holder.itemView.source_content_image.visibility = View.VISIBLE
                                 holder.itemView.source_content.visibility = View.GONE
                                 holder.itemView.source_content_author.visibility = View.VISIBLE
+                                holder.itemView.name_divider.visibility = View.VISIBLE
                                 holder.itemView.source_content_author.text =
-                                    "${it.author?.name ?: ""}:"
+                                    "${it.author?.name ?: ""}"
                                 for (item in it.attachments.values) {
                                     Glide.with(holder.itemView)
                                         .load(
@@ -1337,6 +1339,47 @@ class MessageAdapter(
                                                 Glide.with(view).load(images.url)
                                                     .placeholder(R.drawable.loadinglogo).into(view)
                                             }.apply {
+                                                this.withOverlayView(
+                                                View.inflate(
+                                                    holder.itemView.context,
+                                                    R.layout.image_view_overlay,
+                                                    null
+                                                ).apply {
+                                                    this.findViewById<ImageView>(R.id.btn_image_save)
+                                                        .setOnClickListener {
+                                                            Toast.makeText(
+                                                                holder.itemView.context,
+                                                                "文件保存至:${holder.itemView.context.getExternalFilesDir(
+                                                                    Environment.DIRECTORY_DOWNLOADS
+                                                                )?.absolutePath}",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                            PRDownloader.download(
+                                                                image.url,
+                                                                holder.itemView.context.getExternalFilesDir(
+                                                                    Environment.DIRECTORY_DOWNLOADS
+                                                                )?.absolutePath,
+                                                                image.fileName
+                                                            )
+                                                                .build().start(object : OnDownloadListener {
+                                                                    override fun onDownloadComplete() {
+                                                                        Toast.makeText(
+                                                                            holder.itemView.context,
+                                                                            "下载完成",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    }
+
+                                                                    override fun onError(error: Error?) {
+                                                                        Toast.makeText(
+                                                                            holder.itemView.context,
+                                                                            "下载失败",
+                                                                            Toast.LENGTH_SHORT
+                                                                        ).show()
+                                                                    }
+                                                                })
+                                                        }
+                                                })
                                                 this.allowSwipeToDismiss(true)
                                                 show()
                                             }
@@ -1351,6 +1394,7 @@ class MessageAdapter(
                                 }
                                 holder.itemView.source_content_image.visibility = View.GONE
                                 holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
                                     "${it.author?.name ?: ""}:[视频]"
@@ -1360,6 +1404,7 @@ class MessageAdapter(
                                 }
                                 holder.itemView.source_content_image.visibility = View.GONE
                                 holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
                                     "${it.author?.name ?: ""}:[文件]"
@@ -1370,7 +1415,7 @@ class MessageAdapter(
                         holder.itemView.source_content.visibility = View.VISIBLE
                         holder.itemView.source_content_image.visibility = View.GONE
                         holder.itemView.source_content_author.visibility = View.GONE
-                        holder.itemView.source_content_author.text = it.author?.name
+                        holder.itemView.name_divider.visibility = View.GONE
                         Converter.toMarkdownTextView(
                             Markwon.builder(holder.itemView.context) // automatically create Glide instance
                                 .usePlugin(ImagesPlugin.create())
