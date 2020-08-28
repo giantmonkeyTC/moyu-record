@@ -51,7 +51,6 @@ public class ChannelListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
         updateGuildBanner(getArguments().getString(GUILD_ID));
-        Client.Companion.getGlobal().getChannels().get
     }
 
     private void initView(@NonNull View view) {

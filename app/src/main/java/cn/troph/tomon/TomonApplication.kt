@@ -38,17 +38,18 @@ class TomonApplication : Application() {
     @SuppressLint("MissingPermission")
     override fun onCreate() {
         super.onCreate()
-        SentryAndroid.init(this)
-        EmojiCompat.init(BundledEmojiCompatConfig(this))
-        Logger.addLogAdapter(AndroidLogAdapter())
-        PRDownloader.initialize(this)
         Client.global.initialize(this)
         sAnalytics = GoogleAnalytics.getInstance(this)
         sTracker = sAnalytics.newTracker(R.xml.global_tracker)
         sTracker.enableAutoActivityTracking(true)
+        SentryAndroid.init(this)
+        EmojiCompat.init(BundledEmojiCompatConfig(this))
+        Logger.addLogAdapter(AndroidLogAdapter())
+        PRDownloader.initialize(this)
         initPushService(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(ApplicationObserver())
         UploadServiceConfig.initialize(this,"1",BuildConfig.DEBUG)
+
     }
 
     private fun initChannel() {
