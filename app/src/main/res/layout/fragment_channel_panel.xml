@@ -31,6 +31,45 @@
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout" />
 
     <LinearLayout
+        android:id="@+id/bar_update_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/view_messages">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/shape_message_update">
+
+            <TextView
+                android:id="@+id/message_update_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:text="@string/message_update_bar_text"
+                android:maxLines="1"
+                android:textColor="@color/primaryTextAlpha50" />
+
+            <ImageView
+                android:id="@+id/btn_update_message_cancel"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="22dp"
+                android:background="@drawable/reply_cancel" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/bar_reply_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -102,42 +141,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:id="@+id/bar_update_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background4"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/edit_pannel_view">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:layout_marginStart="20dp"
-                android:layout_weight="7"
-                android:text="@string/updateMessage"
-                android:textColor="@color/secondaryTextAlpha70" />
-
-            <TextView
-                android:id="@+id/btn_update_message_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:layout_marginEnd="30dp"
-                android:layout_weight="1"
-                android:text="@string/cancel"
-                android:textAlignment="viewEnd"
-                android:textColor="@color/white" />
-        </LinearLayout>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/edit_pannel_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/editTextBackground"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/bar_update_message">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+           >
 
             <View
                 android:id="@+id/input_sep_line"
@@ -203,7 +215,7 @@
                 android:layout_marginEnd="14dp"
                 android:layout_marginBottom="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:src="@drawable/btn_send"
+                android:src="@drawable/btn_send_default"
                 android:tag="@string/send_btn_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

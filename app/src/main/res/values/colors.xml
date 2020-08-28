@@ -61,4 +61,7 @@
     <color name="mask">#BF000000</color>
     <color name="notification_dot">#CF5353</color>
     <color name="reply_source_highlight">#802B98D6</color>
+    <color name="primaryTextAlpha50">#80FFFFFF</color>
+    <color name="primaryColorAlpha20">#30FF7896</color>
+    <color name="update_message_shape_color">#5A3F45</color>
 </resources>

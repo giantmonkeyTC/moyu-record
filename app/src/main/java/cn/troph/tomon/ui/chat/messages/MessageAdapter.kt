@@ -1240,8 +1240,6 @@ class MessageAdapter(
                 }
                 messageList[position].replySource?.let {
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
-                    holder.itemView.message_reply_section.setOnClickListener {
-                    }
                     if (it.stamps.size > 0) {
                         holder.itemView.source_content_image.visibility = View.VISIBLE
                         holder.itemView.source_content.visibility = View.GONE
@@ -1299,12 +1297,18 @@ class MessageAdapter(
                                     break
                                 }
                             } else if (isVideo(item.type)) {
+                                if (holder.itemView.source_content.hasOnClickListeners()){
+                                    holder.itemView.source_content.setOnClickListener(null)
+                                }
                                 holder.itemView.source_content_image.visibility = View.GONE
                                 holder.itemView.source_content_author.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
                                     "${it.author?.name ?: ""}:[视频]"
                             } else {
+                                if (holder.itemView.source_content.hasOnClickListeners()){
+                                    holder.itemView.source_content.setOnClickListener(null)
+                                }
                                 holder.itemView.source_content_image.visibility = View.GONE
                                 holder.itemView.source_content_author.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE

@@ -130,6 +130,9 @@ class ChatSharedViewModel : ViewModel() {
 
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
+                if (it.flag) {
+                    replyLd.value = ReplyEnabled(false, null)
+                }
                 updateLD.value = it
             })
 

@@ -310,6 +310,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }, object : OnReplyClickListener {
             override fun onReplyClick(message: Message?) {
+                mChatSharedVM.updateLD.value = UpdateEnabled(flag = false, message = null)
                 mChatSharedVM.replyLd.value = ReplyEnabled(flag = true, message = message)
             }
 
@@ -435,8 +436,8 @@ class ChannelPanelFragment : BaseFragment() {
                                         state = false,
                                         start = start
                                     )
-//                            if (s.isEmpty() && start >= 0) {
-//
+                            if (s.isEmpty() && start >= 0) {
+                                btn_message_send.setImageResource(R.drawable.btn_send_default)
 //                                val animOut = ValueAnimator()
 //                                animOut.setIntValues(300, 900)
 //                                animOut.setInterpolator(LinearInterpolator())
@@ -447,7 +448,7 @@ class ChannelPanelFragment : BaseFragment() {
 //                                    }
 //                                }
 //                                animOut.start()
-//                            }
+                            }
                         }
 
                     }
@@ -455,8 +456,9 @@ class ChannelPanelFragment : BaseFragment() {
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                if (s != null) {
-//                    if (s.isEmpty() && start >= 0) {
+                if (s != null) {
+                    if (s.isEmpty() && start >= 0) {
+                        btn_message_send.setImageResource(R.drawable.btn_send)
 //                        val params = editText.layoutParams
 //                        val animOut = ValueAnimator()
 //                        animOut.setIntValues(900, 300)
@@ -468,8 +470,8 @@ class ChannelPanelFragment : BaseFragment() {
 //                            }
 //                        }
 //                        animOut.start()
-//                    }
-//                }
+                    }
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
