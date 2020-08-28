@@ -36,6 +36,8 @@ class EntryActivity : BaseActivity() {
                     .login()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
+                        iv_logo.visibility = View.INVISIBLE
+                        iv_people.visibility = View.INVISIBLE
                         rl_root.visibility = View.VISIBLE
                         loading_gif_iv.visibility = View.VISIBLE
                     }, {
@@ -43,7 +45,7 @@ class EntryActivity : BaseActivity() {
                     })
             }
 
-        }, 1500);
+        }, 2500);
 
     }
 
