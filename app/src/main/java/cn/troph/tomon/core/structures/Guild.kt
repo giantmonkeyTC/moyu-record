@@ -102,7 +102,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             position = data["position"].optInt ?: 0
         }
         if (data.has("joined_at")) {
-            joinedAt = Converter.toDate(data["joined_at"].asString)
+            joinedAt = Converter.toDate(data["joined_at"].optString)
         }
         if (data.has("owner_id")) {
             ownerId = data["owner_id"].asString
