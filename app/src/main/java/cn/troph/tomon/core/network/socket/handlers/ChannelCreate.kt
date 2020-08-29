@@ -8,8 +8,10 @@ import com.google.gson.JsonNull
 
 val handleChannelCreate: Handler = { client: Client, packet: JsonElement ->
     val c = packet.asJsonObject["d"].asJsonObject
-    if (c["parent_id"].optString == "0") {
-        c.add("parent_id", JsonNull.INSTANCE)
+    c["parent_id"]?.let {
+        if (it.optString == "0") {
+            c.add("parent_id", JsonNull.INSTANCE)
+        }
     }
     client.actions.channelCreate(c)
 }
