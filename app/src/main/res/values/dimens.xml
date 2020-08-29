@@ -37,4 +37,5 @@
     <dimen name="reply_text_size">14dp</dimen>
     <dimen name="image_overlay_save_margin">24dp</dimen>
     <dimen name="btn_image_save_size">40dp</dimen>
+    <dimen name="owner_change_margin_top">16dp</dimen>
 </resources>

@@ -15,6 +15,7 @@ import android.os.Environment
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.*
@@ -73,6 +74,7 @@ import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_message_link.view.*
+import kotlinx.android.synthetic.main.item_message_owner_change.view.*
 import kotlinx.android.synthetic.main.item_message_reply.view.*
 import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_message_video.view.*
@@ -181,6 +183,13 @@ class MessageAdapter(
                         .inflate(R.layout.item_message_reply, parent, false)
                 )
             }
+
+            10 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_owner_change, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -221,6 +230,8 @@ class MessageAdapter(
                     return 8
             }
             return 0
+        } else if (messageList[position].type == MessageType.GUILD_OWNER_CHANGE) {
+            return 10
         }
         return 0
     }
@@ -1462,6 +1473,18 @@ class MessageAdapter(
                     callBottomSheet(holder, 0)
                     true
                 }
+            }
+            10 -> {
+                val message = messageList[position]
+                val oldOwner =
+                    (Client.global.channels[message.channelId] as TextChannel).members[message.author!!.id]
+                val newOwnerId = message.content
+                val newOwner =
+                    (Client.global.channels[message.channelId] as TextChannel).members[newOwnerId!!]
+                val displayNameNewOwner = newOwner!!.displayName
+                val displayNameOldOwner = oldOwner!!.displayName
+                holder.itemView.tv_new_owner.text = displayNameNewOwner
+                holder.itemView.tv_old_owner.text = "👑 " + displayNameOldOwner
             }
         }
 
