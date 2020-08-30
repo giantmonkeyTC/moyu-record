@@ -53,6 +53,9 @@ class GuildChannelSelectorFragment : Fragment() {
         //disconnect voice ws
         Client.global.voiceSocket.close()
     }
+    val voiceLeaveObserver = Observer<Boolean> {
+        Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
+    }
 
     var guildId: String? = null
         set(value) {
@@ -176,9 +179,8 @@ class GuildChannelSelectorFragment : Fragment() {
         })
 
         //点击关闭voice panel
-        mChatSharedViewModel.voiceLeaveClick.observe(viewLifecycleOwner, Observer {
-            Client.global.socket.send(GatewayOp.VOICE, Gson().toJsonTree(VoiceLeaveConnect()))
-        })
+        mChatSharedViewModel.voiceLeaveClick.removeObserver(voiceLeaveObserver)
+        mChatSharedViewModel.voiceLeaveClick.observe(viewLifecycleOwner, voiceLeaveObserver)
 
         //voice ws状态
         mChatSharedViewModel.voiceSocketStateLD.observe(viewLifecycleOwner, Observer {
