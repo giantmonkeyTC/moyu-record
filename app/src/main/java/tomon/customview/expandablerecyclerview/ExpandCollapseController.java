@@ -25,7 +25,7 @@ public class ExpandCollapseController {
    *
    * @param listPosition position of the group to collapse
    */
-  private void collapseGroup(ExpandableListPosition listPosition) {
+  public void collapseGroup(ExpandableListPosition listPosition) {
     expandableList.expandedGroupIndexes[listPosition.groupPos] = false;
     if (listener != null) {
       listener.onGroupCollapsed(expandableList.getFlattenedGroupIndex(listPosition) + 1,
@@ -38,7 +38,7 @@ public class ExpandCollapseController {
    *
    * @param listPosition the group to be expanded
    */
-  private void expandGroup(ExpandableListPosition listPosition) {
+  public void expandGroup(ExpandableListPosition listPosition) {
     expandableList.expandedGroupIndexes[listPosition.groupPos] = true;
     if (listener != null) {
       listener.onGroupExpanded(expandableList.getFlattenedGroupIndex(listPosition) + 1,

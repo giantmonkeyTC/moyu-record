@@ -22,7 +22,7 @@ public abstract class ExpandableRecyclerViewAdapter<GVH extends GroupViewHolder,
   private static final String EXPAND_STATE_MAP = "expandable_recyclerview_adapter_expand_state_map";
 
   protected ExpandableList expandableList;
-  private ExpandCollapseController expandCollapseController;
+  protected ExpandCollapseController expandCollapseController;
 
   private OnGroupClickListener groupClickListener;
   private GroupExpandCollapseListener expandCollapseListener;
@@ -185,6 +185,35 @@ public abstract class ExpandableRecyclerViewAdapter<GVH extends GroupViewHolder,
    */
   public boolean toggleGroup(ExpandableGroup group) {
     return expandCollapseController.toggleGroup(group);
+  }
+
+  public void expandAll() {
+    List<? extends ExpandableGroup> groups = expandableList.groups;
+    for (ExpandableGroup group : groups) {
+      expandGroup(group);
+    }
+  }
+
+  public boolean expandGroup(ExpandableGroup group) {
+    ExpandableListPosition listPos =
+            expandableList.getUnflattenedPosition(expandableList.getFlattenedGroupIndex(group));
+    boolean expanded = expandableList.expandedGroupIndexes[listPos.groupPos];
+    if (expanded) {
+      return false;
+    }
+    expandCollapseController.expandGroup(listPos);
+    return true;
+  }
+
+  public boolean collapseGroup(ExpandableGroup group) {
+    ExpandableListPosition listPos =
+            expandableList.getUnflattenedPosition(expandableList.getFlattenedGroupIndex(group));
+    boolean expanded = expandableList.expandedGroupIndexes[listPos.groupPos];
+    if (!expanded) {
+      return false;
+    }
+    expandCollapseController.collapseGroup(listPos);
+    return true;
   }
 
   /**

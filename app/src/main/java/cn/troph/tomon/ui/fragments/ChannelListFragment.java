@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.fragments;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,18 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import cn.troph.tomon.R;
+import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
+import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.structures.Guild;
+import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.ui.channel.ChannelGroup;
+import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
 
 public class ChannelListFragment extends Fragment {
@@ -39,6 +49,8 @@ public class ChannelListFragment extends Fragment {
     private TextView mTvGuildName;
     private TextView mTvGuildAvaterTextHolder;
     private RecyclerView mRvChannelList;
+    private ChannelListAdapter mChannelListAdapter;
+    private List<ChannelGroup> mChannelGroups;
 
     @Nullable
     @Override
@@ -50,6 +62,7 @@ public class ChannelListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
+        mChannelGroups = new ArrayList<>();
         updateGuildBanner(getArguments().getString(GUILD_ID));
     }
 
@@ -92,5 +105,32 @@ public class ChannelListFragment extends Fragment {
                     }
                 })
                 .into(mIvGuildBanner);
+
+        GuildChannelCollection channels = guild.getChannels();
+        HashMap<String, ChannelGroup> channelGroupHashMap = new HashMap<>();
+        mChannelGroups.clear();
+        for (GuildChannel channel : channels) {
+            ChannelType type = channel.getType();
+            if (type == ChannelType.CATEGORY) {
+                ChannelGroup channelGroup = new ChannelGroup(channel.getName(), new ArrayList<>());
+                channelGroupHashMap.put(channel.getId(), channelGroup);
+                mChannelGroups.add(channelGroup);
+            } else if (type == ChannelType.TEXT || type == ChannelType.VOICE) {
+                ChannelGroup channelGroup1 = channelGroupHashMap.get(channel.getParentId());
+                channelGroup1.getItems().add(channel);
+            } else {
+                Log.d(TAG, "Add an unknown type channel: " + type);
+            }
+        }
+
+        if (mChannelListAdapter == null) {
+            mChannelListAdapter = new ChannelListAdapter(mChannelGroups);
+            mRvChannelList.setAdapter(mChannelListAdapter);
+        } else {
+            mChannelListAdapter.setDataSetAndNotifyChanged(mChannelGroups);
+        }
+
+        mChannelListAdapter.expandAll();
+
     }
 }
