@@ -292,18 +292,19 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }, object : OnAvatarLongClickListener {
             override fun onAvatarLongClick(identifier: String) {
-                val start = editText.selectionStart
-                editText.text.insert(
-                    start,
-                    mentionFormat(identifier)
-                )
-                editText.text.setSpan(
-                    ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
-                    start,
-                    start + mentionFormat(identifier).length,
-                    0x11
-                )
-
+                if (editText.isEnabled) {
+                    val start = editText.selectionStart
+                    editText.text.insert(
+                        start,
+                        mentionFormat(identifier)
+                    )
+                    editText.text.setSpan(
+                        ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
+                        start,
+                        start + mentionFormat(identifier).length,
+                        0x11
+                    )
+                }
             }
         }, object : OnReplyClickListener {
             override fun onReplyClick(message: Message?) {
