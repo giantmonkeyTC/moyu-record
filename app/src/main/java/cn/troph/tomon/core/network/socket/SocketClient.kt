@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import okhttp3.*
 import java.lang.Error
+import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -124,6 +125,8 @@ class SocketClient : WebSocketListener(),
 
     override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosing(webSocket, code, reason)
+        Logger.d(code)
+        Logger.d(reason)
         println("[ws] closing")
         _state = SocketClientState.CLOSING
         _emitter?.onNext(SocketEvent(SocketEventType.CLOSING))
@@ -132,7 +135,8 @@ class SocketClient : WebSocketListener(),
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
         println("[ws] closed")
-        Logger.d("try reconnecting")
+        Logger.d(code)
+        Logger.d(reason)
         _state = SocketClientState.CLOSED
         when (code) {
             1000 -> {

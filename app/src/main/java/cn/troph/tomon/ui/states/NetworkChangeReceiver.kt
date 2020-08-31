@@ -9,9 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.socket.SocketClientState
 import com.androidadvance.topsnackbar.TSnackbar
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import java.lang.NullPointerException
+import java.time.LocalDateTime
 
 class NetworkChangeReceiver() : BroadcastReceiver() {
     lateinit var mView: View
@@ -38,8 +40,12 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
                 new.show()
                 old = new
             } else {
-                Client.global.socket.open()
-                old.dismiss()
+                if (LocalDateTime.now().isAfter(Client.global.socket.lastHeartbeat.plusSeconds(4))
+                ) {
+                    Client.global.socket.open()
+                    old.dismiss()
+                }
+
             }
         } catch (
             e: NullPointerException
