@@ -12,7 +12,9 @@ import androidx.core.content.edit
 import androidx.fragment.app.DialogFragment
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.structures.Message
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.Converter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -39,12 +41,21 @@ class ReplySourcePreviewFragment(val message: Message) : DialogFragment() {
         return inflater.inflate(R.layout.fragment_reply_source, container, false)
     }
 
+    private fun guildMemberOf(msg: Message): GuildMember? {
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val sourceMessage = message.replySource
         sourceMessage?.let {
             reply_source_avatar.user = sourceMessage.author
-            reply_source_author.text = sourceMessage.author?.name ?: ""
+            reply_source_author.text = guildMemberOf(sourceMessage)?.displayName ?: ""
             Converter.toMarkdownTextView(
                 Markwon.builder(requireContext()) // automatically create Glide instance
                     .usePlugin(ImagesPlugin.create())

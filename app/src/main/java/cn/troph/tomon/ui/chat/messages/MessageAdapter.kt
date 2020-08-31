@@ -261,9 +261,10 @@ class MessageAdapter(
             0 -> {
                 val msg = messageList[position]
                 holder.itemView.message_avatar.setOnClickListener {
+                    var member: GuildMember? = guildMemberOf(msg)
                     messageList[holder.adapterPosition].authorId?.let {
                         val context = holder.itemView.context as AppCompatActivity
-                        val guildUserInfoFragment = GuildUserInfoFragment(it)
+                        val guildUserInfoFragment = GuildUserInfoFragment(it, member)
                         guildUserInfoFragment.show(
                             context.supportFragmentManager,
                             guildUserInfoFragment.tag
@@ -312,7 +313,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -340,6 +341,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_file.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_file.setTextColor(
@@ -438,7 +441,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -457,6 +460,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_image.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_image.setTextColor(
@@ -630,7 +635,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -649,6 +654,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_invite.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_invite.setTextColor(
@@ -744,8 +751,19 @@ class MessageAdapter(
 
                 }
                 holder.itemView.message_avatar_invite.user = messageList[position].author
-                holder.itemView.widget_message_author_name_text_invite.text =
-                    messageList[position].author?.name
+                if (Client.global.channels[message.channelId] is TextChannel) {
+                    val member =
+                        (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                            ?: ""]
+                    if (member != null) {
+                        holder.itemView.widget_message_author_name_text_invite.text =
+                            "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    }
+                } else {
+                    holder.itemView.widget_message_author_name_text_invite.text =
+                        messageList[position].author?.name
+                }
+
                 holder.view.widget_message_timestamp_text_invite.text =
                     timestampConverter(messageList[position].timestamp)
                 showReaction(holder, messageList[position])
@@ -769,7 +787,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -798,6 +816,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_stamp.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_stamp.setTextColor(
@@ -878,7 +898,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -897,6 +917,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_video.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_video.setTextColor(
@@ -1086,7 +1108,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
 
                         }
@@ -1105,6 +1127,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_link.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_link.setTextColor(
@@ -1236,7 +1260,7 @@ class MessageAdapter(
                         messageList[holder.adapterPosition].authorId?.let {
 
                             val context = holder.itemView.context as AppCompatActivity
-                            GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
+                            GuildUserInfoFragment(it, guildMemberOf(messageList[holder.adapterPosition])).show(context.supportFragmentManager, null)
 
                         }
                     }
@@ -1256,6 +1280,9 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_reply.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_reply.setTextColor(
@@ -1306,7 +1333,7 @@ class MessageAdapter(
                         holder.itemView.source_content_author.visibility = View.VISIBLE
                         holder.itemView.name_divider.visibility = View.VISIBLE
                         holder.itemView.source_content_author.text =
-                            "${it.author?.name ?: ""}"
+                            "${guildMemberOf(it)?.displayName ?: ""}"
                         for (item in it.stamps) {
                             Glide.with(holder.itemView)
                                 .load(
@@ -1327,7 +1354,7 @@ class MessageAdapter(
                                 holder.itemView.source_content_author.visibility = View.VISIBLE
                                 holder.itemView.name_divider.visibility = View.VISIBLE
                                 holder.itemView.source_content_author.text =
-                                    "${it.author?.name ?: ""}"
+                                    "${guildMemberOf(it)?.displayName ?: ""}"
                                 for (item in it.attachments.values) {
                                     Glide.with(holder.itemView)
                                         .load(
@@ -1408,7 +1435,7 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${it.author?.name ?: ""}:[视频]"
+                                    "${guildMemberOf(it)?.displayName ?: ""}:[视频]"
                             } else {
                                 if (holder.itemView.source_content.hasOnClickListeners()) {
                                     holder.itemView.source_content.setOnClickListener(null)
@@ -1418,7 +1445,7 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${it.author?.name ?: ""}:[文件]"
+                                    "${guildMemberOf(it)?.displayName ?: ""}:[文件]"
                             }
                             break
                         }
@@ -1444,7 +1471,7 @@ class MessageAdapter(
                                             .load(drawable.destination)
                                     }
                                 })).build(),
-                            "${it.author?.name ?: ""}:${it.content}",
+                            "${guildMemberOf(it)?.displayName ?: ""}:${it.content}",
                             holder.itemView.source_content
                         )
                         holder.itemView.source_content.setOnClickListener {
@@ -1488,6 +1515,15 @@ class MessageAdapter(
             }
         }
 
+    }
+
+    private fun guildMemberOf(msg: Message): GuildMember? {
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
@@ -1564,7 +1600,7 @@ class MessageAdapter(
                 itemView.widget_message_author_name_text.text = "T🐱"
             } else {
                 itemView.widget_message_author_name_text.text =
-                    "${message.author?.name} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
+                    "${member?.displayName} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
 
                 if (member != null) {
                     itemView.widget_message_author_name_text.setTextColor(
@@ -1647,10 +1683,24 @@ class MessageAdapter(
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate = "<tomonandroid>%s</tomonandroid>"
         contentSpanAtUser.contentAtUser.forEach {
-            tempMsg = tempMsg?.replaceFirst(
-                "<@${it.id}>",
-                atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
-            )
+            var member: GuildMember? = null
+            if (Client.global.channels[message.channelId] is TextChannel) {
+                member =
+                    (Client.global.channels[message.channelId] as TextChannel).members[it.id
+                        ?: ""]
+            }
+            if (member == null) {
+                tempMsg = tempMsg?.replaceFirst(
+                    "<@${it.id}>",
+                    atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
+                )
+            } else {
+                tempMsg = tempMsg?.replaceFirst(
+                    "<@${it.id}>",
+                    atUserTemplate.format("@${member.displayName}")
+                )
+            }
+
         }
         markdown?.setMarkdown(
             itemView,

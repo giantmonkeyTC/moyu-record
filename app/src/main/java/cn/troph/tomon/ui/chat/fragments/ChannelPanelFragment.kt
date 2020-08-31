@@ -379,6 +379,16 @@ class ChannelPanelFragment : BaseFragment() {
         requireActivity().unregisterReceiver(mNetworkChangeReceiver)
     }
 
+    private fun guildMemberOf(msg: Message?): GuildMember? {
+        if (msg == null) return null
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mEasyImage = EasyImage.Builder(requireContext())
@@ -406,12 +416,13 @@ class ChannelPanelFragment : BaseFragment() {
             } else {
                 bar_reply_message.visibility = View.GONE
             }
+
             bar_reply_message.message_reply_to.text =
 
-                "${if ((it.message?.author?.name ?: "").length > 6) (it.message?.author?.name?.substring(
+                "${if ((guildMemberOf(it.message)?.displayName ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: ""?.substring(
                     0,
                     6
-                ) ?: "") + "···" else it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
+                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: "" ?: ""}:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {

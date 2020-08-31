@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.fragment_guild_selector.*
 
 import kotlinx.android.synthetic.main.guild_user_info.*
 
-class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragment() {
+class GuildUserInfoFragment(private val userId: String, private val member: GuildMember? = null) : BottomSheetDialogFragment() {
     private val mChatVM: ChatSharedViewModel by activityViewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     override fun onCreateView(
@@ -60,7 +60,11 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
         roles.visibility = View.GONE
         mChatVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
             avatar.user = user
-            name.text = user.name
+            if (member == null) {
+                name.text = user.name
+            } else {
+                name.text = member.displayName
+            }
             nick.text = "${user.username} #${user.discriminator}"
             if (user.id != Client.global.me.id && user.id != "1") {
                 out.visibility = View.VISIBLE
