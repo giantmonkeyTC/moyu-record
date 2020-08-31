@@ -20,10 +20,13 @@ class Client {
         val INSTANCE = Client()
     }
 
+
     companion object {
         val global: Client by lazy { HOLDER.INSTANCE }
     }
 
+    var cacheChannelMap = mutableMapOf<String,String>()
+    var isBackground = false
     val rest = Restful()
     val actions = ActionManager(this)
     val socket = Socket(this)
