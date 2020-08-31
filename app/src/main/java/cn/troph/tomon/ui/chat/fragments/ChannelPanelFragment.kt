@@ -709,7 +709,7 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
+                    event.message.nonce != null && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
                     mMsgList.add(event.message)
