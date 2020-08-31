@@ -51,19 +51,19 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
-            id = data["id"].asString
+            id = data["id"].optString ?: ""
         }
         if (data.has("type")) {
             type = data["type"].asInt
         }
         if (data.has("username")) {
-            username = data["username"].asString
+            username = data["username"].optString ?: ""
         }
         if (data.has("discriminator")) {
-            discriminator = data["discriminator"].asString
+            discriminator = data["discriminator"].optString ?: ""
         }
         if (data.has("name")) {
-            name = data["name"].asString
+            name = data["name"].optString ?: ""
         }
         if (data.has("avatar")) {
             avatar = data["avatar"].optString

@@ -159,6 +159,9 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
     var replySource: Message? = null
         get() =
             reply?.let {
+                if (channel == null) {
+                    return null
+                }
                 if ((channel as TextChannel).messages.has(it.id))
                     (channel as TextChannel).messages[it.id]
                 else {

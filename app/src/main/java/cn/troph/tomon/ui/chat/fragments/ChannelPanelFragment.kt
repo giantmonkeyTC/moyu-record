@@ -224,18 +224,15 @@ class ChannelPanelFragment : BaseFragment() {
         }
 
     private fun setNoPermissionViewIfNeeded(channel: TextChannel) {
-        val meCollectionNone = channel.members[Client.global.me.id]?.roles?.collection?.none {
-            it.permissions.has(Permissions.SEND_MESSAGES)
+        var meMember = channel.members[Client.global.me.id]
+        var canSendMessage: Boolean? = false
+        if (meMember != null) {
+            canSendMessage = channel.permissionForMember(meMember)?.has(Permissions.SEND_MESSAGES)
+        } else {
+            canSendMessage = false
         }
 
-        val meCollectionAny = channel.members[Client.global.me.id]?.roles?.collection?.any {
-            val po = channel.permissionOverwrites[it.id]
-            if (po != null)
-                po.denyPermission(Permissions.SEND_MESSAGES)!!
-            else false
-        }
-
-        if (meCollectionNone!! || meCollectionAny!!) {
+        if (canSendMessage == null || !canSendMessage) {
             editText?.let {
                 it.hint = getString(R.string.ed_msg_hint_no_permisson)
                 it.isEnabled = false
