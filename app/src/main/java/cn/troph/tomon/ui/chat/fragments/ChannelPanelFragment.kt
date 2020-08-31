@@ -434,8 +434,9 @@ class ChannelPanelFragment : BaseFragment() {
                                         state = false,
                                         start = start
                                     )
-                            if (s.isEmpty() && start >= 0) {
-                                btn_message_send.setImageResource(R.drawable.btn_send_default)
+                        }
+                        if (s.isEmpty() && start >= 0) {
+                            btn_message_send.setImageResource(R.drawable.btn_send_default)
 //                                val animOut = ValueAnimator()
 //                                animOut.setIntValues(300, 900)
 //                                animOut.setInterpolator(LinearInterpolator())
@@ -446,9 +447,7 @@ class ChannelPanelFragment : BaseFragment() {
 //                                    }
 //                                }
 //                                animOut.start()
-                            }
                         }
-
                     }
                 }
             }
