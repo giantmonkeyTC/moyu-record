@@ -62,7 +62,7 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
             avatar.user = user
             name.text = user.name
             nick.text = "${user.username} #${user.discriminator}"
-            if (user.id != Client.global.me.id) {
+            if (user.id != Client.global.me.id && user.id != "1") {
                 out.visibility = View.VISIBLE
                 user_private_chat.visibility = View.VISIBLE
                 out.setOnClickListener {
