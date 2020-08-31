@@ -70,7 +70,7 @@ class UserAvatar : FrameLayout {
         val url = user?.avatarURL
         val seed = Snowflake.deconstruct(if (user == null) "0" else user!!.id).timestamp
         val rare = rareById(seed)
-        val color = colorById(seed, rare)
+        val color = if (url != null) Color.TRANSPARENT else colorById(seed, rare)
         imageView.setBackgroundColor(color)
         val placeholder = when (rare) {
             AvatarRare.SSR -> R.drawable.avatar_ssr
