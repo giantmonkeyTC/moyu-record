@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -61,27 +62,36 @@ class GuildUserInfoFragment(private val userId: String) : BottomSheetDialogFragm
             avatar.user = user
             name.text = user.name
             nick.text = "${user.username} #${user.discriminator}"
-            out.setOnClickListener {
-                dismiss()
-                ReportFragment(
-                    userId,
-                    1
-                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+            if (user.id != Client.global.me.id) {
+                out.visibility = View.VISIBLE
+                user_private_chat.visibility = View.VISIBLE
+                out.setOnClickListener {
+                    dismiss()
+                    ReportFragment(
+                        userId,
+                        1
+                    ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+                }
+
+                user_private_chat.setOnClickListener {
+                    user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            dialog?.dismiss()
+                            AppState.global.channelSelection.value =
+                                ChannelSelection(guildId = "@me", channelId = it["id"].asString)
+                            AppState.global.eventBus.postEvent(
+                                AppUIEvent(
+                                    AppUIEventType.MEMBER_DRAWER,
+                                    false
+                                )
+                            )
+                        }
+                }
+            } else {
+                out.visibility = View.GONE
+                user_private_chat.visibility = View.GONE
             }
 
-            user_private_chat.setOnClickListener {
-                user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    dialog?.dismiss()
-                    AppState.global.channelSelection.value =
-                        ChannelSelection(guildId = "@me", channelId = it["id"].asString)
-                    AppState.global.eventBus.postEvent(
-                        AppUIEvent(
-                            AppUIEventType.MEMBER_DRAWER,
-                            false
-                        )
-                    )
-                }
-            }
         })
 
     }
