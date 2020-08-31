@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
+import cn.troph.tomon.core.network.socket.SocketClientState
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.Gson
@@ -17,7 +18,7 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-        if (Client.global.isBackground) {
+        if (Client.global.isBackground && Client.global.socket.state == SocketClientState.CLOSED) {
             Client.global.cacheChannelMap.clear()
             Client.global.channels.forEach {
                 if (it is TextChannel)
@@ -45,7 +46,6 @@ class ApplicationObserver : LifecycleObserver {
     fun onStop() {
         Client.global.isBackground = true
         Logger.d("App in background")
-        Client.global.socket.close()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

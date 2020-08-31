@@ -132,9 +132,12 @@ class SocketClient : WebSocketListener(),
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
         super.onClosed(webSocket, code, reason)
         println("[ws] closed")
+        Logger.d("try reconnecting")
         _state = SocketClientState.CLOSED
         when (code) {
-            1006 -> if (url != null) reconnect()
+            1000 -> {
+            }
+            else -> if (url != null) reconnect()
         }
         _emitter?.onNext(SocketEvent(SocketEventType.CLOSED, code = code, reason = reason))
     }
