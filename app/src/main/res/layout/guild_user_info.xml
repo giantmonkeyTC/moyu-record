@@ -48,12 +48,15 @@
 
             <TextView
                 android:id="@+id/user_info_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/primaryText"
                 android:textSize="24sp"
+                app:layout_constraintEnd_toStartOf="@id/user_info_discriminator"
                 app:layout_constraintStart_toEndOf="@id/user_info_avatar"
                 app:layout_constraintTop_toTopOf="@id/user_info_avatar" />
 
@@ -62,11 +65,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="30dp"
                 android:textColor="@color/secondaryText"
                 android:textSize="16sp"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/user_info_name"
-                app:layout_constraintStart_toEndOf="@id/user_info_name" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -161,9 +165,9 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/siliao"
-                android:visibility="gone"
                 android:textColor="@color/success"
                 android:textSize="14sp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -185,8 +189,8 @@
                 android:gravity="center"
                 android:text="@string/report"
                 android:textColor="#FA8072"
-                android:visibility="gone"
                 android:textSize="14sp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider" />
 
