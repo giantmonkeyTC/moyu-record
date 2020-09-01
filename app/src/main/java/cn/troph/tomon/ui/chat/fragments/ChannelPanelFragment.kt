@@ -555,6 +555,7 @@ class ChannelPanelFragment : BaseFragment() {
                     if (isOpen) {
                         btn_message_menu.isChecked = false
                         emoji_tv.isChecked = false
+                        btn_scroll_to_bottom.visibility = View.GONE
                         scrollToBottom()
                     }
                 }
