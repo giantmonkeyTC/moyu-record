@@ -55,7 +55,7 @@ class ReplySourcePreviewFragment(val message: Message) : DialogFragment() {
         val sourceMessage = message.replySource
         sourceMessage?.let {
             reply_source_avatar.user = sourceMessage.author
-            reply_source_author.text = guildMemberOf(sourceMessage)?.displayName ?: ""
+            reply_source_author.text = guildMemberOf(sourceMessage)?.displayName ?: sourceMessage.author?.name ?: ""
             Converter.toMarkdownTextView(
                 Markwon.builder(requireContext()) // automatically create Glide instance
                     .usePlugin(ImagesPlugin.create())

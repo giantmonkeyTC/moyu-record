@@ -1333,7 +1333,7 @@ class MessageAdapter(
                         holder.itemView.source_content_author.visibility = View.VISIBLE
                         holder.itemView.name_divider.visibility = View.VISIBLE
                         holder.itemView.source_content_author.text =
-                            "${guildMemberOf(it)?.displayName ?: ""}"
+                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: ""}"
                         for (item in it.stamps) {
                             Glide.with(holder.itemView)
                                 .load(
@@ -1354,7 +1354,7 @@ class MessageAdapter(
                                 holder.itemView.source_content_author.visibility = View.VISIBLE
                                 holder.itemView.name_divider.visibility = View.VISIBLE
                                 holder.itemView.source_content_author.text =
-                                    "${guildMemberOf(it)?.displayName ?: ""}"
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: ""}"
                                 for (item in it.attachments.values) {
                                     Glide.with(holder.itemView)
                                         .load(
@@ -1435,7 +1435,7 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${guildMemberOf(it)?.displayName ?: ""}:[视频]"
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: ""}:[视频]"
                             } else {
                                 if (holder.itemView.source_content.hasOnClickListeners()) {
                                     holder.itemView.source_content.setOnClickListener(null)
@@ -1445,7 +1445,7 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${guildMemberOf(it)?.displayName ?: ""}:[文件]"
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: ""}:[文件]"
                             }
                             break
                         }
@@ -1471,7 +1471,7 @@ class MessageAdapter(
                                             .load(drawable.destination)
                                     }
                                 })).build(),
-                            "${guildMemberOf(it)?.displayName ?: ""}:${it.content}",
+                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: ""}:${it.content}",
                             holder.itemView.source_content
                         )
                         holder.itemView.source_content.setOnClickListener {

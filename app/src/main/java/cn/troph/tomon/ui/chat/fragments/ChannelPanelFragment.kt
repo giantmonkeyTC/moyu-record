@@ -419,10 +419,10 @@ class ChannelPanelFragment : BaseFragment() {
 
             bar_reply_message.message_reply_to.text =
 
-                "${if ((guildMemberOf(it.message)?.displayName ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: ""?.substring(
+                "${if ((guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "".substring(
                     0,
                     6
-                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: "" ?: ""}:${it.message?.content ?: ""}"
+                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
