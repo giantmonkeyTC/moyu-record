@@ -21,6 +21,7 @@ import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -641,9 +642,15 @@ class ChannelPanelFragment : BaseFragment() {
                             scrollToBottom()
                         }, 300)
                     }
-                        , { _ ->
-                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                .show()
+                        , { e ->
+                            if (e.message?.contains("500") ?: false) {
+                                Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
                         })
             } else {
                 message!!.update(textToSend)
@@ -657,9 +664,14 @@ class ChannelPanelFragment : BaseFragment() {
                             }
                         }
                         scrollToBottom()
-                    }, { _ ->
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                    }, { e ->
+                        if (e.message?.contains("500")?:false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     })
             }
 
@@ -1365,8 +1377,13 @@ class ChannelPanelFragment : BaseFragment() {
                         val index = mMsgList.indexOf(it)
                         mMsgList.remove(it)
                         mMsgListAdapter.notifyItemRemoved(index)
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                        if (exception.message?.contains("500") ?: false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
 
