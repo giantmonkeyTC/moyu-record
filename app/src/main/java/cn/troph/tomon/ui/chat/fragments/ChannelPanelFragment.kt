@@ -829,7 +829,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
         //setup recycler view
-        mLayoutManager = LinearLayoutManager(requireContext())
+        mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mLayoutManager.stackFromEnd = true
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
