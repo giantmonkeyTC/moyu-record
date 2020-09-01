@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.SocketClientState
 import com.androidadvance.topsnackbar.TSnackbar
@@ -34,12 +35,14 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
         }
         try {
             if (!isNetworkAvailable(context)) {
+                Toast.makeText(context, "网络连接中断", Toast.LENGTH_SHORT).show()
                 Client.global.socket.close()
                 if (old.isShown)
                     old.dismiss()
                 new.show()
                 old = new
             } else {
+                Toast.makeText(context, "网络连接恢复", Toast.LENGTH_SHORT).show()
                 Client.global.socket.close(1006, "network not available")
                 Client.global.socket.open()
                 old.dismiss()
