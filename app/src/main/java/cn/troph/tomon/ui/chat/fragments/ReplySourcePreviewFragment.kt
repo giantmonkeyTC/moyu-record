@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,6 +64,7 @@ class ReplySourcePreviewFragment(val message: Message) : DialogFragment() {
                 sourceMessage.content ?: "",
                 reply_source_content
             )
+            reply_source_content.movementMethod = ScrollingMovementMethod()
         }
         reply_source_cancel.setOnClickListener {
             dismiss()

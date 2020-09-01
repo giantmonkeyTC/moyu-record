@@ -4,8 +4,11 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.ChannelFetchEvent
 import cn.troph.tomon.core.events.ChannelMemberUpdateEvent
 import cn.troph.tomon.core.events.ChannelSyncEvent
+import cn.troph.tomon.core.events.SyncMessageEvent
 import cn.troph.tomon.core.structures.Channel
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -62,12 +65,26 @@ class ChannelFetchAction(client: Client) : Action<List<Channel>>(client) {
             }
             if (channel != null) {
                 channels.add(channel)
+                if (client.cacheChannelMap.containsKey(channel.id)) {
+                    if (channel is DmChannel) {
+                        if (channel.lastMessageId != client.cacheChannelMap[channel.id]) {
+                            client.channelNeedUpdate.put(channel.id, true)
+                        }
+                    } else if (channel is TextChannel) {
+                        if (channel.lastMessageId != client.cacheChannelMap[channel.id]) {
+                            client.channelNeedUpdate.put(channel.id, true)
+                        }
+                    }
+                }
             }
         }
         if (data!!.isJsonArray) {
             data.asJsonArray.forEach { parse(it.asJsonObject) }
         } else {
             parse(data.asJsonObject)
+        }
+        if (client.channelNeedUpdate.isNotEmpty()) {
+            client.eventBus.postEvent(SyncMessageEvent(true))
         }
         if (isSync) {
             client.eventBus.postEvent(ChannelSyncEvent(guild))

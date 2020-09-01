@@ -397,6 +397,43 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgListAdapter.notifyItemChanged(index)
             }
         })
+        mChatSharedVM.syncMessageLD.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                mChannelId?.let {
+                    if (Client.global.channelNeedUpdate.containsKey(it)) {
+                        val channel = Client.global.channels[it]
+                        if (channel != null) {
+                            if (channel is TextChannel) {
+                                btn_scroll_to_bottom.visibility = View.GONE
+                                mHeaderMsg.isEnd = false
+                                isFetchingMore = false
+                                editText?.let { input ->
+                                    input.text = mSwitchChannelMap[it]
+                                    input.setSelection(input.text.length)
+                                }
+                                val count = mMsgList.size
+                                mMsgList.clear()
+                                mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                                mChatSharedVM.loadTextChannelMessage(it)
+                            } else if (channel is DmChannel) {
+                                btn_scroll_to_bottom.visibility = View.GONE
+                                mHeaderMsg.isEnd = false
+                                isFetchingMore = false
+                                editText?.let { input ->
+                                    input.text = mSwitchChannelMap[it]
+                                    input.setSelection(input.text.length)
+                                }
+                                val count = mMsgList.size
+                                mMsgList.clear()
+                                mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                                mChatSharedVM.loadDmChannelMessage(it)
+                            }
+
+                        }
+                    }
+                }
+            }
+        })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
             if (it.flag) {
                 it.message?.let { mes ->

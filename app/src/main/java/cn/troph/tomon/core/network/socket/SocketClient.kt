@@ -92,6 +92,7 @@ class SocketClient : WebSocketListener(),
 
     val retryCount get() = _retryCount
 
+
     private fun connect(url: String) {
         _state = SocketClientState.CONNECTING
         _url = url

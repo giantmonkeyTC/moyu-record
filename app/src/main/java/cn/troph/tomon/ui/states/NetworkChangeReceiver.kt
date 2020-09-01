@@ -40,12 +40,9 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
                 new.show()
                 old = new
             } else {
-                if (LocalDateTime.now().isAfter(Client.global.socket.lastHeartbeat.plusSeconds(4))
-                ) {
-                    Client.global.socket.open()
-                    old.dismiss()
-                }
-
+                Client.global.socket.close(1006, "network not available")
+                Client.global.socket.open()
+                old.dismiss()
             }
         } catch (
             e: NullPointerException

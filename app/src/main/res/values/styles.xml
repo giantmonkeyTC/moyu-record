@@ -73,4 +73,10 @@
         <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
+    <style name="no_overflow_name_style">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/primaryText</item>
+    </style>
+
 </resources>

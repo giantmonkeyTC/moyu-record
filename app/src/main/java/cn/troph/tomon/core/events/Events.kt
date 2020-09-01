@@ -67,6 +67,8 @@ data class VoiceSocketStateEvent(val isOpen: Boolean) : Event()
 
 data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate) : Event()
 
+data class SyncMessageEvent(val needSync: Boolean) : Event()
+
 data class GuildVoiceSelectorEvent(val channelId: String) : Event()
 
 data class LinkParseReadyEvent(val linkList: MutableList<Link>) : Event()

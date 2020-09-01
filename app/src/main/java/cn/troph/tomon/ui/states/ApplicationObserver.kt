@@ -18,13 +18,15 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-        if (Client.global.isBackground && Client.global.socket.state == SocketClientState.CLOSED) {
+        if (Client.global.isBackground) {
+            Client.global.socket.close()
             Client.global.cacheChannelMap.clear()
+            Client.global.channelNeedUpdate.clear()
             Client.global.channels.forEach {
                 if (it is TextChannel)
-                    Client.global.cacheChannelMap[it.id] = it.lastMessageId ?: ""
+                    Client.global.cacheChannelMap[it.id] = it.lastMessageId?.substring(2)
                 else if (it is DmChannel)
-                    Client.global.cacheChannelMap[it.id] = it.lastMessageId ?: ""
+                    Client.global.cacheChannelMap[it.id] = it.lastMessageId?.substring(2)
             }
             Logger.d("App in foreground")
             Client.global.socket.open()

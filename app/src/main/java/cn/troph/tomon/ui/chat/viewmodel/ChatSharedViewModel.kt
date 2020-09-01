@@ -7,6 +7,7 @@ import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -20,6 +21,8 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
+
+    val syncMessageLD = MutableLiveData<Boolean>()
 
     val showUserProfileLD = MutableLiveData<User>()
 
@@ -136,6 +139,10 @@ class ChatSharedViewModel : ViewModel() {
                 updateLD.value = it
             })
 
+
+        Client.global.eventBus.observeEventOnUi<SyncMessageEvent>().subscribe(Consumer {
+            syncMessageLD.value = it.needSync
+        })
 
         Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
             voiceStateUpdateLD.value = it.voiceUpdate

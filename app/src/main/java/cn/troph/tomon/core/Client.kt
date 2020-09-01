@@ -25,7 +25,8 @@ class Client {
         val global: Client by lazy { HOLDER.INSTANCE }
     }
 
-    var cacheChannelMap = mutableMapOf<String,String>()
+    var cacheChannelMap = mutableMapOf<String,String?>()
+    var channelNeedUpdate = mutableMapOf<String,Boolean>()
     var isBackground = false
     val rest = Restful()
     val actions = ActionManager(this)
