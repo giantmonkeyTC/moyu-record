@@ -29,6 +29,7 @@ import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -428,6 +429,7 @@ class ChannelPanelFragment : BaseFragment() {
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
             mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
         }
+
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
@@ -723,12 +725,19 @@ class ChannelPanelFragment : BaseFragment() {
                     event.message.nonce != null && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
+                    var needToScroll = false
+                    if (!editText.hasFocus() && !view_messages.canScrollVertically(1)) {
+                        needToScroll = true
+                    }
                     mMsgList.add(event.message)
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
                             fetchLink()
                     }
-                    mMsgListAdapter.notifyDataSetChanged()
+                    mMsgListAdapter.notifyItemInserted(mMsgListAdapter.itemCount - 1)
+                    if (needToScroll) {
+                        view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)
+                    }
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
@@ -842,6 +851,7 @@ class ChannelPanelFragment : BaseFragment() {
         //setup recycler view
         mLayoutManager = LinearLayoutManager(requireContext())
         mLayoutManager.stackFromEnd = true
+        mLayoutManager.scrollToPositionWithOffset(mMsgListAdapter.itemCount - 1, Integer.MIN_VALUE)
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
         OverScrollDecoratorHelper.setUpOverScroll(
@@ -1384,6 +1394,7 @@ class ChannelPanelFragment : BaseFragment() {
             view = View(activity)
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+        editText.clearFocus()
     }
 
     private fun createEmptyMsg(content: String?): Message {
