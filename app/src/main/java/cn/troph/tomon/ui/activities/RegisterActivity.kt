@@ -6,17 +6,16 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +28,6 @@ import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
-import java.util.*
 
 
 class RegisterActivity : AppCompatActivity() {
@@ -43,6 +41,10 @@ class RegisterActivity : AppCompatActivity() {
         override fun onTick(millisUntilFinished: Long) {
             button_confirmation.text = "${millisUntilFinished / 1000} s"
         }
+    }
+
+    companion object {
+        val TAG = "RegisterActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +93,11 @@ class RegisterActivity : AppCompatActivity() {
                     gotoEntryOption()
                 }, {
                     it.message?.let {
+                        Log.e(TAG, "error message: " + it)
                         if (it.contains("422")) {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                getString(R.string.user_existed),
+                                getString(R.string.user_existed_info_error),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         } else {

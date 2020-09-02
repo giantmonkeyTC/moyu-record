@@ -94,7 +94,7 @@
     <string name="message_update_bar_text">正在编辑消息</string>
     <string name="deleted_name">被注销的账号</string>
     <string name="regist_successed">注册成功</string>
-    <string name="user_existed">注册失败:该账户以存在</string>
+    <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
     <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
 
     <string-array name="welcome_array">
