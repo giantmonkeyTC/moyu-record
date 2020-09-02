@@ -50,6 +50,7 @@ class GuildCollection(client: Client) :
 
     fun join(code: String): Observable<Guild?> {
         return client.rest.inviteService.join(code, client.auth).subscribeOn(Schedulers.io()).map {
+            Logger.d(it)
             Gson().fromJson(it, Guild::class.java)
         }
     }

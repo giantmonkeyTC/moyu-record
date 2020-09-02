@@ -56,9 +56,10 @@ class EntryActivity : BaseActivity() {
         intent?.let {
             val uri = it.data
             uri?.let {
-                if (it.toString().contains(Url.inviteUrl)) {
+                mUri->
+                if (mUri.toString().contains(Url.inviteUrl)) {
                     Client.global.guilds.fetchInvite(
-                        Url.parseInviteCode(it.toString())
+                        Url.parseInviteCode(mUri.toString())
                     ).observeOn(AndroidSchedulers.mainThread()).subscribe({
                         Logger.d(it.guild.name)
                         if (it != null) {
@@ -66,7 +67,7 @@ class EntryActivity : BaseActivity() {
                             if (invite.joined) {
                             } else {
                                 Client.global.guilds.join(
-                                    Url.parseInviteCode(it.toString())
+                                    Url.parseInviteCode(mUri.toString())
                                 )
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
@@ -75,7 +76,9 @@ class EntryActivity : BaseActivity() {
                                                 Logger.d(it.name)
                                             }
 
-                                        }, { error -> Logger.d(error) }, { }
+                                        }, { error ->
+                                            Logger.d(error.message)
+                                        }, { }
                                     )
                             }
                         }
