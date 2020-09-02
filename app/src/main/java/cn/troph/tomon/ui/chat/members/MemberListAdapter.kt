@@ -197,7 +197,7 @@ class MemberListAdapter<T>(
             if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline")
                 0xffffff
             else
-                (memberList[position] as GuildMember).roles.highest!!.index.toLong()
+                (memberList[position] as GuildMember).roles.highest?.index?.toLong() ?: -1
         } else
             -1
     }

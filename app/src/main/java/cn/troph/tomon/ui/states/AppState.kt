@@ -3,6 +3,8 @@ package cn.troph.tomon.ui.states
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Message
 import cn.troph.tomon.core.utils.event.RxBus
+import cn.troph.tomon.ui.chat.fragments.LAST_CHANNEL_ID
+import cn.troph.tomon.ui.chat.fragments.LAST_GUILD_ID
 
 data class ChannelSelection(val guildId: String? = null, val channelId: String? = null)
 
@@ -31,9 +33,9 @@ class AppState {
     val eventBus: RxBus = RxBus()
     val channelSelection: Variable<ChannelSelection> = Variable(
         ChannelSelection(
-            guildId = Client.global.preferences.getString("last_guild_id", null),
+            guildId = Client.global.preferences.getString(LAST_GUILD_ID, null),
             channelId = Client.global.preferences.getString(
-                "last_channel_id",
+                LAST_CHANNEL_ID,
                 null
             )
         )

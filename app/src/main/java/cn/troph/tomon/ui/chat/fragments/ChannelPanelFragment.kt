@@ -113,8 +113,8 @@ import kotlin.collections.HashMap
 import kotlin.random.Random
 
 const val FILE_REQUEST_CODE_FILE = 323
-const val LAST_CHANNEL_ID = "last_channel_id"
-const val LAST_GUILD_ID = "last_guild_id"
+public const val LAST_CHANNEL_ID = "last_channel_id"
+public const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
     private val mSwitchChannelMap = HashMap<String, Editable>()
@@ -124,6 +124,7 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
     private lateinit var viewPager: NestedViewPager
+    private var isFirstSetData = true
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
     private lateinit var mEasyImage: EasyImage
@@ -140,7 +141,7 @@ class ChannelPanelFragment : BaseFragment() {
 
     private var mChannelId: String? = null
         set(value) {
-            val changed = field != value
+            val changed = isFirstSetData || field != value
             field = value
             if (changed && value != null) {
                 btn_scroll_to_bottom.visibility = View.GONE
@@ -151,6 +152,9 @@ class ChannelPanelFragment : BaseFragment() {
                     input.setSelection(input.text.length)
                 }
                 val channel = Client.global.channels[value]
+                if (channel != null) {
+                    isFirstSetData = false
+                }
                 val count = mMsgList.size
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
@@ -666,29 +670,36 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                 scrollToBottom()
                 //发送消息
-                (Client.global.channels[mChannelId
-                    ?: ""] as TextChannelBase).messages.create(
-                    textToSend,
-                    nonce = emptyMsg.nonce.toString()
-                )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ ->
-                        mHandler.postDelayed({
-                            emptyMsg.isSending = false;
-                            mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
-                            scrollToBottom()
-                        }, 300)
+                if (Client.global.channels[mChannelId ?: ""] == null) {
+                    context?.let {
+                        Toast.makeText(it.applicationContext, "该频道已被删除", Toast.LENGTH_LONG).show()
                     }
-                        , { e ->
-                            if (e.message?.contains("500") ?: false) {
-                                Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
-                                    .show()
-                            } else {
-                                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                } else {
+                    (Client.global.channels[mChannelId
+                        ?: ""] as TextChannelBase).messages.create(
+                        textToSend,
+                        nonce = emptyMsg.nonce.toString()
+                    )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ _ ->
+                            mHandler.postDelayed({
+                                emptyMsg.isSending = false;
+                                mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
+                                scrollToBottom()
+                            }, 300)
+                        }
+                            , { e ->
+                                if (e.message?.contains("500") ?: false) {
+                                    Toast.makeText(requireContext().applicationContext, R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    Toast.makeText(requireContext().applicationContext, R.string.send_fail, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
 
-                        })
+                            })
+                }
+
             } else {
                 message!!.update(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).subscribe({ msg ->
@@ -771,7 +782,7 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce != null && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
+                    !event.message.author?.isBot!! && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
                     var needToScroll = false
