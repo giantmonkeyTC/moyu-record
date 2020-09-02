@@ -8,8 +8,12 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
+import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_entry.*
 
@@ -19,19 +23,24 @@ import kotlinx.android.synthetic.main.activity_entry.*
 class EntryActivity : BaseActivity() {
 
     val function: () -> Unit = {
+
         val dataPullingViewModel: DataPullingViewModel by viewModels()
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
-            if (it == true)
+            if (it == true) {
+                invite()
                 gotoChat()
+            }
         })
         dataPullingViewModel.setUpFetchData()
         if (Client.global.loggedIn) {
+            invite()
             gotoChat()
         } else {
             Client.global
                 .login()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    invite()
                     iv_logo.visibility = View.INVISIBLE
                     iv_people.visibility = View.INVISIBLE
                     rl_root.visibility = View.VISIBLE
@@ -43,11 +52,46 @@ class EntryActivity : BaseActivity() {
 
     }
 
+    fun invite() {
+        intent?.let {
+            val uri = it.data
+            uri?.let {
+                if (it.toString().contains(Url.inviteUrl)) {
+                    Client.global.guilds.fetchInvite(
+                        Url.parseInviteCode(it.toString())
+                    ).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                        Logger.d(it.guild.name)
+                        if (it != null) {
+                            val invite = it
+                            if (invite.joined) {
+                            } else {
+                                Client.global.guilds.join(
+                                    Url.parseInviteCode(it.toString())
+                                )
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(
+                                        { guild ->
+                                            guild?.let {
+                                                Logger.d(it.name)
+                                            }
+
+                                        }, { error -> Logger.d(error) }, { }
+                                    )
+                            }
+                        }
+                    }, { error ->
+                        Logger.d(error)
+                    })
+                }
+                val a = it
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
         Glide.with(this).load(R.drawable.loading_splash_gif).into(loading_gif_iv)
-
         rl_root.postDelayed(function, 2500);
 
     }
@@ -82,7 +126,7 @@ class EntryActivity : BaseActivity() {
                 ).toBundle()
             )
             finish()
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             // ignore activity is destroyed
         }
 
