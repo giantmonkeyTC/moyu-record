@@ -87,20 +87,20 @@ class RegisterActivity : AppCompatActivity() {
                     invite = invite,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    Toast.makeText(applicationContext, "注册成功", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, getString(R.string.regist_successed), Toast.LENGTH_LONG).show()
                     gotoEntryOption()
                 }, {
                     it.message?.let {
                         if (it.contains("422")) {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:该账户以存在",
+                                getString(R.string.user_existed),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         } else {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:未知错误 " + it,
+                                getString(R.string.regist_unknown_error) + it,
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
