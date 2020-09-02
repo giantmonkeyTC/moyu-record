@@ -21,6 +21,7 @@ import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -379,6 +381,16 @@ class ChannelPanelFragment : BaseFragment() {
         requireActivity().unregisterReceiver(mNetworkChangeReceiver)
     }
 
+    private fun guildMemberOf(msg: Message?): GuildMember? {
+        if (msg == null) return null
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mEasyImage = EasyImage.Builder(requireContext())
@@ -442,17 +454,19 @@ class ChannelPanelFragment : BaseFragment() {
             } else {
                 bar_reply_message.visibility = View.GONE
             }
+
             bar_reply_message.message_reply_to.text =
 
-                "${if ((it.message?.author?.name ?: "").length > 6) (it.message?.author?.name?.substring(
+                "${if ((guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "".substring(
                     0,
                     6
-                ) ?: "") + "···" else it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
+                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
             mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
         }
+
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
@@ -591,6 +605,7 @@ class ChannelPanelFragment : BaseFragment() {
                     if (isOpen) {
                         btn_message_menu.isChecked = false
                         emoji_tv.isChecked = false
+                        btn_scroll_to_bottom.visibility = View.GONE
                         scrollToBottom()
                     }
                 }
@@ -664,9 +679,15 @@ class ChannelPanelFragment : BaseFragment() {
                             scrollToBottom()
                         }, 300)
                     }
-                        , { _ ->
-                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                .show()
+                        , { e ->
+                            if (e.message?.contains("500") ?: false) {
+                                Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
                         })
             } else {
                 message!!.update(textToSend)
@@ -680,9 +701,14 @@ class ChannelPanelFragment : BaseFragment() {
                             }
                         }
                         scrollToBottom()
-                    }, { _ ->
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                    }, { e ->
+                        if (e.message?.contains("500")?:false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     })
             }
 
@@ -745,15 +771,22 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
+                    event.message.nonce != null && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
+                    var needToScroll = false
+                    if (!editText.hasFocus() && !view_messages.canScrollVertically(1)) {
+                        needToScroll = true
+                    }
                     mMsgList.add(event.message)
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
                             fetchLink()
                     }
-                    mMsgListAdapter.notifyDataSetChanged()
+                    mMsgListAdapter.notifyItemInserted(mMsgListAdapter.itemCount - 1)
+                    if (needToScroll) {
+                        view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)
+                    }
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
@@ -867,6 +900,7 @@ class ChannelPanelFragment : BaseFragment() {
         //setup recycler view
         mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mLayoutManager.stackFromEnd = true
+        mLayoutManager.scrollToPositionWithOffset(mMsgListAdapter.itemCount - 1, Integer.MIN_VALUE)
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
         OverScrollDecoratorHelper.setUpOverScroll(
@@ -1380,8 +1414,13 @@ class ChannelPanelFragment : BaseFragment() {
                         val index = mMsgList.indexOf(it)
                         mMsgList.remove(it)
                         mMsgListAdapter.notifyItemRemoved(index)
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                        if (exception.message?.contains("500") ?: false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
 
@@ -1409,6 +1448,7 @@ class ChannelPanelFragment : BaseFragment() {
             view = View(activity)
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+        editText.clearFocus()
     }
 
     private fun createEmptyMsg(content: String?): Message {

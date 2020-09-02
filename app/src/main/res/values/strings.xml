@@ -34,6 +34,7 @@
     <string name="emoji_guild_name">群组名称</string>
     <string name="send_fail">发送失败</string>
     <string name="send_success">发送成功</string>
+    <string name="guild_deleted">该群组已被删除</string>
     <string name="app_name_capital">TOMON</string>
     <string name="ed_msg_hint_no_permisson">你没有此频道发言权限</string>
     <string name="no_voice_support">程序员小哥哥正在努力地开发语音功能!</string>
@@ -91,7 +92,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="message_update_bar_text">正在编辑消息</string>
-    <string name="deleted_user">已被移除的用户</string>
+    <string name="deleted_name">被注销的账号</string>
+    <string name="regist_successed">注册成功</string>
+    <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
+    <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>

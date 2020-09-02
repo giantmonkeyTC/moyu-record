@@ -11,6 +11,7 @@ import cn.troph.tomon.core.network.socket.SocketClientState
 import cn.troph.tomon.core.network.socket.VoiceSocket
 import cn.troph.tomon.core.structures.Me
 import cn.troph.tomon.core.structures.StampPack
+import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.event.RxBus
 import io.reactivex.rxjava3.core.Observable
 
@@ -78,16 +79,14 @@ class Client {
         code: String? = null,
         password: String? = null,
         invite: String? = null
-    ): Observable<Unit> {
+    ): Observable<User> {
         return me.register(
             unionId = unionId,
             password = password,
             code = code,
             invite = invite,
             username = username
-        ).map {
-
-        }
+        )
     }
 
     fun logout(): Unit? {
