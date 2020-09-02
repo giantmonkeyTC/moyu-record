@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import cn.troph.tomon.R
@@ -86,24 +87,20 @@ class RegisterActivity : AppCompatActivity() {
                     invite = invite,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    GeneralSnackbar.make(
-                        GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                        "注册成功",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(applicationContext, "注册成功", Toast.LENGTH_LONG).show()
                     gotoEntryOption()
                 }, {
                     it.message?.let {
                         if (it.contains("422")) {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:邀请码或验证码错误",
+                                "注册失败:该账户以存在",
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         } else {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:未知错误",
+                                "注册失败:未知错误 " + it,
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
