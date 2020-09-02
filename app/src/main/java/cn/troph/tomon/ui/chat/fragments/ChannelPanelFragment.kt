@@ -113,8 +113,8 @@ import kotlin.collections.HashMap
 import kotlin.random.Random
 
 const val FILE_REQUEST_CODE_FILE = 323
-const val LAST_CHANNEL_ID = "last_channel_id"
-const val LAST_GUILD_ID = "last_guild_id"
+public const val LAST_CHANNEL_ID = "last_channel_id"
+public const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
     private val mSwitchChannelMap = HashMap<String, Editable>()
@@ -124,6 +124,7 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
     private lateinit var viewPager: NestedViewPager
+    private var isFirstSetData = true
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
     private lateinit var mEasyImage: EasyImage
@@ -140,7 +141,7 @@ class ChannelPanelFragment : BaseFragment() {
 
     private var mChannelId: String? = null
         set(value) {
-            val changed = field != value
+            val changed = isFirstSetData || field != value
             field = value
             if (changed && value != null) {
                 btn_scroll_to_bottom.visibility = View.GONE
@@ -151,6 +152,9 @@ class ChannelPanelFragment : BaseFragment() {
                     input.setSelection(input.text.length)
                 }
                 val channel = Client.global.channels[value]
+                if (channel != null) {
+                    isFirstSetData = false
+                }
                 val count = mMsgList.size
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
@@ -184,7 +188,7 @@ class ChannelPanelFragment : BaseFragment() {
                     mHeaderMsg.channelText = channel.name
                     Client.global.preferences.edit {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
-                        putString(LAST_CHANNEL_ID, value)
+                        putString(LAST_CHANNEL_ID, value).apply()
                     }
                     mChatSharedVM.loadTextChannelMessage(value)
                     channel.guild?.let { g ->
@@ -983,6 +987,11 @@ class ChannelPanelFragment : BaseFragment() {
             editText.append(it)
             btn_message_send.performClick()
         })
+
+        mChannelId = Client.global.preferences.getString(
+            LAST_CHANNEL_ID,
+            null
+        )
     }
 
 
