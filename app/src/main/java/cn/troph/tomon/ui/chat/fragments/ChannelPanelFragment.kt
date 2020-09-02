@@ -634,29 +634,36 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                 scrollToBottom()
                 //发送消息
-                (Client.global.channels[mChannelId
-                    ?: ""] as TextChannelBase).messages.create(
-                    textToSend,
-                    nonce = emptyMsg.nonce.toString()
-                )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ ->
-                        mHandler.postDelayed({
-                            emptyMsg.isSending = false;
-                            mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
-                            scrollToBottom()
-                        }, 300)
+                if (Client.global.channels[mChannelId ?: ""] == null) {
+                    context?.let {
+                        Toast.makeText(it.applicationContext, "该频道已被删除", Toast.LENGTH_LONG).show()
                     }
-                        , { e ->
-                            if (e.message?.contains("500") ?: false) {
-                                Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
-                                    .show()
-                            } else {
-                                Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
+                } else {
+                    (Client.global.channels[mChannelId
+                        ?: ""] as TextChannelBase).messages.create(
+                        textToSend,
+                        nonce = emptyMsg.nonce.toString()
+                    )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ _ ->
+                            mHandler.postDelayed({
+                                emptyMsg.isSending = false;
+                                mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
+                                scrollToBottom()
+                            }, 300)
+                        }
+                            , { e ->
+                                if (e.message?.contains("500") ?: false) {
+                                    Toast.makeText(requireContext().applicationContext, R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    Toast.makeText(requireContext().applicationContext, R.string.send_fail, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
 
-                        })
+                            })
+                }
+
             } else {
                 message!!.update(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).subscribe({ msg ->
