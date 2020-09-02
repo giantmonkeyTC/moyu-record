@@ -92,6 +92,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="message_update_bar_text">正在编辑消息</string>
+    <string name="deleted_name">被注销的账号</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>
