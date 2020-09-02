@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.ChannelService
+import cn.troph.tomon.core.utils.optBoolean
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -31,6 +32,10 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     @Expose
     var avatarURL: String? = null
+        protected set
+
+    @Expose
+    var isBot: Boolean = false
         protected set
 
     @Expose
@@ -76,6 +81,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
             if (avatarURL?.isEmpty() != false) {
                 avatarURL = null
             }
+        }
+        if (data.has("is_bot")) {
+            isBot = data["is_bot"].optBoolean ?: false
         }
     }
 
