@@ -66,7 +66,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     }
 
     fun updateUnread(): Boolean {
-        unread = channels.find { channel ->
+        unread = channels.clone().find { channel ->
             if (channel is TextChannel) {
                 if (channel.unread)
                     return@find true

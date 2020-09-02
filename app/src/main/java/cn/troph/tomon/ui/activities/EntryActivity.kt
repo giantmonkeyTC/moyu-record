@@ -18,35 +18,43 @@ import kotlinx.android.synthetic.main.activity_entry.*
 
 class EntryActivity : BaseActivity() {
 
+    val function: () -> Unit = {
+        val dataPullingViewModel: DataPullingViewModel by viewModels()
+        dataPullingViewModel.dataFetchLD.observe(this, Observer {
+            if (it == true)
+                gotoChat()
+        })
+        dataPullingViewModel.setUpFetchData()
+        if (Client.global.loggedIn) {
+            gotoChat()
+        } else {
+            Client.global
+                .login()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    iv_logo.visibility = View.INVISIBLE
+                    iv_people.visibility = View.INVISIBLE
+                    rl_root.visibility = View.VISIBLE
+                    loading_gif_iv.visibility = View.VISIBLE
+                }, {
+                    gotoEntryOption()
+                })
+        }
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
         Glide.with(this).load(R.drawable.loading_splash_gif).into(loading_gif_iv)
-        rl_root.postDelayed({
-            val dataPullingViewModel: DataPullingViewModel by viewModels()
-            dataPullingViewModel.dataFetchLD.observe(this, Observer {
-                if (it == true)
-                    gotoChat()
-            })
-            dataPullingViewModel.setUpFetchData()
-            if (Client.global.loggedIn) {
-                gotoChat()
-            } else {
-                Client.global
-                    .login()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        iv_logo.visibility = View.INVISIBLE
-                        iv_people.visibility = View.INVISIBLE
-                        rl_root.visibility = View.VISIBLE
-                        loading_gif_iv.visibility = View.VISIBLE
-                    }, {
-                        gotoEntryOption()
-                    })
-            }
 
-        }, 2500);
+        rl_root.postDelayed(function, 2500);
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rl_root.removeCallbacks(function)
     }
 
     private fun gotoEntryOption() {
@@ -63,16 +71,21 @@ class EntryActivity : BaseActivity() {
     }
 
     private fun gotoChat() {
-        val intent = Intent(this, ChatActivity::class.java)
-        startActivity(
-            intent,
-            ActivityOptions.makeCustomAnimation(
-                this,
-                android.R.anim.fade_in,
-                android.R.anim.fade_out
-            ).toBundle()
-        )
-        finish()
+        try {
+            val intent = Intent(this, ChatActivity::class.java)
+            startActivity(
+                intent,
+                ActivityOptions.makeCustomAnimation(
+                    this,
+                    android.R.anim.fade_in,
+                    android.R.anim.fade_out
+                ).toBundle()
+            )
+            finish()
+        } catch (e:Exception) {
+            // ignore activity is destroyed
+        }
+
     }
 
 }

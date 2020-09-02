@@ -6,6 +6,8 @@ import com.google.gson.JsonElement
 
 class UserRegisterAction(client: Client) :Action<User>(client){
     override fun handle(data: JsonElement?, vararg extras: Any?): User? {
-        return super.handle(data, *extras)
+        val obj = data!!.asJsonObject
+        val user = client.users.add(obj)
+        return user
     }
 }

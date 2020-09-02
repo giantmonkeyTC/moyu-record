@@ -162,10 +162,11 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
                 if (channel == null) {
                     return null
                 }
-                if ((channel as TextChannel).messages.has(it.id))
-                    (channel as TextChannel).messages[it.id]
+
+                if ((channel as TextChannelBase).messages.has(it.id))
+                    (channel as TextChannelBase).messages[it.id]
                 else {
-                    (channel as TextChannel).messages.fetchOne(it.id).subscribeOn(Schedulers.io())
+                    (channel as TextChannelBase).messages.fetchOne(it.id).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe {
                             Client.global.eventBus.postEvent(MessageReplySourceReadyEvent(it,id))
                         }

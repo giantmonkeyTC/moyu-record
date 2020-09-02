@@ -129,7 +129,7 @@ class MemberListAdapter<T>(
                     Color.TRANSPARENT
                 )
             )
-        if (member.id != Client.global.me.id) {
+        if (member.id != Client.global.me.id && member.id != "1") {
             view.user_sign_out.visibility = View.VISIBLE
             view.user_private_chat.visibility = View.VISIBLE
             view.user_private_chat.setOnClickListener {

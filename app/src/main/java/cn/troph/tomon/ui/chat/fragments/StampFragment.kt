@@ -98,12 +98,13 @@ class StampFragment : Fragment() {
                         }
                             , { error ->
                                 Log.d("nope", error.message)
-                                Toast.makeText(
-                                    requireContext(),
-                                    R.string.send_fail,
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
+                                if (error.message?.contains("500")?:false) {
+                                    Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
                             })
                 }
 
