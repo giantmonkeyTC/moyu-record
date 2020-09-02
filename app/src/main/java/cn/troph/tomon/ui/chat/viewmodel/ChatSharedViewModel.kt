@@ -22,7 +22,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
 
-    val syncMessageLD = MutableLiveData<Boolean>()
+    val syncMessageLD = MutableLiveData<Channel>()
 
     val showUserProfileLD = MutableLiveData<User>()
 
@@ -141,7 +141,7 @@ class ChatSharedViewModel : ViewModel() {
 
 
         Client.global.eventBus.observeEventOnUi<SyncMessageEvent>().subscribe(Consumer {
-            syncMessageLD.value = it.needSync
+            syncMessageLD.value = it.channel
         })
 
         Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
@@ -256,22 +256,37 @@ class ChatSharedViewModel : ViewModel() {
     }
 
     fun loadTextChannelMessage(channelId: String) {
+        val channel = Client.global.channels[channelId] as TextChannel
+        if (channel.messages.size == 0) {
+            messageLoadingLiveData.value = true
+            channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(
+                    {
+                        messageLoadingLiveData.value = false
+                        messageLiveData.value = it.toMutableList()
+                    }, {
+                        Logger.d(it.message)
+                        Logger.d(it.cause)
+                        Logger.d(it.stackTrace)
+                        messageLoadingLiveData.value = false
+                    })
+        } else
+            messageLiveData.value = channel.messages.toMutableList()
+    }
+
+    fun fetchTextChannelMessage(channelId: String){
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as TextChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                {
-                    messageLoadingLiveData.value = false
-                    messageLiveData.value = it.toMutableList()
-                }, {
-                    Logger.d(it.message)
-                    Logger.d(it.cause)
-                    Logger.d(it.stackTrace)
-                    messageLoadingLiveData.value = false
-                })
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                messageLoadingLiveData.value = false
+                messageLiveData.value = it.toMutableList()
+            }, {
+                messageLoadingLiveData.value = false
+            })
     }
 
-    fun loadDmChannelMessage(channelId: String) {
+    fun fetchDmChannelMessage(channelId: String){
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
@@ -282,6 +297,23 @@ class ChatSharedViewModel : ViewModel() {
                 messageLoadingLiveData.value = false
             })
     }
+
+    fun loadDmChannelMessage(channelId: String) {
+        val channel = Client.global.channels[channelId] as DmChannel
+        if (channel.messages.size == 0) {
+            messageLoadingLiveData.value = true
+            channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                    messageLoadingLiveData.value = false
+                    messageLiveData.value = it.toMutableList()
+                }, {
+                    messageLoadingLiveData.value = false
+                })
+        } else {
+            messageLiveData.value = channel.messages.toMutableList()
+        }
+    }
+
 
     fun loadDmChannel() {
         dmChannelLiveData.value = Client.global.dmChannels.toMutableList()

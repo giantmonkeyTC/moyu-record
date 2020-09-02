@@ -6,6 +6,8 @@ import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.network.socket.handlers.*
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject

@@ -1351,46 +1351,47 @@ class MessageAdapter(
                                                     .placeholder(R.drawable.loadinglogo).into(view)
                                             }.apply {
                                                 this.withOverlayView(
-                                                View.inflate(
-                                                    holder.itemView.context,
-                                                    R.layout.image_view_overlay,
-                                                    null
-                                                ).apply {
-                                                    this.findViewById<ImageView>(R.id.btn_image_save)
-                                                        .setOnClickListener {
-                                                            Toast.makeText(
-                                                                holder.itemView.context,
-                                                                "文件保存至:${holder.itemView.context.getExternalFilesDir(
-                                                                    Environment.DIRECTORY_DOWNLOADS
-                                                                )?.absolutePath}",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                            PRDownloader.download(
-                                                                image.url,
-                                                                holder.itemView.context.getExternalFilesDir(
-                                                                    Environment.DIRECTORY_DOWNLOADS
-                                                                )?.absolutePath,
-                                                                image.fileName
-                                                            )
-                                                                .build().start(object : OnDownloadListener {
-                                                                    override fun onDownloadComplete() {
-                                                                        Toast.makeText(
-                                                                            holder.itemView.context,
-                                                                            "下载完成",
-                                                                            Toast.LENGTH_SHORT
-                                                                        ).show()
-                                                                    }
+                                                    View.inflate(
+                                                        holder.itemView.context,
+                                                        R.layout.image_view_overlay,
+                                                        null
+                                                    ).apply {
+                                                        this.findViewById<ImageView>(R.id.btn_image_save)
+                                                            .setOnClickListener {
+                                                                Toast.makeText(
+                                                                    holder.itemView.context,
+                                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath}",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                                PRDownloader.download(
+                                                                    image.url,
+                                                                    holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath,
+                                                                    image.fileName
+                                                                )
+                                                                    .build().start(object :
+                                                                        OnDownloadListener {
+                                                                        override fun onDownloadComplete() {
+                                                                            Toast.makeText(
+                                                                                holder.itemView.context,
+                                                                                "下载完成",
+                                                                                Toast.LENGTH_SHORT
+                                                                            ).show()
+                                                                        }
 
-                                                                    override fun onError(error: Error?) {
-                                                                        Toast.makeText(
-                                                                            holder.itemView.context,
-                                                                            "下载失败",
-                                                                            Toast.LENGTH_SHORT
-                                                                        ).show()
-                                                                    }
-                                                                })
-                                                        }
-                                                })
+                                                                        override fun onError(error: Error?) {
+                                                                            Toast.makeText(
+                                                                                holder.itemView.context,
+                                                                                "下载失败",
+                                                                                Toast.LENGTH_SHORT
+                                                                            ).show()
+                                                                        }
+                                                                    })
+                                                            }
+                                                    })
                                                 this.allowSwipeToDismiss(true)
                                                 show()
                                             }
@@ -1481,8 +1482,15 @@ class MessageAdapter(
                 val newOwnerId = message.content
                 val newOwner =
                     (Client.global.channels[message.channelId] as TextChannel).members[newOwnerId!!]
-                val displayNameNewOwner = newOwner!!.displayName
-                val displayNameOldOwner = oldOwner!!.displayName
+                var displayNameNewOwner = holder.itemView.context.getString(R.string.deleted_user)
+                var displayNameOldOwner = holder.itemView.context.getString(R.string.deleted_user)
+                newOwner?.let {
+                    displayNameNewOwner = it.displayName
+                }
+                oldOwner?.let {
+                    displayNameOldOwner = it.displayName
+                }
+
                 holder.itemView.tv_new_owner.text = displayNameNewOwner
                 holder.itemView.tv_old_owner.text = "👑 " + displayNameOldOwner
             }

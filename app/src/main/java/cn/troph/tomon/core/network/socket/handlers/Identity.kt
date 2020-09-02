@@ -43,6 +43,7 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
         client.actions.presenceFetch(guild["presences"].asJsonArray, guild["id"].asString)
     }
 
+
     data["guild_settings"].asJsonArray.forEach { e ->
         client.actions.guildSettingsUpdate(e.asJsonObject)
     }

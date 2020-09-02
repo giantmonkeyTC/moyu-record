@@ -68,11 +68,14 @@ class ChannelFetchAction(client: Client) : Action<List<Channel>>(client) {
                 if (client.cacheChannelMap.containsKey(channel.id)) {
                     if (channel is DmChannel) {
                         if (channel.lastMessageId != client.cacheChannelMap[channel.id]) {
-                            client.channelNeedUpdate.put(channel.id, true)
+//                            client.channelNeedUpdate.put(channel.id, true)
+                            client.eventBus.postEvent(SyncMessageEvent(channel, true))
                         }
                     } else if (channel is TextChannel) {
-                        if (channel.lastMessageId != client.cacheChannelMap[channel.id]) {
-                            client.channelNeedUpdate.put(channel.id, true)
+                        if (channel.lastMessageId != client.cacheChannelMap[channel.id]
+                        ) {
+//                            client.channelNeedUpdate.put(channel.id, true)
+                            client.eventBus.postEvent(SyncMessageEvent(channel, true))
                         }
                     }
                 }
@@ -83,9 +86,7 @@ class ChannelFetchAction(client: Client) : Action<List<Channel>>(client) {
         } else {
             parse(data.asJsonObject)
         }
-        if (client.channelNeedUpdate.isNotEmpty()) {
-            client.eventBus.postEvent(SyncMessageEvent(true))
-        }
+
         if (isSync) {
             client.eventBus.postEvent(ChannelSyncEvent(guild))
         } else {

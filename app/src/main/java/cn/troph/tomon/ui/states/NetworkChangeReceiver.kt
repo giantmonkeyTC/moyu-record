@@ -11,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.SocketClientState
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.TextChannel
 import com.androidadvance.topsnackbar.TSnackbar
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import java.lang.NullPointerException
@@ -42,8 +44,15 @@ class NetworkChangeReceiver() : BroadcastReceiver() {
                 new.show()
                 old = new
             } else {
-                Toast.makeText(context, "网络连接恢复", Toast.LENGTH_SHORT).show()
                 Client.global.socket.close(1006, "network not available")
+                Client.global.cacheChannelMap.clear()
+//            Client.global.channelNeedUpdate.clear()
+                Client.global.channels.forEach {
+                    if (it is TextChannel)
+                        Client.global.cacheChannelMap[it.id] = it.lastMessageId
+                    else if (it is DmChannel)
+                        Client.global.cacheChannelMap[it.id] = it.lastMessageId
+                }
                 Client.global.socket.open()
                 old.dismiss()
             }

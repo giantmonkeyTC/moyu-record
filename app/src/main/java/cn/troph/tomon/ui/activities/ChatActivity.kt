@@ -17,10 +17,7 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Channel
-import cn.troph.tomon.core.structures.DmChannel
-import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.StampPack
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -73,6 +70,24 @@ class ChatActivity : BaseActivity() {
                     updateToolbar(it)
                 }
             }
+        })
+        mChatSharedViewModel.syncMessageLD.observe(this, Observer {
+            if (it is TextChannel) {
+                it.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({
+
+                    }, {
+
+                    })
+            } else if (it is DmChannel) {
+                it.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({
+
+                    }, {
+
+                    })
+            }
+
         })
         mChatSharedViewModel.upEventDrawerLD.observe(this, Observer {
             val event = it as? AppUIEvent

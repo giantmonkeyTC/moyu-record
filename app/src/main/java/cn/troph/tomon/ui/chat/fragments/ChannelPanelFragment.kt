@@ -397,42 +397,41 @@ class ChannelPanelFragment : BaseFragment() {
                     mMsgListAdapter.notifyItemChanged(index)
             }
         })
-        mChatSharedVM.syncMessageLD.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                mChannelId?.let {
-                    if (Client.global.channelNeedUpdate.containsKey(it)) {
-                        val channel = Client.global.channels[it]
-                        if (channel != null) {
-                            if (channel is TextChannel) {
-                                btn_scroll_to_bottom.visibility = View.GONE
-                                mHeaderMsg.isEnd = false
-                                isFetchingMore = false
-                                editText?.let { input ->
-                                    input.text = mSwitchChannelMap[it]
-                                    input.setSelection(input.text.length)
-                                }
-                                val count = mMsgList.size
-                                mMsgList.clear()
-                                mMsgListAdapter.notifyItemRangeRemoved(0, count)
-                                mChatSharedVM.loadTextChannelMessage(it)
-                            } else if (channel is DmChannel) {
-                                btn_scroll_to_bottom.visibility = View.GONE
-                                mHeaderMsg.isEnd = false
-                                isFetchingMore = false
-                                editText?.let { input ->
-                                    input.text = mSwitchChannelMap[it]
-                                    input.setSelection(input.text.length)
-                                }
-                                val count = mMsgList.size
-                                mMsgList.clear()
-                                mMsgListAdapter.notifyItemRangeRemoved(0, count)
-                                mChatSharedVM.loadDmChannelMessage(it)
+        mChatSharedVM.syncMessageLD.observe(viewLifecycleOwner, Observer { eventChannel ->
+            mChannelId?.let {
+                if (eventChannel.id == it) {
+                    val channel = Client.global.channels[it]
+                    if (channel != null) {
+                        if (channel is TextChannel) {
+                            btn_scroll_to_bottom.visibility = View.GONE
+                            mHeaderMsg.isEnd = false
+                            isFetchingMore = false
+                            editText?.let { input ->
+                                input.text = mSwitchChannelMap[it]
+                                input.setSelection(input.text.length)
                             }
-
+                            val count = mMsgList.size
+                            mMsgList.clear()
+                            mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                            mChatSharedVM.fetchTextChannelMessage(it)
+                        } else if (channel is DmChannel) {
+                            btn_scroll_to_bottom.visibility = View.GONE
+                            mHeaderMsg.isEnd = false
+                            isFetchingMore = false
+                            editText?.let { input ->
+                                input.text = mSwitchChannelMap[it]
+                                input.setSelection(input.text.length)
+                            }
+                            val count = mMsgList.size
+                            mMsgList.clear()
+                            mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                            mChatSharedVM.fetchDmChannelMessage(it)
                         }
+
                     }
                 }
             }
+
         })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
             if (it.flag) {
@@ -923,8 +922,8 @@ class ChannelPanelFragment : BaseFragment() {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
-                                        addProperty("last_message_id", lastMessageId)
+                                        addProperty("ack_message_id", lastMessageId.substring(2))
+                                        addProperty("last_message_id", lastMessageId.substring(2))
                                     })
                                     this.mention = 0
                                     lastMessage?.let {
