@@ -188,7 +188,7 @@ class ChannelPanelFragment : BaseFragment() {
                     mHeaderMsg.channelText = channel.name
                     Client.global.preferences.edit {
                         putString(LAST_GUILD_ID, (channel as TextChannel).guildId)
-                        putString(LAST_CHANNEL_ID, value).apply()
+                        putString(LAST_CHANNEL_ID, value)
                     }
                     mChatSharedVM.loadTextChannelMessage(value)
                     channel.guild?.let { g ->
@@ -994,11 +994,6 @@ class ChannelPanelFragment : BaseFragment() {
             editText.append(it)
             btn_message_send.performClick()
         })
-
-        mChannelId = Client.global.preferences.getString(
-            LAST_CHANNEL_ID,
-            null
-        )
     }
 
 

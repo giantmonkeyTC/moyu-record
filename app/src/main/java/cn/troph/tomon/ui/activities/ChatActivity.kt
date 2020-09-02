@@ -32,8 +32,8 @@ import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
-import java.util.logging.Logger
 
 class ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
@@ -70,7 +70,7 @@ class ChatActivity : BaseActivity() {
                 val channel = Client.global.channels[it.channelId]
                 channel?.let {
                     mCurrentChannel = it
-                    updateToolbar(it)
+                    updateToolbarAndInputEditTextView(it)
                 }
             }
         })
@@ -105,7 +105,7 @@ class ChatActivity : BaseActivity() {
         })
         mChatSharedViewModel.channelUpdateLD.observe(this, Observer {
             if (it.channel.id == AppState.global.channelSelection.value.channelId) {
-                updateToolbar(it.channel)
+                updateToolbarAndInputEditTextView(it.channel)
             }
         })
         mChatSharedViewModel.setUpEvents()
@@ -145,7 +145,7 @@ class ChatActivity : BaseActivity() {
         }
     }
 
-    private fun updateToolbar(channel: Channel) {
+    private fun updateToolbarAndInputEditTextView(channel: Channel) {
         if (channel is GuildChannel) {
             var iconId: Int? = null
             text_toolbar_title.text = channel.name
@@ -162,10 +162,13 @@ class ChatActivity : BaseActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
-
+            editText.setHint(getString(R.string.emoji_et_hint))
+            editText.isEnabled = true
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
+            editText.setHint(getString(R.string.emoji_et_hint))
+            editText.isEnabled = true
         }
     }
 
