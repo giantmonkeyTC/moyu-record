@@ -60,7 +60,8 @@ public class WelcomeView extends FrameLayout {
     };
     public static final int DRAWABLE_MISS_DURATION_IN_MILLIS = 4000;
     public static final int DRAWABLE_OCCUR_DURATION_IN_MILLIS = 3000;
-    public static final int DRAWABLE_OCCUR_JITTER_DURATION_IN_SECONDS = 10;
+    public static final int MAX_OCCUR_JITTER_IN_SECONDS = 10;
+    public static int sOccurJitterInSeconds = 4;
 
     private ImageView mIvTopLeft;
     private ImageView mIvTopRight;
@@ -129,78 +130,84 @@ public class WelcomeView extends FrameLayout {
     }
 
     private void fillRightTopView(int w, int h, int deviationX, int deviationY) {
-        int rightTopX = (int) (getX() + w * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int rightTopY = (int) (getY() + h / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvRightTop);
+        int rightTopX = (int) (getX() + w * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int rightTopY = (int) (getY() + h / 4 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvRightTop);
         mIvRightTop.setAlpha(0f);
         mIvRightTop.setX(rightTopX);
         mIvRightTop.setY(rightTopY);
-        mIvRightTop.setRotation(new Random(System.currentTimeMillis()).nextInt(ROTATE_DEGREE));
+        mIvRightTop.setRotation(new Random(getSeed()).nextInt(ROTATE_DEGREE));
         randomScale(mIvRightTop);
         mIvRightTop.setImageResource(randomGetDrawable());
         startAnim(mIvRightTop, w, h, deviationX, deviationY);
     }
 
+
+    private Random mSeedProducer = new Random(System.currentTimeMillis());
+    private long getSeed() {
+        return System.currentTimeMillis() + mSeedProducer.nextInt(48);
+    }
+
     private void fillRightCenterView(int w, int h, int deviationX, int deviationY) {
-        int rightCenterX = (int) (getX() + w * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int rightCenterY = (int) (getY() + h / 2 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvRightCenter);
+        int rightCenterX = (int) (getX() + w * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int rightCenterY = (int) (getY() + h / 2 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvRightCenter);
         mIvRightCenter.setAlpha(0f);
         mIvRightCenter.setX(rightCenterX);
         mIvRightCenter.setY(rightCenterY);
-        mIvRightCenter.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvRightCenter.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvRightCenter);
         mIvRightCenter.setImageResource(randomGetDrawable());
         startAnim(mIvRightCenter, w, h, deviationX, deviationY);
     }
 
     private void fillRightBottomView(int w, int h, int deviationX, int deviationY) {
-        int rightBottomX = (int) (getX() + w * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int rightBottomY = (int) (getY() + h * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvRightBottom);
+        int rightBottomX = (int) (getX() + w * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int rightBottomY = (int) (getY() + h * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvRightBottom);
         mIvRightBottom.setAlpha(0f);
         mIvRightBottom.setX(rightBottomX);
         mIvRightBottom.setY(rightBottomY);
-        mIvRightBottom.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvRightBottom.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvRightBottom);
         mIvRightBottom.setImageResource(randomGetDrawable());
         startAnim(mIvRightBottom, w, h, deviationX, deviationY);
     }
 
     private void fillLeftTopView(int w, int h, int deviationX, int deviationY) {
-        int leftTopX = (int) (getX() + w / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int leftTopY = (int) (getY() + h / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvLeftTop);
+        int leftTopX = (int) (getX() + w / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int leftTopY = (int) (getY() + h / 4 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvLeftTop);
         mIvLeftTop.setAlpha(0f);
         mIvLeftTop.setX(leftTopX);
         mIvLeftTop.setY(leftTopY);
-        mIvLeftTop.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvLeftTop.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvLeftTop);
         mIvLeftTop.setImageResource(randomGetDrawable());
         startAnim(mIvLeftTop, w, h, deviationX, deviationY);
     }
 
     private void fillLeftCenterView(int w, int h, int deviationX, int deviationY) {
-        int leftCenterX = (int) (getX() + w / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int leftCenterY = (int) (getY() + h / 2 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvLeftCenter);
+        int leftCenterX = (int) (getX() + w / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int leftCenterY = (int) (getY() + h / 2 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvLeftCenter);
         mIvLeftCenter.setAlpha(0f);
         mIvLeftCenter.setX(leftCenterX);
         mIvLeftCenter.setY(leftCenterY);
-        mIvLeftCenter.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvLeftCenter.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvLeftCenter);
         mIvLeftCenter.setImageResource(randomGetDrawable());
         startAnim(mIvLeftCenter, w, h, deviationX, deviationY);
     }
 
     private void fillLeftBottomView(int w, int h, int deviationX, int deviationY) {
-        int leftBottomX = (int) (getX() + w / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int leftBottomY = (int) (getY() + h * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationY) - deviationY);
-        setWidthAndHeight(w, mIvLeftBottom);
+        int leftBottomX = (int) (getX() + w / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int leftBottomY = (int) (getY() + h * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationY) - deviationY);
+        setWidthAndHeight(w, h, mIvLeftBottom);
         mIvLeftBottom.setAlpha(0f);
         mIvLeftBottom.setX(leftBottomX);
         mIvLeftBottom.setY(leftBottomY);
-        mIvLeftBottom.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvLeftBottom.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvLeftBottom);
         mIvLeftBottom.setImageResource(randomGetDrawable());
         startAnim(mIvLeftBottom, w, h, deviationX, deviationY);
@@ -211,52 +218,52 @@ public class WelcomeView extends FrameLayout {
     }
 
     private void fillBottomRightView(int w, int h, int deviationX, int deviationY) {
-        setWidthAndHeight(w, mIvBottomRight);
-        int bottomRightViewX = (int) (getX() + w * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int bottomRightViewY = (int) (getY() + h - calculateViewLength(mIvBottomRight) - new Random(System.currentTimeMillis()).nextInt(deviationY));
+        setWidthAndHeight(w, h, mIvBottomRight);
+        int bottomRightViewX = (int) (getX() + w * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int bottomRightViewY = (int) (getY() + h - calculateViewLength(mIvBottomRight) - new Random(getSeed()).nextInt(deviationY));
         mIvBottomRight.setAlpha(0f);
         mIvBottomRight.setX(bottomRightViewX);
         mIvBottomRight.setY(bottomRightViewY);
-        mIvBottomRight.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvBottomRight.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvBottomRight);
         mIvBottomRight.setImageResource(randomGetDrawable());
         startAnim(mIvBottomRight, w, h, deviationX, deviationY);
     }
 
     private void fillBottomLeftView(int w, int h, int deviationX, int deviationY) {
-        setWidthAndHeight(w, mIvBottomLeft);
-        int bottomLeftViewX = (int) (getX() + w / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int bottomLeftViewY = (int) (getY() + h - calculateViewLength(mIvBottomLeft) - new Random(System.currentTimeMillis()).nextInt(deviationY));
+        setWidthAndHeight(w, h, mIvBottomLeft);
+        int bottomLeftViewX = (int) (getX() + w / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int bottomLeftViewY = (int) (getY() + h - calculateViewLength(mIvBottomLeft) - new Random(getSeed()).nextInt(deviationY));
         mIvBottomLeft.setAlpha(0f);
         mIvBottomLeft.setX(bottomLeftViewX);
         mIvBottomLeft.setY(bottomLeftViewY);
-        mIvBottomLeft.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvBottomLeft.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvBottomLeft);
         mIvBottomLeft.setImageResource(randomGetDrawable());
         startAnim(mIvBottomLeft, w, h, deviationX, deviationY);
     }
 
     private void fillTopRightView(int w, int h, int deviationX, int deviationY) {
-        int topRightViewX = w * 3 / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX;
-        int topRightViewY = new Random(System.currentTimeMillis()).nextInt(deviationY);
-        setWidthAndHeight(w, mIvTopRight);
+        int topRightViewX = w * 3 / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX;
+        int topRightViewY = new Random(getSeed()).nextInt(deviationY);
+        setWidthAndHeight(w, h, mIvTopRight);
         mIvTopRight.setAlpha(0f);
         mIvTopRight.setX(topRightViewX);
         mIvTopRight.setY(topRightViewY);
-        mIvTopRight.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvTopRight.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvTopRight);
         mIvTopRight.setImageResource(randomGetDrawable());
         startAnim(mIvTopRight, w, h, deviationX, deviationY);
     }
 
     private void fillTopLeftView(int w, int h, int deviationX, int deviationY) {
-        int topLeftViewX = (int) (getX() + w / 4 + new Random(System.currentTimeMillis()).nextInt(2 * deviationX) - deviationX);
-        int topLeftViewY = (int) (getY() + new Random(System.currentTimeMillis()).nextInt(deviationY));
+        int topLeftViewX = (int) (getX() + w / 4 + new Random(getSeed()).nextInt(2 * deviationX) - deviationX);
+        int topLeftViewY = (int) (getY() + new Random(getSeed()).nextInt(deviationY));
         mIvTopLeft.setAlpha(0f);
-        setWidthAndHeight(w, mIvTopLeft);
+        setWidthAndHeight(w, h, mIvTopLeft);
         mIvTopLeft.setX(topLeftViewX);
         mIvTopLeft.setY(topLeftViewY);
-        mIvTopLeft.setRotation(new Random(System.currentTimeMillis()).nextInt(360));
+        mIvTopLeft.setRotation(new Random(getSeed()).nextInt(360));
         randomScale(mIvTopLeft);
         mIvTopLeft.setImageResource(randomGetDrawable());
         startAnim(mIvTopLeft, w, h, deviationX, deviationY);
@@ -316,14 +323,14 @@ public class WelcomeView extends FrameLayout {
                 missAnim.start();
             }
         });
-        occurAnim.setStartDelay(new Random(System.currentTimeMillis()).nextInt(DRAWABLE_OCCUR_JITTER_DURATION_IN_SECONDS) * 1000);
+        occurAnim.setStartDelay(new Random(getSeed()).nextInt(Math.min(sOccurJitterInSeconds++, MAX_OCCUR_JITTER_IN_SECONDS)) * 1000);
         occurAnim.start();
     }
 
-    private static void setWidthAndHeight(int wh, ImageView view) {
+    private static void setWidthAndHeight(int w, int h, ImageView view) {
         LayoutParams topLeftLp = (LayoutParams) view.getLayoutParams();
-        topLeftLp.width = wh / 10;
-        topLeftLp.height = wh / 10;
+        topLeftLp.width = Math.min(w, h) / 10;
+        topLeftLp.height = Math.min(w, h) / 10;
         view.setLayoutParams(topLeftLp);
     }
 
@@ -371,14 +378,14 @@ public class WelcomeView extends FrameLayout {
         addView(mIvRightBottom);
     }
 
-    private static void randomScale(ImageView view) {
-        float scaleRatio = SCALE_RATIOS[new Random(System.currentTimeMillis()).nextInt(SCALE_RATIOS.length)];
+    private void randomScale(ImageView view) {
+        float scaleRatio = SCALE_RATIOS[new Random(getSeed()).nextInt(SCALE_RATIOS.length)];
         view.setScaleX(scaleRatio);
         view.setScaleY(scaleRatio);
     }
 
     private int randomGetDrawable() {
-        int[] colorDrawables = SELECTED_DRAWABLES[new Random(System.currentTimeMillis()).nextInt(SELECTED_DRAWABLES.length)];
-        return colorDrawables[new Random(System.currentTimeMillis()).nextInt(colorDrawables.length)];
+        int[] colorDrawables = SELECTED_DRAWABLES[new Random(getSeed()).nextInt(SELECTED_DRAWABLES.length)];
+        return colorDrawables[new Random(getSeed()).nextInt(colorDrawables.length)];
     }
 }

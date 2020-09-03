@@ -13,8 +13,6 @@ import androidx.fragment.app.DialogFragment
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.ui.activities.EntryOptionActivity
-import kotlinx.android.synthetic.main.activity_register.*
-import kotlinx.android.synthetic.main.dialog_check_logout.*
 
 class LogoutDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
