@@ -988,7 +988,7 @@ class ChannelPanelFragment : BaseFragment() {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
+                                        addProperty("ack_message_id", lastMessageId.substring(2))
                                     })
                                     lastMessage?.let {
                                         it.ack().observeOn(AndroidSchedulers.mainThread())

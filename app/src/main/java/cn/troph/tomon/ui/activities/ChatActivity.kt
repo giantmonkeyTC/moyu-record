@@ -178,13 +178,20 @@ class ChatActivity : BaseActivity() {
                 image_toolbar_icon.setImageResource(iconId)
             }
             editText.setHint(getString(R.string.emoji_et_hint))
-            editText.isEnabled = true
+            enableInputPanel()
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
             editText.setHint(getString(R.string.emoji_et_hint))
-            editText.isEnabled = true
+            enableInputPanel()
         }
+    }
+
+    private fun enableInputPanel() {
+        btn_message_menu.isEnabled = true
+        emoji_tv.isEnabled = true
+        editText.isEnabled = true
+        btn_message_send.isClickable = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
