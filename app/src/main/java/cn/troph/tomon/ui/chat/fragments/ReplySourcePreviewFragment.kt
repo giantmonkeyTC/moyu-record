@@ -55,6 +55,7 @@ class ReplySourcePreviewFragment(val message: Message) : DialogFragment() {
 
         val sourceMessage = message.replySource
         sourceMessage?.let {
+            reply_source_scrollview.smoothScrollTo(0,0)
             reply_source_avatar.user = sourceMessage.author
             reply_source_author.text = guildMemberOf(sourceMessage)?.displayName ?: sourceMessage.author?.name ?: ""
             Converter.toMarkdownTextView(
@@ -75,7 +76,6 @@ class ReplySourcePreviewFragment(val message: Message) : DialogFragment() {
                 sourceMessage.content ?: "",
                 reply_source_content
             )
-            reply_source_content.movementMethod = ScrollingMovementMethod()
         }
         reply_source_cancel.setOnClickListener {
             dismiss()

@@ -26,6 +26,7 @@
         android:clipToPadding="false"
         android:paddingBottom="20dp"
         android:scrollbars="vertical"
+        android:scrollbarSize="4dp"
         android:scrollbarThumbVertical="@color/primaryColor"
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
