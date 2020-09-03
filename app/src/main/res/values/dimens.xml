@@ -38,4 +38,8 @@
     <dimen name="image_overlay_save_margin">24dp</dimen>
     <dimen name="btn_image_save_size">40dp</dimen>
     <dimen name="owner_change_margin_top">16dp</dimen>
+    <dimen name="invite_avatar">72dp</dimen>
+    <dimen name="invite_confirm_button_width">190dp</dimen>
+    <dimen name="invite_confirm_buttom_height">44dp</dimen>
+    <dimen name="invite_confirm_button_margin_top">40dp</dimen>
 </resources>
