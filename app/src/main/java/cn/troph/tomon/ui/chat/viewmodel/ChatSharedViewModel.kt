@@ -272,10 +272,10 @@ class ChatSharedViewModel : ViewModel() {
                         messageLoadingLiveData.value = false
                     })
         } else
-            messageLiveData.value = channel.messages.toMutableList()
+            messageLiveData.value = channel.messages.getSortedList()
     }
 
-    fun fetchTextChannelMessage(channelId: String){
+    fun fetchTextChannelMessage(channelId: String) {
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as TextChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
@@ -287,7 +287,7 @@ class ChatSharedViewModel : ViewModel() {
             })
     }
 
-    fun fetchDmChannelMessage(channelId: String){
+    fun fetchDmChannelMessage(channelId: String) {
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
@@ -311,7 +311,7 @@ class ChatSharedViewModel : ViewModel() {
                     messageLoadingLiveData.value = false
                 })
         } else {
-            messageLiveData.value = channel.messages.toMutableList()
+            messageLiveData.value = channel.messages.getSortedList()
         }
     }
 
