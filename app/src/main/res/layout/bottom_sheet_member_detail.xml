@@ -4,7 +4,7 @@
     android:id="@+id/bottom_sheet_member_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background2">
+    android:background="@color/background3">
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/detail_member_avatar"
