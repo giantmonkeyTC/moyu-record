@@ -573,25 +573,33 @@ class MessageAdapter(
                                                                 "下载完成",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
+
+
                                                             MediaScannerConnection.scanFile(
                                                                 holder.itemView.context
                                                                 ,
                                                                 arrayOf(
-                                                                    holder.itemView.context.getExternalFilesDir(
+                                                                    (holder.itemView.context.getExternalFilesDir(
                                                                         Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath + "/${image.fileName}"
+                                                                    )?.absolutePath) + "/${image.fileName}"
                                                                 )
                                                                 ,
-                                                                null
+                                                                arrayOf(
+                                                                    "image/jpg",
+                                                                    "image/png",
+                                                                    "image/gif"
+                                                                )
                                                             ) { path, uri ->
                                                                 Logger.d(path)
                                                                 Logger.d(uri)
                                                                 Logger.d(
-                                                                    holder.itemView.context.getExternalFilesDir(
+                                                                    (holder.itemView.context.getExternalFilesDir(
                                                                         Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath + "/${image.fileName}"
+                                                                    )?.absolutePath) + "/${image.fileName}"
                                                                 )
                                                             }
+
+
                                                         }
 
                                                         override fun onError(error: Error?) {
@@ -1479,7 +1487,7 @@ class MessageAdapter(
                                                                         Environment.DIRECTORY_DOWNLOADS
                                                                     )?.absolutePath}",
                                                                     Toast.LENGTH_SHORT
-                                                                 ).show()
+                                                                ).show()
                                                                 PRDownloader.download(
                                                                     image.url,
                                                                     holder.itemView.context.getExternalFilesDir(

@@ -10,10 +10,10 @@
         android:layout_height="@dimen/btn_image_save_size"
         android:layout_marginEnd="@dimen/image_overlay_save_margin"
         android:layout_marginBottom="@dimen/image_overlay_save_margin"
-        android:background="@drawable/save_image_background"
         android:clickable="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/btn_image_save"
+        android:scaleType="centerCrop"
+        android:elevation="20dp"
+        android:background="@drawable/save_image_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
