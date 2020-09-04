@@ -42,13 +42,7 @@ class ChatActivity : BaseActivity() {
 
         val map = HashMap<String, Int>()
 
-        Client.global.rest.guildEmojiService.fetchStampPack(
-            Assets.defaultStampPackId,
-            Client.global.auth
-        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java)) }, {
-                com.orhanobut.logger.Logger.d(it.message)
-            })
+
 
 
 
