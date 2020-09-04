@@ -2,15 +2,10 @@ package cn.troph.tomon.ui.activities
 
 import android.app.ActivityOptions
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.Html
 import android.view.inputmethod.InputMethodManager
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,7 +21,7 @@ import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.layout_activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
@@ -90,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.layout_activity_login)
         bindProgressButton(button_login)
         button_login.attachTextChangeAnimator()
         val dataPullingViewModel: DataPullingViewModel by viewModels()

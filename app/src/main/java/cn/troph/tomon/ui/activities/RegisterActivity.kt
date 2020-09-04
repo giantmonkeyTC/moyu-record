@@ -27,7 +27,7 @@ import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.layout_activity_register.*
 
 
 class RegisterActivity : AppCompatActivity() {
@@ -49,7 +49,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        setContentView(R.layout.layout_activity_register)
 
         button_confirmation.setOnClickListener {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -76,17 +76,26 @@ class RegisterActivity : AppCompatActivity() {
             val code = register_confirmation_code.text.toString().trim()
             val invite = register_input_invite_code.text.toString().trim()
             val unionId = register_input_union_id.text.toString().trim()
+            val passwd = register_input_password.text.toString().trim()
             if (!Validator.isUserName(username))
                 GeneralSnackbar.make(
                     GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                     "用户名限制",
                     Snackbar.LENGTH_LONG
                 ).show()
+            else if (passwd.length < 8 || passwd.length > 32) {
+                GeneralSnackbar.make(
+                    GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                    "密码长度需在 8 至 32 位之间",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
             else
                 Client.global.register(
                     username = username,
                     code = code,
                     invite = invite,
+                    password = passwd,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
                     Toast.makeText(applicationContext, getString(R.string.regist_successed), Toast.LENGTH_LONG).show()
