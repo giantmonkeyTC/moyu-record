@@ -1,7 +1,6 @@
 package cn.troph.tomon.ui.activities;
 
 import android.animation.ObjectAnimator;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -44,6 +43,7 @@ import cn.troph.tomon.core.utils.Assets;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.fragments.ChannelListFragment;
 import cn.troph.tomon.ui.guild.GuildListAdapter;
+import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
 import cn.troph.tomon.ui.widgets.TomonTabButton;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -51,10 +51,6 @@ import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class TomonMainActivity extends BaseActivity {
-
-    public static final String NO_GUILD_ID = "";
-    public static final String SP_NAME_CHANNEL_LIST_CONFIG = "channel_list_config";
-    public static final String SP_KEY_GUILD_ID = "guild_id";
 
     private ChatSharedViewModel mChatVM;
     private RecyclerView mGuildListRecyclerView;
@@ -167,16 +163,11 @@ public class TomonMainActivity extends BaseActivity {
     }
 
     private String getLastGuildId() {
-        SharedPreferences spChannelListConfig = getSharedPreferences(
-                SP_NAME_CHANNEL_LIST_CONFIG, MODE_PRIVATE);
-        return spChannelListConfig.getString(SP_KEY_GUILD_ID, NO_GUILD_ID);
+        return GuildUtils.getLastGuildId(this);
     }
 
     private void saveLastGuildId(String id) {
-        getSharedPreferences(SP_NAME_CHANNEL_LIST_CONFIG, MODE_PRIVATE)
-                .edit()
-                .putString(SP_KEY_GUILD_ID, id)
-                .apply();
+        GuildUtils.saveLastGuildId(this, id);
     }
 
     private void initViewModel() {

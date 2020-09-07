@@ -23,6 +23,7 @@ import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.core.structures.TextChannel;
 import cn.troph.tomon.ui.activities.TomonMainActivity;
+import cn.troph.tomon.ui.utils.GuildUtils;
 
 public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.ViewHolder> {
 
@@ -99,9 +100,7 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
         if (TextUtils.isEmpty(mCurrentGuildId) && position == 0) {
             holder.ivSelectedFlag.setVisibility(View.VISIBLE);
             mCurrentGuildId = guild.getId();
-            SharedPreferences sp = holder.ivSelectedFlag.getContext().
-                    getSharedPreferences(TomonMainActivity.SP_NAME_CHANNEL_LIST_CONFIG, Context.MODE_PRIVATE);
-            sp.edit().putString(TomonMainActivity.SP_KEY_GUILD_ID, mCurrentGuildId).apply();
+            GuildUtils.saveLastGuildId(holder.ivSelectedFlag.getContext(), mCurrentGuildId);
 
         } else {
             if (guild.getId().equals(mCurrentGuildId)) {

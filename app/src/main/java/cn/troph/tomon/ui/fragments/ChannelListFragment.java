@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.fragments;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +25,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
@@ -52,6 +50,8 @@ public class ChannelListFragment extends Fragment {
     private TextView mTvGuildAvaterTextHolder;
     private RecyclerView mRvChannelList;
     private ChannelGroupRV mChannelTreeRoot;
+    private ArrayMap<String, ChannelGroupRV> mChannelGroupCache = new ArrayMap<>();
+    private ArrayMap<String, ArrayList<GuildChannel>> mChannelOrphans = new ArrayMap<>();
 
     @Nullable
     @Override
@@ -108,18 +108,42 @@ public class ChannelListFragment extends Fragment {
 
         GuildChannelCollection channels = guild.getChannels();
         if (channels != null && channels.getSize() > 0) {
-            mChannelTreeRoot = new ChannelGroupRV("root", new LinkedList<ChannelRV>());
+            mChannelTreeRoot = new ChannelGroupRV(null, new ArrayList<>());
         }
         for (GuildChannel channel : channels) {
-            if (channel.getIndent() == 0) {
-                if (channel.getType() == ChannelType.CATEGORY) {
-                    mChannelTreeRoot.add(channel.getPosition(), new ChannelRV((CategoryChannel) channel, new LinkedList<ChannelRV>()));
-                } else {
-                    mChannelTreeRoot.add(channel.getPosition(), new ChannelRV(channel));
-                }
+            if (channel.getParent() == null) {
+                insertChannel(mChannelTreeRoot, channel);
             } else {
+                ChannelGroupRV channelGroupRV = mChannelGroupCache.get(channel.getParentId());
+                if (channelGroupRV == null) {
+                    ArrayList<GuildChannel> orphans = mChannelOrphans.get(channel.getParentId());
+                    if (orphans == null) {
+                        orphans = new ArrayList<>();
+                        mChannelOrphans.put(channel.getParentId(), orphans);
+                    }
+                    orphans.add(channel);
+                } else {
+                    insertChannel(channelGroupRV, channel);
+                }
 
             }
+        }
+    }
+
+    private void insertChannel(ChannelGroupRV root, GuildChannel channel) {
+        if (channel.getType() == ChannelType.CATEGORY) {
+            ChannelGroupRV group = new ChannelGroupRV(channel, new ArrayList<>());
+            root.addSortedByPostion(group);
+            mChannelGroupCache.put(channel.getId(), group);
+            ArrayList<GuildChannel> orphans = mChannelOrphans.get(channel.getId());
+            if (orphans == null) {
+                return;
+            }
+            for (GuildChannel orphan : orphans) {
+                insertChannel(group, orphan);
+            }
+        } else {
+            root.addSortedByPostion(new ChannelRV(channel));
         }
     }
 }
