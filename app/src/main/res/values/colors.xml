@@ -65,4 +65,6 @@
     <color name="primaryColorAlpha20">#30FF7896</color>
     <color name="update_message_shape_color">#5A3F45</color>
     <color name="save_image_ripple">#80000000</color>
+    <color name="blackAlpha10">#1A000000</color>
+    <color name="whiteAlpha10">#1AFFFFFF</color>
 </resources>
