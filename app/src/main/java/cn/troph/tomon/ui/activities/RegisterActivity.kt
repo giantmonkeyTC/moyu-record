@@ -6,17 +6,17 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import cn.troph.tomon.R
@@ -27,8 +27,7 @@ import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_register.*
-import java.util.*
+import kotlinx.android.synthetic.main.layout_activity_register.*
 
 
 class RegisterActivity : AppCompatActivity() {
@@ -44,9 +43,13 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    companion object {
+        val TAG = "RegisterActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        setContentView(R.layout.layout_activity_register)
 
         button_confirmation.setOnClickListener {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -73,37 +76,43 @@ class RegisterActivity : AppCompatActivity() {
             val code = register_confirmation_code.text.toString().trim()
             val invite = register_input_invite_code.text.toString().trim()
             val unionId = register_input_union_id.text.toString().trim()
+            val passwd = register_input_password.text.toString().trim()
             if (!Validator.isUserName(username))
                 GeneralSnackbar.make(
                     GeneralSnackbar.findSuitableParent(button_confirmation)!!,
                     "用户名限制",
                     Snackbar.LENGTH_LONG
                 ).show()
+            else if (passwd.length < 8 || passwd.length > 32) {
+                GeneralSnackbar.make(
+                    GeneralSnackbar.findSuitableParent(button_confirmation)!!,
+                    "密码长度需在 8 至 32 位之间",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
             else
                 Client.global.register(
                     username = username,
                     code = code,
                     invite = invite,
+                    password = passwd,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    GeneralSnackbar.make(
-                        GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                        "注册成功",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(applicationContext, getString(R.string.regist_successed), Toast.LENGTH_LONG).show()
                     gotoEntryOption()
                 }, {
                     it.message?.let {
+                        Log.e(TAG, "error message: " + it)
                         if (it.contains("422")) {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:邀请码或验证码错误",
+                                getString(R.string.user_existed_info_error),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         } else {
                             GeneralSnackbar.make(
                                 GeneralSnackbar.findSuitableParent(button_confirmation)!!,
-                                "注册失败:未知错误",
+                                getString(R.string.regist_unknown_error) + it,
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }

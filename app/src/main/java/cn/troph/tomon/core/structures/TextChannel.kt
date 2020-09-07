@@ -68,7 +68,7 @@ class TextChannel(client: Client, data: JsonObject) : GuildChannel(client, data)
         }
 
         if (data.has("unread_count")) {
-            unreadMention = data["unread_count"].optInt!!
+            unreadMention = data["unread_count"].optInt ?: 0
             mention = unreadMention
         }
 

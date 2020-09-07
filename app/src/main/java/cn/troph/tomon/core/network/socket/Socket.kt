@@ -6,6 +6,8 @@ import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.NetworkConfigs
 import cn.troph.tomon.core.network.socket.handlers.*
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -13,6 +15,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -43,6 +46,7 @@ class Socket : Observer<SocketEvent>, LifecycleObserver {
     private var _ready: Boolean = false
     private var _sessionId: String? = null
     private var _heartbeatTimer = Timer()
+    var lastHeartbeat = LocalDateTime.now()
     private var _heartbeatTimerTask: TimerTask? = null
     private var _heartbeatInterval: Long = 40000
     private val _handlers = mapOf(
@@ -157,6 +161,7 @@ class Socket : Observer<SocketEvent>, LifecycleObserver {
                 )
             }
             GatewayOp.HEARTBEAT -> {
+                lastHeartbeat = LocalDateTime.now()
                 send(GatewayOp.HEARTBEAT_ACK)
             }
             GatewayOp.HEARTBEAT_ACK -> {

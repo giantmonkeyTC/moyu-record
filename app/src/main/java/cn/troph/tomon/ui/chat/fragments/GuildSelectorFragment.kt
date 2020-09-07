@@ -4,9 +4,13 @@ package cn.troph.tomon.ui.chat.fragments
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.*
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -23,14 +27,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.fragment_guild_selector.*
 import kotlinx.android.synthetic.main.bottom_sheet_join_guild.view.*
+import kotlinx.android.synthetic.main.fragment_guild_selector.*
 
 const val FILE_REQUEST_CODE = 717
 const val IMAGE_REQUEST_CODE = 7179
 
 class GuildSelectorFragment : Fragment() {
 
+    private val TAG = "GuildSelectorFragment"
 
     private val mChatVM: ChatSharedViewModel by activityViewModels()
     private val mGuildList = mutableListOf<Guild>()
@@ -292,12 +297,13 @@ class GuildSelectorFragment : Fragment() {
                     if (it != null) {
                         val invite = it
                         if (invite.joined) {
-                            GeneralSnackbar.make(
-                                GeneralSnackbar.findSuitableParent(viewBase)!!,
-                                "你已经在该群组中",
-                                Snackbar.LENGTH_LONG
+                            Toast.makeText(
+                                requireContext().applicationContext,
+                                getString(R.string.guild_already_joined),
+                                Toast.LENGTH_LONG
                             ).show()
                             textField.setText("")
+
                         } else {
                             Client.global.guilds.join(
                                 textField.text.toString()
@@ -306,12 +312,12 @@ class GuildSelectorFragment : Fragment() {
                                 .subscribe(
                                     { guild ->
                                         dialog.dismiss()
-                                        GeneralSnackbar.make(
-                                            GeneralSnackbar.findSuitableParent(view)!!,
-                                            "加入成功",
-                                            Snackbar.LENGTH_LONG
+                                        Toast.makeText(
+                                            requireContext().applicationContext,
+                                            getString(R.string.guild_joined_success),
+                                            Toast.LENGTH_LONG
                                         ).show()
-                                    }, { error -> println(error) }, { }
+                                    }, { error -> Log.e(TAG, "joined error:", error) }, { }
                                 )
                         }
                     }

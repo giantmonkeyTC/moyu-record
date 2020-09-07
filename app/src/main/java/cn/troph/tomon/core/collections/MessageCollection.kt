@@ -34,6 +34,17 @@ class MessageCollection(client: Client, val channel: Channel) :
 
     val list get() = sortedList
 
+    fun getSortedList(): MutableList<Message> {
+        val cloneMap = this.clone().toMap()
+        val sorted = mutableListOf<Message>()
+        list.forEach {
+            cloneMap[it.substring(2)]?.let {
+                sorted.add(it)
+            }
+        }
+        return sorted
+    }
+
     override fun add(data: JsonObject, identify: CollectionIdentify?): Message? {
         val advancedId = identify ?: {
             val id = it["id"].optString
@@ -156,5 +167,5 @@ class MessageCollection(client: Client, val channel: Channel) :
             client.actions.messageCreate(it)
         }
     }
-
 }
+

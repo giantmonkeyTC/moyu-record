@@ -5,6 +5,9 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.GatewayOp
+import cn.troph.tomon.core.network.socket.SocketClientState
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.TextChannel
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 
@@ -15,8 +18,20 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-//        Logger.d("App in foreground")
-//        Client.global.socket.open()
+        if (Client.global.isBackground && Client.global.loggedIn) {
+            Client.global.socket.close()
+            Client.global.cacheChannelMap.clear()
+//            Client.global.channelNeedUpdate.clear()
+            Client.global.channels.forEach {
+                if (it is TextChannel)
+                    Client.global.cacheChannelMap[it.id] = it.lastMessageId
+                else if (it is DmChannel)
+                    Client.global.cacheChannelMap[it.id] = it.lastMessageId
+            }
+            Logger.d("App in foreground")
+            Client.global.socket.open()
+        }
+
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -31,8 +46,8 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStop() {
-//        Logger.d("App in background")
-//        Client.global.socket.close()
+        Client.global.isBackground = true
+        Logger.d("App in background")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

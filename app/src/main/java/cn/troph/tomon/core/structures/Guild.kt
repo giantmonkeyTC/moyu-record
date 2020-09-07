@@ -55,7 +55,8 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
 
     fun updateMention(): Boolean {
         val old = mention
-        mention = channels.fold(0, { acc, element ->
+        val cloned = channels.clone();
+        mention = cloned.fold(0, { acc, element ->
             if (element is TextChannel) {
                 acc + element.mention
             } else
@@ -65,7 +66,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
     }
 
     fun updateUnread(): Boolean {
-        unread = channels.find { channel ->
+        unread = channels.clone().find { channel ->
             if (channel is TextChannel) {
                 if (channel.unread)
                     return@find true
@@ -101,7 +102,7 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
             position = data["position"].optInt ?: 0
         }
         if (data.has("joined_at")) {
-            joinedAt = Converter.toDate(data["joined_at"].asString)
+            joinedAt = Converter.toDate(data["joined_at"].optString)
         }
         if (data.has("owner_id")) {
             ownerId = data["owner_id"].asString

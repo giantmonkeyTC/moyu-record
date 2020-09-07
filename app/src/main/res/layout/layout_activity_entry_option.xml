@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background3"
+    >
+
+    <cn.troph.tomon.ui.widgets.WelcomeView
+        android:id="@+id/register_n_login"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="49dp"
+        android:background="#33000000"
+        app:layout_constraintBottom_toTopOf="@+id/slogan_japan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+
+    </cn.troph.tomon.ui.widgets.WelcomeView>
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/register_n_login"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/register_n_login"
+        app:srcCompat="@drawable/login_register_logo" />
+    <Button
+        android:id="@+id/button_register_route"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="24dp"
+        android:background="#FF7896"
+        android:gravity="center"
+        android:text="@string/register_button"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_login_route"
+        app:layout_constraintEnd_toEndOf="@+id/button_login_route"
+        app:layout_constraintStart_toStartOf="@+id/button_login_route" />
+
+    <Button
+        android:id="@+id/button_login_route"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="50dp"
+        android:background="#FF7896"
+        android:gravity="center"
+        android:text="@string/login_button"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/slogan_chinese"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="独特的人会找到独特的人"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_register_route"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/slogan_japan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="類はTomonを呼ぶ"
+        android:textColor="#DEFFFFFF"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/slogan_chinese"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

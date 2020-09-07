@@ -16,7 +16,8 @@
     <string name="register_invite_code">邀请码</string>
     <string name="register_confirmation_code">验证码</string>
     <string name="register_button">注册</string>
-    <string name="register_user_name">用户名</string>
+    <string name="register_user_name">用户名（如：tomon）</string>
+    <string name="register_passwd">密码（8-32位）</string>
     <string name="register_confirmation">发送验证码</string>
     <string name="register_to_login">已有账号登录</string>
 
@@ -34,6 +35,7 @@
     <string name="emoji_guild_name">群组名称</string>
     <string name="send_fail">发送失败</string>
     <string name="send_success">发送成功</string>
+    <string name="guild_deleted">该群组已被删除</string>
     <string name="app_name_capital">TOMON</string>
     <string name="ed_msg_hint_no_permisson">你没有此频道发言权限</string>
     <string name="no_voice_support">程序员小哥哥正在努力地开发语音功能!</string>
@@ -93,6 +95,14 @@
     <string name="guild_list_search_hint">搜索群组名称</string>
     <string name="channel_tab_text">频道</string>
     <string name="dm_tab_text">私聊</string>
+    <string name="message_update_bar_text">正在编辑消息</string>
+    <string name="deleted_name">被注销的账号</string>
+    <string name="regist_successed">注册成功</string>s
+    <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
+    <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
+    <string name="select_guild_channel_hint">请先选择群组或者频道</string>
+    <string name="guild_already_joined">你已经在该群组中</string>
+    <string name="guild_joined_success">加入成功</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>

@@ -30,6 +30,7 @@
         android:background="@color/blackPrimary"
         android:drawableStart="@drawable/small_icon_repeat"
         android:drawablePadding="35dp"
+        android:visibility="gone"
         android:gravity="center_vertical"
         android:paddingVertical="16dp"
         android:paddingStart="27dp"

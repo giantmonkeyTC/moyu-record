@@ -1,12 +1,14 @@
 package cn.troph.tomon.ui.chat.viewmodel
 
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.utils.event.observeEvent
 import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -20,6 +22,8 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class ChatSharedViewModel : ViewModel() {
+
+    val syncMessageLD = MutableLiveData<Channel>()
 
     val showUserProfileLD = MutableLiveData<User>()
 
@@ -64,6 +68,7 @@ class ChatSharedViewModel : ViewModel() {
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
 
+    val replySourceReadyLD = MutableLiveData<MessageReplySourceReadyEvent>()
 
     val messageLiveData = MutableLiveData<MutableList<Message>>()
 
@@ -129,9 +134,16 @@ class ChatSharedViewModel : ViewModel() {
 
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {
+                if (it.flag) {
+                    replyLd.value = ReplyEnabled(false, null)
+                }
                 updateLD.value = it
             })
 
+
+        Client.global.eventBus.observeEventOnUi<SyncMessageEvent>().subscribe(Consumer {
+            syncMessageLD.value = it.channel
+        })
 
         Client.global.eventBus.observeEventOnUi<VoiceStateUpdateEvent>().subscribe(Consumer {
             voiceStateUpdateLD.value = it.voiceUpdate
@@ -148,6 +160,12 @@ class ChatSharedViewModel : ViewModel() {
         Client.global.eventBus.observeEventOnUi<ChannelUpdateEvent>().subscribe(Consumer {
             channelUpdateLD.value = it
         })
+
+        Client.global.eventBus.observeEventOnUi<MessageReplySourceReadyEvent>().subscribe(
+            Consumer {
+                replySourceReadyLD.value = it
+            }
+        )
 
         Client.global.eventBus.observeEventOnUi<ChannelDeleteEvent>().subscribe(Consumer {
             if (it.channel is DmChannel) {
@@ -239,19 +257,37 @@ class ChatSharedViewModel : ViewModel() {
     }
 
     fun loadTextChannelMessage(channelId: String) {
+        val channel = Client.global.channels[channelId] as TextChannel
+        if (channel.messages.size == 0) {
+            messageLoadingLiveData.value = true
+            channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(
+                    {
+                        messageLoadingLiveData.value = false
+                        messageLiveData.value = it.toMutableList()
+                    }, {
+                        Logger.d(it.message)
+                        Logger.d(it.cause)
+                        Logger.d(it.stackTrace)
+                        messageLoadingLiveData.value = false
+                    })
+        } else
+            messageLiveData.value = channel.messages.getSortedList()
+    }
+
+    fun fetchTextChannelMessage(channelId: String) {
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as TextChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                {
-                    messageLoadingLiveData.value = false
-                    messageLiveData.value = it.toMutableList()
-                }, {
-                    messageLoadingLiveData.value = false
-                })
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                messageLoadingLiveData.value = false
+                messageLiveData.value = it.toMutableList()
+            }, {
+                messageLoadingLiveData.value = false
+            })
     }
 
-    fun loadDmChannelMessage(channelId: String) {
+    fun fetchDmChannelMessage(channelId: String) {
         messageLoadingLiveData.value = true
         val channel = Client.global.channels[channelId] as DmChannel
         channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
@@ -262,6 +298,23 @@ class ChatSharedViewModel : ViewModel() {
                 messageLoadingLiveData.value = false
             })
     }
+
+    fun loadDmChannelMessage(channelId: String) {
+        val channel = Client.global.channels[channelId] as DmChannel
+        if (channel.messages.size == 0) {
+            messageLoadingLiveData.value = true
+            channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                    messageLoadingLiveData.value = false
+                    messageLiveData.value = it.toMutableList()
+                }, {
+                    messageLoadingLiveData.value = false
+                })
+        } else {
+            messageLiveData.value = channel.messages.getSortedList()
+        }
+    }
+
 
     fun loadDmChannel() {
         dmChannelLiveData.value = Client.global.dmChannels.toMutableList()

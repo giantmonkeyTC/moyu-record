@@ -4,11 +4,14 @@ import android.util.Log
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.socket.Handler
 import cn.troph.tomon.core.structures.StampPack
+import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.orhanobut.logger.Logger
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 val handleIdentity: Handler = { client: Client, packet: JsonElement ->
     val data = packet.asJsonObject["d"].asJsonObject
@@ -43,11 +46,19 @@ val handleIdentity: Handler = { client: Client, packet: JsonElement ->
         client.actions.presenceFetch(guild["presences"].asJsonArray, guild["id"].asString)
     }
 
+
     data["guild_settings"].asJsonArray.forEach { e ->
         client.actions.guildSettingsUpdate(e.asJsonObject)
     }
+    client.stamps.clear()
     data["stamp_packs"].asJsonArray.forEach { s ->
         val stampPack = s.asJsonObject
         client.stamps.add(Gson().fromJson(stampPack, StampPack::class.java))
     }
+    Client.global.rest.guildEmojiService.fetchStampPack(
+        Assets.defaultStampPackId,
+        Client.global.auth
+    ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        .subscribe({ Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java)) }, {
+        })
 }

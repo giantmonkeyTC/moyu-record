@@ -17,10 +17,7 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Channel
-import cn.troph.tomon.core.structures.DmChannel
-import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.StampPack
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
@@ -32,8 +29,8 @@ import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
-import java.util.logging.Logger
 
 class ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
@@ -45,13 +42,7 @@ class ChatActivity : BaseActivity() {
 
         val map = HashMap<String, Int>()
 
-        Client.global.rest.guildEmojiService.fetchStampPack(
-            Assets.defaultStampPackId,
-            Client.global.auth
-        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ Client.global.stamps.add(Gson().fromJson(it, StampPack::class.java)) }, {
-                com.orhanobut.logger.Logger.d(it.message)
-            })
+
 
 
 
@@ -70,9 +61,27 @@ class ChatActivity : BaseActivity() {
                 val channel = Client.global.channels[it.channelId]
                 channel?.let {
                     mCurrentChannel = it
-                    updateToolbar(it)
+                    updateToolbarAndInputEditTextView(it)
                 }
             }
+        })
+        mChatSharedViewModel.syncMessageLD.observe(this, Observer {
+            if (it is TextChannel) {
+                it.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({
+
+                    }, {
+
+                    })
+            } else if (it is DmChannel) {
+                it.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({
+
+                    }, {
+
+                    })
+            }
+
         })
         mChatSharedViewModel.upEventDrawerLD.observe(this, Observer {
             val event = it as? AppUIEvent
@@ -105,7 +114,7 @@ class ChatActivity : BaseActivity() {
         })
         mChatSharedViewModel.channelUpdateLD.observe(this, Observer {
             if (it.channel.id == AppState.global.channelSelection.value.channelId) {
-                updateToolbar(it.channel)
+                updateToolbarAndInputEditTextView(it.channel)
             }
         })
         mChatSharedViewModel.setUpEvents()
@@ -145,7 +154,7 @@ class ChatActivity : BaseActivity() {
         }
     }
 
-    private fun updateToolbar(channel: Channel) {
+    private fun updateToolbarAndInputEditTextView(channel: Channel) {
         if (channel is GuildChannel) {
             var iconId: Int? = null
             text_toolbar_title.text = channel.name
@@ -162,11 +171,21 @@ class ChatActivity : BaseActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
-
+            editText.setHint(getString(R.string.emoji_et_hint))
+            enableInputPanel()
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)
+            editText.setHint(getString(R.string.emoji_et_hint))
+            enableInputPanel()
         }
+    }
+
+    private fun enableInputPanel() {
+        btn_message_menu.isEnabled = true
+        emoji_tv.isEnabled = true
+        editText.isEnabled = true
+        btn_message_send.isClickable = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

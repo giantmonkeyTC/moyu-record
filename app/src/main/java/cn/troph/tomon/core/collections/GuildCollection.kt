@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.collections
 
+import android.util.Log
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.utils.SortedList
@@ -50,7 +51,8 @@ class GuildCollection(client: Client) :
 
     fun join(code: String): Observable<Guild?> {
         return client.rest.inviteService.join(code, client.auth).subscribeOn(Schedulers.io()).map {
-            Gson().fromJson(it, Guild::class.java)
+            Logger.d(it)
+            Guild(client, it)
         }
     }
 

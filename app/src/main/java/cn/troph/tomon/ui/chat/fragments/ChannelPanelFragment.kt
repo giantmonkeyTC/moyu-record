@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -10,6 +11,7 @@ import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,16 +21,22 @@ import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.view.animation.TranslateAnimation
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.edit
+import androidx.core.view.get
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -77,6 +85,7 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.view.*
+import kotlinx.coroutines.delay
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper
 import net.gotev.uploadservice.data.UploadInfo
 import net.gotev.uploadservice.data.UploadNotificationConfig
@@ -99,11 +108,13 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.net.URL
 import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.random.Random
 
 const val FILE_REQUEST_CODE_FILE = 323
-const val LAST_CHANNEL_ID = "last_channel_id"
-const val LAST_GUILD_ID = "last_guild_id"
+public const val LAST_CHANNEL_ID = "last_channel_id"
+public const val LAST_GUILD_ID = "last_guild_id"
 
 class ChannelPanelFragment : BaseFragment() {
     private val mSwitchChannelMap = HashMap<String, Editable>()
@@ -113,6 +124,7 @@ class ChannelPanelFragment : BaseFragment() {
     private lateinit var mBottomSheet: FileBottomSheetFragment
     private lateinit var viewPagerCollectionAdapter: ViewPagerCollectionAdapter
     private lateinit var viewPager: NestedViewPager
+    private var isFirstSetData = true
     private val mIntentFilter = IntentFilter()
     private val mNetworkChangeReceiver = NetworkChangeReceiver()
     private lateinit var mEasyImage: EasyImage
@@ -129,7 +141,7 @@ class ChannelPanelFragment : BaseFragment() {
 
     private var mChannelId: String? = null
         set(value) {
-            val changed = field != value
+            val changed = isFirstSetData || field != value
             field = value
             if (changed && value != null) {
                 btn_scroll_to_bottom.visibility = View.GONE
@@ -140,6 +152,9 @@ class ChannelPanelFragment : BaseFragment() {
                     input.setSelection(input.text.length)
                 }
                 val channel = Client.global.channels[value]
+                if (channel != null) {
+                    isFirstSetData = false
+                }
                 val count = mMsgList.size
                 mMsgList.clear()
                 mMsgListAdapter.notifyItemRangeRemoved(0, count)
@@ -215,18 +230,15 @@ class ChannelPanelFragment : BaseFragment() {
         }
 
     private fun setNoPermissionViewIfNeeded(channel: TextChannel) {
-        val meCollectionNone = channel.members[Client.global.me.id]?.roles?.collection?.none {
-            it.permissions.has(Permissions.SEND_MESSAGES)
+        var meMember = channel.members[Client.global.me.id]
+        var canSendMessage: Boolean? = false
+        if (meMember != null) {
+            canSendMessage = channel.permissionForMember(meMember)?.has(Permissions.SEND_MESSAGES)
+        } else {
+            canSendMessage = false
         }
 
-        val meCollectionAny = channel.members[Client.global.me.id]?.roles?.collection?.any {
-            val po = channel.permissionOverwrites[it.id]
-            if (po != null)
-                po.denyPermission(Permissions.SEND_MESSAGES)!!
-            else false
-        }
-
-        if (meCollectionNone!! || meCollectionAny!!) {
+        if (canSendMessage == null || !canSendMessage) {
             editText?.let {
                 it.hint = getString(R.string.ed_msg_hint_no_permisson)
                 it.isEnabled = false
@@ -286,30 +298,70 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }, object : OnAvatarLongClickListener {
             override fun onAvatarLongClick(identifier: String) {
-                val start = editText.selectionStart
-                editText.text.insert(
-                    start,
-                    mentionFormat(identifier)
-                )
-                editText.text.setSpan(
-                    ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
-                    start,
-                    start + mentionFormat(identifier).length,
-                    0x11
-                )
-
+                if (editText.isEnabled) {
+                    val start = editText.selectionStart
+                    editText.text.insert(
+                        start,
+                        mentionFormat(identifier)
+                    )
+                    editText.text.setSpan(
+                        ForegroundColorSpan(requireContext().getColor(R.color.secondary)),
+                        start,
+                        start + mentionFormat(identifier).length,
+                        0x11
+                    )
+                }
             }
         }, object : OnReplyClickListener {
             override fun onReplyClick(message: Message?) {
+                mChatSharedVM.updateLD.value = UpdateEnabled(flag = false, message = null)
                 mChatSharedVM.replyLd.value = ReplyEnabled(flag = true, message = message)
             }
+
             override fun onSourceClick(message: Message?, position: Int) {
                 mMsgList.forEachIndexed { index, mes ->
                     if (message != null) {
-                        if (message.id == mes.id)
+                        if (message.id == mes.id) {
                             view_messages.scrollToPosition(index)
+                            val timer = Timer()
+                            val task: TimerTask = object : TimerTask() {
+                                override fun run() {
+                                    val view =
+                                        view_messages.findViewHolderForAdapterPosition(index)?.itemView
+                                    view?.findViewById<View>(R.id.reply_source_highlight).let {
+                                        it?.apply {
+                                            if (background is TransitionDrawable) {
+                                                (background as TransitionDrawable).startTransition(0)
+                                                (background as TransitionDrawable).reverseTransition(
+                                                    1000
+                                                )
+                                            } else {
+                                                background =
+                                                    resources.getDrawable(R.drawable.reply_source_transition)
+                                                (background as TransitionDrawable).startTransition(0)
+                                                (background as TransitionDrawable).reverseTransition(
+                                                    1000
+                                                )
+                                            }
+
+
+                                        }
+                                    }
+                                }
+                            }
+                            timer.schedule(task, 100)
+
+                        }
                     }
                 }
+            }
+
+            override fun onSourcePreviewClick(message: Message) {
+                val previewFragment = ReplySourcePreviewFragment(message)
+                previewFragment.show(
+                    requireActivity().supportFragmentManager,
+                    "ReplySourcePreviewFragment"
+                )
             }
         })
 
@@ -333,6 +385,16 @@ class ChannelPanelFragment : BaseFragment() {
         requireActivity().unregisterReceiver(mNetworkChangeReceiver)
     }
 
+    private fun guildMemberOf(msg: Message?): GuildMember? {
+        if (msg == null) return null
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mEasyImage = EasyImage.Builder(requireContext())
@@ -345,6 +407,48 @@ class ChannelPanelFragment : BaseFragment() {
             message = it.message
             isUpdateEnabled = it.flag
         })
+        mChatSharedVM.replySourceReadyLD.observe(viewLifecycleOwner, Observer {
+            mMsgList.forEachIndexed { index, message ->
+                if (message.id == it.replyMesId)
+                    mMsgListAdapter.notifyItemChanged(index)
+            }
+        })
+        mChatSharedVM.syncMessageLD.observe(viewLifecycleOwner, Observer { eventChannel ->
+            mChannelId?.let {
+                if (eventChannel.id == it) {
+                    val channel = Client.global.channels[it]
+                    if (channel != null) {
+                        if (channel is TextChannel) {
+                            btn_scroll_to_bottom.visibility = View.GONE
+                            mHeaderMsg.isEnd = false
+                            isFetchingMore = false
+                            editText?.let { input ->
+                                input.text = mSwitchChannelMap[it]
+                                input.setSelection(input.text.length)
+                            }
+                            val count = mMsgList.size
+                            mMsgList.clear()
+                            mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                            mChatSharedVM.fetchTextChannelMessage(it)
+                        } else if (channel is DmChannel) {
+                            btn_scroll_to_bottom.visibility = View.GONE
+                            mHeaderMsg.isEnd = false
+                            isFetchingMore = false
+                            editText?.let { input ->
+                                input.text = mSwitchChannelMap[it]
+                                input.setSelection(input.text.length)
+                            }
+                            val count = mMsgList.size
+                            mMsgList.clear()
+                            mMsgListAdapter.notifyItemRangeRemoved(0, count)
+                            mChatSharedVM.fetchDmChannelMessage(it)
+                        }
+
+                    }
+                }
+            }
+
+        })
         mChatSharedVM.replyLd.observe(viewLifecycleOwner, Observer {
             if (it.flag) {
                 it.message?.let { mes ->
@@ -354,22 +458,24 @@ class ChannelPanelFragment : BaseFragment() {
             } else {
                 bar_reply_message.visibility = View.GONE
             }
+
             bar_reply_message.message_reply_to.text =
 
-                "${if ((it.message?.author?.name ?: "").length > 6) (it.message?.author?.name?.substring(
+                "${if ((guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "".substring(
                     0,
                     6
-                ) ?: "") + "···" else it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
+                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
             mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
         }
+
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.let {
                     mChannelId?.let {
-                        if (Client.global.channels[it] is TextChannel)
+                        if (Client.global.channels[it] is TextChannel) {
                             if (s.isNotEmpty() && start < s.length)
                                 mChatSharedVM.mentionState.value =
                                     ChatSharedViewModel.MentionState(
@@ -382,12 +488,41 @@ class ChannelPanelFragment : BaseFragment() {
                                         state = false,
                                         start = start
                                     )
+                        }
+                        if (s.isEmpty() && start >= 0) {
+                            btn_message_send.setImageResource(R.drawable.btn_send_default)
+//                                val animOut = ValueAnimator()
+//                                animOut.setIntValues(300, 900)
+//                                animOut.setInterpolator(LinearInterpolator())
+//                                animOut.duration = 1000
+//                                animOut.addUpdateListener { it ->
+//                                    editText.updateLayoutParams {
+//                                        this.width = it.animatedValue as Int
+//                                    }
+//                                }
+//                                animOut.start()
+                        }
                     }
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
+                if (s != null) {
+                    if (s.isEmpty() && start >= 0) {
+                        btn_message_send.setImageResource(R.drawable.btn_send)
+//                        val params = editText.layoutParams
+//                        val animOut = ValueAnimator()
+//                        animOut.setIntValues(900, 300)
+//                        animOut.setInterpolator(LinearInterpolator())
+//                        animOut.duration = 1000
+//                        animOut.addUpdateListener { it ->
+//                            editText.updateLayoutParams {
+//                                this.width = it.animatedValue as Int
+//                            }
+//                        }
+//                        animOut.start()
+                    }
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -416,6 +551,7 @@ class ChannelPanelFragment : BaseFragment() {
                     callMentionBottomSheet(it)
             }
         })
+
         mChatSharedVM.stampSendedLiveData.observe(viewLifecycleOwner, Observer {
             if (it.state) {
                 mMsgList.add(it.emptyMsg)
@@ -473,6 +609,7 @@ class ChannelPanelFragment : BaseFragment() {
                     if (isOpen) {
                         btn_message_menu.isChecked = false
                         emoji_tv.isChecked = false
+                        btn_scroll_to_bottom.visibility = View.GONE
                         scrollToBottom()
                     }
                 }
@@ -523,8 +660,8 @@ class ChannelPanelFragment : BaseFragment() {
                     ,
                     token = Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                            _ -> mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
+                    .subscribe({ _ ->
+                        mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
                     }, { error -> })
             } else if (!AppState.global.updateEnabled.value.flag) {
                 //新建一个空message，并加入到RecyclerView
@@ -533,23 +670,36 @@ class ChannelPanelFragment : BaseFragment() {
                 mMsgListAdapter.notifyItemInserted(mMsgList.size - 1)
                 scrollToBottom()
                 //发送消息
-                (Client.global.channels[mChannelId
-                    ?: ""] as TextChannelBase).messages.create(
-                    textToSend,
-                    nonce = emptyMsg.nonce.toString()
-                )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ _ ->
-                        mHandler.postDelayed({
-                            emptyMsg.isSending = false;
-                            mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
-                            scrollToBottom()
-                        }, 300)
+                if (Client.global.channels[mChannelId ?: ""] == null) {
+                    context?.let {
+                        Toast.makeText(it.applicationContext, "该频道已被删除", Toast.LENGTH_LONG).show()
                     }
-                        , { _ ->
-                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                                .show()
-                        })
+                } else {
+                    (Client.global.channels[mChannelId
+                        ?: ""] as TextChannelBase).messages.create(
+                        textToSend,
+                        nonce = emptyMsg.nonce.toString()
+                    )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ _ ->
+                            mHandler.postDelayed({
+                                emptyMsg.isSending = false;
+                                mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
+                                scrollToBottom()
+                            }, 300)
+                        }
+                            , { e ->
+                                if (e.message?.contains("500") ?: false) {
+                                    Toast.makeText(requireContext().applicationContext, R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                        .show()
+                                } else {
+                                    Toast.makeText(requireContext().applicationContext, R.string.send_fail, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+
+                            })
+                }
+
             } else {
                 message!!.update(textToSend)
                     .observeOn(AndroidSchedulers.mainThread()).subscribe({ msg ->
@@ -562,9 +712,14 @@ class ChannelPanelFragment : BaseFragment() {
                             }
                         }
                         scrollToBottom()
-                    }, { _ ->
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                    }, { e ->
+                        if (e.message?.contains("500")?:false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     })
             }
 
@@ -627,15 +782,22 @@ class ChannelPanelFragment : BaseFragment() {
 
             if (event.message.channelId == mChannelId) {
                 val msg = mMsgList.find { msgInList ->
-                    event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
+                    !event.message.author?.isBot!! && event.message.nonce == msgInList.nonce && event.message.authorId == msgInList.authorId
                 }
                 if (msg == null) {//接收新的msg
+                    var needToScroll = false
+                    if (!editText.hasFocus() && !view_messages.canScrollVertically(1)) {
+                        needToScroll = true
+                    }
                     mMsgList.add(event.message)
                     event.message.content?.let {
                         if (Assets.regexLink.containsMatchIn(it))
                             fetchLink()
                     }
-                    mMsgListAdapter.notifyDataSetChanged()
+                    mMsgListAdapter.notifyItemInserted(mMsgListAdapter.itemCount - 1)
+                    if (needToScroll) {
+                        view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)
+                    }
                 } else {//发送附件，删除刚发送的本地msg
                     val index = mMsgList.indexOf(msg)
                     mMsgList[index] = event.message
@@ -747,8 +909,9 @@ class ChannelPanelFragment : BaseFragment() {
             }
         })
         //setup recycler view
-        mLayoutManager = LinearLayoutManager(requireContext())
+        mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mLayoutManager.stackFromEnd = true
+        mLayoutManager.scrollToPositionWithOffset(mMsgListAdapter.itemCount - 1, Integer.MIN_VALUE)
         view_messages.layoutManager = mLayoutManager
         view_messages.adapter = mMsgListAdapter
         OverScrollDecoratorHelper.setUpOverScroll(
@@ -804,8 +967,8 @@ class ChannelPanelFragment : BaseFragment() {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
-                                        addProperty("last_message_id", lastMessageId)
+                                        addProperty("ack_message_id", lastMessageId.substring(2))
+                                        addProperty("last_message_id", lastMessageId.substring(2))
                                     })
                                     this.mention = 0
                                     lastMessage?.let {
@@ -825,7 +988,7 @@ class ChannelPanelFragment : BaseFragment() {
                                     val lastMessageId = messages.list[messages.size - 1]
                                     val lastMessage = messages[lastMessageId.substring(2)]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId)
+                                        addProperty("ack_message_id", lastMessageId.substring(2))
                                     })
                                     lastMessage?.let {
                                         it.ack().observeOn(AndroidSchedulers.mainThread())
@@ -930,11 +1093,11 @@ class ChannelPanelFragment : BaseFragment() {
                                             p0: PermissionRequest?,
                                             p1: PermissionToken?
                                         ) {
-
+                                            p1?.continuePermissionRequest()
                                         }
 
                                         override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
-
+                                            mBottomSheet.dismiss()
                                         }
                                     }).check()
 
@@ -971,7 +1134,7 @@ class ChannelPanelFragment : BaseFragment() {
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-
+                    p1?.continuePermissionRequest()
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
@@ -1262,8 +1425,13 @@ class ChannelPanelFragment : BaseFragment() {
                         val index = mMsgList.indexOf(it)
                         mMsgList.remove(it)
                         mMsgListAdapter.notifyItemRemoved(index)
-                        Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
-                            .show()
+                        if (exception.message?.contains("500") ?: false) {
+                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
 
@@ -1291,6 +1459,7 @@ class ChannelPanelFragment : BaseFragment() {
             view = View(activity)
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+        editText.clearFocus()
     }
 
     private fun createEmptyMsg(content: String?): Message {

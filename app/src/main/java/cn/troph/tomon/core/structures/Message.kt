@@ -3,6 +3,7 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.MessageType
 import cn.troph.tomon.core.collections.MessageReactionCollection
+import cn.troph.tomon.core.events.MessageReplySourceReadyEvent
 import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.utils.Collection
 import cn.troph.tomon.core.utils.Converter
@@ -55,6 +56,8 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         private set
     var reply: Reply? = null
 
+    var editedTimestamp: LocalDateTime? = null
+
     val reactions: MessageReactionCollection = MessageReactionCollection(client, this)
 
     val stamps = mutableListOf<Stamp>()
@@ -88,6 +91,11 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
         }
         if (data.has("nonce")) {
             nonce = data["nonce"].optString
+        }
+        if (data.has("edited_timestamp")) {
+            if (data["edited_timestamp"] !is JsonNull) {
+                editedTimestamp = Converter.toDate(data["edited_timestamp"].asString)
+            }
         }
         if (data.has("attachments")) {
             attachments = Collection()
@@ -148,10 +156,36 @@ open class Message(client: Client, data: JsonObject) : Base(client, data),
             else -> nonce?.snowflake?.aligned + "N"
         }
 
-    val replySource
+    var replySource: Message? = null
         get() =
             reply?.let {
-                (channel as TextChannel).messages[it.id]
+                if (channel == null) {
+                    return null
+                }
+
+                if ((channel as TextChannelBase).messages.has(it.id))
+                    (channel as TextChannelBase).messages[it.id]
+                else {
+                    (channel as TextChannelBase).messages.fetchOne(it.id).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            Client.global.eventBus.postEvent(MessageReplySourceReadyEvent(it,id))
+                        }
+                    return@let Message(client, JsonObject().apply {
+                        addProperty("content", "")
+                        addProperty("id", it.id)
+                        val userObject = JsonObject()
+                        userObject.addProperty("id", it.author.id)
+                        userObject.addProperty("username", it.author.username)
+                        userObject.addProperty(
+                            "discriminator",
+                            it.author.discriminator
+                        )
+                        userObject.addProperty("name", it.author.name)
+                        userObject.addProperty("avatar", it.author.avatar)
+                        userObject.addProperty("avatar_url", it.author.avatarURL)
+                        add("author", userObject)
+                    })
+                }
             }
 
     // 唯一确定用的id

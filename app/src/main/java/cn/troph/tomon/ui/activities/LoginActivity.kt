@@ -21,7 +21,7 @@ import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.layout_activity_login.*
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
@@ -85,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.layout_activity_login)
         bindProgressButton(button_login)
         button_login.attachTextChangeAnimator()
         val dataPullingViewModel: DataPullingViewModel by viewModels()

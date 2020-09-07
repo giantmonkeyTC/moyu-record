@@ -25,10 +25,52 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="20dp"
+        android:scrollbars="vertical"
+        android:scrollbarSize="4dp"
+        android:scrollbarThumbVertical="@color/primaryColor"
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout" />
+
+    <LinearLayout
+        android:id="@+id/bar_update_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/view_messages">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/shape_message_update">
+
+            <TextView
+                android:id="@+id/message_update_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/message_update_bar_text"
+                android:textColor="@color/primaryTextAlpha50" />
+
+            <ImageView
+                android:id="@+id/btn_update_message_cancel"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="22dp"
+                android:background="@drawable/reply_cancel" />
+
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bar_reply_message"
@@ -43,8 +85,7 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="17dp"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/shape_message_reply"
-            >
+            android:background="@drawable/shape_message_reply">
 
             <TextView
                 android:id="@+id/message_reply_to"
@@ -59,13 +100,12 @@
 
             <ImageView
                 android:id="@+id/btn_reply_message_cancel"
-                android:background="@drawable/reply_cancel"
                 android:layout_width="17dp"
                 android:layout_height="17dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="14dp"
                 android:layout_marginEnd="14dp"
-                />
+                android:background="@drawable/reply_cancel" />
 
         </LinearLayout>
     </LinearLayout>
@@ -104,42 +144,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:id="@+id/bar_update_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/background4"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/edit_pannel_view">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:layout_marginStart="20dp"
-                android:layout_weight="7"
-                android:text="@string/updateMessage"
-                android:textColor="@color/secondaryTextAlpha70" />
-
-            <TextView
-                android:id="@+id/btn_update_message_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
-                android:layout_marginEnd="30dp"
-                android:layout_weight="1"
-                android:text="@string/cancel"
-                android:textAlignment="viewEnd"
-                android:textColor="@color/white" />
-        </LinearLayout>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/edit_pannel_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:enabled="false"
             android:background="@color/editTextBackground"
-            app:layout_constraintTop_toBottomOf="@id/bar_update_message">
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <View
                 android:id="@+id/input_sep_line"
@@ -156,6 +169,7 @@
                 android:layout_height="22dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginBottom="16dp"
+                android:enabled="false"
                 android:checked="false"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -170,6 +184,7 @@
                 android:layout_marginEnd="12dp"
                 android:layout_marginBottom="16dp"
                 android:checked="false"
+                android:enabled="false"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btn_message_send"
@@ -179,19 +194,23 @@
             <androidx.emoji.widget.EmojiEditText
                 android:id="@+id/editText"
                 android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="14dp"
-                android:layout_marginStart="14dp"
+                android:layout_marginBottom="10dp"
                 android:background="@drawable/shape_edittext"
-                android:hint="@string/emoji_et_hint"
+                android:hint="@string/select_guild_channel_hint"
                 android:inputType="textMultiLine"
-                android:paddingStart="12dp"
+                android:enabled="false"
+                android:maxLines="5"
+                android:paddingVertical="@dimen/message_edittext_padding_vertical"
+                android:paddingStart="18dp"
+                android:paddingEnd="14dp"
                 android:textColor="@color/white"
                 android:textColorHint="#6D6D6D"
-                app:layout_constraintEnd_toStartOf="@id/emoji_tv"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/emoji_tv"
                 app:layout_constraintStart_toEndOf="@id/btn_message_menu"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -202,7 +221,8 @@
                 android:layout_marginEnd="14dp"
                 android:layout_marginBottom="16dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:src="@drawable/btn_send"
+                android:clickable="false"
+                android:src="@drawable/btn_send_default"
                 android:tag="@string/send_btn_tag"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

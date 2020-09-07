@@ -2,44 +2,89 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background3">
 
-    <cn.troph.tomon.ui.widgets.UserAvatar
-        android:id="@+id/reply_source_avatar"
-        android:layout_width="78dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="54dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/reply_source_author"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reply_source_avatar" />
-
-    <TextView
-        android:id="@+id/reply_source_content"
+    <ScrollView
+        android:id="@+id/reply_source_scrollview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reply_source_author" />
-
-    <ImageView
-        android:id="@+id/reply_source_cancel"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginTop="45dp"
+        android:overScrollMode="never"
+        android:paddingBottom="135dp"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <cn.troph.tomon.ui.widgets.UserAvatar
+                android:id="@+id/reply_source_avatar"
+                android:layout_width="@dimen/reply_avatar_size"
+                android:layout_height="@dimen/reply_avatar_size"
+                android:layout_marginTop="35dp"
+                android:layout_marginBottom="@dimen/reply_author_margin_top"
+                app:layout_constraintBottom_toTopOf="@id/reply_source_author"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/reply_source_author"
+                style="@style/no_overflow_name_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="@dimen/reply_content_margin_top"
+                android:textSize="@dimen/reply_source_text_size"
+                app:layout_constraintBottom_toTopOf="@id/reply_source_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.emoji.widget.EmojiTextView
+                android:id="@+id/reply_source_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/reply_content_margin_horizontal"
+                android:gravity="center"
+                android:textColor="@color/primaryTextAlpha70"
+                android:textIsSelectable="true"
+                android:textSize="@dimen/reply_source_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ScrollView>
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/reply_source_cancel"
+        android:layout_width="@dimen/reply_source_cancel_size"
+        android:layout_height="@dimen/reply_source_cancel_size"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="35dp"
+        android:background="@drawable/source_preview_cancel_background"
+        android:clickable="true"
+        android:paddingVertical="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/reply_source_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

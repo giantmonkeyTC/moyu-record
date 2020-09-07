@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.chat.messages
 
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,11 +9,14 @@ import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Bundle
 import android.os.Environment
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.*
@@ -22,6 +26,7 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -30,6 +35,8 @@ import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
+import cn.troph.tomon.ui.chat.fragments.LogoutDialogFragment
+import cn.troph.tomon.ui.chat.fragments.ReplySourcePreviewFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -38,14 +45,17 @@ import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import io.noties.markwon.*
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.HtmlTag
@@ -59,11 +69,13 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
+import kotlinx.android.synthetic.main.image_view_overlay.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
 import kotlinx.android.synthetic.main.item_invite_link.view.*
 import kotlinx.android.synthetic.main.item_message_link.view.*
+import kotlinx.android.synthetic.main.item_message_owner_change.view.*
 import kotlinx.android.synthetic.main.item_message_reply.view.*
 import kotlinx.android.synthetic.main.item_message_stamp.view.*
 import kotlinx.android.synthetic.main.item_message_video.view.*
@@ -172,6 +184,13 @@ class MessageAdapter(
                         .inflate(R.layout.item_message_reply, parent, false)
                 )
             }
+
+            10 -> {
+                return MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_message_owner_change, parent, false)
+                )
+            }
             else -> {
                 return MessageViewHolder(
                     LayoutInflater.from(parent.context)
@@ -212,6 +231,8 @@ class MessageAdapter(
                     return 8
             }
             return 0
+        } else if (messageList[position].type == MessageType.GUILD_OWNER_CHANGE) {
+            return 10
         }
         return 0
     }
@@ -241,15 +262,14 @@ class MessageAdapter(
             0 -> {
                 val msg = messageList[position]
                 holder.itemView.message_avatar.setOnClickListener {
+                    var member: GuildMember? = guildMemberOf(msg)
                     messageList[holder.adapterPosition].authorId?.let {
-                        if (it != Client.global.me.id) {
-                            val context = holder.itemView.context as AppCompatActivity
-                            val guildUserInfoFragment = GuildUserInfoFragment(it)
-                            guildUserInfoFragment.show(
-                                context.supportFragmentManager,
-                                guildUserInfoFragment.tag
-                            )
-                        }
+                        val context = holder.itemView.context as AppCompatActivity
+                        val guildUserInfoFragment = GuildUserInfoFragment(it, member)
+                        guildUserInfoFragment.show(
+                            context.supportFragmentManager,
+                            guildUserInfoFragment.tag
+                        )
                     }
                 }
 
@@ -259,9 +279,10 @@ class MessageAdapter(
                             messageList[holder.adapterPosition].author?.let { author ->
                                 avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                             }
+                            true
                         }
                     }
-                    true
+                    false
                 }
 
                 holder.itemView.setOnLongClickListener {
@@ -287,30 +308,39 @@ class MessageAdapter(
                     )
 
                 ) {
+                    holder.itemView.space_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.VISIBLE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
+                            if (it != Client.global.me.id)
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
-                            }
                         }
                         true
                     }
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_file.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
+
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -321,6 +351,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_file.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_file.setTextColor(
@@ -337,6 +369,7 @@ class MessageAdapter(
                         timestampConverter(messageList[position].timestamp)
                 } else {
                     holder.itemView.message_avatar_file.visibility = View.GONE
+                    holder.itemView.space_file.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_file.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_file.visibility = View.GONE
                 }
@@ -412,20 +445,30 @@ class MessageAdapter(
                         }
                         true
                     }
+                    holder.itemView.space_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_image.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_image.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_image.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
+
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -436,6 +479,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_image.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_image.setTextColor(
@@ -452,6 +497,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_image.visibility = View.GONE
                     holder.itemView.message_avatar_image.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_image.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.GONE
@@ -497,7 +543,75 @@ class MessageAdapter(
                             ) { view, images ->
                                 Glide.with(view).load(images.url)
                                     .placeholder(R.drawable.loadinglogo).into(view)
-                            }.show()
+                            }
+                                .withOverlayView(
+                                    View.inflate(
+                                        holder.itemView.context,
+                                        R.layout.image_view_overlay,
+                                        null
+                                    ).apply {
+                                        this.findViewById<ImageView>(R.id.btn_image_save)
+                                            .setOnClickListener {
+                                                Toast.makeText(
+                                                    holder.itemView.context,
+                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
+                                                        Environment.DIRECTORY_DOWNLOADS
+                                                    )?.absolutePath}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                PRDownloader.download(
+                                                    image.url,
+                                                    holder.itemView.context.getExternalFilesDir(
+                                                        Environment.DIRECTORY_DOWNLOADS
+                                                    )?.absolutePath,
+                                                    image.fileName
+                                                )
+                                                    .build().start(object : OnDownloadListener {
+                                                        override fun onDownloadComplete() {
+                                                            Toast.makeText(
+                                                                holder.itemView.context,
+                                                                "下载完成",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+
+
+                                                            MediaScannerConnection.scanFile(
+                                                                holder.itemView.context
+                                                                ,
+                                                                arrayOf(
+                                                                    (holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath) + "/${image.fileName}"
+                                                                )
+                                                                ,
+                                                                arrayOf(
+                                                                    "image/jpg",
+                                                                    "image/png",
+                                                                    "image/gif"
+                                                                )
+                                                            ) { path, uri ->
+                                                                Logger.d(path)
+                                                                Logger.d(uri)
+                                                                Logger.d(
+                                                                    (holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath) + "/${image.fileName}"
+                                                                )
+                                                            }
+
+
+                                                        }
+
+                                                        override fun onError(error: Error?) {
+                                                            Toast.makeText(
+                                                                holder.itemView.context,
+                                                                "下载失败",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    })
+                                            }
+                                    }).show()
                             break
                         }
                     }
@@ -551,6 +665,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -564,17 +679,26 @@ class MessageAdapter(
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_invite.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
+
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -585,6 +709,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_invite.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_invite.setTextColor(
@@ -600,6 +726,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_invite.visibility = View.GONE
                     holder.itemView.message_avatar_invite.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_invite.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.GONE
@@ -679,8 +806,20 @@ class MessageAdapter(
 
                 }
                 holder.itemView.message_avatar_invite.user = messageList[position].author
-                holder.itemView.widget_message_author_name_text_invite.text =
-                    messageList[position].author?.name
+                if (Client.global.channels[message.channelId] is TextChannel) {
+                    val member =
+                        (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
+                            ?: ""]
+                    if (member != null) {
+                        holder.itemView.widget_message_author_name_text_invite.text =
+                            "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    }
+                } else {
+                    holder.itemView.widget_message_author_name_text_invite.text =
+                        messageList[position].author?.name
+                            ?: holder.itemView.context.getString(R.string.deleted_name)
+                }
+
                 holder.view.widget_message_timestamp_text_invite.text =
                     timestampConverter(messageList[position].timestamp)
                 showReaction(holder, messageList[position])
@@ -690,7 +829,10 @@ class MessageAdapter(
                     holder.itemView.context.resources.getStringArray(R.array.welcome_array)
                 val index = Random.nextInt(0, welcomeArray.size)
                 val welMsg = welcomeArray[index]
-                val name = "**" + messageList[position].author?.name + "**"
+                val name =
+                    "**" + (messageList[position].author?.name ?: holder.itemView.context.getString(
+                        R.string.deleted_name
+                    )) + "**"
                 markdown?.setMarkdown(holder.itemView.system_txt_welcome, welMsg.format(name))
             }
             6 -> {
@@ -698,13 +840,17 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.message_avatar_stamp.setOnLongClickListener {
@@ -721,7 +867,12 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_stamp.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_stamp.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -732,6 +883,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_stamp.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_stamp.setTextColor(
@@ -748,6 +901,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_stamp.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_stamp.visibility = View.GONE
                     holder.itemView.message_avatar_stamp.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_stamp.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.GONE
@@ -795,6 +949,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -808,17 +963,25 @@ class MessageAdapter(
                     holder.itemView.message_avatar_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_video.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_video.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_video.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
                     val message = messageList[position]
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
@@ -829,6 +992,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_video.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_video.setTextColor(
@@ -845,6 +1010,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_video.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_video.visibility = View.GONE
                     holder.itemView.message_avatar_video.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_video.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_video.visibility = View.GONE
@@ -870,16 +1036,22 @@ class MessageAdapter(
                     val videoPreview = holder.itemView.video_preview
                     holder.itemView.video_card.updateLayoutParams {
                         item.width?.let {
-                            this.width = item.width!!
-                            this.height = item.height!!
+                            this.width = (item.width!! * 0.5).toInt()
+                            this.height = (item.height!! * 0.5).toInt()
+                        }
+                    }
+                    holder.itemView.video_player.updateLayoutParams {
+                        item.width?.let {
+                            this.width = (item.width!! * 0.5).toInt()
+                            this.height = (item.height!! * 0.5).toInt()
                         }
                     }
                     videoPreview.updateLayoutParams {
                         item.width?.let {
                             this.width =
-                                item.width!!
+                                (item.width!! * 0.5).toInt()
                             this.height =
-                                item.height!!
+                                (item.height!! * 0.5).toInt()
                             if (item.width!! > item.height!!) {
                                 videoPreview.setImageResource(R.drawable.sixty_nine_horizontal)
                             } else {
@@ -888,12 +1060,6 @@ class MessageAdapter(
                         }
                     }
 
-                    holder.itemView.video_player.updateLayoutParams {
-                        item.width?.let {
-                            this.width = item.width!!
-                            this.height = item.height!!
-                        }
-                    }
                     var status = 0
                     val vidPlayer =
                         AliPlayerFactory.createAliPlayer(holder.itemView.context).apply {
@@ -908,6 +1074,7 @@ class MessageAdapter(
                                 status = it
                             }
                         }
+
 
                     holder.itemView.play_status.setOnClickListener {
                         if (status == 4) {
@@ -1000,6 +1167,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -1013,17 +1181,26 @@ class MessageAdapter(
                     holder.itemView.message_avatar_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
+
                         }
                     }
                     holder.itemView.widget_message_author_name_text_link.visibility = View.VISIBLE
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_link.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_link.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
                             (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
@@ -1033,6 +1210,8 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_link.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_link.setTextColor(
@@ -1049,6 +1228,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_link.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_link.visibility = View.GONE
                     holder.itemView.message_avatar_link.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_link.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.GONE
@@ -1147,6 +1327,7 @@ class MessageAdapter(
                         messageList[position - 1].timestamp.plusMinutes(5)
                     )
                 ) {
+                    holder.itemView.space_reply.visibility = View.VISIBLE
                     holder.itemView.message_avatar_reply.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
                             if (it != Client.global.me.id) {
@@ -1160,10 +1341,13 @@ class MessageAdapter(
                     holder.itemView.message_avatar_reply.visibility = View.VISIBLE
                     holder.itemView.message_avatar_reply.setOnClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id) {
-                                val context = holder.itemView.context as AppCompatActivity
-                                GuildUserInfoFragment(it).show(context.supportFragmentManager, null)
-                            }
+
+                            val context = holder.itemView.context as AppCompatActivity
+                            GuildUserInfoFragment(
+                                it,
+                                guildMemberOf(messageList[holder.adapterPosition])
+                            ).show(context.supportFragmentManager, null)
+
                         }
                     }
                     holder.itemView.message_reply_section.visibility = View.GONE
@@ -1172,7 +1356,13 @@ class MessageAdapter(
                     holder.itemView.message_avatar_reply.user = messageList[position].author
 
                     holder.itemView.widget_message_author_name_text_reply.text =
-                        "${messageList[position].author?.name}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                    holder.itemView.widget_message_author_name_text_reply.setTextColor(
+                        holder.itemView.context.getColor(
+                            R.color.white
+                        )
+                    )
+
                     if (Client.global.channels[message.channelId] is TextChannel) {
                         val member =
                             (Client.global.channels[message.channelId] as TextChannel).members[message.authorId
@@ -1182,6 +1372,9 @@ class MessageAdapter(
                                 (if (member.roles.color == null)
                                     0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                             )
+                            holder.itemView.widget_message_author_name_text_reply.text =
+                                "${member?.displayName}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+
                         }
                     } else {
                         holder.itemView.widget_message_author_name_text_reply.setTextColor(
@@ -1198,6 +1391,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_reply.text =
                         timestampConverter(messageList[position].timestamp)
                 } else {
+                    holder.itemView.space_reply.visibility = View.GONE
                     holder.itemView.message_avatar_reply.visibility = View.GONE
                     holder.itemView.widget_message_author_name_text_reply.visibility = View.GONE
                     holder.itemView.widget_message_timestamp_text_reply.visibility = View.GONE
@@ -1225,9 +1419,183 @@ class MessageAdapter(
                 }
                 messageList[position].replySource?.let {
                     holder.itemView.message_reply_section.visibility = View.VISIBLE
-                    holder.itemView.message_reply_section.setOnClickListener {
+                    if (it.stamps.size > 0) {
+                        holder.itemView.source_content_image.visibility = View.VISIBLE
+                        holder.itemView.source_content.visibility = View.GONE
+                        holder.itemView.source_content_author.visibility = View.VISIBLE
+                        holder.itemView.name_divider.visibility = View.VISIBLE
+                        holder.itemView.source_content_author.text =
+                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                R.string.deleted_name
+                            )}"
+                        for (item in it.stamps) {
+                            Glide.with(holder.itemView)
+                                .load(
+                                    if (item.animated) STAMP_URL_GIF.format(item.hash) else STAMP_URL.format(
+                                        item.hash
+                                    )
+                                )
+                                .placeholder(R.drawable.loadinglogo)
+                                .override(item.width, item.height)
+                                .into(holder.itemView.source_content_image)
+                            break
+                        }
+                    } else if (it.attachments.size > 0) {
+                        for (item in it.attachments.values) {
+                            if (isImage(item.type)) {
+                                holder.itemView.source_content_image.visibility = View.VISIBLE
+                                holder.itemView.source_content.visibility = View.GONE
+                                holder.itemView.source_content_author.visibility = View.VISIBLE
+                                holder.itemView.name_divider.visibility = View.VISIBLE
+                                holder.itemView.source_content_author.text =
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                        R.string.deleted_name
+                                    )}"
+                                for (item in it.attachments.values) {
+                                    Glide.with(holder.itemView)
+                                        .load(
+                                            if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
+                                                    ".gif",
+                                                    true
+                                                )
+                                            ) "" else "?x-oss-process=image/resize,p_100"}"
+                                        )
+                                        .transform(RoundedCorners(25))
+                                        .placeholder(R.drawable.loading_solid_gray)
+                                        .into(holder.itemView.source_content_image)
+                                    holder.itemView.message_reply_section.setOnClickListener { mView ->
+                                        val msg = it
+                                        for (image in msg.attachments.values) {
+                                            StfalconImageViewer.Builder<MessageAttachment>(
+                                                holder.itemView.context,
+                                                mutableListOf(image)
+                                            ) { view, images ->
+                                                Glide.with(view).load(images.url)
+                                                    .placeholder(R.drawable.loadinglogo).into(view)
+                                            }.apply {
+                                                this.withOverlayView(
+                                                    View.inflate(
+                                                        holder.itemView.context,
+                                                        R.layout.image_view_overlay,
+                                                        null
+                                                    ).apply {
+                                                        this.findViewById<ImageView>(R.id.btn_image_save)
+                                                            .setOnClickListener {
+                                                                Toast.makeText(
+                                                                    holder.itemView.context,
+                                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath}",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                                PRDownloader.download(
+                                                                    image.url,
+                                                                    holder.itemView.context.getExternalFilesDir(
+                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                    )?.absolutePath,
+                                                                    image.fileName
+                                                                )
+                                                                    .build().start(object :
+                                                                        OnDownloadListener {
+                                                                        override fun onDownloadComplete() {
+                                                                            Toast.makeText(
+                                                                                holder.itemView.context,
+                                                                                "下载完成",
+                                                                                Toast.LENGTH_SHORT
+                                                                            ).show()
+                                                                            MediaScannerConnection.scanFile(
+                                                                                holder.itemView.context
+                                                                                ,
+                                                                                arrayOf(
+                                                                                    holder.itemView.context.getExternalFilesDir(
+                                                                                        Environment.DIRECTORY_DOWNLOADS
+                                                                                    )?.absolutePath
+                                                                                )
+                                                                                ,
+                                                                                null,
+                                                                                { path, uri ->
+
+                                                                                })
+
+                                                                        }
+
+                                                                        override fun onError(error: Error?) {
+                                                                            Toast.makeText(
+                                                                                holder.itemView.context,
+                                                                                "下载失败",
+                                                                                Toast.LENGTH_SHORT
+                                                                            ).show()
+                                                                        }
+                                                                    })
+                                                            }
+                                                    })
+                                                this.allowSwipeToDismiss(true)
+                                                show()
+                                            }
+                                            break
+                                        }
+                                    }
+                                    break
+                                }
+                            } else if (isVideo(item.type)) {
+                                if (holder.itemView.source_content.hasOnClickListeners()) {
+                                    holder.itemView.source_content.setOnClickListener(null)
+                                }
+                                holder.itemView.source_content_image.visibility = View.GONE
+                                holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.name_divider.visibility = View.GONE
+                                holder.itemView.source_content.visibility = View.VISIBLE
+                                holder.itemView.source_content.text =
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                        R.string.deleted_name
+                                    )}:[视频]"
+                            } else {
+                                if (holder.itemView.source_content.hasOnClickListeners()) {
+                                    holder.itemView.source_content.setOnClickListener(null)
+                                }
+                                holder.itemView.source_content_image.visibility = View.GONE
+                                holder.itemView.source_content_author.visibility = View.GONE
+                                holder.itemView.name_divider.visibility = View.GONE
+                                holder.itemView.source_content.visibility = View.VISIBLE
+                                holder.itemView.source_content.text =
+                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                        R.string.deleted_name
+                                    )}:[文件]"
+                            }
+                            break
+                        }
+                    } else if (it.content != null) {
+                        holder.itemView.source_content.visibility = View.VISIBLE
+                        holder.itemView.source_content_image.visibility = View.GONE
+                        holder.itemView.source_content_author.visibility = View.GONE
+                        holder.itemView.name_divider.visibility = View.GONE
+                        Converter.toMarkdownTextView(
+                            Markwon.builder(holder.itemView.context) // automatically create Glide instance
+                                .usePlugin(ImagesPlugin.create())
+                                .usePlugin(HtmlPlugin.create())
+                                .usePlugin(GlideImagesPlugin.create(holder.itemView.context)) // use supplied Glide instance
+                                .usePlugin(GlideImagesPlugin.create(Glide.with(holder.itemView.context))) // if you need more control
+                                .usePlugin(GlideImagesPlugin.create(object :
+                                    GlideImagesPlugin.GlideStore {
+                                    override fun cancel(target: Target<*>) {
+                                        Glide.with(holder.itemView.context).clear(target)
+                                    }
+
+                                    override fun load(drawable: AsyncDrawable): RequestBuilder<Drawable> {
+                                        return Glide.with(holder.itemView.context)
+                                            .load(drawable.destination)
+                                    }
+                                })).build(),
+                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                R.string.deleted_name
+                            )}:${it.content}",
+                            holder.itemView.source_content
+                        )
+                        holder.itemView.source_content.setOnClickListener {
+                            replyClickListener.onSourcePreviewClick(message)
+                        }
                     }
-                    holder.itemView.source_content.text = "${it.author?.name ?: ""}:${it.content}"
+
                     holder.itemView.btn_goto_source.setOnClickListener { view ->
                         replyClickListener.onSourceClick(it, position)
                     }
@@ -1250,8 +1618,55 @@ class MessageAdapter(
                     true
                 }
             }
+            10 -> {
+                val message = messageList[position]
+                val oldOwner =
+                    (Client.global.channels[message.channelId] as TextChannel).members[message.author?.id
+                        ?: ""]
+                val newOwnerId = message.content
+                val newOwner =
+                    (Client.global.channels[message.channelId] as TextChannel).members[newOwnerId
+                        ?: ""]
+                var displayNameNewOwner = ""
+                var displayNameOldOwner = ""
+
+                if (newOwner != null) {
+                    displayNameNewOwner = newOwner.displayName
+                } else {
+                    displayNameNewOwner = Client.global.users[message.content ?: ""]?.name
+                        ?: holder.itemView.context.resources.getString(R.string.deleted_name)
+                }
+
+                if (oldOwner != null) {
+                    displayNameOldOwner = oldOwner.displayName
+                } else {
+                    displayNameOldOwner = Client.global.users[message.authorId ?: ""]?.name
+                        ?: holder.itemView.context.resources.getString(R.string.deleted_name)
+                }
+
+                holder.itemView.tv_new_owner.text = displayNameNewOwner
+                holder.itemView.tv_old_owner.text = "👑 " + displayNameOldOwner
+            }
+        }
+    }
+
+    private fun getDisplayName(context: Context, member: GuildMember?, message: Message): String {
+        if (member != null) {
+            return member.displayName
         }
 
+        return Client.global.users[message.content ?: ""]?.name
+            ?: context.resources.getString(R.string.deleted_name)
+
+    }
+
+    private fun guildMemberOf(msg: Message): GuildMember? {
+        var member: GuildMember? = null
+        if (Client.global.channels[msg.channelId] is TextChannel) {
+            member = (Client.global.channels[msg.channelId] as TextChannel).members[msg.authorId
+                ?: ""]
+        }
+        return member
     }
 
     private fun showReaction(vh: MessageViewHolder, msg: Message) {
@@ -1328,17 +1743,20 @@ class MessageAdapter(
                 itemView.widget_message_author_name_text.text = "T🐱"
             } else {
                 itemView.widget_message_author_name_text.text =
-                    "${message.author?.name} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
-
+                    "${message.author?.name ?: holder.itemView.context.getString(R.string.deleted_name)} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
+                itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
                 if (member != null) {
                     itemView.widget_message_author_name_text.setTextColor(
                         (if (member.roles.color == null)
                             0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt())
                     )
+                    itemView.widget_message_author_name_text.text =
+                        "${member?.displayName} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
                 }
             }
         } else {
-            itemView.widget_message_author_name_text.text = message.author?.name
+            itemView.widget_message_author_name_text.text =
+                message.author?.name ?: holder.itemView.context.getString(R.string.deleted_name)
             itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(
@@ -1374,10 +1792,12 @@ class MessageAdapter(
             itemView.message_avatar.visibility = View.VISIBLE
             itemView.widget_message_timestamp_text.visibility = View.VISIBLE
             itemView.widget_message_author_name_text.visibility = View.VISIBLE
+            itemView.space.visibility = View.VISIBLE
         } else {
             itemView.message_avatar.visibility = View.GONE
             itemView.widget_message_timestamp_text.visibility = View.GONE
             itemView.widget_message_author_name_text.visibility = View.GONE
+            itemView.space.visibility = View.GONE
         }
         if (message.isSending) {
             val apl = AlphaAnimation(0.1f, 0.78f)
@@ -1409,10 +1829,24 @@ class MessageAdapter(
         val contentSpanAtUser = Assets.contentParser(tempMsg!!)
         val atUserTemplate = "<tomonandroid>%s</tomonandroid>"
         contentSpanAtUser.contentAtUser.forEach {
-            tempMsg = tempMsg?.replaceFirst(
-                "<@${it.id}>",
-                atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
-            )
+            var member: GuildMember? = null
+            if (Client.global.channels[message.channelId] is TextChannel) {
+                member =
+                    (Client.global.channels[message.channelId] as TextChannel).members[it.id
+                        ?: ""]
+            }
+            if (member == null) {
+                tempMsg = tempMsg?.replaceFirst(
+                    "<@${it.id}>",
+                    atUserTemplate.format("@${it.name}#${Client.global.users[it.id]?.discriminator}")
+                )
+            } else {
+                tempMsg = tempMsg?.replaceFirst(
+                    "<@${it.id}>",
+                    atUserTemplate.format("@${member.displayName}")
+                )
+            }
+
         }
         markdown?.setMarkdown(
             itemView,
@@ -1541,6 +1975,7 @@ interface OnAvatarLongClickListener {
 interface OnReplyClickListener {
     fun onReplyClick(message: Message?)
     fun onSourceClick(message: Message?, position: Int)
+    fun onSourcePreviewClick(message: Message)
 }
 
 class TomonTagHandler : SimpleTagHandler() {

@@ -2,6 +2,7 @@ package cn.troph.tomon.core.structures
 
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.ChannelService
+import cn.troph.tomon.core.utils.optBoolean
 import cn.troph.tomon.core.utils.optString
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -34,6 +35,10 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         protected set
 
     @Expose
+    var isBot: Boolean = false
+        protected set
+
+    @Expose
     var isSpeaking = false
 
     @Expose
@@ -51,19 +56,19 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
 
     private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
-            id = data["id"].asString
+            id = data["id"].optString ?: ""
         }
         if (data.has("type")) {
             type = data["type"].asInt
         }
         if (data.has("username")) {
-            username = data["username"].asString
+            username = data["username"].optString ?: ""
         }
         if (data.has("discriminator")) {
-            discriminator = data["discriminator"].asString
+            discriminator = data["discriminator"].optString ?: ""
         }
         if (data.has("name")) {
-            name = data["name"].asString
+            name = data["name"].optString ?: ""
         }
         if (data.has("avatar")) {
             avatar = data["avatar"].optString
@@ -76,6 +81,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
             if (avatarURL?.isEmpty() != false) {
                 avatarURL = null
             }
+        }
+        if (data.has("is_bot")) {
+            isBot = data["is_bot"].optBoolean ?: false
         }
     }
 

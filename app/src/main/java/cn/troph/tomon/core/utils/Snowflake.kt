@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.utils
 
+import android.text.TextUtils
 import com.google.gson.annotations.SerializedName
 
 class Snowflake(val value: String = "") : Comparable<Snowflake> {
@@ -26,6 +27,9 @@ class Snowflake(val value: String = "") : Comparable<Snowflake> {
         }
 
         fun idToBinary(num: String): String {
+            if (TextUtils.isEmpty(num)) {
+                return "";
+            }
             val long = num.toLong()
             val binary = long.toString(2)
 //            var bin = ""

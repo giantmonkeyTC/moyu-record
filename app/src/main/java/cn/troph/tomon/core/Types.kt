@@ -34,7 +34,8 @@ enum class MessageType(val value: Int) {
     CHANNEL_NAME_CHANGE(5),
     CHANNEL_ICON_CHANGE(6),
     CHANNEL_PINNED_MESSAGE(7),
-    SYSTEM(8);
+    SYSTEM(8),
+    GUILD_OWNER_CHANGE(9);
 
     companion object {
         private val map = MessageType.values().associateBy(MessageType::value)

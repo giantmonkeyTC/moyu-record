@@ -13,6 +13,7 @@
     <color name="secondaryLight"></color>
     <color name="accent">#6d6d6d</color>
     <color name="primaryText">#FFFFFF</color>
+    <color name="primaryTextAlpha70">#B2FFFFFF</color>
     <color name="captionText">#99FFFFFF</color>
     <color name="secondaryText">#828282</color>
     <color name="secondaryTextAlpha70">#B3828282</color>
@@ -46,7 +47,7 @@
     <color name="editTextBackground">#181818</color>
     <color name="error">#FF7A6B</color>
     <color name="primaryVariant">#FFA1C8</color>
-    <color name="primaryColor">#FF9EC6</color>
+    <color name="primaryColor">#FF7896</color>
     <color name="background1HalfAlpha">#80171717</color>
     <color name="channel_name_unactivated">#969696</color>
     <color name="color_guild_no_img">#7A84D9</color>
@@ -58,8 +59,12 @@
     <color name="system_pink">#FB9CC7</color>
     <color name="mask">#BF000000</color>
     <color name="notification_dot">#CF5353</color>
-
-<!--    Use new color   -->
+    <color name="reply_source_highlights">#802B98D6</color>
+    <color name="primaryTextAlpha50">#80FFFFFF</color>
+    <color name="primaryColorAlpha20">#30FF7896</color>
+    <color name="update_message_shape_color">#5A3F45</color>
+    <color name="save_image_ripple">#80000000</color>
+    <!--    Use new color   -->
     <color name="guildlist_bg">#2E2E2E</color>
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_50">#80ffffff</color>

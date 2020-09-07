@@ -35,6 +35,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
 import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.member_detail_roles
 import kotlinx.android.synthetic.main.fragment_guild_selector.*
+import kotlinx.android.synthetic.main.guild_user_info.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*
@@ -62,8 +63,7 @@ class MemberListAdapter<T>(
     private fun bind(itemView: View, member: T) {
         if (member is GuildMember) {
             itemView.setOnClickListener {
-                if (member.id != Client.global.me.id)
-                    callMemberDetail(parent = itemView as ViewGroup, member = member)
+                callMemberDetail(parent = itemView as ViewGroup, member = member)
             }
             itemView.member_avatar.user = member.user
             itemView.widget_member_name_text.text = member.displayName
@@ -117,7 +117,7 @@ class MemberListAdapter<T>(
         view.user_info_name.text =
             displaynameSpan
         view.user_info_discriminator.text = discriminatorSpan
-        view.user_info_nick.text = TextUtils.concat(member.displayName, discriminatorSpan)
+        view.user_info_nick.text = TextUtils.concat(member.user?.username, discriminatorSpan)
 
         rolesBinder(itemView = view, member = member)
 
@@ -129,25 +129,33 @@ class MemberListAdapter<T>(
                     Color.TRANSPARENT
                 )
             )
-        view.user_private_chat.setOnClickListener {
-            member.directMessage(member.id).observeOn(AndroidSchedulers.mainThread()).subscribe {
-                dialog.dismiss()
-                AppState.global.channelSelection.value =
-                    ChannelSelection(guildId = "@me", channelId = it["id"].asString)
-                AppState.global.eventBus.postEvent(
-                    AppUIEvent(
-                        AppUIEventType.MEMBER_DRAWER,
-                        false
-                    )
-                )
+        if (member.id != Client.global.me.id && member.id != "1") {
+            view.user_sign_out.visibility = View.VISIBLE
+            view.user_private_chat.visibility = View.VISIBLE
+            view.user_private_chat.setOnClickListener {
+                member.directMessage(member.id).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        dialog.dismiss()
+                        AppState.global.channelSelection.value =
+                            ChannelSelection(guildId = "@me", channelId = it["id"].asString)
+                        AppState.global.eventBus.postEvent(
+                            AppUIEvent(
+                                AppUIEventType.MEMBER_DRAWER,
+                                false
+                            )
+                        )
+                    }
             }
-        }
-        view.user_sign_out.setOnClickListener {
-            dialog.dismiss()
-            ReportFragment(
-                member.id,
-                1
-            ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+            view.user_sign_out.setOnClickListener {
+                dialog.dismiss()
+                ReportFragment(
+                    member.id,
+                    1
+                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+            }
+        } else {
+            view.user_sign_out.visibility = View.GONE
+            view.user_private_chat.visibility = View.GONE
         }
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
         val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
@@ -189,7 +197,7 @@ class MemberListAdapter<T>(
             if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline")
                 0xffffff
             else
-                (memberList[position] as GuildMember).roles.highest!!.index.toLong()
+                (memberList[position] as GuildMember).roles.highest?.index?.toLong() ?: -1
         } else
             -1
     }

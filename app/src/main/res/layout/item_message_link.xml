@@ -4,10 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout1_link"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/message_item_margin_bottom"
-    android:paddingEnd="@dimen/message_item_padding_end"
-    >
+    android:layout_height="wrap_content">
+
+    <Space
+        android:id="@+id/space_link"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/reply_source_highlight"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/reply_highlight_margin_horizontal"
+        android:layout_marginTop="@dimen/reply_highlight_margin_top"
+        android:layout_marginBottom="@dimen/reply_highlight_margin_bottom"
+        android:background="@drawable/reply_source_transition"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/space_link"
+        app:layout_goneMarginTop="0dp" />
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
@@ -24,12 +42,12 @@
         android:id="@+id/widget_message_author_name_text_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="@dimen/body_size"
-        android:maxLines="1"
         android:layout_marginStart="@dimen/message_item_author_name_margin_start"
         android:ellipsize="end"
         android:maxWidth="150dp"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/body_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/widget_message_timestamp_text_link"
         app:layout_constraintStart_toEndOf="@+id/message_avatar_link"
@@ -42,8 +60,8 @@
         android:layout_marginStart="@dimen/message_item_timestamp_margin_start"
         android:textColor="@color/channelCategoryText"
         android:textSize="@dimen/caption_size"
-        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_link"
-        app:layout_constraintBottom_toBottomOf="@id/widget_message_author_name_text_link" />
+        app:layout_constraintBottom_toBottomOf="@id/widget_message_author_name_text_link"
+        app:layout_constraintStart_toEndOf="@+id/widget_message_author_name_text_link" />
 
     <androidx.emoji.widget.EmojiTextView
         android:id="@+id/link_text"
@@ -51,20 +69,25 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/message_content_margin_start"
         android:layout_marginTop="@dimen/message_item_content_margin_top"
+        android:layout_marginEnd="@dimen/content_margin_end"
         android:textColor="#DDFFFFFF"
         android:textColorLink="@android:color/holo_blue_dark"
         android:textSize="@dimen/body_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_link" />
+        app:layout_constraintTop_toBottomOf="@id/widget_message_timestamp_text_link"
+        app:layout_goneMarginTop="0dp" />
 
     <LinearLayout
         android:id="@+id/link_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/message_content_margin_start"
+        android:layout_marginEnd="@dimen/content_margin_end"
+        android:layout_marginBottom="@dimen/content_margin_bottom"
         android:orientation="vertical"
         android:visibility="gone"
-        android:layout_marginStart="@dimen/message_content_margin_start"
+        android:paddingBottom="@dimen/content_margin_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/link_text">
@@ -74,9 +97,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="4dp"
-            android:visibility="gone"
             android:background="@drawable/shape_message_file"
-            android:paddingVertical="4dp">
+            android:paddingVertical="4dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/imageView_link"
