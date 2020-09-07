@@ -25,12 +25,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
-import cn.troph.tomon.core.structures.CategoryChannel;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
@@ -125,9 +125,10 @@ public class ChannelListFragment extends Fragment {
                 } else {
                     insertChannel(channelGroupRV, channel);
                 }
-
             }
         }
+
+
     }
 
     private void insertChannel(ChannelGroupRV root, GuildChannel channel) {
