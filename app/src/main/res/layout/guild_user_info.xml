@@ -58,15 +58,16 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="6dp"
                 android:layout_marginEnd="12dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="@color/primaryText"
                 android:textSize="18dp"
+                app:layout_constraintBottom_toTopOf="@+id/user_info_discriminator"
                 app:layout_constraintEnd_toStartOf="@+id/barrier2"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@id/user_info_avatar"
-                app:layout_constraintTop_toTopOf="@id/user_info_avatar" />
+                app:layout_constraintTop_toTopOf="@+id/user_info_avatar" />
 
             <TextView
                 android:id="@+id/user_info_discriminator"
@@ -76,19 +77,21 @@
                 android:layout_marginEnd="12dp"
                 android:textColor="@color/whiteAlpha50"
                 android:textSize="15dp"
+                app:layout_constraintBottom_toBottomOf="@+id/user_info_avatar"
                 app:layout_constraintEnd_toStartOf="@id/barrier2"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@id/user_info_name"
-                app:layout_constraintTop_toBottomOf="@id/user_info_name" />
+                app:layout_constraintTop_toBottomOf="@+id/user_info_name" />
 
             <ImageView
                 android:id="@+id/user_info_menu"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginTop="38dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/member_info_menu"
+                app:layout_constraintBottom_toBottomOf="@+id/user_info_avatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/user_info_avatar" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/goto_dm"
@@ -122,6 +125,7 @@
                     android:layout_marginStart="16dp"
                     android:text="@string/goto_dm"
                     android:textColor="@color/primaryText"
+                    android:textSize="14dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"

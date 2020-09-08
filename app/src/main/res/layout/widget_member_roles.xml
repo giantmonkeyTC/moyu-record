@@ -35,6 +35,7 @@
             android:layout_gravity="center_vertical"
             android:textColor="@color/whiteAlpha70"
             android:textSize="12dp"
+            style="@style/no_overflow_name_style"
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toEndOf="@id/role_color"
             app:layout_constraintTop_toTopOf="parent"

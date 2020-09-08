@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColor
@@ -140,16 +141,21 @@ class MemberListAdapter<T>(
                     }
             }
             view.user_info_menu.setOnClickListener {
-                dialog.dismiss()
-                ReportFragment(
-                    member.id,
-                    1
-                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+                val popUp = PopupMenu(context, view.user_info_menu)
+                val inflater = popUp.menuInflater
+                inflater.inflate(R.menu.guild_member_info_menu, popUp.menu)
+                popUp.show()
+//                dialog.dismiss()
+//                ReportFragment(
+//                    member.id,
+//                    1
+//                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
             }
         } else {
             view.user_info_menu.visibility = View.GONE
             view.goto_dm.visibility = View.GONE
         }
+
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
         val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
         val peekHeightPx =
@@ -171,7 +177,7 @@ class MemberListAdapter<T>(
                 val drawable = ContextCompat.getDrawable(context, R.drawable.shape_role_item)
                 drawable!!.colorFilter = PorterDuffColorFilter(
                     (if (role.color == 0)
-                        0 or 0X0DFFFFFF else role.color or 0x0D000000), PorterDuff.Mode.OVERLAY
+                        0 or 0X1AFFFFFF else role.color or 0x1A000000), PorterDuff.Mode.OVERLAY
                 )
                 val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
                 role_view.widget_role_unit.background = drawable
