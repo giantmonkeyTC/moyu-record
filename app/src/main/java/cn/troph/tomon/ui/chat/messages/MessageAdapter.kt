@@ -82,6 +82,7 @@ import kotlinx.android.synthetic.main.item_message_video.view.*
 import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
+import java.io.File
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.random.Random
@@ -559,11 +560,13 @@ class MessageAdapter(
                                                     )?.absolutePath}",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
+                                                val path = File(
+                                                    Environment.getExternalStorageDirectory(),
+                                                    "Tomon"
+                                                ).absolutePath
                                                 PRDownloader.download(
                                                     image.url,
-                                                    holder.itemView.context.getExternalFilesDir(
-                                                        Environment.DIRECTORY_DOWNLOADS
-                                                    )?.absolutePath,
+                                                    path,
                                                     image.fileName
                                                 )
                                                     .build().start(object : OnDownloadListener {
@@ -573,33 +576,19 @@ class MessageAdapter(
                                                                 "下载完成",
                                                                 Toast.LENGTH_SHORT
                                                             ).show()
-
-
-                                                            MediaScannerConnection.scanFile(
-                                                                holder.itemView.context
-                                                                ,
-                                                                arrayOf(
-                                                                    (holder.itemView.context.getExternalFilesDir(
-                                                                        Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath) + "/${image.fileName}"
+                                                            val file = File(
+                                                                path + "/${image.fileName}"
+                                                            )
+                                                            val mediaScanIntent =
+                                                                Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                                                            mediaScanIntent.setData(
+                                                                Uri.fromFile(
+                                                                    file
                                                                 )
-                                                                ,
-                                                                arrayOf(
-                                                                    "image/jpg",
-                                                                    "image/png",
-                                                                    "image/gif"
-                                                                )
-                                                            ) { path, uri ->
-                                                                Logger.d(path)
-                                                                Logger.d(uri)
-                                                                Logger.d(
-                                                                    (holder.itemView.context.getExternalFilesDir(
-                                                                        Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath) + "/${image.fileName}"
-                                                                )
-                                                            }
-
-
+                                                            )
+                                                            holder.itemView.context.sendBroadcast(
+                                                                mediaScanIntent
+                                                            )
                                                         }
 
                                                         override fun onError(error: Error?) {
@@ -1488,11 +1477,13 @@ class MessageAdapter(
                                                                     )?.absolutePath}",
                                                                     Toast.LENGTH_SHORT
                                                                 ).show()
+                                                                val path = File(
+                                                                    Environment.getExternalStorageDirectory(),
+                                                                    "Tomon"
+                                                                ).absolutePath
                                                                 PRDownloader.download(
                                                                     image.url,
-                                                                    holder.itemView.context.getExternalFilesDir(
-                                                                        Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath,
+                                                                    path,
                                                                     image.fileName
                                                                 )
                                                                     .build().start(object :
@@ -1503,20 +1494,19 @@ class MessageAdapter(
                                                                                 "下载完成",
                                                                                 Toast.LENGTH_SHORT
                                                                             ).show()
-                                                                            MediaScannerConnection.scanFile(
-                                                                                holder.itemView.context
-                                                                                ,
-                                                                                arrayOf(
-                                                                                    holder.itemView.context.getExternalFilesDir(
-                                                                                        Environment.DIRECTORY_DOWNLOADS
-                                                                                    )?.absolutePath
+                                                                            val file = File(
+                                                                                path + "/${image.fileName}"
+                                                                            )
+                                                                            val mediaScanIntent =
+                                                                                Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                                                                            mediaScanIntent.setData(
+                                                                                Uri.fromFile(
+                                                                                    file
                                                                                 )
-                                                                                ,
-                                                                                null,
-                                                                                { path, uri ->
-
-                                                                                })
-
+                                                                            )
+                                                                            holder.itemView.context.sendBroadcast(
+                                                                                mediaScanIntent
+                                                                            )
                                                                         }
 
                                                                         override fun onError(error: Error?) {
