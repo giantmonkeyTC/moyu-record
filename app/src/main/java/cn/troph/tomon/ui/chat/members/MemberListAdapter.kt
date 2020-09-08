@@ -32,10 +32,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.*
-import kotlinx.android.synthetic.main.bottom_sheet_member_detail.view.member_detail_roles
-import kotlinx.android.synthetic.main.fragment_guild_selector.*
-import kotlinx.android.synthetic.main.guild_user_info.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
 import kotlinx.android.synthetic.main.widget_member_item.view.*
 import kotlinx.android.synthetic.main.widget_member_roles.view.*

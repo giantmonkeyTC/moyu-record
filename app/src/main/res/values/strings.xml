@@ -98,6 +98,7 @@
     <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
     <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
     <string name="select_guild_channel_hint">请先选择群组或者频道</string>
+    <string name="member_info_report">举报</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>

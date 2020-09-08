@@ -42,4 +42,12 @@
     <dimen name="invite_confirm_button_width">190dp</dimen>
     <dimen name="invite_confirm_buttom_height">44dp</dimen>
     <dimen name="invite_confirm_button_margin_top">40dp</dimen>
+    <dimen name="member_detail_name_margin_start">24dp</dimen>
+    <dimen name="member_detail_name_margin_top">6dp</dimen>
+    <dimen name="detail_avatar_margin_start">12dp</dimen>
+    <dimen name="detail_avatar_margin_top">24dp</dimen>
+    <dimen name="member_info_menu_margin_top">38dp</dimen>
+    <dimen name="member_info_menu_margin_end">12dp</dimen>
+    <dimen name="bs_member_info_dm">46dp</dimen>
+    <dimen name="bs_member_info_dm_mt">40dp</dimen>
 </resources>
