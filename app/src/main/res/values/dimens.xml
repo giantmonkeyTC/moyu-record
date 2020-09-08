@@ -92,7 +92,7 @@
     <dimen name="channel_list_category_name_margin_right">8dp</dimen>
     <dimen name="channel_list_expand_text_size">12dp</dimen>
     <dimen name="item_channel_list_height">66dp</dimen>
-    <dimen name="channel_list_margin_left">32dp</dimen>
+    <dimen name="channel_list_margin_left">8dp</dimen>
     <dimen name="channel_list_channel_name_margin_left">14dp</dimen>
     <dimen name="channel_list_channel_name_margin_right">14dp</dimen>
     <dimen name="channel_list_channel_name_size">14dp</dimen>
@@ -105,4 +105,6 @@
     <dimen name="channel_unread_dot_stroke_height">8dp</dimen>
     <dimen name="channel_unread_dot_content_width">6dp</dimen>
     <dimen name="channel_unread_dot_content_height">6dp</dimen>
+    <dimen name="channel_list_icon_margin_top">1dp</dimen>
+    <dimen name="item_channel_list_margin_top">8dp</dimen>
 </resources>

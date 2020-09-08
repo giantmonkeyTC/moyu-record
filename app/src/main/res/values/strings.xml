@@ -103,6 +103,12 @@
     <string name="select_guild_channel_hint">请先选择群组或者频道</string>
     <string name="guild_already_joined">你已经在该群组中</string>
     <string name="guild_joined_success">加入成功</string>
+    <string name="user_joined_guild">%1$s 加入了该群组</string>
+    <string name="attachment_file">[文件]</string>
+    <string name="attachment_image">[图片]</string>
+    <string name="attachment_video">[视频]</string>
+    <string name="msg_desp_stamp">[stamp]</string>
+    <string name="guild_owner_changed">群主转移给了 %1$s</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>
@@ -173,10 +179,14 @@
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="in_a_week">%1$d天前</string>
-    <string name="in_a_year">%1$d月%2$d日</string>
-    <string name="out_of_a_year">%1$d年%2$d月%3$d日</string>
-    <string name="in_the_future">你穿越到了%1$d年%2$d月%3$d日</string>
-    <string name="time_stamp">%1$s %2$s:%3$s</string>
+    <string name="in_a_year_detailed">%1$d月%2$d日</string>
+    <string name="in_a_year_simple">%1$02d/%2$02d</string>
+    <string name="out_of_a_year_detailed">%1$d年%2$d月%3$d日</string>
+    <string name="out_of_a_year_simple">%1$02d/%2$02d/%3$02d</string>
+    <string name="in_the_future_detailed">你穿越到了%1$d年%2$d月%3$d日</string>
+    <string name="in_the_future_simple">你穿越到了%1$02d/%2$02d/%3$02d</string>
+    <string name="time_stamp_detailed">%1$s %2$s:%3$s</string>
+    <string name="time_stamp_show_time_simple">%1$s:%2$s</string>
     <string name="voice_channel_no_joined_desp">喂喂喂？</string>
     <string name="voice_channel_joined_desp">%1$s和%2$s正在疯狂输出</string>
     <string name="voice_channel_alot_joined_desp">%1$s、%2$s等%3$d人正在疯狂输出</string>

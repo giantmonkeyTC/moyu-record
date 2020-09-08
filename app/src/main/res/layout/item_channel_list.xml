@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_channel_list_height"
-    android:layout_marginTop="@dimen/margin_12dp"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_marginTop="@dimen/item_channel_list_margin_top">
 
     <ImageView
         android:id="@+id/iv_channel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/channel_list_margin_left"
-        app:layout_constraintBottom_toTopOf="@+id/tv_channel_dscp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_channel_name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_channel_name"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
@@ -26,11 +27,12 @@
         android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="@dimen/channel_list_channel_name_size"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_channel"
+        app:layout_constraintBottom_toTopOf="@+id/tv_channel_dscp"
         app:layout_constraintEnd_toStartOf="@+id/tv_channel_time"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/iv_channel"
-        app:layout_constraintTop_toTopOf="@+id/iv_channel" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/tv_channel_time"
@@ -38,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/channel_time_margin_right"
         android:text="12:30"
-        android:textColor="@color/white_50"
+        android:textColor="@color/white_30"
         android:textSize="@dimen/channel_time_text_size"
         app:layout_constraintBottom_toBottomOf="@+id/iv_channel"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +50,7 @@
         android:id="@+id/tv_channel_dscp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/channel_dscp_margin_top"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="@dimen/channel_dscp_margin_right"
         android:ellipsize="end"
         android:maxLines="1"
@@ -56,10 +58,9 @@
         android:textSize="@dimen/channel_dscp_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/tv_channel_name"
-        app:layout_constraintTop_toBottomOf="@+id/iv_channel"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_channel_name" />
 
     <ImageView
         android:id="@+id/iv_unread_dot_stroke"
@@ -79,10 +80,10 @@
         android:layout_height="@dimen/channel_unread_dot_content_height"
         android:background="@drawable/shape_unread_dot_content"
         android:visibility="invisible"
-        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/iv_unread_dot_stroke"
         app:layout_constraintEnd_toEndOf="@+id/iv_unread_dot_stroke"
         app:layout_constraintStart_toStartOf="@+id/iv_unread_dot_stroke"
-        app:layout_constraintTop_toTopOf="@+id/iv_unread_dot_stroke" />
+        app:layout_constraintTop_toTopOf="@+id/iv_unread_dot_stroke"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

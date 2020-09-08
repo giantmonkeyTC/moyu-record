@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_marginTop="@dimen/margin_12dp"
+    android:layout_marginTop="@dimen/item_channel_list_margin_top"
     android:layout_height="@dimen/channel_category_height">
 
     <ImageView
@@ -14,8 +14,7 @@
         android:layout_marginStart="@dimen/channel_list_expand_margin_left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/channel_group_collapse" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_categoty_name"

@@ -8,41 +8,68 @@ import cn.troph.tomon.core.structures.GuildChannel;
 
 public class ChannelGroupRV extends ChannelRV {
 
-    private List<ChannelRV> mChannels;
+    private List<ChannelRV> mChildren;
+    private boolean mCollapsed = false;
 
     private Comparator<ChannelRV> comparator =  new Comparator<ChannelRV>() {
         @Override
         public int compare(ChannelRV o1, ChannelRV o2) {
-            return o1.mChannel.getPosition() - o2.mChannel.getPosition();
+            return o1.getChannel().getPosition() - o2.getChannel().getPosition();
         }
     };
 
-    public ChannelGroupRV(GuildChannel channel, List<ChannelRV> channels) {
-        super(channel);
-        mChannels = channels;
+    public ChannelGroupRV(ChannelGroupRV parent, GuildChannel channel, List<ChannelRV> channels) {
+        super(parent, channel);
+        mChildren = channels;
     }
 
-    public String getName() {
-        return mChannel.getName();
-    }
-
-    public List<ChannelRV> getChannels() {
-        return mChannels;
+    public List<ChannelRV> getChildrenChannels() {
+        return mChildren;
     }
 
     public void addSortedByPostion(ChannelRV channel) {
-        mChannels.add(channel);
-        mChannels.sort(comparator);
+        mChildren.add(channel);
+        mChildren.sort(comparator);
+    }
+
+    public List<ChannelRV> toggleCollapse() {
+        List<ChannelRV> excludeSelf = new ArrayList<>();
+        List<ChannelRV> flatten = flatten();
+        for (ChannelRV child : flatten) {
+            if (child == this) {
+                continue;
+            }
+            excludeSelf.add(child);
+            if (child.getChannel().getParent() == getChannel()) {
+                child.setIsVisible(isCollapsed());
+            } else {
+                child.setIsVisible(isCollapsed() && !child.getParent().isCollapsed());
+            }
+        }
+        setCollapsed(!isCollapsed());
+        return excludeSelf;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        mCollapsed = collapsed;
+    }
+
+    public boolean isCollapsed() {
+        return mCollapsed;
     }
 
     public List<ChannelRV> flatten() {
         List<ChannelRV> flattenedChannels = new ArrayList<>();
-        if (mChannel != null) {
+        if (getChannel() != null) {
             flattenedChannels.add(this);
         }
-        for (ChannelRV each : mChannels) {
+        for (ChannelRV each : mChildren) {
             if (each instanceof ChannelGroupRV) {
-                flattenedChannels.addAll(((ChannelGroupRV) each).flatten());
+                if (((ChannelGroupRV) each).isCollapsed()) {
+                    flattenedChannels.add(each);
+                } else {
+                    flattenedChannels.addAll(((ChannelGroupRV) each).flatten());
+                }
             } else {
                 flattenedChannels.add(each);
             }
@@ -53,12 +80,12 @@ public class ChannelGroupRV extends ChannelRV {
     @Override
     public String toString() {
         String name = "";
-        if (mChannel != null) {
-            name = mChannel.getName();
+        if (getChannel() != null) {
+            name = getChannel().getName();
         }
         return "ChannelGroupRV{" +
                 "mName='" + name + '\'' +
-                ", mChannels=" + mChannels +
+                ", mChannels=" + mChildren +
                 '}';
     }
 }

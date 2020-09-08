@@ -68,6 +68,7 @@
     <!--    Use new color   -->
     <color name="guildlist_bg">#2E2E2E</color>
     <color name="white_10">#1AFFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
     <color name="white_50">#80ffffff</color>
     <color name="black_50">#80000000</color>
     <color name="alert_dot">#FF7A6B</color>

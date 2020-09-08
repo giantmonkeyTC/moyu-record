@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
@@ -34,6 +32,7 @@ import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
+import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.channel.ChannelRV;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
 
@@ -49,6 +48,7 @@ public class ChannelListFragment extends Fragment {
     private TextView mTvGuildName;
     private TextView mTvGuildAvaterTextHolder;
     private RecyclerView mRvChannelList;
+    private ChannelListAdapter mChannelListAdapter;
     private ChannelGroupRV mChannelTreeRoot;
     private ArrayMap<String, ChannelGroupRV> mChannelGroupCache = new ArrayMap<>();
     private ArrayMap<String, ArrayList<GuildChannel>> mChannelOrphans = new ArrayMap<>();
@@ -84,6 +84,9 @@ public class ChannelListFragment extends Fragment {
             guildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
         }
         Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
+        if (guild == null) {
+            return;
+        }
         GuildAvatarUtils.setGuildAvatar(mIvGuildAvater, mTvGuildAvaterTextHolder, guild);
         mTvGuildName.setText(guild.getName());
         Glide.with(mIvGuildBanner).clear(mIvGuildBanner);
@@ -108,11 +111,11 @@ public class ChannelListFragment extends Fragment {
 
         GuildChannelCollection channels = guild.getChannels();
         if (channels != null && channels.getSize() > 0) {
-            mChannelTreeRoot = new ChannelGroupRV(null, new ArrayList<>());
+            mChannelTreeRoot = new ChannelGroupRV(null, null, new ArrayList<>());
         }
         for (GuildChannel channel : channels) {
             if (channel.getParent() == null) {
-                insertChannel(mChannelTreeRoot, channel);
+                insertChannelAndCacheGroup(mChannelTreeRoot, channel);
             } else {
                 ChannelGroupRV channelGroupRV = mChannelGroupCache.get(channel.getParentId());
                 if (channelGroupRV == null) {
@@ -123,17 +126,24 @@ public class ChannelListFragment extends Fragment {
                     }
                     orphans.add(channel);
                 } else {
-                    insertChannel(channelGroupRV, channel);
+                    insertChannelAndCacheGroup(channelGroupRV, channel);
                 }
             }
+        }
+
+        if (mChannelListAdapter == null) {
+            mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot);
+            mRvChannelList.setAdapter(mChannelListAdapter);
+        } else {
+            mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot);
         }
 
 
     }
 
-    private void insertChannel(ChannelGroupRV root, GuildChannel channel) {
+    private void insertChannelAndCacheGroup(ChannelGroupRV root, GuildChannel channel) {
         if (channel.getType() == ChannelType.CATEGORY) {
-            ChannelGroupRV group = new ChannelGroupRV(channel, new ArrayList<>());
+            ChannelGroupRV group = new ChannelGroupRV(root, channel, new ArrayList<>());
             root.addSortedByPostion(group);
             mChannelGroupCache.put(channel.getId(), group);
             ArrayList<GuildChannel> orphans = mChannelOrphans.get(channel.getId());
@@ -141,10 +151,10 @@ public class ChannelListFragment extends Fragment {
                 return;
             }
             for (GuildChannel orphan : orphans) {
-                insertChannel(group, orphan);
+                insertChannelAndCacheGroup(group, orphan);
             }
         } else {
-            root.addSortedByPostion(new ChannelRV(channel));
+            root.addSortedByPostion(new ChannelRV(root, channel));
         }
     }
 }
