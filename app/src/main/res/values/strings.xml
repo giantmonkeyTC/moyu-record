@@ -16,7 +16,7 @@
     <string name="register_invite_code">邀请码</string>
     <string name="register_confirmation_code">验证码</string>
     <string name="register_button">注册</string>
-    <string name="register_user_name">称呼（仅支持英文、数字、下划线）</string>
+    <string name="register_user_name">用户名（如：tomon）</string>
     <string name="register_passwd">密码（8-32位）</string>
     <string name="register_confirmation">发送验证码</string>
     <string name="register_to_login">已有账号登录</string>
