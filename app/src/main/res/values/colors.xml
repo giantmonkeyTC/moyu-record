@@ -67,4 +67,5 @@
     <color name="save_image_ripple">#80000000</color>
     <color name="blackAlpha10">#1A000000</color>
     <color name="whiteAlpha10">#1AFFFFFF</color>
+    <color name="whiteAlpha5">#0D000000</color>
 </resources>

@@ -59,7 +59,7 @@ class ChannelMemberFragment : Fragment() {
 
         chatSharedViewModel.memberLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {
-                val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it)
+                val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it,requireContext())
                 view_members.layoutManager = LinearLayoutManager(view.context)
                 view_members.adapter = mAdapter
                 if (view_members.itemDecorationCount > 0) {
@@ -77,7 +77,7 @@ class ChannelMemberFragment : Fragment() {
         })
         chatSharedViewModel.dmMemberLiveData.observe(viewLifecycleOwner, Observer {
             it?.let {
-                val mAdapter: MemberListAdapter<User> = MemberListAdapter(it)
+                val mAdapter: MemberListAdapter<User> = MemberListAdapter(it,requireContext())
                 view_members.layoutManager = LinearLayoutManager(view.context)
                 view_members.adapter = mAdapter
                 if (view_members.itemDecorationCount > 0) {

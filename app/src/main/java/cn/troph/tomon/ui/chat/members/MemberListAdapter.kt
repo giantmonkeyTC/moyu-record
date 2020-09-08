@@ -1,7 +1,12 @@
 package cn.troph.tomon.ui.chat.members
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.text.SpannableString
 import android.text.TextUtils
@@ -11,6 +16,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColor
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +44,8 @@ import kotlinx.android.synthetic.main.widget_member_roles.view.*
 import kotlinx.android.synthetic.main.widget_role_list_header.view.*
 
 class MemberListAdapter<T>(
-    private val memberList: MutableList<T>
+    private val memberList: MutableList<T>,
+    private val context: Context
 ) :
     RecyclerView.Adapter<MemberListAdapter.ViewHolder>(),
     StickyRecyclerHeadersAdapter<MemberListAdapter.HeaderViewHolder> {
@@ -100,20 +107,10 @@ class MemberListAdapter<T>(
         val layoutInflater = LayoutInflater.from(parent.context)
         val view = layoutInflater.inflate(R.layout.guild_user_info, null)
         view.user_info_avatar.user = member.user
-        val discriminatorSpan: SpannableString =
-            spannable { color(Color.GRAY, " #" + member.user!!.discriminator) }
-        val displaynameSpan: SpannableString =
-            spannable {
-                color(
-                    (if (member.roles.color == null)
-                        0 or 0XFFFFFFFF.toInt() else member.roles.color!!.color or 0xFF000000.toInt()),
-                    member.displayName
-                )
-            }
         view.user_info_name.text =
-            displaynameSpan
-        view.user_info_discriminator.text = discriminatorSpan
-        view.user_info_nick.text = TextUtils.concat(member.user?.username, discriminatorSpan)
+            member.displayName
+        view.user_info_discriminator.text =
+            TextUtils.concat(member.user?.username, " #" + member.user!!.discriminator)
 
         rolesBinder(itemView = view, member = member)
 
@@ -126,9 +123,9 @@ class MemberListAdapter<T>(
                 )
             )
         if (member.id != Client.global.me.id && member.id != "1") {
-            view.user_sign_out.visibility = View.VISIBLE
-            view.user_private_chat.visibility = View.VISIBLE
-            view.user_private_chat.setOnClickListener {
+            view.user_info_menu.visibility = View.VISIBLE
+            view.goto_dm.visibility = View.VISIBLE
+            view.goto_dm.setOnClickListener {
                 member.directMessage(member.id).observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         dialog.dismiss()
@@ -142,7 +139,7 @@ class MemberListAdapter<T>(
                         )
                     }
             }
-            view.user_sign_out.setOnClickListener {
+            view.user_info_menu.setOnClickListener {
                 dialog.dismiss()
                 ReportFragment(
                     member.id,
@@ -150,8 +147,8 @@ class MemberListAdapter<T>(
                 ).show((view.context as AppCompatActivity).supportFragmentManager, null)
             }
         } else {
-            view.user_sign_out.visibility = View.GONE
-            view.user_private_chat.visibility = View.GONE
+            view.user_info_menu.visibility = View.GONE
+            view.goto_dm.visibility = View.GONE
         }
         val extraSpace = view.findViewById<View>(R.id.extraSpace)
         val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
@@ -171,14 +168,22 @@ class MemberListAdapter<T>(
                 if (role.isEveryone)
                     return@explicit
                 val layoutInflater = LayoutInflater.from(itemView.context)
+                val drawable = ContextCompat.getDrawable(context, R.drawable.shape_role_item)
+                drawable!!.colorFilter = PorterDuffColorFilter(
+                    (if (role.color == 0)
+                        0 or 0X0DFFFFFF else role.color or 0x0D000000), PorterDuff.Mode.OVERLAY
+                )
                 val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
-                role_view.role_color.background = (
-                        ColorDrawable(
-                            (if (role.color == 0)
-                                0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
-                        )
-                        )
+                role_view.widget_role_unit.background = drawable
+                role_view.role_color.imageTintList = ColorStateList.valueOf(
+                    (if (role.color == 0)
+                        0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                )
                 role_view.role_name.text = role.name
+                role_view.role_name.setTextColor(
+                    (if (role.color == 0)
+                        0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                )
                 itemView.member_detail_roles.addView(role_view)
             }
 

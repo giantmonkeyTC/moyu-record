@@ -4,8 +4,8 @@
     android:id="@+id/widget_message_reaction"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingEnd="4dp"
-    android:paddingBottom="4dp">
+    android:paddingHorizontal="4dp"
+    android:paddingVertical="4dp">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,29 +13,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/shape_role_item"
-        android:paddingEnd="4dp">
+        android:paddingVertical="8dp"
+        android:paddingEnd="16dp">
 
         <ImageView
             android:id="@+id/role_color"
-            android:layout_width="4dp"
-            android:layout_height="12dp"
+            android:layout_width="12dp"
+            android:layout_height="13dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/role_color"
+            />
 
         <TextView
             android:id="@+id/role_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:paddingHorizontal="4dp"
-            android:paddingVertical="4dp"
             android:textColor="@color/whiteAlpha70"
-            android:textSize="15sp"
-            android:layout_marginStart="4dp"
+            android:textSize="12dp"
+            android:layout_marginStart="8dp"
             app:layout_constraintStart_toEndOf="@id/role_color"
-            app:layout_constraintStart_toStartOf="@id/widget_role_unit"
-            app:layout_constraintTop_toTopOf="@+id/widget_role_unit" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

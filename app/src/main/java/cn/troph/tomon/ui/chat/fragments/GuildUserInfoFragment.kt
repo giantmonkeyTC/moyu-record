@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +36,10 @@ import kotlinx.android.synthetic.main.fragment_guild_selector.*
 
 
 import kotlinx.android.synthetic.main.guild_user_info.*
+import kotlinx.android.synthetic.main.guild_user_info.view.*
 
-class GuildUserInfoFragment(private val userId: String, private val member: GuildMember? = null) : BottomSheetDialogFragment() {
+class GuildUserInfoFragment(private val userId: String, private val member: GuildMember? = null) :
+    BottomSheetDialogFragment() {
     private val mChatVM: ChatSharedViewModel by activityViewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     override fun onCreateView(
@@ -53,31 +56,25 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
         super.onViewCreated(view, savedInstanceState)
         mChatVM.loadGuildUserInfo(userId)
         val avatar = view.findViewById<UserAvatar>(R.id.user_info_avatar)
-        val name = view.findViewById<TextView>(R.id.user_info_name)
-        val nick = view.findViewById<TextView>(R.id.user_info_nick)
-        val out = view.findViewById<TextView>(R.id.user_sign_out)
         val roles = view.findViewById<ConstraintLayout>(R.id.role_section)
         roles.visibility = View.GONE
         mChatVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
             avatar.user = user
             if (member == null) {
-                name.text = user.name
+                view.user_info_name.text =
+                    user.name
+                view.user_info_discriminator.text =
+                    TextUtils.concat(user.username, " #" + user.discriminator)
             } else {
-                name.text = member.displayName
-            }
-            nick.text = "${user.username} #${user.discriminator}"
-            if (user.id != Client.global.me.id && user.id != "1") {
-                out.visibility = View.VISIBLE
-                user_private_chat.visibility = View.VISIBLE
-                out.setOnClickListener {
-                    dismiss()
-                    ReportFragment(
-                        userId,
-                        1
-                    ).show((view.context as AppCompatActivity).supportFragmentManager, null)
-                }
+                view.user_info_name.text =
+                    member.displayName
+                view.user_info_discriminator.text =
+                    TextUtils.concat(member.user?.username, " #" + member.user!!.discriminator)
 
-                user_private_chat.setOnClickListener {
+            }
+            if (user.id != Client.global.me.id && user.id != "1") {
+                goto_dm.visibility = View.VISIBLE
+                goto_dm.setOnClickListener {
                     user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             dialog?.dismiss()
@@ -92,8 +89,7 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
                         }
                 }
             } else {
-                out.visibility = View.GONE
-                user_private_chat.visibility = View.GONE
+                goto_dm.visibility = View.GONE
             }
 
         })

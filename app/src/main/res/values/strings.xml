@@ -101,6 +101,7 @@
     <string name="member_info_report">举报</string>
     <string name="guild_already_joined">你已经在该群组中</string>
     <string name="guild_joined_success">加入成功</string>
+    <string name="goto_dm">发起私聊</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>
