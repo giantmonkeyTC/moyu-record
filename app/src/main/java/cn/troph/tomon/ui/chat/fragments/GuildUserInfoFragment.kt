@@ -1,8 +1,12 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.app.Dialog
+import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.TextUtils
@@ -10,10 +14,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 
@@ -21,6 +28,7 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.GuildMember
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
@@ -37,11 +45,16 @@ import kotlinx.android.synthetic.main.fragment_guild_selector.*
 
 import kotlinx.android.synthetic.main.guild_user_info.*
 import kotlinx.android.synthetic.main.guild_user_info.view.*
+import kotlinx.android.synthetic.main.widget_member_roles.view.*
 
 class GuildUserInfoFragment(private val userId: String, private val member: GuildMember? = null) :
     BottomSheetDialogFragment() {
     private val mChatVM: ChatSharedViewModel by activityViewModels()
     lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.Theme_App_Dialog_Bottomsheet)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,15 +70,17 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
         mChatVM.loadGuildUserInfo(userId)
         val avatar = view.findViewById<UserAvatar>(R.id.user_info_avatar)
         val roles = view.findViewById<ConstraintLayout>(R.id.role_section)
-        roles.visibility = View.GONE
         mChatVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
             avatar.user = user
             if (member == null) {
+                roles.visibility = View.GONE
                 view.user_info_name.text =
                     user.name
                 view.user_info_discriminator.text =
                     TextUtils.concat(user.username, " #" + user.discriminator)
             } else {
+                roles.visibility = View.VISIBLE
+                rolesBinder(itemView = view, member = member)
                 view.user_info_name.text =
                     member.displayName
                 view.user_info_discriminator.text =
@@ -73,7 +88,8 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
 
             }
             if (user.id != Client.global.me.id && user.id != "1") {
-                goto_dm.visibility = View.VISIBLE
+                view.user_info_menu.visibility = View.VISIBLE
+                view.goto_dm.visibility = View.VISIBLE
                 goto_dm.setOnClickListener {
                     user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -88,36 +104,92 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
                             )
                         }
                 }
+                view.user_info_menu.setOnClickListener {
+
+                    val inflater =
+                        requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val menu = inflater.inflate(R.layout.user_info_more_menu, null)
+                    val popUp = PopupWindow(
+                        menu,
+                        DensityUtil.dip2px(context, 108f),
+                        DensityUtil.dip2px(context, 44f),
+                        true
+                    )
+                    menu.setOnClickListener {
+                        dismiss()
+                        popUp.dismiss()
+                        ReportFragment(
+                            user.id,
+                            1
+                        ).show((view.context as AppCompatActivity).supportFragmentManager, null)
+                    }
+
+                    popUp.elevation = 10f
+                    popUp.showAsDropDown(
+                        it,
+                        DensityUtil.dip2px(context, 90f).unaryMinus(),
+                        DensityUtil.dip2px(context, 10f)
+                    )
+//                dialog.dismiss()
+                }
             } else {
-                goto_dm.visibility = View.GONE
+                view.user_info_menu.visibility = View.GONE
+                view.goto_dm.visibility = View.GONE
             }
 
         })
 
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val bottomSheet = super.onCreateDialog(savedInstanceState)
-        val view = View.inflate(context, R.layout.guild_user_info, null)
-        bottomSheet.setContentView(view)
-        bottomSheet.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
-            ?.setBackgroundDrawable(
-                ColorDrawable(
-                    Color.TRANSPARENT
+    private fun rolesBinder(itemView: View, member: GuildMember) {
+        itemView.member_detail_roles.removeAllViews()
+        if (member.roles.sequence.size == 1) {
+            itemView.role_section.visibility = View.GONE
+        } else
+            member.roles.sequence.forEach explicit@{ role ->
+                if (role.isEveryone)
+                    return@explicit
+                val layoutInflater = LayoutInflater.from(itemView.context)
+                val drawable =
+                    ContextCompat.getDrawable(itemView.context, R.drawable.shape_role_item)
+                drawable!!.colorFilter = PorterDuffColorFilter(
+                    (if (role.color == 0)
+                        0 or 0X1AFFFFFF else role.color or 0x1A000000), PorterDuff.Mode.OVERLAY
                 )
-            )
-        val extraSpace = view.findViewById<View>(R.id.extraSpace)
-        bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
-        val peekHeightPx = requireContext().resources
-            .getDimensionPixelSize(R.dimen.profile_peek_height)
-        bottomSheetBehavior.setPeekHeight(peekHeightPx)
-        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
+                val role_view = layoutInflater.inflate(R.layout.widget_member_roles, null)
+                role_view.widget_role_unit.background = drawable
+                role_view.role_color.imageTintList = ColorStateList.valueOf(
+                    (if (role.color == 0)
+                        0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                )
+                role_view.role_name.text = role.name
+                role_view.role_name.setTextColor(
+                    (if (role.color == 0)
+                        0 or 0XFFFFFFFF.toInt() else role.color or 0xFF000000.toInt())
+                )
+                itemView.member_detail_roles.addView(role_view)
+            }
 
-        return bottomSheet
     }
 
-    override fun onStart() {
-        super.onStart()
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        val bottomSheet = super.onCreateDialog(savedInstanceState)
+//        val view = View.inflate(context, R.layout.guild_user_info, null)
+//        bottomSheet.setContentView(view)
+//        bottomSheet.window?.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+//            ?.setBackgroundDrawable(
+//                ColorDrawable(
+//                    Color.TRANSPARENT
+//                )
+//            )
+////        val extraSpace = view.findViewById<View>(R.id.extraSpace)
+////        bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
+////        val peekHeightPx = requireContext().resources
+////            .getDimensionPixelSize(R.dimen.profile_peek_height)
+////        bottomSheetBehavior.setPeekHeight(peekHeightPx)
+////        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
+//
+//        return bottomSheet
+//    }
+
 }

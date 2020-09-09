@@ -16,7 +16,9 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import android.widget.PopupMenu
+import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColor
 import androidx.fragment.app.Fragment
@@ -27,6 +29,7 @@ import cn.troph.tomon.core.structures.Guild
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.structures.Presence
 import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
 import cn.troph.tomon.ui.chat.fragments.DmChannelSelectorFragment
@@ -141,27 +144,48 @@ class MemberListAdapter<T>(
                     }
             }
             view.user_info_menu.setOnClickListener {
-                val popUp = PopupMenu(context, view.user_info_menu)
-                val inflater = popUp.menuInflater
-                inflater.inflate(R.menu.guild_member_info_menu, popUp.menu)
-                popUp.show()
+
+                val inflater =
+                    context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val menu = inflater.inflate(R.layout.user_info_more_menu, null)
+                val popUp = PopupWindow(
+                    menu,
+                    DensityUtil.dip2px(context, 108f),
+                    DensityUtil.dip2px(context, 44f),
+                    true
+                )
+                menu.setOnClickListener {
+                    popUp.dismiss()
+                    dialog.dismiss()
+                    val reportF =
+                        ReportFragment(
+                            member.id,
+                            1
+                        ).apply {
+                            show((view.context as AppCompatActivity).supportFragmentManager, null)
+                        }
+
+                }
+                popUp.elevation = 10f
+
+                popUp.showAsDropDown(
+                    it,
+                    DensityUtil.dip2px(context, 90f).unaryMinus(),
+                    DensityUtil.dip2px(context, 10f)
+                )
 //                dialog.dismiss()
-//                ReportFragment(
-//                    member.id,
-//                    1
-//                ).show((view.context as AppCompatActivity).supportFragmentManager, null)
             }
         } else {
             view.user_info_menu.visibility = View.GONE
             view.goto_dm.visibility = View.GONE
         }
 
-        val extraSpace = view.findViewById<View>(R.id.extraSpace)
-        val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
-        val peekHeightPx =
-            view.context.resources.getDimensionPixelSize(R.dimen.member_profile_peek_height)
-        bottomSheetBehavior.setPeekHeight(peekHeightPx)
-        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
+//        val extraSpace = view.findViewById<View>(R.id.extraSpace)
+//        val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
+//        val peekHeightPx =
+//            view.context.resources.getDimensionPixelSize(R.dimen.member_profile_peek_height)
+//        bottomSheetBehavior.setPeekHeight(peekHeightPx)
+//        extraSpace.minimumHeight = Resources.getSystem().displayMetrics.heightPixels / 2
         dialog.show()
     }
 

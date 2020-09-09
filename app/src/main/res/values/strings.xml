@@ -28,7 +28,7 @@
     <string name="login_to_register">新用户注册</string>
 
     <string name="updateMessage">编辑信息中</string>
-    <string name="cancel"><u>取消</u></string>
+    <string name="cancel">取消</string>
     <string name="reply">回复:</string>
     <string name="emoji">^.^</string>
     <string name="emoji_et_hint">输入消息</string>
@@ -102,6 +102,7 @@
     <string name="guild_already_joined">你已经在该群组中</string>
     <string name="guild_joined_success">加入成功</string>
     <string name="goto_dm">发起私聊</string>
+    <string name="report_reason">举报原因</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>

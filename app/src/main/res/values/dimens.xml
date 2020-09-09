@@ -50,4 +50,7 @@
     <dimen name="member_info_menu_margin_end">12dp</dimen>
     <dimen name="bs_member_info_dm">46dp</dimen>
     <dimen name="bs_member_info_dm_mt">40dp</dimen>
+    <dimen name="info_more_menu_width">108dp</dimen>
+    <dimen name="info_more_menu_height">44dp</dimen>
+    <dimen name="radio_group_mv">8dp</dimen>
 </resources>

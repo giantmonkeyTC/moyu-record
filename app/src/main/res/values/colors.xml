@@ -68,4 +68,7 @@
     <color name="blackAlpha10">#1A000000</color>
     <color name="whiteAlpha10">#1AFFFFFF</color>
     <color name="whiteAlpha5">#0D000000</color>
+    <color name="reportBackground">#2C2C2C</color>
+    <color name="whiteAlpha20">#33FFFFFF</color>
+    <color name="blackAlpha20">#33000000</color>
 </resources>
