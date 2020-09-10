@@ -40,7 +40,7 @@
             android:id="@+id/fragment_member_selector"
             android:layout_width="match_parent"
             android:elevation="10dp"
-            android:name="cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment"
+            android:name="cn.troph.tomon.ui.chat.fragments.ChannelInfoFragment"
             android:layout_height="match_parent"
             android:layout_gravity="end"
             />

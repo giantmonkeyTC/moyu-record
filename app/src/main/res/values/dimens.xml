@@ -53,4 +53,5 @@
     <dimen name="info_more_menu_width">108dp</dimen>
     <dimen name="info_more_menu_height">44dp</dimen>
     <dimen name="radio_group_mv">8dp</dimen>
+    <dimen name="channel_info_action_bar_height">72dp</dimen>
 </resources>

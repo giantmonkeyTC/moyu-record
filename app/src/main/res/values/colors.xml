@@ -71,4 +71,5 @@
     <color name="reportBackground">#2C2C2C</color>
     <color name="whiteAlpha20">#33FFFFFF</color>
     <color name="blackAlpha20">#33000000</color>
+    <color name="whiteAlpha60">#9AFFFFFF</color>
 </resources>
