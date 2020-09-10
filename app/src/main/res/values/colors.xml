@@ -81,4 +81,5 @@
     <color name="blackPrimary">#313131</color>
     <color name="black_20">#33000000</color>
     <color name="transparent">#00000000</color>
+    <color name="msg_desp_mention">#CDFF7A6B</color>
 </resources>

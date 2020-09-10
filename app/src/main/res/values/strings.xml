@@ -188,6 +188,8 @@
     <string name="time_stamp_detailed">%1$s %2$s:%3$s</string>
     <string name="time_stamp_show_time_simple">%1$s:%2$s</string>
     <string name="voice_channel_no_joined_desp">喂喂喂？</string>
-    <string name="voice_channel_joined_desp">%1$s和%2$s正在疯狂输出</string>
-    <string name="voice_channel_alot_joined_desp">%1$s、%2$s等%3$d人正在疯狂输出</string>
+    <string name="voice_channel_joined_one_desp">%1$s 正在输出</string>
+    <string name="voice_channel_joined_two_desp">%1$s 和 %2$s 正在疯狂输出</string>
+    <string name="voice_channel_alot_joined_desp">%1$s、%2$s 等%3$d人正在疯狂输出</string>
+    <string name="msg_desp_mention">[有人@我]&#160;</string>
 </resources>

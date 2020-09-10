@@ -19,8 +19,15 @@ import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
+import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.MessageType;
 import cn.troph.tomon.core.collections.MessageCollection;
+import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
+import cn.troph.tomon.core.events.MessageAtMeEvent;
+import cn.troph.tomon.core.events.MessageCreateEvent;
+import cn.troph.tomon.core.events.MessageReadEvent;
+import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
+import cn.troph.tomon.core.structures.Base;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.core.structures.GuildMember;
 import cn.troph.tomon.core.structures.Message;
@@ -28,6 +35,7 @@ import cn.troph.tomon.core.structures.MessageAttachment;
 import cn.troph.tomon.core.structures.TextChannel;
 import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceUpdate;
+import cn.troph.tomon.core.utils.Assets;
 import cn.troph.tomon.ui.utils.LocalDateUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -37,15 +45,18 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private List<ChannelRV> mDataList = new ArrayList<>();
     private ArrayMap<String, Message> mLastedMessageCache = new ArrayMap<>();
+    private String mCurrentGuildID;
 
-    public ChannelListAdapter(ChannelGroupRV root) {
+    public ChannelListAdapter(ChannelGroupRV root, String guildId) {
         if (root != null) {
             mDataList = root.flatten();
+            mCurrentGuildID = guildId;
         }
     }
 
-    public void setDataAndNotifyChanged(ChannelGroupRV root) {
+    public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
         mDataList = root.flatten();
+        mCurrentGuildID = guildID;
         notifyDataSetChanged();
     }
 
@@ -67,11 +78,68 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        registerObserverForChannel(position, holder);
+        bindChannelForHolder(holder, position);
+    }
+
+    private void bindChannelForHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ChannelGroupViewHolder) {
             onBindChannelGroupViewHolder((ChannelGroupViewHolder) holder, position);
         } else {
             onBindChannelViewHolder((ChannelViewHolder) holder, position);
         }
+    }
+
+    private void registerObserverForChannel(int position, RecyclerView.ViewHolder holder) {
+        ChannelRV channelRV = mDataList.get(position);
+        GuildChannel channel = channelRV.getChannel();
+        channel.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Base>() {
+            @Override
+            public void accept(Base base) throws Throwable {
+                bindChannelForHolder(holder, position);
+            }
+        });
+
+        Client.Companion.getGlobal().getEventBus().observeEventsOnUi().subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object event) throws Throwable {
+                if (event instanceof MessageCreateEvent) {
+                    MessageCreateEvent createEvent = (MessageCreateEvent) event;
+                    if (createEvent.getMessage().getChannelId().equals(channel.getId())) {
+                        mLastedMessageCache.put(channel.getId(), createEvent.getMessage());
+                        bindChannelForHolder(holder, position);
+                    }
+                } else if (event instanceof MessageAtMeEvent) {
+                    MessageAtMeEvent atMeEvent = (MessageAtMeEvent) event;
+                    if (atMeEvent.getMessage().getChannelId().equals(channel.getId())) {
+                        mLastedMessageCache.put(channel.getId(), atMeEvent.getMessage());
+                        bindChannelForHolder(holder, position);
+                    }
+                } else if (event instanceof MessageReadEvent) {
+                    MessageReadEvent readEvent = (MessageReadEvent) event;
+                    if (readEvent.getMessage().getChannelId().equals(channel.getId())) {
+                        mLastedMessageCache.put(channel.getId(), readEvent.getMessage());
+                        bindChannelForHolder(holder, position);
+                    }
+                } else if (event instanceof GuildVoiceSelectorEvent) {
+                    GuildVoiceSelectorEvent voiceSelectorEvent = (GuildVoiceSelectorEvent) event;
+                    if (voiceSelectorEvent.getChannelId().equals(channel.getId())) {
+                        VoiceChannel voiceChannel = (VoiceChannel) channel;
+                        voiceChannel.setJoined(true);
+                        bindChannelForHolder(holder, position);
+                    } else {
+                        if (channel instanceof VoiceChannel) {
+                            ((VoiceChannel) channel).setJoined(false);
+                        }
+                    }
+                } else if (event instanceof VoiceStateUpdateEvent) {
+                    if (!mCurrentGuildID.equals(channel.getGuildId())) {
+                        return;
+                    }
+                    bindChannelForHolder(holder, position);
+                }
+            }
+        });
     }
 
     private void onBindChannelViewHolder(ChannelViewHolder holder, int position) {
@@ -148,22 +216,41 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else {
             List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
             GuildMember guildMember1 = voiceChannel.getMembers().get(voiceStates.get(0).getUserId());
-            GuildMember guildMember2 = voiceChannel.getMembers().get(voiceStates.get(1).getUserId());
+            GuildMember guildMember2 = null;
+            if (voiceStates.size() >= 2) {
+                guildMember2 = voiceChannel.getMembers().get(voiceStates.get(1).getUserId());
+            }
+
             int channelDespStringResId;
-            if (voiceStates.size() <= 2) {
-                channelDespStringResId = R.string.voice_channel_joined_desp;
+            if (voiceStates.size() == 1) {
+                channelDespStringResId = R.string.voice_channel_joined_one_desp;
+            } else if (voiceStates.size() == 2) {
+                channelDespStringResId = R.string.voice_channel_joined_two_desp;
             } else {
                 channelDespStringResId = R.string.voice_channel_alot_joined_desp;
             }
-            String channelDesp = holder.itemView.getContext().getString(
-                    channelDespStringResId,
-                    guildMember1.getDisplayName(),
-                    guildMember2.getDisplayName());
+            String channelDesp;
+            if (voiceStates.size() == 1) {
+                channelDesp = holder.itemView.getContext().getString(
+                        channelDespStringResId,
+                        guildMember1.getDisplayName());
+            } else if (voiceStates.size() == 2){
+                channelDesp = holder.itemView.getContext().getString(
+                        channelDespStringResId,
+                        guildMember1.getDisplayName(),
+                        guildMember2.getDisplayName());
+            } else {
+                channelDesp = holder.itemView.getContext().getString(
+                        channelDespStringResId,
+                        guildMember1.getDisplayName(),
+                        guildMember2.getDisplayName(),
+                        voiceStates.size());
+            }
             holder.tvChannelDesp.setText(channelDesp);
         }
     }
 
-    private String getMessageAuthorName(Context context, String authorId, GuildChannel channel) {
+    private String getAuthorNameInChannel(Context context, String authorId, GuildChannel channel) {
         String displayName = null;
         GuildMember guildMember = channel.getMembers().get(authorId);
         if (guildMember != null) {
@@ -172,19 +259,36 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (TextUtils.isEmpty(displayName)) {
             displayName =context.getResources().getString(R.string.deleted_name);
         }
+        if (displayName.length() > 14) {
+            displayName = displayName.substring(0, 14) + "...";
+        }
         return displayName;
     }
 
-    private void setMessageDesp(ChannelViewHolder holder, Message msg, GuildChannel channel) {
-        String name = getMessageAuthorName(holder.itemView.getContext(), msg.getAuthorId(), channel);
+    private void setMessageDesp(ChannelViewHolder holder, Message msg, TextChannel channel) {
+        boolean hasMentionedUnread = channel.getUnread() && channel.getMention() > 0;
+        String name = getAuthorNameInChannel(holder.itemView.getContext(), msg.getAuthorId(), channel);
         if (msg.getType() == MessageType.GUILD_MEMBER_JOIN) {
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.user_joined_guild, name));
         } else if (msg.getType() == MessageType.GUILD_OWNER_CHANGE) {
             String newOwnerId = msg.getContent();
-            String newOwnerName = getMessageAuthorName(holder.itemView.getContext(), newOwnerId, channel);
+            String newOwnerName = getAuthorNameInChannel(holder.itemView.getContext(), newOwnerId, channel);
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.guild_owner_changed, newOwnerName));
         } else if (msg.getStamps().size() > 0 && msg.getType() == MessageType.DEFAULT) {
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.msg_desp_stamp));
+        } else if (!TextUtils.isEmpty(msg.getContent()) &&
+                (Assets.INSTANCE.getRegexAtUser().containsMatchIn(msg.getContent()) || Assets.INSTANCE.getRegexEmoji().containsMatchIn(msg.getContent()))) {
+            Assets.ContentSpan contentSpan = Assets.INSTANCE.contentParser(msg.getContent());
+            String tmpMsg = msg.getContent();
+            List<Assets.ContentEmoji> contentEmojis = contentSpan.getContentEmoji();
+            for (Assets.ContentEmoji contentEmoji : contentEmojis) {
+                tmpMsg = tmpMsg.replaceFirst(contentEmoji.getRaw(), "["+contentEmoji.getName()+"]");
+            }
+            List<Assets.ContentAtUser> contentAtUsers = contentSpan.getContentAtUser();
+            for (Assets.ContentAtUser contentAtUser : contentAtUsers) {
+                tmpMsg = tmpMsg.replaceFirst("<@"+contentAtUser.getId()+">", "@" + getAuthorNameInChannel(holder.itemView.getContext(), contentAtUser.getId(), channel));
+            }
+            holder.tvChannelDesp.setText(String.format("%s: %s", name, tmpMsg));
         } else if (TextUtils.isEmpty(msg.getContent()) && msg.getAttachments().getSize() > 0) {
             for (MessageAttachment attachment : msg.getAttachments()) {
                 String content = "";
@@ -204,6 +308,14 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.tvChannelDesp.setText(String.format("%s: %s",
                     name
                     , msg.getContent()));
+        }
+
+        if (hasMentionedUnread) {
+            holder.tvChannelDespMention.setText(R.string.msg_desp_mention);
+            holder.tvChannelDespMention.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvChannelDespMention.setText("");
+            holder.tvChannelDespMention.setVisibility(View.INVISIBLE);
         }
 
     }
@@ -279,6 +391,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView tvChannelName;
         TextView tvChannelTime;
         TextView tvChannelDesp;
+        TextView tvChannelDespMention;
 
 
         public ChannelViewHolder(@NonNull View itemView) {
@@ -289,6 +402,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvChannelName = itemView.findViewById(R.id.tv_channel_name);
             tvChannelDesp = itemView.findViewById(R.id.tv_channel_dscp);
             tvChannelTime = itemView.findViewById(R.id.tv_channel_time);
+            tvChannelDespMention = itemView.findViewById(R.id.tv_channel_dscp_mention);
         }
 
         public void setUnreadView(boolean unread, boolean mention) {

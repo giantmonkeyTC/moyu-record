@@ -31,6 +31,7 @@ import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.core.utils.Collection;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
 import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.channel.ChannelRV;
@@ -113,7 +114,8 @@ public class ChannelListFragment extends Fragment {
         if (channels != null && channels.getSize() > 0) {
             mChannelTreeRoot = new ChannelGroupRV(null, null, new ArrayList<>());
         }
-        for (GuildChannel channel : channels) {
+        Collection<GuildChannel> guildChannels = channels.clone();
+        for (GuildChannel channel : guildChannels) {
             if (channel.getParent() == null) {
                 insertChannelAndCacheGroup(mChannelTreeRoot, channel);
             } else {
@@ -132,10 +134,10 @@ public class ChannelListFragment extends Fragment {
         }
 
         if (mChannelListAdapter == null) {
-            mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot);
+            mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot, guild.getId());
             mRvChannelList.setAdapter(mChannelListAdapter);
         } else {
-            mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot);
+            mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot, guild.getId());
         }
 
 
