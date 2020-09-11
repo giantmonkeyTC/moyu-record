@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/guild_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_user_info_bottom_sheet">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/section1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blackAlpha10"
+        android:paddingEnd="12dp"
+        android:paddingBottom="32dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="user_info_menu" />
+
+        <cn.troph.tomon.ui.widgets.GuildAvatar
+            android:id="@+id/guild_info_avatar"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/user_info_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/primaryText"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/guild_info_avatar"
+            app:layout_constraintEnd_toStartOf="@+id/barrier2"
+            app:layout_constraintStart_toEndOf="@id/guild_info_avatar"
+            app:layout_constraintTop_toTopOf="@+id/guild_info_avatar" />
+
+        <TextView
+            android:id="@+id/guild_member_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:drawableStart="@drawable/member_count_icon"
+            android:drawablePadding="4dp"
+            android:text="@string/guild_member_count"
+            android:textColor="@color/whiteAlpha50"
+            android:textSize="10dp"
+            app:layout_constraintStart_toStartOf="@id/guild_info_avatar"
+            app:layout_constraintTop_toBottomOf="@id/guild_info_avatar" />
+
+        <ImageView
+            android:id="@+id/user_info_menu"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/member_info_menu"
+            app:layout_constraintBottom_toBottomOf="@+id/guild_info_avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guild_info_avatar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/guild_setting_section"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/shape_goto_dm"
+            android:drawablePadding="16dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:textColor="@color/primaryText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guild_info_avatar">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/guild_info_nick_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/guild_info_user_nick"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:drawableEnd="@drawable/guild_info_nick_icon"
+                    android:gravity="center_vertical|end"
+                    android:maxLines="2"
+                    android:textColor="@color/whiteAlpha50"
+                    app:layout_constraintBottom_toBottomOf="@+id/guild_info_nick"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guild_info_nick"
+                    app:layout_constraintTop_toTopOf="@+id/guild_info_nick" />
+
+                <TextView
+                    android:id="@+id/guild_info_nick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/guild_info_user_nickname"
+                    android:textColor="@color/primaryText"
+                    android:textSize="14dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/guild_info_mute"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="@string/guild_info_mute"
+                android:textColor="@color/primaryText"
+                app:layout_constraintStart_toStartOf="@id/guild_info_nick_section"
+                app:layout_constraintTop_toBottomOf="@id/guild_info_nick_section" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/MySwitch"
+                android:minWidth="34dp"
+                app:layout_constraintBottom_toBottomOf="@+id/guild_info_mute"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guild_info_mute" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingStart="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="@string/mark_as_read"
+                android:textColor="@color/primaryText"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guild_info_mute"
+
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/leave_guild"
+            android:textColor="@color/error"
+            android:gravity="center"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingVertical="12dp"
+            android:background="@drawable/shape_goto_dm"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guild_setting_section" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

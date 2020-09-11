@@ -49,6 +49,7 @@
     <color name="error">#FF7A6B</color>
     <color name="primaryVariant">#FFA1C8</color>
     <color name="primaryColor">#FF7896</color>
+    <color name="primaryColorAlpha38">#61FF7896</color>
     <color name="background1HalfAlpha">#80171717</color>
     <color name="channel_name_unactivated">#969696</color>
     <color name="color_guild_no_img">#7A84D9</color>
@@ -72,4 +73,6 @@
     <color name="whiteAlpha20">#33FFFFFF</color>
     <color name="blackAlpha20">#33000000</color>
     <color name="whiteAlpha60">#9AFFFFFF</color>
+    <color name="switchOff">#A2A2A2</color>
+    <color name="switchOffShade">#61A2A2A2</color>
 </resources>

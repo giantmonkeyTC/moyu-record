@@ -10,6 +10,7 @@ class NestedRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerView(
 
     private val globalRect: Rect = Rect() // 临时数据
 
+
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         val x = ev?.rawX?.toInt()
         val y = ev?.rawY?.toInt()
@@ -19,4 +20,5 @@ class NestedRecyclerView(context: Context, attrs: AttributeSet?) : RecyclerView(
         }
         return super.dispatchTouchEvent(ev)
     }
+
 }

@@ -104,9 +104,14 @@
     <string name="goto_dm">发起私聊</string>
     <string name="report_reason">举报原因</string>
     <string name="channel_info">频道详情</string>
-    <string name="overflow_test_string">三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十</string>
+    <string name="overflow_test_string">三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十</string>
     <string name="channel_info_invite">邀请成员</string>
     <string name="channel_info_mute">静音</string>
+    <string name="guild_member_count">%1$d位成员</string>
+    <string name="guild_info_user_nickname">群组内昵称</string>
+    <string name="guild_info_mute">消息免打扰</string>
+    <string name="mark_as_read">标记为已读</string>
+    <string name="leave_guild">离开群组</string>
 
     <string-array name="welcome_array">
         <item>就是现在，上吧%1$s！</item>
