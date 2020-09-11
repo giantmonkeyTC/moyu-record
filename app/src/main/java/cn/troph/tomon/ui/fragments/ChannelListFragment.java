@@ -19,11 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ActivityViewModelLazyKt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -392,7 +390,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     }
                     Client.Companion.getGlobal().getVoiceSocket().send(
                             GatewayOp.SPEAK,
-                            new Gson().toJsonTree(new Speaking(speaking, "")));
+                            new Gson().toJsonTree(new Speaking(speaking, Client.Companion.getGlobal().getMe().getId())));
                     Client.Companion.getGlobal().getEventBus().postEvent(
                             new VoiceSpeakEvent(
                                     new Speaking(speaking, Client.Companion.getGlobal().getMe().getId())));

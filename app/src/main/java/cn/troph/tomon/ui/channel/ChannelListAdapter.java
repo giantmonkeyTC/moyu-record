@@ -88,9 +88,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void bindChannelForHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof ChannelGroupViewHolder) {
+        if (holder instanceof ChannelGroupViewHolder && mDataList.get(position).getChannel().getType() == ChannelType.CATEGORY) {
             onBindChannelGroupViewHolder((ChannelGroupViewHolder) holder, position);
-        } else {
+        } else if (holder instanceof ChannelViewHolder && mDataList.get(position).getChannel().getType() != ChannelType.CATEGORY) {
             onBindChannelViewHolder((ChannelViewHolder) holder, position);
         }
     }
@@ -141,7 +141,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     if (!mCurrentGuildID.equals(channel.getGuildId())) {
                         return;
                     }
-                    bindChannelForHolder(holder, position);
+                    String eventChannelId = ((VoiceStateUpdateEvent) event).getVoiceUpdate().getChannelId();
+                    if (TextUtils.isEmpty(eventChannelId) || eventChannelId.equals(mDataList.get(position).getChannel().getId()) ) {
+                        bindChannelForHolder(holder, position);
+                    }
                 }
             }
         });
@@ -158,6 +161,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             TextChannel textChannel = (TextChannel) channel;
             holder.setUnreadView(textChannel.getUnread(), textChannel.getMention() > 0);
             setTextChannelLatestMsgDespAndTime(holder, textChannel);
+            holder.itemView.setOnClickListener(null);
         } else if (type == ChannelType.VOICE) {
             holder.tvChannelTime.setVisibility(View.INVISIBLE);
             holder.ivChannelIcon.setImageResource(R.drawable.channel_voice_icon);
@@ -171,6 +175,8 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 }
             });
+        } else {
+            holder.itemView.setOnClickListener(null);
         }
         int indent = channel.getIndent() + 2;
         int marginStart = indent * holder.itemView.getContext().getResources().getDimensionPixelSize(
