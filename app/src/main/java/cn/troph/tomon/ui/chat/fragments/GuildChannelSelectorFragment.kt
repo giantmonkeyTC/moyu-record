@@ -369,9 +369,9 @@ class GuildChannelSelectorFragment : Fragment() {
         } catch (e: Exception) {
             Logger.d(e.message)
             Toast.makeText(
-                requireContext(),
-                R.string.join_voice_fail,
-                Toast.LENGTH_SHORT
+                    requireContext(),
+            R.string.join_voice_fail,
+            Toast.LENGTH_SHORT
             ).show()
         }
     }

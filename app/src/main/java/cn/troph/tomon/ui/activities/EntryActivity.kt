@@ -28,13 +28,13 @@ class EntryActivity : BaseActivity() {
         dataPullingViewModel.dataFetchLD.observe(this, Observer {
             if (it == true) {
                 invite()
-                gotoChat()
+                gotoChannelList()
             }
         })
         dataPullingViewModel.setUpFetchData()
         if (Client.global.loggedIn) {
             invite()
-            gotoChat()
+            gotoChannelList()
         } else {
             Client.global
                 .login()
@@ -117,9 +117,9 @@ class EntryActivity : BaseActivity() {
         finish()
     }
 
-    private fun gotoChat() {
+    private fun gotoChannelList() {
         try {
-            val intent = Intent(this, ChatActivity::class.java)
+            val intent = Intent(this, TomonMainActivity::class.java)
             startActivity(
                 intent,
                 ActivityOptions.makeCustomAnimation(

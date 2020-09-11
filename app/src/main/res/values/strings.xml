@@ -92,15 +92,24 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="guild_list_search_hint">搜索群组名称</string>
+    <string name="channel_tab_text">频道</string>
+    <string name="dm_tab_text">私聊</string>
     <string name="message_update_bar_text">正在编辑消息</string>
     <string name="deleted_name">被注销的账号</string>
-    <string name="regist_successed">注册成功</string>
+    <string name="regist_successed">注册成功</string>s
     <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
     <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
     <string name="select_guild_channel_hint">请先选择群组或者频道</string>
     <string name="member_info_report">举报</string>
     <string name="guild_already_joined">你已经在该群组中</string>
     <string name="guild_joined_success">加入成功</string>
+    <string name="user_joined_guild">%1$s 加入了该群组</string>
+    <string name="attachment_file">[文件]</string>
+    <string name="attachment_image">[图片]</string>
+    <string name="attachment_video">[视频]</string>
+    <string name="msg_desp_stamp">[stamp]</string>
+    <string name="guild_owner_changed">群主转移给了 %1$s</string>
     <string name="goto_dm">发起私聊</string>
     <string name="report_reason">举报原因</string>
     <string name="channel_info">频道详情</string>
@@ -178,4 +187,21 @@
         <item>%1$s加入了，稳(๑ ͡° ͜◡ ͡° ๑)b</item>
         <item>%1$s加入了，群友们洋溢着笑容拍手称快。</item>
     </string-array>
+
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string name="in_a_week">%1$d天前</string>
+    <string name="in_a_year_detailed">%1$d月%2$d日</string>
+    <string name="in_a_year_simple">%1$02d/%2$02d</string>
+    <string name="out_of_a_year_detailed">%1$d年%2$d月%3$d日</string>
+    <string name="out_of_a_year_simple">%1$02d/%2$02d/%3$02d</string>
+    <string name="in_the_future_detailed">你穿越到了%1$d年%2$d月%3$d日</string>
+    <string name="in_the_future_simple">你穿越到了%1$02d/%2$02d/%3$02d</string>
+    <string name="time_stamp_detailed">%1$s %2$s:%3$s</string>
+    <string name="time_stamp_show_time_simple">%1$s:%2$s</string>
+    <string name="voice_channel_no_joined_desp">喂喂喂？</string>
+    <string name="voice_channel_joined_one_desp">%1$s 正在输出</string>
+    <string name="voice_channel_joined_two_desp">%1$s 和 %2$s 正在疯狂输出</string>
+    <string name="voice_channel_alot_joined_desp">%1$s、%2$s 等%3$d人正在疯狂输出</string>
+    <string name="msg_desp_mention">[有人@我]&#160;</string>
 </resources>

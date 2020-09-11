@@ -13,7 +13,7 @@ import java.util.*
 import kotlin.Comparator
 
 open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data),
-    Comparable<GuildChannel> {
+    Comparable<GuildChannel>{
 
     data class MemberPermissionOverwrites(
         val everyone: PermissionOverwrites? = null,

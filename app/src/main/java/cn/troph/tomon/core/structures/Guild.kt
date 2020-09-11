@@ -141,9 +141,9 @@ class Guild(client: Client, data: JsonObject) : Base(client, data), Comparable<G
         val comparator = Comparator<Guild> { o1, o2 ->
             o1.position.compareTo(o2.position)
         }.then(Comparator { o1, o2 ->
-            o1.joinedAt.compareTo(o2.joinedAt)
+            o2.joinedAt.compareTo(o1.joinedAt)
         }).then(Comparator { o1, o2 ->
-            o1.id.snowflake.compareTo(o2.id.snowflake)
+            o2.id.snowflake.compareTo(o1.id.snowflake)
         })
         return comparator.compare(this, other)
     }

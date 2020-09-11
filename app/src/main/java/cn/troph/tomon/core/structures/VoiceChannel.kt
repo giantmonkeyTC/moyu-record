@@ -28,11 +28,14 @@ class VoiceChannel(client: Client, data: JsonObject) :
             userLimit = data["user_limit"].optInt ?: 0
         }
         guild?.let {
-            it.voiceStates.forEach {
-                if (it.channelId == id) {
-                    voiceStates.add(it)
+            isJoined = false
+            it.voiceStates.forEach { vu ->
+                if (vu.channelId == id) {
+                    isJoined = true
+                    voiceStates.add(vu)
                 }
             }
+
         }
     }
 

@@ -75,4 +75,21 @@
     <color name="whiteAlpha60">#9AFFFFFF</color>
     <color name="switchOff">#A2A2A2</color>
     <color name="switchOffShade">#61A2A2A2</color>
+    <!--    Use new color   -->
+    <color name="guildlist_bg">#2E2E2E</color>
+    <color name="white_10">#1AFFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="white_50">#80ffffff</color>
+    <color name="black_50">#80000000</color>
+    <color name="alert_dot">#FF7A6B</color>
+    <color name="no_icon_url_avatar">#4D4D4D</color>
+    <color name="text_color_white">#ffffff</color>
+    <color name="channel_list_tab_bg">#171717</color>
+    <color name="white_60">#99FFFFFF</color>
+    <color name="pinkPrimary">#FF7896</color>
+    <color name="status_online">#67D78E</color>
+    <color name="blackPrimary">#313131</color>
+    <color name="black_20">#33000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="msg_desp_mention">#CDFF7A6B</color>
 </resources>
