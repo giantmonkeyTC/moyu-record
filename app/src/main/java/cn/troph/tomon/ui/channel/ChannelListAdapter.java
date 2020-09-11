@@ -46,6 +46,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<ChannelRV> mDataList = new ArrayList<>();
     private ArrayMap<String, Message> mLastedMessageCache = new ArrayMap<>();
     private String mCurrentGuildID;
+    private OnVoiceChannelItemClickListener mOnVoiceChannelClickListener;
 
     public ChannelListAdapter(ChannelGroupRV root, String guildId) {
         if (root != null) {
@@ -58,6 +59,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         mDataList = root.flatten();
         mCurrentGuildID = guildID;
         notifyDataSetChanged();
+    }
+
+    public void setOnVoiceChannelClickListener(OnVoiceChannelItemClickListener listener) {
+        mOnVoiceChannelClickListener = listener;
     }
 
     @NonNull
@@ -158,6 +163,14 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.ivChannelIcon.setImageResource(R.drawable.channel_voice_icon);
             holder.setUnreadView(false, false);
             setVoiceChannelStateDesp(holder, (VoiceChannel) channel);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnVoiceChannelClickListener != null) {
+                        mOnVoiceChannelClickListener.onVoiceChannelClick((VoiceChannel) channel);
+                    }
+                }
+            });
         }
         int indent = channel.getIndent() + 2;
         int marginStart = indent * holder.itemView.getContext().getResources().getDimensionPixelSize(
@@ -431,5 +444,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ivCategoryExpandStateIcon = itemView.findViewById(R.id.iv_category_expand_state);
             tvCategoryName = itemView.findViewById(R.id.tv_categoty_name);
         }
+    }
+
+    public interface OnVoiceChannelItemClickListener {
+        void onVoiceChannelClick(VoiceChannel channel);
     }
 }

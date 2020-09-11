@@ -175,6 +175,10 @@ public class TomonMainActivity extends BaseActivity {
         mChatVM.setUpEvents();
     }
 
+    public ChatSharedViewModel getActivityViewModel() {
+        return mChatVM;
+    }
+
     private void initGuildEmoji() {
         Client.Companion.getGlobal().getRest().getGuildEmojiService().fetchStampPack(
                 Assets.defaultStampPackId,

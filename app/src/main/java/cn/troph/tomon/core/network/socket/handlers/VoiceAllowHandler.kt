@@ -21,7 +21,7 @@ val handleVoiceStateHandler: Handler = { client, packet ->
             VoiceUpdate::class.java
         )
     )
-    
+
     if (voiceStateUpdateEvent.voiceUpdate.channelId.isEmpty()) {
         var toDelete:VoiceUpdate? = null
         var voiceChannel:VoiceChannel? = null
