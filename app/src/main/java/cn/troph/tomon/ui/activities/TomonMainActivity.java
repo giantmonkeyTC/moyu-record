@@ -3,6 +3,7 @@ package cn.troph.tomon.ui.activities;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -433,6 +434,7 @@ public class TomonMainActivity extends BaseActivity {
 
         if (ChannelListFragment.TAG.equals(mCurrentFragmentTag)) {
             channelListFragment.updateGuildBanner(guildId);
+//            channelListFragment.connectVoiceChannelIfNeeded(guildId);
         } else {
             channelListFragment.setArguments(extraData);
             getSupportFragmentManager().beginTransaction()
@@ -498,5 +500,8 @@ public class TomonMainActivity extends BaseActivity {
         mDrawerLayout.setContentFadeColor(getColor(R.color.black_50));
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

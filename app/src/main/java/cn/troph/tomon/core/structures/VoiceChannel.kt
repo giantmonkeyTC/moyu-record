@@ -32,7 +32,15 @@ class VoiceChannel(client: Client, data: JsonObject) :
             it.voiceStates.forEach { vu ->
                 if (vu.channelId == id) {
                     isJoined = true
-                    voiceStates.add(vu)
+                    val finded = voiceStates.find {
+                        it.userId == vu.userId
+                    }
+                    if (finded == null) {
+                        voiceStates.add(vu)
+                    } else {
+                        val indexOf = voiceStates.indexOf(finded)
+                        voiceStates[indexOf] = vu
+                    }
                 }
             }
 

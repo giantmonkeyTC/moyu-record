@@ -192,4 +192,5 @@
     <string name="voice_channel_joined_two_desp">%1$s 和 %2$s 正在疯狂输出</string>
     <string name="voice_channel_alot_joined_desp">%1$s、%2$s 等%3$d人正在疯狂输出</string>
     <string name="msg_desp_mention">[有人@我]&#160;</string>
+    <string name="me">我</string>
 </resources>

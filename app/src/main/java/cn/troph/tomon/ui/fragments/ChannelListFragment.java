@@ -44,14 +44,15 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
-import cn.troph.tomon.core.events.VoiceLeaveChannelEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
+import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
 import cn.troph.tomon.core.network.socket.GatewayOp;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
@@ -61,8 +62,8 @@ import cn.troph.tomon.core.structures.VoiceConnectSend;
 import cn.troph.tomon.core.structures.VoiceConnectStateReceive;
 import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
+import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
-import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
 import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.channel.ChannelRV;
@@ -126,8 +127,10 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mRtcEngine = null;
         Sensey.getInstance().stop();
         Client.Companion.getGlobal().getSocket().send(GatewayOp.VOICE, new Gson().toJsonTree(new VoiceLeaveConnect()));
-        mWakeLock.release();
-        mWakeLock = null;
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+            mWakeLock = null;
+        }
     }
 
     private void initAgoraEngine() {
@@ -214,11 +217,37 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
         if (mChannelListAdapter == null) {
             mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot, guild.getId());
+            mChannelListAdapter.setChatSharedVM(mChatVM);
             setOnVoiceChannelClickListener();
             registerObserver();
             mRvChannelList.setAdapter(mChannelListAdapter);
+            connectVoiceChannelIfNeeded(guildId);
         } else {
             mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot, guild.getId());
+        }
+    }
+
+    public void connectVoiceChannelIfNeeded(String guildId) {
+        Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
+        if (guild == null) {
+            return;
+        }
+        for (GuildChannel channel : guild.getChannels().clone()) {
+            if (channel instanceof VoiceChannel && ((VoiceChannel) channel).isJoined()) {
+                VoiceChannel voiceChannel = (VoiceChannel) channel;
+                boolean isMeJoined = false;
+                List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
+                for (VoiceUpdate voiceUpdate : voiceStates) {
+                    if (voiceUpdate.getUserId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                        isMeJoined = true;
+                        break;
+                    }
+                }
+                if (isMeJoined) {
+                    mChannelListAdapter.getOnVoiceChannelClickListener().onVoiceChannelClick(voiceChannel);
+                }
+                break;
+            }
         }
     }
 
@@ -329,7 +358,14 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-        VoiceChannel channel = mRtcEngineEventHandler.getCurrentVoiceChannel();
+        connectToVoiceChannel(mRtcEngineEventHandler.getCurrentVoiceChannel());
+    }
+
+    private void connectToVoiceChannel(VoiceChannel channel) {
+        if (channel.isJoined() && mChatVM.getSelectedCurrentVoiceChannel().getValue() == null) {
+            Client.Companion.getGlobal().getSocket().send(GatewayOp.VOICE, new Gson().toJsonTree(new VoiceLeaveConnect()));
+            Client.Companion.getGlobal().getVoiceSocket().open();
+        }
         if (mChatVM.getSelectedCurrentVoiceChannel().getValue() == null) {
             mChatVM.getSwitchingChannelVoiceLD().setValue(false);
             AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -428,7 +464,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     mChatVM.getSwitchingChannelVoiceLD().setValue(false);
                     mChatVM.getSelectedCurrentVoiceChannel().setValue(null);
                     Client.Companion.getGlobal().getEventBus().postEvent(new GuildVoiceSelectorEvent(""));
-                    mWakeLock.release();
+                    if (mWakeLock.isHeld()) {
+                        mWakeLock.release();
+                    }
                     Sensey.getInstance().stopProximityDetection(mProximityListener);
                 }
             });
@@ -438,6 +476,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         @Override
         public void onJoinChannelSuccess(String s, int i, int i1) {
             super.onJoinChannelSuccess(s, i, i1);
+            if (selectedVoiceChannel == null) {
+                return;
+            }
             mainThread.post(new Runnable() {
                 @Override
                 public void run() {

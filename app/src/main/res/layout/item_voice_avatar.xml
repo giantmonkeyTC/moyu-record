@@ -50,6 +50,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:clickable="false"
         app:tib_drawable_off="@drawable/baseline_mic_white_48"
         app:tib_drawable_on="@drawable/baseline_mic_off_white_48"
         />
@@ -59,6 +60,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
+        android:clickable="false"
         app:tib_drawable_off="@drawable/baseline_volume_up_white_48"
         app:tib_drawable_on="@drawable/baseline_volume_off_white_48"
         android:layout_width="20dp"
