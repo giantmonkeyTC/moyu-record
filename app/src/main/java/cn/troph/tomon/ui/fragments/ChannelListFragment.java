@@ -2,6 +2,8 @@ package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -35,6 +37,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.nisrulz.sensey.ProximityDetector;
 import com.github.nisrulz.sensey.Sensey;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -50,6 +53,7 @@ import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
+import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
 import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
@@ -160,6 +164,24 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mRvChannelList = view.findViewById(R.id.rv_channel_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRvChannelList.setLayoutManager(linearLayoutManager);
+        mIvGuildSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGuildSettings();
+            }
+        });
+    }
+
+    private void showGuildSettings() {
+        View viewBase = LayoutInflater.from(getContext()).inflate(R.layout.coordinator_guild_settings, null);
+        BottomSheetDialog dialog = new BottomSheetDialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+        View windowBg = dialog.getWindow().findViewById(R.id.design_bottom_sheet);
+        dialog.setContentView(viewBase);
+        if (windowBg != null) {
+            windowBg.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.show();
+
     }
 
     public void updateGuildBanner(String guildId) {
@@ -252,6 +274,24 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     }
 
     private void registerObserver() {
+        mChatVM.getChannelSyncLD().observe(getViewLifecycleOwner(), new Observer<ChannelSyncEvent>() {
+            @Override
+            public void onChanged(ChannelSyncEvent channelSyncEvent) {
+                String lastGuildId = getArguments().getString(GUILD_ID);
+                if (TextUtils.isEmpty(lastGuildId)) {
+                    lastGuildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
+                }
+                Guild guild = channelSyncEvent.getGuild();
+                if (guild == null) {
+                    return;
+                }
+                String syncGuildId = guild.getId();
+                if (syncGuildId.equals(lastGuildId)) {
+                    updateGuildBanner(syncGuildId);
+                }
+            }
+        });
+
         mChatVM.getVoiceSocketLeaveLD().observe(getViewLifecycleOwner(), new Observer<VoiceConnectStateReceive>() {
             @Override
             public void onChanged(VoiceConnectStateReceive voiceConnectStateReceive) {

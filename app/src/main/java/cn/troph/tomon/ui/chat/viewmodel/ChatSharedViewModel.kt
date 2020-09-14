@@ -122,6 +122,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val guildUpdateLD: MutableLiveData<GuildUpdateEvent> = MutableLiveData()
 
+    val channelSyncLD: MutableLiveData<ChannelSyncEvent> = MutableLiveData()
+
     fun setUpEvents() {
 
         AppState.global.channelSelection.observable
@@ -255,6 +257,9 @@ class ChatSharedViewModel : ViewModel() {
         })
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
             messageAtMeLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>().subscribe(Consumer {
+            channelSyncLD.value = it
         })
     }
 

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_guild_settings"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_bottom_sheet">
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/margin_12dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="@dimen/margin_24dp" />
+
+    <TextView
+        android:id="@+id/tv_guild_settings_guild_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_16"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Troph 救援团救援团救援团救援团救援团救援团救援团救援团救援团"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/imageView5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/margin_12dp" />
+
+    <ImageView
+        android:id="@+id/iv_member"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="16.5dp"
+        android:src="@drawable/member_icon"
+        app:layout_constraintStart_toStartOf="@+id/imageView5"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+
+    <TextView
+        android:id="@+id/tv_member_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="13位成员"
+        android:textColor="@color/white_50"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_member"
+        app:layout_constraintStart_toEndOf="@+id/iv_member"
+        app:layout_constraintTop_toTopOf="@+id/iv_member" />
+
+    <Button
+        android:id="@+id/btn_leave_group"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="@dimen/margin_22dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bottom_sheet_button"
+        android:text="@string/leave_group"
+        android:textColor="@color/alert"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/tv_member_info" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

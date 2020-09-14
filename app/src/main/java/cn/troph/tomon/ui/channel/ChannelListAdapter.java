@@ -68,6 +68,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    public String getCurrentGuildId() {
+        return mCurrentGuildID;
+    }
+
     public void setOnVoiceChannelClickListener(OnVoiceChannelItemClickListener listener) {
         mOnVoiceChannelClickListener = listener;
     }

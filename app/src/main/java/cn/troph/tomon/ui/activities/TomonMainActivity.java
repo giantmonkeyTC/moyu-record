@@ -535,7 +535,7 @@ public class TomonMainActivity extends BaseActivity {
         View viewBase = LayoutInflater.from(this).inflate(R.layout.coordinator_join_guild, null);
         View bottomSheetView = viewBase.findViewById(R.id.bottom_sheet_join_guild);
         EditText etLink = bottomSheetView.findViewById(R.id.bs_textfield);
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.CustomBottomSheetDialogTheme);
         dialog.setContentView(viewBase);
         View windowBg = dialog.getWindow().findViewById(R.id.design_bottom_sheet);
         if (windowBg != null) {
