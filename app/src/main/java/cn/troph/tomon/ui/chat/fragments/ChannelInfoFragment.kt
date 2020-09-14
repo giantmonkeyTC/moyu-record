@@ -18,6 +18,7 @@ import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.ui.chat.emoji.EmojiFragment
 import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
+import cn.troph.tomon.ui.chat.ui.NestedScrollViewPager
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
@@ -29,7 +30,6 @@ import kotlinx.android.synthetic.main.fragment_channel_panel.*
 class ChannelInfoFragment : Fragment() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var viewPager: ViewPager
-    private val mChatSharedViewModel:ChatSharedViewModel by activityViewModels()
     private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
 
     private var channelId: String? = null
@@ -56,54 +56,53 @@ class ChannelInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        viewPagerAdapter =
-//            ViewPagerAdapter(requireFragmentManager())
-//        viewPager = view.findViewById(R.id.channel_info_viewpager)
-//        viewPager.adapter = viewPagerAdapter
+        viewPagerAdapter =
+            ViewPagerAdapter(requireFragmentManager())
+        viewPager = view.findViewById(R.id.channel_info_viewpager)
+        viewPager.adapter = viewPagerAdapter
 //        channel_info_description.setText("三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二")
         chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
             channelId = it.channelId
         })
-
-        chatSharedViewModel.presenceUpdateLV.observe(viewLifecycleOwner, Observer {
-            channelId?.let { it1 ->
-                if (Client.global.channels[it1] !is DmChannel)
-                    chatSharedViewModel.loadMemberList(it1)
-                else if (Client.global.channels[it1] is DmChannel)
-                    chatSharedViewModel.loadDmMemberList(it1)
-            }
-        })
-       
-        chatSharedViewModel.memberLiveData.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it,requireContext())
-                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
-                channel_info_member_list.adapter = mAdapter
-                if (channel_info_member_list.itemDecorationCount > 0) {
-                    channel_info_member_list.removeItemDecorationAt(0)
-                }
-                val headersDecor = StickyRecyclerHeadersDecoration(mAdapter)
-                channel_info_member_list.addItemDecoration(headersDecor)
-                mAdapter.notifyDataSetChanged()
-                mAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-                    override fun onChanged() {
-                        headersDecor.invalidateHeaders()
-                    }
-                })
-            }
-        })
-        chatSharedViewModel.dmMemberLiveData.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                val mAdapter: MemberListAdapter<User> = MemberListAdapter(it,requireContext())
-                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
-                channel_info_member_list.adapter = mAdapter
-                if (channel_info_member_list.itemDecorationCount > 0) {
-                    channel_info_member_list.removeItemDecorationAt(0)
-                }
-                mAdapter.notifyDataSetChanged()
-                channel_info_member_list.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
-            }
-        })
+//        chatSharedViewModel.presenceUpdateLV.observe(viewLifecycleOwner, Observer {
+//            channelId?.let { it1 ->
+//                if (Client.global.channels[it1] !is DmChannel)
+//                    chatSharedViewModel.loadMemberList(it1)
+//                else if (Client.global.channels[it1] is DmChannel)
+//                    chatSharedViewModel.loadDmMemberList(it1)
+//            }
+//        })
+//
+//        chatSharedViewModel.memberLiveData.observe(viewLifecycleOwner, Observer {
+//            it?.let {
+//                val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it,requireContext())
+//                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
+//                channel_info_member_list.adapter = mAdapter
+//                if (channel_info_member_list.itemDecorationCount > 0) {
+//                    channel_info_member_list.removeItemDecorationAt(0)
+//                }
+//                val headersDecor = StickyRecyclerHeadersDecoration(mAdapter)
+//                channel_info_member_list.addItemDecoration(headersDecor)
+//                mAdapter.notifyDataSetChanged()
+//                mAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+//                    override fun onChanged() {
+//                        headersDecor.invalidateHeaders()
+//                    }
+//                })
+//            }
+//        })
+//        chatSharedViewModel.dmMemberLiveData.observe(viewLifecycleOwner, Observer {
+//            it?.let {
+//                val mAdapter: MemberListAdapter<User> = MemberListAdapter(it,requireContext())
+//                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
+//                channel_info_member_list.adapter = mAdapter
+//                if (channel_info_member_list.itemDecorationCount > 0) {
+//                    channel_info_member_list.removeItemDecorationAt(0)
+//                }
+//                mAdapter.notifyDataSetChanged()
+//                channel_info_member_list.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
+//            }
+//        })
    
    
     }

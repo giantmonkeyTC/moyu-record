@@ -36,6 +36,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView
+        android:id="@+id/channel_info_scroll_view"
         android:layout_width="0dp"
         android:fillViewport="true"
         android:layout_height="0dp"
@@ -45,130 +46,159 @@
         app:layout_constraintTop_toBottomOf="@id/channel_info_actionbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/channel_info_header"
+            android:id="@+id/channel_info_scroll_section"
             android:layout_width="match_parent"
             android:background="@color/blackAlpha20"
             android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="48dp"
-                android:layout_marginTop="5dp"
-                android:src="@drawable/channel_info_icon"
-                app:layout_constraintEnd_toStartOf="@+id/channel_info_channel_name"
-                app:layout_constraintHorizontal_bias="0.5"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:id="@+id/channel_info_header"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/channel_info_channel_name" />
+                android:paddingBottom="32dp"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/imageView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/channel_info_icon"
+                    app:layout_constraintEnd_toStartOf="@+id/channel_info_channel_name"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/channel_info_channel_name" />
 
-            <TextView
-                android:id="@+id/channel_info_channel_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="48dp"
-                android:maxLines="3"
-                android:text="@string/overflow_test_string"
-                android:textColor="@color/primaryText"
-                android:textSize="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageView6"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/channel_info_channel_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="48dp"
+                    android:maxLines="3"
+                    android:text="@string/overflow_test_string"
+                    android:textColor="@color/primaryText"
+                    android:textSize="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/imageView6"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/channel_info_guild_name"
-                style="@style/no_overflow_name_style"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="44dp"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="@string/overflow_test_string"
-                android:textColor="@color/whiteAlpha50"
-                android:textSize="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
+                <TextView
+                    android:id="@+id/channel_info_guild_name"
+                    style="@style/no_overflow_name_style"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="44dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/overflow_test_string"
+                    android:textColor="@color/whiteAlpha50"
+                    android:textSize="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/channel_info_channel_name" />
+
+                <ImageView
+                    android:id="@+id/channel_info_invite"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="32dp"
+                    android:src="@drawable/channel_info_invite"
+                    app:layout_constraintEnd_toStartOf="@+id/channel_info_mute"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/channel_info_guild_name" />
+
+                <TextView
+                    android:id="@+id/channel_info_invite_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/channel_info_invite"
+                    android:textColor="@color/whiteAlpha70"
+                    android:textSize="12dp"
+                    app:layout_constraintEnd_toEndOf="@id/channel_info_invite"
+                    app:layout_constraintStart_toStartOf="@id/channel_info_invite"
+                    app:layout_constraintTop_toBottomOf="@id/channel_info_invite" />
+
+                <ImageView
+                    android:id="@+id/channel_info_mute"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="88dp"
+                    android:layout_marginTop="32dp"
+                    android:src="@drawable/channel_info_mute"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/channel_info_invite"
+                    app:layout_constraintTop_toBottomOf="@+id/channel_info_guild_name" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/channel_info_mute"
+                    android:textColor="@color/whiteAlpha70"
+                    android:textSize="12dp"
+                    app:layout_constraintEnd_toEndOf="@id/channel_info_mute"
+                    app:layout_constraintStart_toStartOf="@id/channel_info_mute"
+                    app:layout_constraintTop_toBottomOf="@id/channel_info_mute" />
+
+                <TextView
+                    android:id="@+id/channel_info_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_button_logout"
+                    android:backgroundTint="@color/whiteAlpha10"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="32dp"
+                    android:textColor="@color/whiteAlpha60"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="12dp"
+                    android:text="本频道是用来欢迎新同学同时用来灌水的，其余的只要不搞黄色都欢迎。本频道是用来欢迎新同学同时用来灌水的。"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/channel_info_invite_text" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/channel_info_tab"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:tabTextColor="@color/primaryText"
+                android:background="@color/background3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/channel_info_channel_name" />
+                app:layout_constraintTop_toBottomOf="@id/channel_info_header"
+                >
+                <com.google.android.material.tabs.TabItem
+                    android:text="成员"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <com.google.android.material.tabs.TabItem
+                    android:text="\@我"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </com.google.android.material.tabs.TabLayout>
 
-            <ImageView
-                android:id="@+id/channel_info_invite"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="32dp"
-                android:src="@drawable/channel_info_invite"
-                app:layout_constraintEnd_toStartOf="@+id/channel_info_mute"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/channel_info_guild_name" />
-
-            <TextView
-                android:id="@+id/channel_info_invite_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/channel_info_invite"
-                android:textColor="@color/whiteAlpha70"
-                android:textSize="12dp"
-                app:layout_constraintEnd_toEndOf="@id/channel_info_invite"
-                app:layout_constraintStart_toStartOf="@id/channel_info_invite"
-                app:layout_constraintTop_toBottomOf="@id/channel_info_invite" />
-
-            <ImageView
-                android:id="@+id/channel_info_mute"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="88dp"
-                android:layout_marginTop="32dp"
-                android:src="@drawable/channel_info_mute"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/channel_info_invite"
-                app:layout_constraintTop_toBottomOf="@+id/channel_info_guild_name" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/channel_info_mute"
-                android:textColor="@color/whiteAlpha70"
-                android:textSize="12dp"
-                app:layout_constraintEnd_toEndOf="@id/channel_info_mute"
-                app:layout_constraintStart_toStartOf="@id/channel_info_mute"
-                app:layout_constraintTop_toBottomOf="@id/channel_info_mute" />
-
-            <TextView
-                android:id="@+id/channel_info_description"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/shape_button_logout"
-                android:backgroundTint="@color/whiteAlpha10"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="32dp"
-                android:textColor="@color/whiteAlpha60"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="12dp"
-                android:text="本频道是用来欢迎新同学同时用来灌水的，其余的只要不搞黄色都欢迎。本频道是用来欢迎新同学同时用来灌水的。"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/channel_info_invite_text" />
             <androidx.viewpager.widget.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/channel_info_viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
                 android:background="@color/background3"
-                app:layout_constraintTop_toBottomOf="@id/channel_info_description"
+                app:layout_constraintTop_toBottomOf="@id/channel_info_tab"
                 />
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/channel_info_member_list"
-                android:layout_marginTop="32dp"
-                android:background="@color/background3"
-                app:layout_constraintTop_toBottomOf="@id/channel_info_description"
-                />
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/channel_info_member_list"-->
+<!--                android:layout_marginTop="32dp"-->
+<!--                android:background="@color/background3"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/channel_info_description"-->
+<!--                />-->
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView>

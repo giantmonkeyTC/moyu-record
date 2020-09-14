@@ -41,7 +41,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="14dp"
-        android:textSize="12dp"
+        android:textSize="15dp"
         android:ellipsize="end"
         app:layout_constraintEnd_toEndOf="parent"
         android:maxLines="1"
