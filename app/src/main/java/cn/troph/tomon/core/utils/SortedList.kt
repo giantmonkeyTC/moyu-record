@@ -51,4 +51,8 @@ class SortedList<T>(
         else -> findEquals(index + step, element, step)
     }
 
+    fun toList(): MutableList<T> {
+        return list
+    }
+
 }

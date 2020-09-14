@@ -120,6 +120,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val guildDeleteLD: MutableLiveData<GuildDeleteEvent> = MutableLiveData()
 
+    val guildUpdateLD: MutableLiveData<GuildUpdateEvent> = MutableLiveData()
+
     fun setUpEvents() {
 
         AppState.global.channelSelection.observable
@@ -243,6 +245,10 @@ class ChatSharedViewModel : ViewModel() {
         )
         Client.global.eventBus.observeEventOnUi<GuildDeleteEvent>().subscribe(Consumer {
             guildDeleteLD.value = it
+        })
+
+        Client.global.eventBus.observeEventOnUi<GuildUpdateEvent>().subscribe(Consumer {
+            guildUpdateLD.value = it
         })
         Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
             messageReadLD.value = it

@@ -1,7 +1,5 @@
 package cn.troph.tomon.ui.guild;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,38 +10,45 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.core.structures.TextChannel;
-import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.utils.GuildUtils;
 
 public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.ViewHolder> {
 
     private List<Guild> mGuildList;
     private String mCurrentGuildId;
+    private boolean mIsInviting = false;
     private OnItemClickListener mOnItemClickListener;
 
-    public GuildListAdapter(List<Guild> guilds) {
-        mGuildList = guilds;
+    public GuildListAdapter(List<Guild> guilds, String filter) {
+        filterGuildList(guilds, filter);
+    }
+
+    private void filterGuildList(List<Guild> newGuilds, String filter) {
+        if (TextUtils.isEmpty(filter)) {
+            mGuildList = newGuilds;
+        } else {
+            mGuildList = new ArrayList<>();
+            for (Guild guild : newGuilds) {
+                if (guild.getName().contains(filter)) {
+                    mGuildList.add(guild);
+                }
+            }
+        }
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         mOnItemClickListener = listener;
     }
 
-    public void setDataAndNotifyChanged(List<Guild> newGuilds) {
-        if (mGuildList != null) {
-            mGuildList.clear();
-        }
-        mGuildList = newGuilds;
+    public void setDataAndNotifyChanged(List<Guild> newGuilds, String filter) {
+        filterGuildList(newGuilds, filter);
         notifyDataSetChanged();
     }
 
@@ -121,6 +126,14 @@ public class GuildListAdapter extends RecyclerView.Adapter<GuildListAdapter.View
     @Override
     public int getItemCount() {
         return mGuildList.size();
+    }
+
+    public void setIsInviting(boolean isInviting) {
+        mIsInviting = isInviting;
+    }
+
+    public boolean isInviting() {
+        return mIsInviting;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -4,6 +4,8 @@
     android:layout_gravity="start"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:background="@color/guildlist_bg">
 
     <EditText
@@ -15,7 +17,7 @@
         android:layout_marginTop="@dimen/margin_47dp"
         android:layout_marginBottom="@dimen/margin_22dp"
         android:layout_marginEnd="@dimen/margin_24dp"
-        android:focusable="false"
+        android:textColor="@color/white"
         android:background="@drawable/shape_guild_list_search"
         android:drawableStart="@drawable/guild_list_search_icon"
         android:drawablePadding="@dimen/guild_list_search_padding"
