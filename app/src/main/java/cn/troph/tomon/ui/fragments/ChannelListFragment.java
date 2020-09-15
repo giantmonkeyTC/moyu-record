@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -17,12 +18,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -37,6 +42,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.nisrulz.sensey.ProximityDetector;
 import com.github.nisrulz.sensey.Sensey;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
@@ -53,13 +59,14 @@ import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
+import cn.troph.tomon.core.collections.GuildMemberCollection;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
-import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
 import cn.troph.tomon.core.network.socket.GatewayOp;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.core.structures.GuildMember;
 import cn.troph.tomon.core.structures.Speaking;
 import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceConnectSend;
@@ -74,8 +81,13 @@ import cn.troph.tomon.ui.channel.ChannelRV;
 import cn.troph.tomon.ui.chat.fragments.VoiceBottomSheet;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
+import cn.troph.tomon.ui.widgets.TomonToast;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Response;
 
 public class ChannelListFragment extends Fragment implements PermissionListener {
 
@@ -91,6 +103,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private RecyclerView mRvChannelList;
     private ChannelListAdapter mChannelListAdapter;
     private ChannelGroupRV mChannelTreeRoot;
+    private Guild mCurrentGuild;
     private RtcEngine mRtcEngine;
     private ChatSharedViewModel mChatVM;
     private PowerManager.WakeLock mWakeLock;
@@ -145,7 +158,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 mRtcEngine.enableAudioVolumeIndication(200, 3, true);
             } catch (Exception e) {
                 Log.e(TAG, "RtcEngine create error:", e);
-                Toast.makeText(
+                TomonToast.makeText(
                         getContext().getApplicationContext(),
                         R.string.join_voice_fail,
                         Toast.LENGTH_SHORT
@@ -173,6 +186,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     }
 
     private void showGuildSettings() {
+        if (mCurrentGuild == null) {
+            return;
+        }
         View viewBase = LayoutInflater.from(getContext()).inflate(R.layout.coordinator_guild_settings, null);
         BottomSheetDialog dialog = new BottomSheetDialog(getContext(), R.style.CustomBottomSheetDialogTheme);
         View windowBg = dialog.getWindow().findViewById(R.id.design_bottom_sheet);
@@ -180,8 +196,155 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         if (windowBg != null) {
             windowBg.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
+        View bottomSheetView = viewBase.findViewById(R.id.bottom_sheet_guild_settings);
+        initGuildSettingsHeader(bottomSheetView);
+        initNickNameButton(bottomSheetView);
+        initLeaveGroupButton(dialog, bottomSheetView);
+        initMuteButton(bottomSheetView);
+        setPeekHeight(dialog, bottomSheetView);
         dialog.show();
+    }
 
+    private void initMuteButton(View bottomSheetView) {
+        ConstraintLayout clMute = bottomSheetView.findViewById(R.id.cl_guild_mute);
+        clMute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    private void setPeekHeight(BottomSheetDialog dialog, View bottomSheetView) {
+        int marginBottom = getContext().getResources().getDimensionPixelSize(R.dimen.btn_leave_group_margin_bottom);
+        int height = getContext().getResources().getDimensionPixelSize(R.dimen.btn_leave_group_height);
+        int hideHeight = (int) (marginBottom + (3.0 * height) / 4);
+        bottomSheetView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                bottomSheetView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int sheetHeight = bottomSheetView.getHeight();
+                BottomSheetBehavior<FrameLayout> behavior = dialog.getBehavior();
+                behavior.setPeekHeight(sheetHeight - hideHeight, true);
+                behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                            behavior.setHideable(true);
+                            behavior.setSkipCollapsed(true);
+                        }
+                    }
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    private void initNickNameButton(View bottomSheetView) {
+        TextView tvNickName = bottomSheetView.findViewById(R.id.tv_guild_nickname);
+        GuildMember meMember = mCurrentGuild.getMembers().get(Client.Companion.getGlobal().getMe().getId());
+        tvNickName.setText(meMember.getDisplayName());
+        ConstraintLayout clGuildNickName = bottomSheetView.findViewById(R.id.cl_guild_nickname);
+        clGuildNickName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showChangeNickNameDialog();
+            }
+        });
+    }
+
+    private void initLeaveGroupButton(BottomSheetDialog dialog, View bottomSheetView) {
+        Button leaveGroup = bottomSheetView.findViewById(R.id.btn_leave_group);
+        leaveGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCurrentGuild.getOwnerId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                    showOwnerDialog();
+                } else {
+                    showLeaveAlertDialog();
+                }
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void initGuildSettingsHeader(View bottomSheetView) {
+        ImageView guildAvatar = bottomSheetView.findViewById(R.id.iv_guild_avatar);
+        TextView textHolder = bottomSheetView.findViewById(R.id.tv_no_icon_text);
+        GuildAvatarUtils.setGuildAvatar(guildAvatar, textHolder, mCurrentGuild);
+        TextView guildName = bottomSheetView.findViewById(R.id.tv_guild_settings_guild_name);
+        guildName.setText(mCurrentGuild.getName());
+        TextView memberInfo = bottomSheetView.findViewById(R.id.tv_member_info);
+        GuildMemberCollection members = mCurrentGuild.getMembers();
+        memberInfo.setText(getString(R.string.guild_member_number, members.getSize()));
+    }
+
+    private void showChangeNickNameDialog() {
+        TomonToast.makeText(getContext().getApplicationContext(), "没开发呢", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showLeaveAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View viewBase = View.inflate(getContext(), R.layout.leave_alert_dialog, null);
+        Button btnOk = viewBase.findViewById(R.id.btn_ok);
+        Button btnCancel = viewBase.findViewById(R.id.btn_cancel);
+        builder.setView(viewBase);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().getDecorView().setBackground(new ColorDrawable(Color.TRANSPARENT));
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestLeaveGroup(dialog);
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showOwnerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View viewBase = View.inflate(getContext(), R.layout.owner_dialog, null);
+        Button btnOk = viewBase.findViewById(R.id.btn_ok);
+        builder.setView(viewBase);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().getDecorView().setBackground(new ColorDrawable(Color.TRANSPARENT));
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void requestLeaveGroup(AlertDialog dialog) {
+        Client.Companion.getGlobal().getRest().getGuildService().leaveGuild(
+                mCurrentGuild.getId(),
+                Client.Companion.getGlobal().getAuth())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<Response<Integer>>() {
+                    @Override
+                    public void accept(Response<Integer> response) throws Throwable {
+                        TomonToast.makeText(getContext().getApplicationContext(), "成功离开群组", Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        TomonToast.makeText(getContext().getApplicationContext(), "请重试", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "error:", throwable);
+                    }
+                });
     }
 
     public void updateGuildBanner(String guildId) {
@@ -192,6 +355,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         if (guild == null) {
             return;
         }
+        mCurrentGuild = guild;
         GuildAvatarUtils.setGuildAvatar(mIvGuildAvater, mTvGuildAvaterTextHolder, guild);
         mTvGuildName.setText(guild.getName());
         Glide.with(mIvGuildBanner).clear(mIvGuildBanner);
@@ -277,13 +441,19 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mChatVM.getChannelSyncLD().observe(getViewLifecycleOwner(), new Observer<ChannelSyncEvent>() {
             @Override
             public void onChanged(ChannelSyncEvent channelSyncEvent) {
-                String lastGuildId = getArguments().getString(GUILD_ID);
-                if (TextUtils.isEmpty(lastGuildId)) {
-                    lastGuildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
-                }
                 Guild guild = channelSyncEvent.getGuild();
                 if (guild == null) {
                     return;
+                }
+                String lastGuildId = null;
+                if (mCurrentGuild != null) {
+                    lastGuildId = mCurrentGuild.getId();
+                }
+                if (TextUtils.isEmpty(lastGuildId)) {
+                    lastGuildId = getArguments().getString(GUILD_ID);
+                }
+                if (TextUtils.isEmpty(lastGuildId)) {
+                    lastGuildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
                 }
                 String syncGuildId = guild.getId();
                 if (syncGuildId.equals(lastGuildId)) {
@@ -427,7 +597,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-        Toast.makeText(
+        TomonToast.makeText(
                 getContext(),
                 R.string.join_permission_msg,
                 Toast.LENGTH_SHORT

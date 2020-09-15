@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
+import retrofit2.Response
 import retrofit2.http.*
 
 interface GuildService {
@@ -44,6 +45,18 @@ interface GuildService {
         @Header("Authorization") token: String
     ): Observable<JsonObject>
 
+    data class MuteGuildRequest(
+        @SerializedName("mute")
+        val mute: Boolean
+    )
+
+    @PATCH("users/@me/guilds/{id}/settings")
+    fun muteGuild(
+        @Path("id") id: String,
+        @Body request: MuteGuildRequest,
+        @Header("Authorization") token: String
+    ): Observable<JsonObject>
+
     @DELETE("guilds/{id}")
     fun deleteGuild(
         @Path("id") id: String,
@@ -54,7 +67,7 @@ interface GuildService {
     fun leaveGuild(
         @Path("id") id: String,
         @Header("Authorization") token: String
-    ): Observable<Void>
+    ): Observable<Response<Integer>>
 
 
 }

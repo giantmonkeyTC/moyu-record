@@ -8,7 +8,7 @@
     android:background="@drawable/shape_bottom_sheet">
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/iv_guild_avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -36,13 +36,14 @@
         android:layout_marginStart="@dimen/margin_16"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textSize="18dp"
         android:text="Troph 救援团救援团救援团救援团救援团救援团救援团救援团救援团"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_guild_avatar"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
-        app:layout_constraintTop_toTopOf="@+id/imageView5" />
+        app:layout_constraintStart_toEndOf="@+id/iv_guild_avatar"
+        app:layout_constraintTop_toTopOf="@+id/iv_guild_avatar" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -57,27 +58,130 @@
         android:layout_height="10dp"
         android:layout_marginTop="16.5dp"
         android:src="@drawable/member_icon"
-        app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+        app:layout_constraintStart_toStartOf="@+id/iv_guild_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/iv_guild_avatar" />
 
     <TextView
         android:id="@+id/tv_member_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="13位成员"
+        android:text="@string/guild_member_number"
         android:textColor="@color/white_50"
         android:textSize="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/iv_member"
         app:layout_constraintStart_toEndOf="@+id/iv_member"
         app:layout_constraintTop_toTopOf="@+id/iv_member" />
 
-    <Button
-        android:id="@+id/btn_leave_group"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_guild_nickname"
         android:layout_width="0dp"
         android:layout_height="46dp"
         android:layout_marginTop="@dimen/margin_22dp"
-        android:layout_marginBottom="24dp"
+        android:background="@drawable/item_settings_top_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/tv_member_info" >
+
+        <TextView
+            android:id="@+id/tv_guild_nickname_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/guild_nick_name"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_guild_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="owl"
+            android:textColor="@color/white_50"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_change_guild_nickname"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/tv_guild_nickname_title"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_change_guild_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/settings_enter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_guild_mute"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:background="@drawable/item_settings_normal_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/cl_guild_nickname">
+
+        <TextView
+            android:id="@+id/tv_guild_mute_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/guild_mute"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:layout_width="34dp"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:layout_marginEnd="12dp"
+            android:checked="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_guild_read"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
+        android:background="@drawable/item_settings_bottom_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/cl_guild_mute">
+
+        <TextView
+            android:id="@+id/tv_guild_read_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/mark_guild_read"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btn_leave_group"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/btn_leave_group_height"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="@dimen/btn_leave_group_margin_bottom"
         android:background="@drawable/bottom_sheet_button"
         android:text="@string/leave_group"
         android:textColor="@color/alert"
@@ -85,6 +189,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/tv_member_info" />
+        app:layout_constraintTop_toBottomOf="@+id/cl_guild_read" />
+
+    <TextView
+        android:id="@+id/tv_no_icon_text"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="18dp"
+        android:textColor="@color/text_color_white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_guild_avatar"
+        app:layout_constraintEnd_toEndOf="@+id/iv_guild_avatar"
+        app:layout_constraintStart_toStartOf="@+id/iv_guild_avatar"
+        app:layout_constraintTop_toTopOf="@+id/iv_guild_avatar"
+        tools:text="T"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

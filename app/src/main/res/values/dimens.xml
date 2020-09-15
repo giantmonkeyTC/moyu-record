@@ -107,4 +107,9 @@
     <dimen name="channel_unread_dot_content_height">6dp</dimen>
     <dimen name="channel_list_icon_margin_top">1dp</dimen>
     <dimen name="item_channel_list_margin_top">8dp</dimen>
+    <dimen name="guild_setting_width">24dp</dimen>
+    <dimen name="guild_setting_height">24dp</dimen>
+    <dimen name="btn_leave_group_margin_bottom">24dp</dimen>
+    <dimen name="btn_leave_group_margin_top">24dp</dimen>
+    <dimen name="btn_leave_group_height">46dp</dimen>
 </resources>

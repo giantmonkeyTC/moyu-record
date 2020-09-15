@@ -61,6 +61,7 @@ import cn.troph.tomon.ui.guild.GuildListAdapter;
 import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
 import cn.troph.tomon.ui.widgets.TomonTabButton;
+import cn.troph.tomon.ui.widgets.TomonToast;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -555,7 +556,7 @@ public class TomonMainActivity extends BaseActivity {
                 } else if (inviteCode.contains(Url.inviteUrl)) {
                     inviteCode = Url.INSTANCE.parseInviteCode(inviteCode);
                 } else {
-                    Toast.makeText(getApplicationContext(),
+                    TomonToast.makeText(getApplicationContext(),
                             getString(R.string.invalid_invite),
                             Toast.LENGTH_LONG).show();
                     return;
@@ -570,7 +571,7 @@ public class TomonMainActivity extends BaseActivity {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        Toast.makeText(getApplicationContext(),
+                        TomonToast.makeText(getApplicationContext(),
                                 getString(R.string.invalid_invite),
                                 Toast.LENGTH_LONG).show();
                     }
@@ -594,7 +595,7 @@ public class TomonMainActivity extends BaseActivity {
             return;
         }
         if (invite.getJoined()) {
-            Toast.makeText(
+            TomonToast.makeText(
                     getApplicationContext(),
                     getString(R.string.guild_already_joined),
                     Toast.LENGTH_LONG
@@ -607,7 +608,7 @@ public class TomonMainActivity extends BaseActivity {
             @Override
             public void accept(Guild guild) throws Throwable {
                 dialog.dismiss();
-                Toast.makeText(getApplicationContext(),
+                TomonToast.makeText(getApplicationContext(),
                         getString(R.string.guild_joined_success),
                         Toast.LENGTH_LONG).show();
                 mAdapter.setIsInviting(true);

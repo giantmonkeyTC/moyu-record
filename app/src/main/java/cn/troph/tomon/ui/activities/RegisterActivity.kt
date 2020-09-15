@@ -24,6 +24,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.Validator
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import cn.troph.tomon.ui.widgets.TomonToast
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -98,7 +99,7 @@ class RegisterActivity : AppCompatActivity() {
                     password = passwd,
                     unionId = unionId
                 ).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                    Toast.makeText(applicationContext, getString(R.string.regist_successed), Toast.LENGTH_LONG).show()
+                    TomonToast.makeText(applicationContext, getString(R.string.regist_successed), Toast.LENGTH_LONG).show()
                     gotoEntryOption()
                 }, {
                     it.message?.let {

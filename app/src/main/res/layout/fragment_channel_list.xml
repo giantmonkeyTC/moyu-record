@@ -54,8 +54,8 @@
 
     <ImageView
         android:id="@+id/iv_guild_setting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/guild_setting_width"
+        android:layout_height="@dimen/guild_setting_height"
         android:layout_marginEnd="@dimen/margin_24dp"
         android:background="@drawable/guild_setting"
         app:layout_constraintBottom_toBottomOf="@+id/iv_guild_avatar"
@@ -74,6 +74,7 @@
         app:layout_constraintStart_toStartOf="@+id/iv_guild_avatar"
         app:layout_constraintTop_toTopOf="@+id/iv_guild_avatar"
         tools:text="T"
+        android:textSize="18dp"
         tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
