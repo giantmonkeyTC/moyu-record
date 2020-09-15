@@ -33,6 +33,18 @@
             app:layout_constraintBottom_toBottomOf="@+id/btn_back"
             app:layout_constraintStart_toEndOf="@id/btn_back"
             app:layout_constraintTop_toTopOf="@+id/btn_back" />
+        <TextView
+            android:id="@+id/channel_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/channel_info"
+            android:textColor="@color/primaryText"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+            app:layout_constraintStart_toEndOf="@id/btn_back"
+            app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -77,6 +77,7 @@ class ChannelInfoFragment : Fragment() {
             view.findViewById<ExpandableTextView>(R.id.channel_info_description)
         val expandIcon = view.findViewById<ImageView>(R.id.ic_expand_text)
         val channelInfo = view.findViewById<TextView>(R.id.channel_info)
+        channel_info_name.setText("哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈")
         channelInfoDescription.setInterpolator(OvershootInterpolator())
         channelInfoDescription.setText("哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈")
         channelInfoDescription.post {
@@ -97,6 +98,10 @@ class ChannelInfoFragment : Fragment() {
         AppState.global.scrollPercent.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 channelInfo.alpha = 1 - it
+                if (it == 1f)
+                    channel_info_name.visibility = View.VISIBLE
+                else
+                    channel_info_name.visibility = View.GONE
             }
         expandIcon.setOnClickListener {
             if (channelInfoDescription.isExpanded) {
