@@ -21,12 +21,10 @@
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents">
+    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@color/blackPrimary</item>
-        <item name="colorOnSurface">@color/pinkPrimary</item>
-        <item name="colorSecondary">@color/shrine_pink_100</item>
     </style>s
 
     <style name="AppTheme.NoTitle">
