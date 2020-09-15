@@ -1,35 +1,52 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.*
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import at.blogc.android.views.ExpandableTextView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.ui.chat.emoji.EmojiFragment
 import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
 import cn.troph.tomon.ui.chat.members.MemberListAdapter
 import cn.troph.tomon.ui.chat.ui.NestedScrollViewPager
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import cn.troph.tomon.ui.states.AppState
+import com.google.android.material.tabs.TabItem
+import com.google.android.material.tabs.TabLayout
+import com.orhanobut.logger.Logger
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
 import kotlinx.android.synthetic.main.fragment_channel_member.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
+import kotlin.math.exp
 
 
 class ChannelInfoFragment : Fragment() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
-    private lateinit var viewPager: ViewPager
+    private lateinit var viewPager: NestedViewPager
+    private lateinit var tabLayout: TabLayout
     private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
 
     private var channelId: String? = null
@@ -56,65 +73,108 @@ class ChannelInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val channelInfoDescription =
+            view.findViewById<ExpandableTextView>(R.id.channel_info_description)
+        val expandIcon = view.findViewById<ImageView>(R.id.ic_expand_text)
+        val channelInfo = view.findViewById<TextView>(R.id.channel_info)
+        channelInfoDescription.setInterpolator(OvershootInterpolator())
+        channelInfoDescription.setText("哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈")
+        channelInfoDescription.post {
+            val layout = channelInfoDescription.layout
+            val lines = layout.lineCount
+            if (lines > 0) {
+                val count = layout.getEllipsisCount(lines - 1)
+                if (count == 0) {
+                    space_expand.visibility = View.VISIBLE
+                    expandIcon.visibility = View.GONE
+                } else {
+                    space_expand.visibility = View.GONE
+                    expandIcon.visibility = View.VISIBLE
+                }
+
+            }
+        }
+        AppState.global.scrollPercent.observable.observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                channelInfo.alpha = 1 - it
+            }
+        expandIcon.setOnClickListener {
+            if (channelInfoDescription.isExpanded) {
+                channelInfoDescription.collapse()
+                expandIcon.setImageResource(R.drawable.channel_info_expand_arrow)
+            } else {
+                channelInfoDescription.expand()
+                expandIcon.setImageResource(R.drawable.channel_info_collapse_arrow)
+            }
+        }
         viewPagerAdapter =
             ViewPagerAdapter(requireFragmentManager())
         viewPager = view.findViewById(R.id.channel_info_viewpager)
         viewPager.adapter = viewPagerAdapter
-//        channel_info_description.setText("三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二三十二")
+        tabLayout = view.findViewById(R.id.channel_info_tab)
+//        tabLayout.addTab(tabLayout.newTab().apply {
+//            this.
+//            text = "成员"
+//        })
+//        tabLayout.addTab(tabLayout.newTab().apply {
+//            text = "@我"
+//        })
+//        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+//            override fun onPageScrolled(
+//                position: Int,
+//                positionOffset: Float,
+//                positionOffsetPixels: Int
+//            ) {
+//
+//            }
+//
+//            override fun onPageSelected(position: Int) {
+//                tabLayout.getTabAt(position)?.select()
+//            }
+//
+//            override fun onPageScrollStateChanged(state: Int) {
+//                when (state) {
+//                    ViewPager.SCROLL_STATE_IDLE -> {
+//                        Logger.d("idle")
+//                    }
+//                    ViewPager.SCROLL_STATE_DRAGGING -> {
+//                        Logger.d("drag")
+//                    }
+//                    ViewPager.SCROLL_STATE_SETTLING -> {
+//                        Logger.d("settle")
+//                    }
+//                }
+//            }
+//
+//        })
+        tabLayout.setupWithViewPager(viewPager)
         chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
             channelId = it.channelId
         })
-//        chatSharedViewModel.presenceUpdateLV.observe(viewLifecycleOwner, Observer {
-//            channelId?.let { it1 ->
-//                if (Client.global.channels[it1] !is DmChannel)
-//                    chatSharedViewModel.loadMemberList(it1)
-//                else if (Client.global.channels[it1] is DmChannel)
-//                    chatSharedViewModel.loadDmMemberList(it1)
-//            }
-//        })
-//
-//        chatSharedViewModel.memberLiveData.observe(viewLifecycleOwner, Observer {
-//            it?.let {
-//                val mAdapter: MemberListAdapter<GuildMember> = MemberListAdapter(it,requireContext())
-//                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
-//                channel_info_member_list.adapter = mAdapter
-//                if (channel_info_member_list.itemDecorationCount > 0) {
-//                    channel_info_member_list.removeItemDecorationAt(0)
-//                }
-//                val headersDecor = StickyRecyclerHeadersDecoration(mAdapter)
-//                channel_info_member_list.addItemDecoration(headersDecor)
-//                mAdapter.notifyDataSetChanged()
-//                mAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-//                    override fun onChanged() {
-//                        headersDecor.invalidateHeaders()
-//                    }
-//                })
-//            }
-//        })
-//        chatSharedViewModel.dmMemberLiveData.observe(viewLifecycleOwner, Observer {
-//            it?.let {
-//                val mAdapter: MemberListAdapter<User> = MemberListAdapter(it,requireContext())
-//                channel_info_member_list.layoutManager = LinearLayoutManager(view.context)
-//                channel_info_member_list.adapter = mAdapter
-//                if (channel_info_member_list.itemDecorationCount > 0) {
-//                    channel_info_member_list.removeItemDecorationAt(0)
-//                }
-//                mAdapter.notifyDataSetChanged()
-//                channel_info_member_list.addItemDecoration(StickyRecyclerHeadersDecoration(mAdapter))
-//            }
-//        })
-   
-   
+
     }
 }
+
 class ViewPagerAdapter(
     fragmentManager: FragmentManager
 ) : FragmentPagerAdapter(fragmentManager) {
+    override fun getPageTitle(position: Int): CharSequence? {
+        return when (position) {
+            0 -> "成员"
+            1 -> "@我"
+            else -> ""
+        }
+    }
+
     override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> {
-                val fragment = ChannelMemberFragment()
-                return fragment
+                val channelMemberFragment = ChannelMemberFragment()
+                return channelMemberFragment
+            }
+            1 -> {
+                val mentionMefragment = MentionMeFragment()
+                return mentionMefragment
             }
             else -> Fragment()
         }
@@ -122,7 +182,7 @@ class ViewPagerAdapter(
     }
 
     override fun getCount(): Int {
-        return 1
+        return 2
     }
 
 }

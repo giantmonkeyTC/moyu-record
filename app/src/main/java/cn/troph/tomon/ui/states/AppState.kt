@@ -42,6 +42,7 @@ class AppState {
     )
     val channelCollapses: Variable<Map<String, Boolean>> = Variable(mapOf())
     val updateEnabled: Variable<UpdateEnabled> = Variable(UpdateEnabled())
+    val scrollPercent:Variable<Float> = Variable(0f)
 
     fun channelIsCollapsed(channelId: String): Boolean {
         return channelCollapses.value[channelId] ?: false
