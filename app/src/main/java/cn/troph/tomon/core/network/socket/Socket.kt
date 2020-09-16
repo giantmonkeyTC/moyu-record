@@ -57,6 +57,7 @@ class Socket : Observer<SocketEvent>, LifecycleObserver {
         "CHANNEL_CREATE" to handleChannelCreate,
         "CHANNEL_DELETE" to handleChannelDelete,
         "CHANNEL_UPDATE" to handleChannelUpdate,
+        "CHANNEL_ACK" to handleChannelAck,
         "USER_GUILD_SETTINGS" to handleGuildSettings,
         "MESSAGE_CREATE" to handleMessageCreate,
         "MESSAGE_DELETE" to handleMessageDelete,

@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.events
 
 import cn.troph.tomon.core.actions.Position
+import cn.troph.tomon.core.network.services.ChannelService
 import cn.troph.tomon.core.structures.*
 
 open class Event
@@ -21,7 +22,7 @@ data class ChannelCreateEvent(val channel: Channel) : Event()
 data class ChannelDeleteEvent(val channel: Channel) : Event()
 data class ChannelUpdateEvent(val channel: Channel) : Event()
 data class GuildChannelPositionEvent(val guild: Guild) : Event()
-data class ChannelAckEvent(val channel: Channel) : Event()
+data class ChannelAckEvent(val channelAcks: ChannelService.ChannelsBulkAcks) : Event()
 data class ChannelTypingEvent(val channel: Channel) : Event()
 data class ChannelMemberUpdateEvent(val channel: Channel) : Event()
 data class DmChannelCreateEvent(val channel: DmChannel) : Event()

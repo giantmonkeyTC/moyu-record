@@ -203,4 +203,6 @@
     <string name="guild_nick_name">群组内昵称</string>
     <string name="guild_mute">消息免打扰</string>
     <string name="mark_guild_read">标记为已读</string>
+    <string name="setting_failed">设置失败，请重试</string>
+    <string name="mark_read_failed">标记失败，请重试</string>
 </resources>

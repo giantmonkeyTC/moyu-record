@@ -242,7 +242,8 @@ public class TomonMainActivity extends BaseActivity {
         mChatVM.getGuildUpdateLD().observe(this, new Observer<GuildUpdateEvent>() {
             @Override
             public void onChanged(GuildUpdateEvent guildUpdateEvent) {
-                mAdapter.setDataAndNotifyChanged(mChatVM.getGuildListLiveData().getValue(), mEtSearchBar.getText().toString().trim());
+                mAdapter.setDataAndNotifyChanged(Client.Companion.getGlobal().getGuilds().getList().toList(),
+                        mEtSearchBar.getText().toString().trim());
             }
         });
     }
@@ -454,7 +455,7 @@ public class TomonMainActivity extends BaseActivity {
                             &&
                             !msgCreateEv.getMessage().getAuthorId().equals(getMyId())
                     ) {
-                        mAdapter.notifyItemChanged(guildList.indexOf(msgFromGuild));
+                        mAdapter.notifyItemChanged(guildList.indexOf(msgFromGuild), new Object());
                     }
                 }
             }

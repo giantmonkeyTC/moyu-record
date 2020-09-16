@@ -85,4 +85,7 @@
     <color name="msg_desp_mention">#CDFF7A6B</color>
     <color name="splitter">#858585</color>
     <color name="bluePrimary">#2B98D6</color>
+    <color name="uncheck_thumb">#A2A2A2</color>
+    <color name="uncheck_track">#61A2A2A2</color>
+    <color name="check_track">#61FF7896</color>
 </resources>

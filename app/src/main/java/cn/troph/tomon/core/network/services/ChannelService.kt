@@ -5,6 +5,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ChannelService {
@@ -115,4 +116,22 @@ interface ChannelService {
         @Path("id") id: String,
         @Header("Authorization") token: String
     ): Observable<Void>
+
+    data class AckChannel (
+        @SerializedName("channel_id")
+        val channel_id: String,
+        @SerializedName("message_id")
+        val message_id: String
+    )
+
+    data class ChannelsBulkAcks(
+        @SerializedName("acks")
+        val acks:List<AckChannel>
+    )
+
+    @POST("channels/bulk-acks")
+    fun bulkAcks(
+        @Header("Authorization") token: String,
+        @Body request:ChannelsBulkAcks
+    ):Observable<Response<JsonObject>>
 }

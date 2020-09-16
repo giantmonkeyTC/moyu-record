@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.network.services
 
+import cn.troph.tomon.core.structures.GuildSettingsOverride
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -45,15 +46,21 @@ interface GuildService {
         @Header("Authorization") token: String
     ): Observable<JsonObject>
 
-    data class MuteGuildRequest(
+    data class NotifyGuildSetting(
         @SerializedName("mute")
-        val mute: Boolean
+        val mute: Boolean?,
+        @SerializedName("message_notifications")
+        val message_notifications: Int,
+        @SerializedName("suppress_everyone")
+        val suppress_everyone: Boolean,
+        @SerializedName("channel_overrides")
+        val channel_overrides: JsonArray
     )
 
     @PATCH("users/@me/guilds/{id}/settings")
-    fun muteGuild(
+    fun setNotifyGuild(
         @Path("id") id: String,
-        @Body request: MuteGuildRequest,
+        @Body setting: NotifyGuildSetting,
         @Header("Authorization") token: String
     ): Observable<JsonObject>
 
