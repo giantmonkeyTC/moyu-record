@@ -2,12 +2,15 @@ package cn.troph.tomon.ui.chat.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.NestedScrollView
 import androidx.viewpager.widget.ViewPager
 import cn.troph.tomon.R
+import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.ui.chat.fragments.ChannelInfoFragment
 import cn.troph.tomon.ui.states.AppState
 import com.google.android.material.tabs.TabLayout
 
@@ -21,6 +24,7 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
     private var mTouchSlop = 0
     private var mMaximumVelocity = 0
     private var mMinimumVelocity: Int = 0
+    private var onScrollListener: ExpandNestedScrollView.OnScrollListener? = null
 
 
     init {
@@ -30,6 +34,7 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
         mMinimumVelocity = ViewConfiguration.get(context)
             .getScaledMinimumFlingVelocity()
     }
+    
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -46,18 +51,50 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val params = viewPager.layoutParams
-        params.height = measuredHeight - tab.measuredHeight
+        params.height =
+            measuredHeight - tab.measuredHeight + ((1 - AppState.global.scrollPercent.value) * DensityUtil.dip2px(
+                context,
+                ChannelInfoFragment.actionBarMoveY
+            )).toInt()
+    }
+
+    override fun scrollTo(x: Int, y: Int) {
+        super.scrollTo(x, y)
+        if (y == 0) {
+            onScrollListener?.let {
+                it.onReset()
+            }
+        }
     }
 
     override fun onNestedPreScroll(target: View, dx: Int, dy: Int, consumed: IntArray, type: Int) {
-        if (scrollY >= header.height){
-            AppState.global.scrollPercent.value = 1f
+        if (scrollY >= header.height) {
             consumed[1] = 0
-        }
-        else {
-            AppState.global.scrollPercent.value = scrollY.toFloat() / header.height.toFloat()
+        } else {
             scrollBy(0, dy)
             consumed[1] = dy
+        }
+    }
+
+
+
+    fun setOnScrollListener(onScrollListener: ExpandNestedScrollView.OnScrollListener?) {
+        this.onScrollListener = onScrollListener
+    }
+
+
+    fun resetViewpagerHeight() {
+        val params = viewPager.layoutParams
+        params.height =
+            params.height + DensityUtil.dip2px(context, ChannelInfoFragment.actionBarMoveY)
+    }
+
+    interface OnScrollListener {
+        fun onScroll() {
+        }
+
+        fun onReset() {
+
         }
     }
 

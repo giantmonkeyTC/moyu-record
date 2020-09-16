@@ -67,6 +67,7 @@ class ChatSharedViewModel : ViewModel() {
     val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
+    val guildUpdateLD = MutableLiveData<GuildUpdateEvent>()
 
     val replySourceReadyLD = MutableLiveData<MessageReplySourceReadyEvent>()
 
@@ -159,6 +160,9 @@ class ChatSharedViewModel : ViewModel() {
 
         Client.global.eventBus.observeEventOnUi<ChannelUpdateEvent>().subscribe(Consumer {
             channelUpdateLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<GuildUpdateEvent>().subscribe(Consumer {
+            guildUpdateLD.value = it
         })
 
         Client.global.eventBus.observeEventOnUi<MessageReplySourceReadyEvent>().subscribe(
