@@ -1,5 +1,6 @@
 package cn.troph.tomon.core.network.services
 
+import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.structures.DmChannel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -134,4 +135,23 @@ interface ChannelService {
         @Header("Authorization") token: String,
         @Body request:ChannelsBulkAcks
     ):Observable<Response<JsonObject>>
+
+    data class NotifyChannelSetting(
+        @SerializedName("channel_overrides")
+        val channel_overrides: List<ChannelOverride>
+    )
+
+    data class ChannelOverride(
+        @SerializedName("channel_id")
+        val channelId: String,
+        @SerializedName("message_notifications")
+        val messageNotifications: Int
+    )
+
+    @PATCH("users/@me/guilds/{id}/settings")
+    fun setNotifyChannel(
+        @Path("id") id: String,
+        @Body setting: JsonObject,
+        @Header("Authorization") token: String
+    ): Observable<JsonObject>
 }

@@ -96,10 +96,6 @@
         <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
     </style>
 
-    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <style name="MySwitch" parent="Theme.AppCompat.Light">
         <!--开启时的颜色-->
         <item name="colorControlActivated">@color/primaryColor</item>
@@ -107,5 +103,8 @@
         <item name="colorSwitchThumbNormal">@color/switchOff</item>
         <!--关闭时的轨迹颜色取30%的颜色-->
         <item name="android:colorForeground">@color/primaryColorAlpha38</item>
+    </style>
+    <style name="ChannelInfoTabTextStyle">
+        <item name="android:textSize">@dimen/channel_info_tab_text_size</item>
     </style>
 </resources>

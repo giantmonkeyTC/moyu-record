@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/widget_member_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginVertical="2dp"
     android:orientation="vertical"
-    android:paddingVertical="8dp"
-    android:layout_marginVertical="2dp">
+    android:paddingVertical="8dp">
 
 
     <cn.troph.tomon.ui.widgets.UserAvatar
@@ -17,14 +16,16 @@
         android:layout_marginStart="24dp"
         app:layout_constraintStart_toStartOf="@id/widget_member_item"
         app:layout_constraintTop_toTopOf="@id/widget_member_item" />
+
     <ImageView
         android:id="@+id/offline_user_shadow"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:src="@drawable/shape_offline_shadow"
         android:layout_marginStart="24dp"
+        android:src="@drawable/shape_offline_shadow"
         app:layout_constraintStart_toStartOf="@id/widget_member_item"
-        app:layout_constraintTop_toTopOf="@id/widget_member_item"/>
+        app:layout_constraintTop_toTopOf="@id/widget_member_item" />
+
     <ImageView
         android:id="@+id/guild_user_online"
         android:layout_width="12dp"
@@ -36,19 +37,39 @@
         android:paddingVertical="2dp"
         app:layout_constraintStart_toStartOf="@id/member_avatar"
         app:layout_constraintTop_toTopOf="@id/member_avatar" />
+
     <TextView
         android:id="@+id/widget_member_name_text"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:textSize="15dp"
-        android:ellipsize="end"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:maxLines="1"
         android:layout_marginEnd="@dimen/member_name_margin_end"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/white"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/widget_member_description_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/member_avatar"
-        app:layout_constraintTop_toTopOf="@id/member_avatar" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/widget_member_description_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="@dimen/member_name_margin_end"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/whiteAlpha70"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/member_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/widget_member_name_text" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

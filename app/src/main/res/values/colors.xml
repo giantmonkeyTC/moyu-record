@@ -50,6 +50,7 @@
     <color name="primaryVariant">#FFA1C8</color>
     <color name="primaryColor">#FF7896</color>
     <color name="primaryColorAlpha38">#61FF7896</color>
+    <color name="primaryColorAlpha80">#CCFF7896</color>
     <color name="background1HalfAlpha">#80171717</color>
     <color name="channel_name_unactivated">#969696</color>
     <color name="color_guild_no_img">#7A84D9</color>

@@ -6,19 +6,29 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.app.ShareCompat
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import at.blogc.android.views.ExpandableTextView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.*
+import cn.troph.tomon.core.Client.Companion.global
+import cn.troph.tomon.core.MessageNotificationsType
+import cn.troph.tomon.core.network.services.ChannelService
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView
@@ -26,8 +36,12 @@ import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import cn.troph.tomon.ui.widgets.TomonToast
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonParser
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -39,6 +53,35 @@ class ChannelInfoFragment : Fragment() {
     private lateinit var viewPager: NestedViewPager
     private lateinit var tabLayout: TabLayout
     private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
+    private var muteState = ChannelMuteState.DEFAULT
+        set(value) {
+            field = value
+            when (value) {
+                ChannelMuteState.DEFAULT -> {
+                    channel_info_mute?.let {
+                        channel_info_mute.setCompoundDrawablesWithIntrinsicBounds(
+                            null,
+                            requireContext().getDrawable(R.drawable.channel_info_mute),
+                            null,
+                            null
+                        )
+                        channel_info_mute.setTextColor(requireContext().getColor(R.color.whiteAlpha70))
+                    }
+
+                }
+                ChannelMuteState.MUTED -> {
+                    channel_info_mute?.let {
+                        channel_info_mute.setCompoundDrawablesWithIntrinsicBounds(
+                            null,
+                            requireContext().getDrawable(R.drawable.channel_info_muted),
+                            null,
+                            null
+                        )
+                        channel_info_mute.setTextColor(requireContext().getColor(R.color.primaryColorAlpha80))
+                    }
+                }
+            }
+        }
 
     companion object {
         val actionBarMoveY = 55f
@@ -53,13 +96,17 @@ class ChannelInfoFragment : Fragment() {
             val changed = field != value
             field = value
             if (changed && value != null) {
-                val channel = Client.global.channels[value]
-                if (channel is TextChannelBase && channel !is DmChannel) {
-                    chatSharedViewModel.loadMemberList(value)
-                } else if (channel is DmChannel) {
-                    chatSharedViewModel.loadDmMemberList(value)
-                }
+                val channel = global.channels[value]
+                if (channel is TextChannel)
+                    muteState = when (global.guildSettings[channel.guildId
+                        ?: ""]?.channelOverrides?.get(value)?.messageNotifications) {
+                        MessageNotificationsType.DEFAULT -> ChannelMuteState.DEFAULT
+                        MessageNotificationsType.ONLY_MENTION -> ChannelMuteState.MUTED
+                        else -> ChannelMuteState.DEFAULT
+                    }
+
             }
+
         }
 
     override fun onCreateView(
@@ -77,6 +124,23 @@ class ChannelInfoFragment : Fragment() {
             view.findViewById<ExpandableTextView>(R.id.channel_info_description)
         val expandIcon = view.findViewById<ImageView>(R.id.ic_expand_text)
         val channelInfo = view.findViewById<TextView>(R.id.channel_info)
+
+        channelInfoDescription.post {
+            actionbarHeight = channel_info_actionbar.measuredHeight
+            val layout = channelInfoDescription.layout
+            val lines = layout.lineCount
+            if (lines > 0) {
+                val count = layout.getEllipsisCount(lines - 1)
+                if (count == 0) {
+                    space_expand.visibility = View.VISIBLE
+                    expandIcon.visibility = View.GONE
+                } else {
+                    space_expand.visibility = View.GONE
+                    expandIcon.visibility = View.VISIBLE
+                }
+
+            }
+        }
         channel_info_scroll_view.setOnScrollListener(object :
             ExpandNestedScrollView.OnScrollListener {
             override fun onReset() {
@@ -104,7 +168,7 @@ class ChannelInfoFragment : Fragment() {
             channel_info_scroll_view.scrollTo(0, 0)
             channelId = it.channelId
             channelId?.let {
-                val channel = Client.global.channels[it]
+                val channel = global.channels[it]
                 if (channel is TextChannel) {
                     channel_info_channel_name.text = channel.name
                     channel_info_guild_name.text = channel.guild?.name ?: "群组不存在"
@@ -122,7 +186,6 @@ class ChannelInfoFragment : Fragment() {
                 moveY = DensityUtil.dip2px(context, actionBarMoveY).toFloat()
                 moveX = imageView6.x - channelInfo.x
                 guildMoveX = channel_info_guild_name.x - channelInfo.x
-                actionbarHeight = channel_info_actionbar.measuredHeight
                 val layout = channelInfoDescription.layout
                 val lines = layout.lineCount
                 if (lines > 0) {
@@ -148,7 +211,6 @@ class ChannelInfoFragment : Fragment() {
                 } else
                     expand_text.visibility = View.GONE
                 channelInfoDescription.post {
-                    actionbarHeight = channel_info_actionbar.measuredHeight
                     val layout = channelInfoDescription.layout
                     val lines = layout.lineCount
                     if (lines > 0) {
@@ -172,7 +234,7 @@ class ChannelInfoFragment : Fragment() {
         })
         chatSharedViewModel.guildUpdateLD.observe(viewLifecycleOwner, Observer { event ->
             channelId?.let {
-                val channel = Client.global.channels[it]
+                val channel = global.channels[it]
                 if (channel is TextChannel) {
                     if (channel.guildId == event.guild.id) {
                         channel_info_guild_name.text = event.guild.name
@@ -187,22 +249,6 @@ class ChannelInfoFragment : Fragment() {
             }
         })
         channelInfoDescription.setInterpolator(OvershootInterpolator())
-        channelInfoDescription.post {
-            actionbarHeight = channel_info_actionbar.measuredHeight
-            val layout = channelInfoDescription.layout
-            val lines = layout.lineCount
-            if (lines > 0) {
-                val count = layout.getEllipsisCount(lines - 1)
-                if (count == 0) {
-                    space_expand.visibility = View.VISIBLE
-                    expandIcon.visibility = View.GONE
-                } else {
-                    space_expand.visibility = View.GONE
-                    expandIcon.visibility = View.VISIBLE
-                }
-
-            }
-        }
         AppState.global.scrollPercent.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if (it > 1f) {
@@ -232,7 +278,7 @@ class ChannelInfoFragment : Fragment() {
             }
         channel_info_invite.setOnClickListener {
             channelId?.let {
-                val channel = Client.global.channels[it]
+                val channel = global.channels[it]
                 if (channel is TextChannel) {
                     var inviteCode: String = ""
                     var ticketCode: String = ""
@@ -266,7 +312,7 @@ class ChannelInfoFragment : Fragment() {
                                 val intent = Intent().apply {
                                     setAction(Intent.ACTION_SEND)
                                     setType("text/plain")
-                                    putExtra(Intent.EXTRA_TEXT,inviteLink)
+                                    putExtra(Intent.EXTRA_TEXT, inviteLink)
                                 }
                                 if (intent.resolveActivity(requireActivity().packageManager) != null) {
                                     startActivity(intent)
@@ -278,6 +324,78 @@ class ChannelInfoFragment : Fragment() {
 
                 }
             }
+        }
+        channel_info_mute.setOnClickListener {
+            channelId?.let {
+                val channel = global.channels[it]
+                if (channel is TextChannel) {
+                    when (muteState) {
+                        ChannelMuteState.DEFAULT -> {
+                            val array = JsonArray()
+                            global.rest.channelService.setNotifyChannel(
+                                channel.guildId ?: "",
+                                JsonParser.parseString(
+                                    Gson().toJson(
+                                        ChannelService.NotifyChannelSetting(
+                                            channel_overrides = listOf(
+                                                ChannelService.ChannelOverride(
+                                                    channelId = it,
+                                                    messageNotifications = 1
+                                                )
+                                            )
+                                        )
+                                    )
+                                ).asJsonObject,
+                                global.auth
+                            )
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe({
+                                    muteState = ChannelMuteState.MUTED
+                                }
+                                ) {
+                                    TomonToast.makeText(
+                                        requireContext().applicationContext,
+                                        getString(R.string.setting_failed),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        }
+                        ChannelMuteState.MUTED -> {
+                            global.rest.channelService.setNotifyChannel(
+                                channel.guildId ?: "",
+                                JsonParser.parseString(
+                                    Gson().toJson(
+                                        ChannelService.NotifyChannelSetting(
+                                            channel_overrides = listOf(
+                                                ChannelService.ChannelOverride(
+                                                    channelId = it,
+                                                    messageNotifications = 0
+                                                )
+                                            )
+                                        )
+                                    )
+                                ).asJsonObject,
+                                global.auth
+                            )
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe({
+                                    muteState = ChannelMuteState.DEFAULT
+                                }
+                                ) {
+                                    TomonToast.makeText(
+                                        requireContext().applicationContext,
+                                        getString(R.string.setting_failed),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        }
+                    }
+                }
+
+            }
+
         }
         expand_text.setOnClickListener {
             if (channelInfoDescription.isExpanded) {
@@ -336,13 +454,18 @@ class ChannelInfoFragment : Fragment() {
     }
 }
 
+enum class ChannelMuteState(val value: Int) {
+    DEFAULT(0),
+    MUTED(1)
+}
+
 class ViewPagerAdapter(
     fragmentManager: FragmentManager
 ) : FragmentPagerAdapter(fragmentManager) {
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {
             0 -> "成员"
-            1 -> "@我"
+//            1 -> "@我"
             else -> ""
         }
     }
@@ -353,17 +476,17 @@ class ViewPagerAdapter(
                 val channelMemberFragment = ChannelMemberFragment()
                 return channelMemberFragment
             }
-            1 -> {
-                val mentionMefragment = MentionMeFragment()
-                return mentionMefragment
-            }
+//            1 -> {
+//                val mentionMefragment = MentionMeFragment()
+//                return mentionMefragment
+//            }
             else -> Fragment()
         }
 
     }
 
     override fun getCount(): Int {
-        return 2
+        return 1
     }
 
 }

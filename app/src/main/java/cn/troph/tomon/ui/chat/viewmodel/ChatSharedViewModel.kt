@@ -67,7 +67,6 @@ class ChatSharedViewModel : ViewModel() {
     val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
-    val guildUpdateLD = MutableLiveData<GuildUpdateEvent>()
 
     val replySourceReadyLD = MutableLiveData<MessageReplySourceReadyEvent>()
 
