@@ -52,6 +52,7 @@ class ChannelInfoFragment : Fragment() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var viewPager: NestedViewPager
     private lateinit var tabLayout: TabLayout
+    private var needMeasure: Boolean = true
     private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
     private var muteState = ChannelMuteState.DEFAULT
         set(value) {
@@ -126,7 +127,11 @@ class ChannelInfoFragment : Fragment() {
         val channelInfo = view.findViewById<TextView>(R.id.channel_info)
 
         channelInfoDescription.post {
-            actionbarHeight = channel_info_actionbar.measuredHeight
+            if (needMeasure) {
+                actionbarHeight = channel_info_actionbar.measuredHeight
+                needMeasure = false
+            }
+
             val layout = channelInfoDescription.layout
             val lines = layout.lineCount
             if (lines > 0) {
