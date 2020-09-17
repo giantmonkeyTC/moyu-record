@@ -411,3 +411,30 @@ data class Invite(
     @SerializedName("joined")
     val joined: Boolean
 )
+data class ChannelInviteInfo(
+    @SerializedName("id")
+    val id:String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("type")
+    val type: Int
+)
+
+data class ChannelInvite(
+    @SerializedName("code")
+    val code:String,
+    @SerializedName("guild")
+    val guild: GuildInvite,
+    @SerializedName("inviter")
+    val inviter: Inviter,
+    @SerializedName("joined")
+    val joined: Boolean,
+    @SerializedName("channel")
+    val channel: ChannelInviteInfo,
+    @SerializedName("uses")
+    val uses: Int,
+    @SerializedName("max_age")
+    val maxAge: Int,
+    @SerializedName("max_uses")
+    val maxUses: Int
+)

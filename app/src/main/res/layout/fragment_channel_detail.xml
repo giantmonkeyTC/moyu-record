@@ -53,18 +53,18 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
             android:focusable="true"
-            android:textColor="@color/primaryText"
-            android:textSize="16dp"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
-            android:fadingEdge="horizontal"
+            android:singleLine="true"
+            android:textColor="@color/primaryText"
 
+            android:textSize="16dp"
             app:layout_constraintEnd_toEndOf="@id/barrier1"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/imageView6"
-            app:layout_constraintTop_toBottomOf="@id/channel_info"
-            android:singleLine="true" />
+            app:layout_constraintTop_toBottomOf="@id/channel_info" />
 
         <TextView
             android:id="@+id/channel_info_guild_name"
@@ -85,30 +85,31 @@
             android:id="@+id/space1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="48dp"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <Space
             android:id="@+id/space2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="48dp"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="space1"
-            app:barrierDirection="start" />
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="space1" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="space2"
-            app:barrierDirection="end" />
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="space2" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -116,9 +117,9 @@
     <cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView
         android:id="@+id/channel_info_scroll_view"
         android:layout_width="0dp"
-        android:overScrollMode="never"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -138,91 +139,79 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
+
+                <TextView
                     android:id="@+id/channel_info_invite"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="48dp"
+                    android:layout_height="50dp"
                     android:layout_marginTop="32dp"
-                    android:src="@drawable/channel_info_invite"
+                    android:drawableTop="@drawable/channel_info_invite"
+                    android:drawablePadding="8dp"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:text="@string/channel_info_invite"
+                    android:textColor="@color/whiteAlpha70"
+                    android:textSize="12dp"
                     app:layout_constraintEnd_toStartOf="@+id/channel_info_mute"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/channel_info_invite_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/channel_info_invite"
-                    android:textColor="@color/whiteAlpha70"
-                    android:textSize="12dp"
-                    app:layout_constraintEnd_toEndOf="@id/channel_info_invite"
-                    app:layout_constraintStart_toStartOf="@id/channel_info_invite"
-                    app:layout_constraintTop_toBottomOf="@id/channel_info_invite" />
 
-                <ImageView
+                <TextView
                     android:id="@+id/channel_info_mute"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="48dp"
+                    android:layout_height="50dp"
                     android:layout_marginStart="88dp"
                     android:layout_marginTop="32dp"
-                    android:src="@drawable/channel_info_mute"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/channel_info_invite"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:drawableTop="@drawable/channel_info_mute"
+                    android:drawablePadding="8dp"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:gravity="center_horizontal"
                     android:text="@string/channel_info_mute"
                     android:textColor="@color/whiteAlpha70"
                     android:textSize="12dp"
-                    app:layout_constraintEnd_toEndOf="@id/channel_info_mute"
-                    app:layout_constraintStart_toStartOf="@id/channel_info_mute"
-                    app:layout_constraintTop_toBottomOf="@id/channel_info_mute" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/channel_info_invite"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
                     android:id="@+id/expand_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="32dp"
                     android:background="@drawable/shape_button_logout"
                     android:backgroundTint="@color/whiteAlpha10"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/channel_info_invite_text"
-                    >
+                    app:layout_constraintTop_toBottomOf="@+id/channel_info_invite">
+
                     <at.blogc.android.views.ExpandableTextView
                         android:id="@+id/channel_info_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="12dp"
+                        android:ellipsize="end"
+                        android:lineHeight="21dp"
                         android:maxLines="3"
+                        android:paddingHorizontal="12dp"
                         android:paddingTop="12dp"
                         android:paddingBottom="8dp"
-                        android:lineHeight="21dp"
-                        android:ellipsize="end"
-                        app:animation_duration="233"
                         android:textColor="@color/whiteAlpha60"
-                        />
+                        app:animation_duration="233" />
+
                     <Space
                         android:id="@+id/space_expand"
                         android:layout_width="match_parent"
-                        android:layout_height="4dp"
-                        />
+                        android:layout_height="4dp" />
+
                     <ImageView
                         android:id="@+id/ic_expand_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/channel_info_expand_arrow"
-                        />
-
+                        android:src="@drawable/channel_info_expand_arrow" />
 
 
                 </LinearLayout>
@@ -234,27 +223,27 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@color/background3"
+                android:paddingTop="28dp"
+                android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/channel_info_header"
                 app:tabIndicatorHeight="0dp"
-                android:paddingTop="28dp"
-                android:paddingBottom="16dp"
                 app:tabRippleColor="@android:color/transparent"
                 app:tabSelectedTextColor="@color/primaryColor"
                 app:tabTextColor="@color/primaryText">
 
-<!--                <com.google.android.material.tabs.TabItem-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_marginHorizontal="28dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="成员" />-->
+                <!--                <com.google.android.material.tabs.TabItem-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_marginHorizontal="28dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:text="成员" />-->
 
-<!--                <com.google.android.material.tabs.TabItem-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_marginHorizontal="28dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="\@我" />-->
+                <!--                <com.google.android.material.tabs.TabItem-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_marginHorizontal="28dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:text="\@我" />-->
             </com.google.android.material.tabs.TabLayout>
 
             <cn.troph.tomon.ui.chat.ui.NestedViewPager

@@ -1,46 +1,37 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
-import android.graphics.Color
+import android.content.Intent
 import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.Toast
+import androidx.core.app.ShareCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.*
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import at.blogc.android.views.ExpandableTextView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.DensityUtil
-import cn.troph.tomon.ui.chat.emoji.EmojiFragment
-import cn.troph.tomon.ui.chat.emoji.OnEmojiClickListener
-import cn.troph.tomon.ui.chat.members.MemberListAdapter
+import cn.troph.tomon.core.utils.Url
 import cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView
-import cn.troph.tomon.ui.chat.ui.NestedScrollViewPager
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
-import com.google.android.material.tabs.TabItem
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
-import com.orhanobut.logger.Logger
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Consumer
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
-import kotlinx.android.synthetic.main.fragment_channel_member.*
-import kotlinx.android.synthetic.main.fragment_channel_panel.*
-import kotlin.math.exp
 
 
 class ChannelInfoFragment : Fragment() {
@@ -106,6 +97,7 @@ class ChannelInfoFragment : Fragment() {
         (requireActivity().getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(
             point
         )
+        channel_info_invite
         channel_info_channel_name.maxWidth =
             point.x - DensityUtil.dip2px(context, 48f) * 2
         chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
@@ -238,7 +230,56 @@ class ChannelInfoFragment : Fragment() {
                 }
 
             }
-        expandIcon.setOnClickListener {
+        channel_info_invite.setOnClickListener {
+            channelId?.let {
+                val channel = Client.global.channels[it]
+                if (channel is TextChannel) {
+                    var inviteCode: String = ""
+                    var ticketCode: String = ""
+                    Observable.merge(
+                        Client.global.rest.inviteService.getChannelInvite(
+                            channelId = it,
+                            token = Client.global.auth
+                        ).doOnNext {
+                            inviteCode = it.code
+                        }.doOnError { Toast.makeText(context, "获取频道邀请码失败", Toast.LENGTH_SHORT) },
+                        Client.global.rest.inviteService.getTickets(token = Client.global.auth)
+                            .doOnNext {
+                                ticketCode = it.code
+                            }.doOnError {
+                                Toast.makeText(context, "获取激活码失败", Toast.LENGTH_SHORT)
+                            }
+                    ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            if (inviteCode != "" && ticketCode != "") {
+                                val inviteLink = Url.inviteFormat.format(inviteCode, ticketCode)
+                                GeneralSnackbar.make(
+                                    GeneralSnackbar.findSuitableParent(view)!!,
+                                    getString(R.string.copied_invite),
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                                val clipboard =
+                                    view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip: ClipData =
+                                    ClipData.newPlainText("copy", inviteLink)
+                                clipboard.setPrimaryClip(clip)
+                                val intent = Intent().apply {
+                                    setAction(Intent.ACTION_SEND)
+                                    setType("text/plain")
+                                    putExtra(Intent.EXTRA_TEXT,inviteLink)
+                                }
+                                if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                                    startActivity(intent)
+                                }
+
+                            }
+                        }
+
+
+                }
+            }
+        }
+        expand_text.setOnClickListener {
             if (channelInfoDescription.isExpanded) {
                 channelInfoDescription.collapse()
                 expandIcon.setImageResource(R.drawable.channel_info_expand_arrow)

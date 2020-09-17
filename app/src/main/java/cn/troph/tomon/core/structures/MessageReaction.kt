@@ -3,6 +3,7 @@ package cn.troph.tomon.core.structures
 import androidx.core.text.htmlEncode
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.orhanobut.logger.Logger
@@ -79,7 +80,7 @@ class MessageReaction(
             }
             var name: String = ""
             if (data.has("name")) {
-                name = data["name"].asString
+                name = if (data["name"] is JsonNull) "emoji" else data["name"].asString
             }
             return EmojiData(id, name)
         }
