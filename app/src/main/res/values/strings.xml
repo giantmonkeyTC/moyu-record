@@ -204,5 +204,18 @@
     <string name="voice_channel_joined_two_desp">%1$s 和 %2$s 正在疯狂输出</string>
     <string name="voice_channel_alot_joined_desp">%1$s、%2$s 等%3$d人正在疯狂输出</string>
     <string name="msg_desp_mention">[有人@我]&#160;</string>
+    <string name="me">我</string>
+    <string name="invalid_invite">无效邀请码</string>
+    <string name="leave_group">离开群组</string>
+    <string name="guild_member_number">%1$d位成员</string>
+    <string name="owner_dialog_is_owner_title">拥有群主身份</string>
+    <string name="owner_dialog_is_owner_desp">退出群组之前请转移你所拥有的群组群主身份</string>
+    <string name="ok">好的</string>
+    <string name="leave_group_title">你确定退出该群组？</string>
+    <string name="guild_nick_name">群组内昵称</string>
+    <string name="guild_mute">消息免打扰</string>
+    <string name="mark_guild_read">标记为已读</string>
+    <string name="setting_failed">设置失败，请重试</string>
+    <string name="mark_read_failed">标记失败，请重试</string>
     <string name="copied_invite">邀请链接已复制</string>
 </resources>

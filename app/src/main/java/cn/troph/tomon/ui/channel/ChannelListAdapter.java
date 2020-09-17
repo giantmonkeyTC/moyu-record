@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.channel;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import cn.troph.tomon.core.structures.TextChannel;
 import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Assets;
+import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.utils.LocalDateUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -46,6 +48,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<ChannelRV> mDataList = new ArrayList<>();
     private ArrayMap<String, Message> mLastedMessageCache = new ArrayMap<>();
     private String mCurrentGuildID;
+    private ChatSharedViewModel mFragmentVM;
     private OnVoiceChannelItemClickListener mOnVoiceChannelClickListener;
 
     public ChannelListAdapter(ChannelGroupRV root, String guildId) {
@@ -55,14 +58,26 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
+    public void setChatSharedVM(ChatSharedViewModel vm) {
+        mFragmentVM = vm;
+    }
+
     public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
         mDataList = root.flatten();
         mCurrentGuildID = guildID;
         notifyDataSetChanged();
     }
 
+    public String getCurrentGuildId() {
+        return mCurrentGuildID;
+    }
+
     public void setOnVoiceChannelClickListener(OnVoiceChannelItemClickListener listener) {
         mOnVoiceChannelClickListener = listener;
+    }
+
+    public OnVoiceChannelItemClickListener getOnVoiceChannelClickListener() {
+        return mOnVoiceChannelClickListener;
     }
 
     @NonNull
@@ -88,9 +103,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void bindChannelForHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof ChannelGroupViewHolder) {
+
+        if (holder instanceof ChannelGroupViewHolder && mDataList.get(position).getChannel().getType() == ChannelType.CATEGORY) {
             onBindChannelGroupViewHolder((ChannelGroupViewHolder) holder, position);
-        } else {
+        } else if (holder instanceof ChannelViewHolder && mDataList.get(position).getChannel().getType() != ChannelType.CATEGORY) {
             onBindChannelViewHolder((ChannelViewHolder) holder, position);
         }
     }
@@ -101,7 +117,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         channel.getObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Base>() {
             @Override
             public void accept(Base base) throws Throwable {
-                bindChannelForHolder(holder, position);
+                notifyItemChanged(position, new Object());
             }
         });
 
@@ -112,26 +128,26 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     MessageCreateEvent createEvent = (MessageCreateEvent) event;
                     if (createEvent.getMessage().getChannelId().equals(channel.getId())) {
                         mLastedMessageCache.put(channel.getId(), createEvent.getMessage());
-                        bindChannelForHolder(holder, position);
+                        notifyItemChanged(position, new Object());
                     }
                 } else if (event instanceof MessageAtMeEvent) {
                     MessageAtMeEvent atMeEvent = (MessageAtMeEvent) event;
                     if (atMeEvent.getMessage().getChannelId().equals(channel.getId())) {
                         mLastedMessageCache.put(channel.getId(), atMeEvent.getMessage());
-                        bindChannelForHolder(holder, position);
+                        notifyItemChanged(position, new Object());
                     }
                 } else if (event instanceof MessageReadEvent) {
                     MessageReadEvent readEvent = (MessageReadEvent) event;
                     if (readEvent.getMessage().getChannelId().equals(channel.getId())) {
                         mLastedMessageCache.put(channel.getId(), readEvent.getMessage());
-                        bindChannelForHolder(holder, position);
+                        notifyItemChanged(position, new Object());
                     }
                 } else if (event instanceof GuildVoiceSelectorEvent) {
                     GuildVoiceSelectorEvent voiceSelectorEvent = (GuildVoiceSelectorEvent) event;
                     if (voiceSelectorEvent.getChannelId().equals(channel.getId())) {
                         VoiceChannel voiceChannel = (VoiceChannel) channel;
                         voiceChannel.setJoined(true);
-                        bindChannelForHolder(holder, position);
+                        notifyItemChanged(position, new Object());
                     } else {
                         if (channel instanceof VoiceChannel) {
                             ((VoiceChannel) channel).setJoined(false);
@@ -141,7 +157,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     if (!mCurrentGuildID.equals(channel.getGuildId())) {
                         return;
                     }
-                    bindChannelForHolder(holder, position);
+                    String channelId = ((VoiceStateUpdateEvent) event).getVoiceUpdate().getChannelId();
+                    if (TextUtils.isEmpty(channelId) || channelId.equals(channel.getId())) {
+                        notifyItemChanged(position, new Object());
+                    }
                 }
             }
         });
@@ -158,6 +177,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             TextChannel textChannel = (TextChannel) channel;
             holder.setUnreadView(textChannel.getUnread(), textChannel.getMention() > 0);
             setTextChannelLatestMsgDespAndTime(holder, textChannel);
+            holder.itemView.setOnClickListener(null);
         } else if (type == ChannelType.VOICE) {
             holder.tvChannelTime.setVisibility(View.INVISIBLE);
             holder.ivChannelIcon.setImageResource(R.drawable.channel_voice_icon);
@@ -171,6 +191,8 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 }
             });
+        } else {
+            holder.itemView.setOnClickListener(null);
         }
         int indent = channel.getIndent() + 2;
         int marginStart = indent * holder.itemView.getContext().getResources().getDimensionPixelSize(
@@ -224,10 +246,25 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private void setVoiceChannelStateDesp(ChannelViewHolder holder, VoiceChannel voiceChannel) {
         boolean joined = voiceChannel.isJoined();
+        List<VoiceUpdate> voiceStatesOrig = voiceChannel.getVoiceStates();
+        List<VoiceUpdate> voiceStates = voiceStatesOrig;
+        if (joined) {
+            boolean isWebNotCheckMeLeave = mFragmentVM.getSelectedCurrentVoiceChannel().getValue() == null;
+            if (isWebNotCheckMeLeave) {
+                voiceStates = new ArrayList<>();
+                for (VoiceUpdate each : voiceStatesOrig) {
+                    if (each.getUserId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                        continue;
+                    }
+                    voiceStates.add(each);
+                }
+                joined = voiceStates.size() > 0;
+            }
+        }
+
         if (!joined) {
             holder.tvChannelDesp.setText(R.string.voice_channel_no_joined_desp);
         } else {
-            List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
             GuildMember guildMember1 = voiceChannel.getMembers().get(voiceStates.get(0).getUserId());
             GuildMember guildMember2 = null;
             if (voiceStates.size() >= 2) {
@@ -246,21 +283,28 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if (voiceStates.size() == 1) {
                 channelDesp = holder.itemView.getContext().getString(
                         channelDespStringResId,
-                        guildMember1.getDisplayName());
+                        replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember1));
             } else if (voiceStates.size() == 2){
                 channelDesp = holder.itemView.getContext().getString(
                         channelDespStringResId,
-                        guildMember1.getDisplayName(),
-                        guildMember2.getDisplayName());
+                        replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember1),
+                        replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember2));
             } else {
                 channelDesp = holder.itemView.getContext().getString(
                         channelDespStringResId,
-                        guildMember1.getDisplayName(),
-                        guildMember2.getDisplayName(),
+                        replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember1),
+                        replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember2),
                         voiceStates.size());
             }
             holder.tvChannelDesp.setText(channelDesp);
         }
+    }
+
+    private String replaceMeMemberNameIfNeeded(Context context, GuildMember member) {
+        if (member.getUser().getId().equals(Client.Companion.getGlobal().getMe().getId())) {
+            return context.getString(R.string.me);
+        }
+        return member.getDisplayName();
     }
 
     private String getAuthorNameInChannel(Context context, String authorId, GuildChannel channel) {

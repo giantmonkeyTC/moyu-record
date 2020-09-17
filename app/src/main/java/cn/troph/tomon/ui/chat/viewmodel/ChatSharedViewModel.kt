@@ -93,6 +93,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val mChannelCreateLD = MutableLiveData<ChannelCreateEvent>()
 
+    val mChannelAckLD = MutableLiveData<ChannelAckEvent>()
+
     val mChannelMemberUpdateLD = MutableLiveData<ChannelMemberUpdateEvent>()
 
     val dmChannelLiveData = MutableLiveData<MutableList<DmChannel>>()
@@ -120,6 +122,10 @@ class ChatSharedViewModel : ViewModel() {
     val guildCreateLD: MutableLiveData<GuildCreateEvent> = MutableLiveData()
 
     val guildDeleteLD: MutableLiveData<GuildDeleteEvent> = MutableLiveData()
+
+    val guildUpdateLD: MutableLiveData<GuildUpdateEvent> = MutableLiveData()
+
+    val channelSyncLD: MutableLiveData<ChannelSyncEvent> = MutableLiveData()
 
     fun setUpEvents() {
 
@@ -177,6 +183,10 @@ class ChatSharedViewModel : ViewModel() {
                 dmUnReadLiveData.notifyObserver()
             }
         })
+
+        Client.global.eventBus.observeEventOnUi<ChannelAckEvent>().subscribe {
+            mChannelAckLD.value = it
+        }
 
         Client.global.eventBus.observeEventOnUi<VoiceSpeakEvent>().subscribe(Consumer {
             voiceSpeakLD.value = it.speaking
@@ -248,11 +258,18 @@ class ChatSharedViewModel : ViewModel() {
         Client.global.eventBus.observeEventOnUi<GuildDeleteEvent>().subscribe(Consumer {
             guildDeleteLD.value = it
         })
+
+        Client.global.eventBus.observeEventOnUi<GuildUpdateEvent>().subscribe(Consumer {
+            guildUpdateLD.value = it
+        })
         Client.global.eventBus.observeEventOnUi<MessageReadEvent>().subscribe(Consumer {
             messageReadLD.value = it
         })
         Client.global.eventBus.observeEventOnUi<MessageAtMeEvent>().subscribe(Consumer {
             messageAtMeLD.value = it
+        })
+        Client.global.eventBus.observeEventOnUi<ChannelSyncEvent>().subscribe(Consumer {
+            channelSyncLD.value = it
         })
     }
 

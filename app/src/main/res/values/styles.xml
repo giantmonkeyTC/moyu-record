@@ -92,6 +92,14 @@
         <item name="android:textColor">@color/primaryText</item>
     </style>
 
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
     <style name="MySwitch" parent="Theme.AppCompat.Light">
         <!--开启时的颜色-->
         <item name="colorControlActivated">@color/primaryColor</item>

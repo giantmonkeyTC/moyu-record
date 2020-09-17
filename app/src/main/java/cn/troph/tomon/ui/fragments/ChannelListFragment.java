@@ -1,7 +1,11 @@
 package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -15,15 +19,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ActivityViewModelLazyKt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,7 +44,14 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.nisrulz.sensey.ProximityDetector;
 import com.github.nisrulz.sensey.Sensey;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.color.MaterialColors;
+import com.google.android.material.elevation.ElevationOverlayProvider;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -46,33 +60,52 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
+import cn.troph.tomon.core.MessageNotificationsType;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
+import cn.troph.tomon.core.collections.GuildMemberCollection;
+import cn.troph.tomon.core.collections.GuildSettingsCollection;
+import cn.troph.tomon.core.events.ChannelAckEvent;
+import cn.troph.tomon.core.events.ChannelSyncEvent;
+import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
-import cn.troph.tomon.core.events.VoiceLeaveChannelEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
+import cn.troph.tomon.core.network.services.ChannelService;
+import cn.troph.tomon.core.network.services.GuildService;
 import cn.troph.tomon.core.network.socket.GatewayOp;
 import cn.troph.tomon.core.structures.Guild;
 import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.core.structures.GuildMember;
+import cn.troph.tomon.core.structures.GuildSettings;
+import cn.troph.tomon.core.structures.GuildSettingsOverride;
 import cn.troph.tomon.core.structures.Speaking;
+import cn.troph.tomon.core.structures.TextChannel;
 import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceConnectSend;
 import cn.troph.tomon.core.structures.VoiceConnectStateReceive;
 import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
+import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
-import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
 import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.channel.ChannelRV;
 import cn.troph.tomon.ui.chat.fragments.VoiceBottomSheet;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
+import cn.troph.tomon.ui.utils.TomonMaterialColors;
+import cn.troph.tomon.ui.utils.TomonViewUtils;
+import cn.troph.tomon.ui.widgets.TomonToast;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Response;
 
 public class ChannelListFragment extends Fragment implements PermissionListener {
 
@@ -88,12 +121,20 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private RecyclerView mRvChannelList;
     private ChannelListAdapter mChannelListAdapter;
     private ChannelGroupRV mChannelTreeRoot;
+    private Guild mCurrentGuild;
     private RtcEngine mRtcEngine;
     private ChatSharedViewModel mChatVM;
     private PowerManager.WakeLock mWakeLock;
     private RtcEngineEventHandler mRtcEngineEventHandler = new RtcEngineEventHandler();
     private ArrayMap<String, ChannelGroupRV> mChannelGroupCache = new ArrayMap<>();
     private ArrayMap<String, ArrayList<GuildChannel>> mChannelOrphans = new ArrayMap<>();
+    private static final int[][] ENABLED_CHECKED_STATES =
+            new int[][] {
+                    new int[] {android.R.attr.state_enabled, android.R.attr.state_checked}, // [0]
+                    new int[] {android.R.attr.state_enabled, -android.R.attr.state_checked}, // [1]
+                    new int[] {-android.R.attr.state_enabled, android.R.attr.state_checked}, // [2]
+                    new int[] {-android.R.attr.state_enabled, -android.R.attr.state_checked} // [3]
+            };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -128,8 +169,10 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mRtcEngine = null;
         Sensey.getInstance().stop();
         Client.Companion.getGlobal().getSocket().send(GatewayOp.VOICE, new Gson().toJsonTree(new VoiceLeaveConnect()));
-        mWakeLock.release();
-        mWakeLock = null;
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+            mWakeLock = null;
+        }
     }
 
     private void initAgoraEngine() {
@@ -140,7 +183,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 mRtcEngine.enableAudioVolumeIndication(200, 3, true);
             } catch (Exception e) {
                 Log.e(TAG, "RtcEngine create error:", e);
-                Toast.makeText(
+                TomonToast.makeText(
                         getContext().getApplicationContext(),
                         R.string.join_voice_fail,
                         Toast.LENGTH_SHORT
@@ -159,6 +202,305 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mRvChannelList = view.findViewById(R.id.rv_channel_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRvChannelList.setLayoutManager(linearLayoutManager);
+        mIvGuildSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showGuildSettings();
+            }
+        });
+    }
+
+    private void showGuildSettings() {
+        if (mCurrentGuild == null) {
+            return;
+        }
+        View viewBase = LayoutInflater.from(getContext()).inflate(R.layout.coordinator_guild_settings, null);
+        BottomSheetDialog dialog = new BottomSheetDialog(getContext(), R.style.CustomBottomSheetDialogTheme);
+        View windowBg = dialog.getWindow().findViewById(R.id.design_bottom_sheet);
+        dialog.setContentView(viewBase);
+        if (windowBg != null) {
+            windowBg.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        View bottomSheetView = viewBase.findViewById(R.id.bottom_sheet_guild_settings);
+        initGuildSettingsHeader(bottomSheetView);
+        initNickNameButton(bottomSheetView);
+        initLeaveGroupButton(dialog, bottomSheetView);
+        initMuteButton(bottomSheetView);
+        initMarkReadButton(dialog, bottomSheetView);
+        setPeekHeight(dialog, bottomSheetView);
+        dialog.show();
+    }
+
+    private void initMarkReadButton(BottomSheetDialog dialog, View bottomSheetView) {
+        ConstraintLayout clMarkRead = bottomSheetView.findViewById(R.id.cl_guild_read);
+        clMarkRead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                markAllChannelsRead(dialog);
+            }
+        });
+    }
+
+    private void markAllChannelsRead(BottomSheetDialog dialog) {
+        List<ChannelService.AckChannel> ackChannels = new ArrayList<>();
+        for (GuildChannel each : mCurrentGuild.getChannels()) {
+            if (each instanceof TextChannel) {
+                if (TextUtils.isEmpty(((TextChannel) each).getLastMessageId())) {
+                    continue;
+                }
+                ChannelService.AckChannel channel = new ChannelService.AckChannel(
+                        each.getId(), ((TextChannel) each).getLastMessageId());
+                ackChannels.add(channel);
+            }
+        }
+        ChannelService.ChannelsBulkAcks request = new ChannelService.ChannelsBulkAcks(ackChannels);
+        Client.Companion.getGlobal().getRest().getChannelService().bulkAcks(
+                Client.Companion.getGlobal().getAuth(), request)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io()).subscribe(new Consumer<Response<JsonObject>>() {
+            @Override
+            public void accept(Response<JsonObject> response) throws Throwable {
+                dialog.dismiss();
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Throwable {
+                Log.e(TAG, "mark unread error:", throwable);
+                TomonToast.makeText(getContext().getApplicationContext(),
+                        R.string.mark_read_failed, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void initMuteButton(View bottomSheetView) {
+        ConstraintLayout clMute = bottomSheetView.findViewById(R.id.cl_guild_mute);
+        SwitchMaterial switcher = clMute.findViewById(R.id.switch_guild_mute);
+        switcher.setThumbTintList(getMaterialThemeColorsThumbTintList(switcher));
+        switcher.setTrackTintList(getMaterialThemeColorsTrackTintList());
+        GuildSettingsCollection guildSettings = Client.Companion.getGlobal().getGuildSettings();
+        GuildSettings setting = guildSettings.get(mCurrentGuild.getId());
+        MessageNotificationsType messageNotifications = setting.getMessageNotifications();
+        boolean notifyMobile = setting.getMuted();
+        boolean suppressEveryone = setting.getSuppressEveryone();
+        if (messageNotifications != MessageNotificationsType.ALL /*&& !notifyMobile*/ && suppressEveryone) {
+            switcher.setChecked(true);
+        } else {
+            switcher.setChecked(false);
+        }
+        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setNotifyGuild(switcher, setting);
+            }
+        });
+    }
+
+    private void setNotifyGuild(SwitchMaterial switcher, GuildSettings setting) {
+        GuildService.NotifyGuildSetting request = null;
+        JsonArray array = new JsonArray();
+        for (GuildSettingsOverride each : setting.getChannelOverrides()) {
+            array.add(each.getRaw());
+        }
+        if (switcher.isChecked()) {
+            request = new GuildService.NotifyGuildSetting(
+                    false,
+                    MessageNotificationsType.ONLY_MENTION.getValue(),
+                    true, array);
+        } else {
+            request = new GuildService.NotifyGuildSetting(
+                    true,
+                    MessageNotificationsType.ALL.getValue(),
+                    false, array);
+        }
+        Client.Companion.getGlobal().getRest().getGuildService().setNotifyGuild(
+                mCurrentGuild.getId(),
+                request,
+                Client.Companion.getGlobal().getAuth())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<JsonObject>() {
+                    @Override
+                    public void accept(JsonObject jsonObject) throws Throwable {
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        TomonToast.makeText(getContext().getApplicationContext(), getString(R.string.setting_failed), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private ColorStateList getMaterialThemeColorsThumbTintList(SwitchMaterial view) {
+            int colorSurface = getResources().getColor(R.color.uncheck_thumb, null);
+            int colorControlActivated = getResources().getColor(R.color.pinkPrimary, null);
+            float thumbElevation = getResources().getDimension(R.dimen.mtrl_switch_thumb_elevation);
+            ElevationOverlayProvider elevationOverlayProvider = new ElevationOverlayProvider(getContext());
+            if (elevationOverlayProvider.isThemeElevationOverlayEnabled()) {
+                thumbElevation += TomonViewUtils.getParentAbsoluteElevation(view);
+            }
+            int colorThumbOff =
+                    elevationOverlayProvider.compositeOverlayIfNeeded(colorSurface, thumbElevation);
+
+            int[] switchThumbColorsList = new int[ENABLED_CHECKED_STATES.length];
+            switchThumbColorsList[0] =
+                    TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_FULL);
+            switchThumbColorsList[1] = colorThumbOff;
+            switchThumbColorsList[2] =
+                    TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_DISABLED);
+            switchThumbColorsList[3] = colorThumbOff;
+                    return new ColorStateList(ENABLED_CHECKED_STATES, switchThumbColorsList);
+    }
+
+    private ColorStateList getMaterialThemeColorsTrackTintList() {
+        int[] switchTrackColorsList = new int[ENABLED_CHECKED_STATES.length];
+        int colorSurface = getResources().getColor(R.color.uncheck_thumb, null);
+        int transSurface = getResources().getColor(R.color.transparent, null);
+        int colorControlActivated = getResources().getColor(R.color.check_track, null);
+        int colorOnSurface = getResources().getColor(R.color.uncheck_track, null);
+        switchTrackColorsList[0] =
+                TomonMaterialColors.layer(transSurface, colorControlActivated, MaterialColors.ALPHA_MEDIUM);
+        switchTrackColorsList[1] =
+                TomonMaterialColors.layer(transSurface, colorOnSurface, MaterialColors.ALPHA_DISABLED);
+        switchTrackColorsList[2] =
+                TomonMaterialColors.layer(
+                        colorSurface, colorControlActivated, MaterialColors.ALPHA_DISABLED_LOW);
+        switchTrackColorsList[3] =
+                TomonMaterialColors.layer(colorSurface, colorOnSurface, MaterialColors.ALPHA_DISABLED);
+        return new ColorStateList(ENABLED_CHECKED_STATES, switchTrackColorsList);
+    }
+
+    private void setPeekHeight(BottomSheetDialog dialog, View bottomSheetView) {
+        int marginBottom = getContext().getResources().getDimensionPixelSize(R.dimen.btn_leave_group_margin_bottom);
+        int height = getContext().getResources().getDimensionPixelSize(R.dimen.btn_leave_group_height);
+        int hideHeight = (int) (marginBottom + (3.0 * height) / 4);
+        bottomSheetView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                bottomSheetView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int sheetHeight = bottomSheetView.getHeight();
+                BottomSheetBehavior<FrameLayout> behavior = dialog.getBehavior();
+                behavior.setPeekHeight(sheetHeight - hideHeight, true);
+                behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                    @Override
+                    public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                        if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                            behavior.setHideable(true);
+                            behavior.setSkipCollapsed(true);
+                        }
+                    }
+
+                    @Override
+                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    private void initNickNameButton(View bottomSheetView) {
+        TextView tvNickName = bottomSheetView.findViewById(R.id.tv_guild_nickname);
+        GuildMember meMember = mCurrentGuild.getMembers().get(Client.Companion.getGlobal().getMe().getId());
+        tvNickName.setText(meMember.getDisplayName());
+        ConstraintLayout clGuildNickName = bottomSheetView.findViewById(R.id.cl_guild_nickname);
+        clGuildNickName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showChangeNickNameDialog();
+            }
+        });
+    }
+
+    private void initLeaveGroupButton(BottomSheetDialog dialog, View bottomSheetView) {
+        Button leaveGroup = bottomSheetView.findViewById(R.id.btn_leave_group);
+        leaveGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCurrentGuild.getOwnerId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                    showOwnerDialog();
+                } else {
+                    showLeaveAlertDialog();
+                }
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void initGuildSettingsHeader(View bottomSheetView) {
+        ImageView guildAvatar = bottomSheetView.findViewById(R.id.iv_guild_avatar);
+        TextView textHolder = bottomSheetView.findViewById(R.id.tv_no_icon_text);
+        GuildAvatarUtils.setGuildAvatar(guildAvatar, textHolder, mCurrentGuild);
+        TextView guildName = bottomSheetView.findViewById(R.id.tv_guild_settings_guild_name);
+        guildName.setText(mCurrentGuild.getName());
+        TextView memberInfo = bottomSheetView.findViewById(R.id.tv_member_info);
+        GuildMemberCollection members = mCurrentGuild.getMembers();
+        memberInfo.setText(getString(R.string.guild_member_number, members.getSize()));
+    }
+
+    private void showChangeNickNameDialog() {
+        TomonToast.makeText(getContext().getApplicationContext(), "没开发呢", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showLeaveAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View viewBase = View.inflate(getContext(), R.layout.leave_alert_dialog, null);
+        Button btnOk = viewBase.findViewById(R.id.btn_ok);
+        Button btnCancel = viewBase.findViewById(R.id.btn_cancel);
+        builder.setView(viewBase);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().getDecorView().setBackground(new ColorDrawable(Color.TRANSPARENT));
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestLeaveGroup(dialog);
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void showOwnerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View viewBase = View.inflate(getContext(), R.layout.owner_dialog, null);
+        Button btnOk = viewBase.findViewById(R.id.btn_ok);
+        builder.setView(viewBase);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().getDecorView().setBackground(new ColorDrawable(Color.TRANSPARENT));
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void requestLeaveGroup(AlertDialog dialog) {
+        Client.Companion.getGlobal().getRest().getGuildService().leaveGuild(
+                mCurrentGuild.getId(),
+                Client.Companion.getGlobal().getAuth())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<Response<Integer>>() {
+                    @Override
+                    public void accept(Response<Integer> response) throws Throwable {
+                        TomonToast.makeText(getContext().getApplicationContext(), "成功离开群组", Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        TomonToast.makeText(getContext().getApplicationContext(), "请重试", Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "error:", throwable);
+                    }
+                });
     }
 
     public void updateGuildBanner(String guildId) {
@@ -169,6 +511,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         if (guild == null) {
             return;
         }
+        mCurrentGuild = guild;
         GuildAvatarUtils.setGuildAvatar(mIvGuildAvater, mTvGuildAvaterTextHolder, guild);
         mTvGuildName.setText(guild.getName());
         Glide.with(mIvGuildBanner).clear(mIvGuildBanner);
@@ -216,15 +559,76 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
         if (mChannelListAdapter == null) {
             mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot, guild.getId());
+            mChannelListAdapter.setChatSharedVM(mChatVM);
             setOnVoiceChannelClickListener();
             registerObserver();
             mRvChannelList.setAdapter(mChannelListAdapter);
+            connectVoiceChannelIfNeeded(guildId);
         } else {
             mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot, guild.getId());
         }
     }
 
+    public void connectVoiceChannelIfNeeded(String guildId) {
+        Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
+        if (guild == null) {
+            return;
+        }
+        for (GuildChannel channel : guild.getChannels().clone()) {
+            if (channel instanceof VoiceChannel && ((VoiceChannel) channel).isJoined()) {
+                VoiceChannel voiceChannel = (VoiceChannel) channel;
+                boolean isMeJoined = false;
+                List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
+                for (VoiceUpdate voiceUpdate : voiceStates) {
+                    if (voiceUpdate.getUserId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                        isMeJoined = true;
+                        break;
+                    }
+                }
+                if (isMeJoined) {
+                    mChannelListAdapter.getOnVoiceChannelClickListener().onVoiceChannelClick(voiceChannel);
+                }
+                break;
+            }
+        }
+    }
+
     private void registerObserver() {
+        mChatVM.getChannelSyncLD().observe(getViewLifecycleOwner(), new Observer<ChannelSyncEvent>() {
+            @Override
+            public void onChanged(ChannelSyncEvent channelSyncEvent) {
+                Guild guild = channelSyncEvent.getGuild();
+                if (guild == null) {
+                    return;
+                }
+                String lastGuildId = null;
+                if (mCurrentGuild != null) {
+                    lastGuildId = mCurrentGuild.getId();
+                }
+                if (TextUtils.isEmpty(lastGuildId)) {
+                    lastGuildId = getArguments().getString(GUILD_ID);
+                }
+                if (TextUtils.isEmpty(lastGuildId)) {
+                    lastGuildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
+                }
+                String syncGuildId = guild.getId();
+                if (syncGuildId.equals(lastGuildId)) {
+                    updateGuildBanner(syncGuildId);
+                }
+            }
+        });
+
+        mChatVM.getMChannelAckLD().observe(getViewLifecycleOwner(), new Observer<ChannelAckEvent>() {
+            @Override
+            public void onChanged(ChannelAckEvent channelAckEvent) {
+                ChannelService.AckChannel ackChannel = channelAckEvent.getChannelAcks().getAcks().get(0);
+                if (mCurrentGuild.getChannels().contains(ackChannel.getChannel_id())) {
+                    mChannelListAdapter.notifyDataSetChanged();
+                    mChatVM.getGuildUpdateLD().setValue(new GuildUpdateEvent(mCurrentGuild));
+                }
+            }
+        });
+
         mChatVM.getVoiceSocketLeaveLD().observe(getViewLifecycleOwner(), new Observer<VoiceConnectStateReceive>() {
             @Override
             public void onChanged(VoiceConnectStateReceive voiceConnectStateReceive) {
@@ -331,7 +735,14 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-        VoiceChannel channel = mRtcEngineEventHandler.getCurrentVoiceChannel();
+        connectToVoiceChannel(mRtcEngineEventHandler.getCurrentVoiceChannel());
+    }
+
+    private void connectToVoiceChannel(VoiceChannel channel) {
+        if (channel.isJoined() && mChatVM.getSelectedCurrentVoiceChannel().getValue() == null) {
+            Client.Companion.getGlobal().getSocket().send(GatewayOp.VOICE, new Gson().toJsonTree(new VoiceLeaveConnect()));
+            Client.Companion.getGlobal().getVoiceSocket().open();
+        }
         if (mChatVM.getSelectedCurrentVoiceChannel().getValue() == null) {
             mChatVM.getSwitchingChannelVoiceLD().setValue(false);
             AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -353,7 +764,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-        Toast.makeText(
+        TomonToast.makeText(
                 getContext(),
                 R.string.join_permission_msg,
                 Toast.LENGTH_SHORT
@@ -392,7 +803,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     }
                     Client.Companion.getGlobal().getVoiceSocket().send(
                             GatewayOp.SPEAK,
-                            new Gson().toJsonTree(new Speaking(speaking, "")));
+                            new Gson().toJsonTree(new Speaking(speaking, Client.Companion.getGlobal().getMe().getId())));
                     Client.Companion.getGlobal().getEventBus().postEvent(
                             new VoiceSpeakEvent(
                                     new Speaking(speaking, Client.Companion.getGlobal().getMe().getId())));
@@ -430,7 +841,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     mChatVM.getSwitchingChannelVoiceLD().setValue(false);
                     mChatVM.getSelectedCurrentVoiceChannel().setValue(null);
                     Client.Companion.getGlobal().getEventBus().postEvent(new GuildVoiceSelectorEvent(""));
-                    mWakeLock.release();
+                    if (mWakeLock.isHeld()) {
+                        mWakeLock.release();
+                    }
                     Sensey.getInstance().stopProximityDetection(mProximityListener);
                 }
             });
@@ -440,6 +853,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         @Override
         public void onJoinChannelSuccess(String s, int i, int i1) {
             super.onJoinChannelSuccess(s, i, i1);
+            if (selectedVoiceChannel == null) {
+                return;
+            }
             mainThread.post(new Runnable() {
                 @Override
                 public void run() {
