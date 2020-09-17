@@ -1,8 +1,11 @@
 package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -74,6 +77,7 @@ import cn.troph.tomon.core.events.ChannelAckEvent;
 import cn.troph.tomon.core.events.ChannelCreateEvent;
 import cn.troph.tomon.core.events.ChannelDeleteEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
+import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
@@ -94,6 +98,7 @@ import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
+import cn.troph.tomon.ui.activities.GuildNickNameSettingsActivity;
 import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
 import cn.troph.tomon.ui.channel.ChannelListAdapter;
@@ -122,6 +127,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private ImageView mIvGuildBannerMask;
     private TextView mTvGuildName;
     private TextView mTvGuildAvaterTextHolder;
+    private TextView mTvBottomSheetNickName;
     private RecyclerView mRvChannelList;
     private LinearLayout mEmptyChannelListPanel;
     private ConstraintLayout mEmptyGuildListPanel;
@@ -236,6 +242,12 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         initMuteButton(bottomSheetView);
         initMarkReadButton(dialog, bottomSheetView);
         setPeekHeight(dialog, bottomSheetView);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mTvBottomSheetNickName = null;
+            }
+        });
         dialog.show();
     }
 
@@ -410,13 +422,14 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     private void initNickNameButton(View bottomSheetView) {
         TextView tvNickName = bottomSheetView.findViewById(R.id.tv_guild_nickname);
+        mTvBottomSheetNickName = tvNickName;
         GuildMember meMember = mCurrentGuild.getMembers().get(Client.Companion.getGlobal().getMe().getId());
         tvNickName.setText(meMember.getDisplayName());
         ConstraintLayout clGuildNickName = bottomSheetView.findViewById(R.id.cl_guild_nickname);
         clGuildNickName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showChangeNickNameDialog();
+                showChangeNickNameActivity();
             }
         });
     }
@@ -447,8 +460,10 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         memberInfo.setText(getString(R.string.guild_member_number, members.getSize()));
     }
 
-    private void showChangeNickNameDialog() {
-        TomonToast.makeText(getContext().getApplicationContext(), "没开发呢", Toast.LENGTH_SHORT).show();
+    private void showChangeNickNameActivity() {
+        Intent intent = new Intent(getContext(), GuildNickNameSettingsActivity.class);
+        intent.putExtra(GuildNickNameSettingsActivity.KEY_GUILD_ID, mCurrentGuild.getId());
+        startActivityForResult(intent, 0);
     }
 
     private void showLeaveAlertDialog() {
@@ -664,6 +679,17 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     mChannelListAdapter.notifyDataSetChanged();
                     mChatVM.getGuildUpdateLD().setValue(new GuildUpdateEvent(mCurrentGuild));
                 }
+            }
+        });
+
+        mChatVM.getGuildMemberUpdateLD().observe(getViewLifecycleOwner(), new Observer<GuildMemberUpdateEvent>() {
+            @Override
+            public void onChanged(GuildMemberUpdateEvent guildMemberUpdateEvent) {
+                GuildMember member = guildMemberUpdateEvent.getMember();
+                if (mTvBottomSheetNickName != null && member.getId().equals(Client.Companion.getGlobal().getMe().getId())) {
+                    mTvBottomSheetNickName.setText(member.getDisplayName());
+                }
+                mChannelListAdapter.notifyDataSetChanged();
             }
         });
 
@@ -922,6 +948,15 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         public void onError(int i) {
             super.onError(i);
             Log.e(TAG, "an error during Angora SDK runtime: " + i);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Huan", "result code" + resultCode);
+        if (resultCode == Activity.RESULT_OK) {
+
         }
     }
 }

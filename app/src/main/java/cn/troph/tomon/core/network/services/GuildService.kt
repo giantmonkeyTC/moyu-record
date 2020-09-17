@@ -76,5 +76,16 @@ interface GuildService {
         @Header("Authorization") token: String
     ): Observable<Response<Integer>>
 
+    data class SetNickNameRequest(
+        @SerializedName("nick")
+        val nick: String
+    )
+
+    @PATCH("guilds/{id}/members/@me/nick")
+    fun setNickName(
+        @Path("id") id: String,
+        @Header("Authorization") token: String,
+        @Body request:SetNickNameRequest
+    ):Observable<JsonObject>
 
 }
