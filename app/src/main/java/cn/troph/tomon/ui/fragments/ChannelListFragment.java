@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,8 @@ import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.collections.GuildMemberCollection;
 import cn.troph.tomon.core.collections.GuildSettingsCollection;
 import cn.troph.tomon.core.events.ChannelAckEvent;
+import cn.troph.tomon.core.events.ChannelCreateEvent;
+import cn.troph.tomon.core.events.ChannelDeleteEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
@@ -91,6 +94,7 @@ import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
+import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
 import cn.troph.tomon.ui.channel.ChannelListAdapter;
 import cn.troph.tomon.ui.channel.ChannelRV;
@@ -119,6 +123,8 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private TextView mTvGuildName;
     private TextView mTvGuildAvaterTextHolder;
     private RecyclerView mRvChannelList;
+    private LinearLayout mEmptyChannelListPanel;
+    private ConstraintLayout mEmptyGuildListPanel;
     private ChannelListAdapter mChannelListAdapter;
     private ChannelGroupRV mChannelTreeRoot;
     private Guild mCurrentGuild;
@@ -158,7 +164,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         super.onViewCreated(view, savedInstanceState);
         initAgoraEngine();
         initView(view);
-        updateGuildBanner(getArguments().getString(GUILD_ID));
+        updateWholePage(getArguments().getString(GUILD_ID));
     }
 
     @Override
@@ -199,6 +205,8 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mIvGuildSetting = view.findViewById(R.id.iv_guild_setting);
         mTvGuildName = view.findViewById(R.id.tv_guild_name);
         mTvGuildAvaterTextHolder = view.findViewById(R.id.tv_no_icon_text);
+        mEmptyChannelListPanel = view.findViewById(R.id.ll_empty_channel_list);
+        mEmptyGuildListPanel = view.findViewById(R.id.cl_empty_guild_list);
         mRvChannelList = view.findViewById(R.id.rv_channel_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRvChannelList.setLayoutManager(linearLayoutManager);
@@ -503,7 +511,19 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 });
     }
 
-    public void updateGuildBanner(String guildId) {
+    public void updateWholePage(String guildId) {
+        if (Client.Companion.getGlobal().getGuilds().getSize() == 0) {
+            showEmptyGuildsView();
+            setOnJoinGuildClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((TomonMainActivity)getActivity()).joinGuild();
+                }
+            });
+            return;
+        } else {
+            hideEmptyGuildsView();
+        }
         if (TextUtils.isEmpty(guildId)) {
             guildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
         }
@@ -535,8 +555,12 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 .into(mIvGuildBanner);
 
         GuildChannelCollection channels = guild.getChannels();
-        if (channels != null && channels.getSize() > 0) {
+        if (channels.getSize() > 0) {
             mChannelTreeRoot = new ChannelGroupRV(null, null, new ArrayList<>());
+            mEmptyChannelListPanel.setVisibility(View.GONE);
+        } else {
+            mChannelTreeRoot = null;
+            mEmptyChannelListPanel.setVisibility(View.VISIBLE);
         }
         Collection<GuildChannel> guildChannels = channels.clone();
         for (GuildChannel channel : guildChannels) {
@@ -613,8 +637,22 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 }
                 String syncGuildId = guild.getId();
                 if (syncGuildId.equals(lastGuildId)) {
-                    updateGuildBanner(syncGuildId);
+                    updateWholePage(syncGuildId);
                 }
+            }
+        });
+
+        mChatVM.getMChannelCreateLD().observe(getViewLifecycleOwner(), new Observer<ChannelCreateEvent>() {
+            @Override
+            public void onChanged(ChannelCreateEvent channelCreateEvent) {
+                updateWholePage(mCurrentGuild.getId());
+            }
+        });
+
+        mChatVM.getMChannelDeleteLD().observe(getViewLifecycleOwner(), new Observer<ChannelDeleteEvent>() {
+            @Override
+            public void onChanged(ChannelDeleteEvent channelDeleteEvent) {
+                updateWholePage(mCurrentGuild.getId());
             }
         });
 
@@ -773,6 +811,18 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+    }
+
+    public void showEmptyGuildsView() {
+        mEmptyGuildListPanel.setVisibility(View.VISIBLE);
+    }
+
+    public void hideEmptyGuildsView() {
+        mEmptyGuildListPanel.setVisibility(View.GONE);
+    }
+
+    public void setOnJoinGuildClickListener(View.OnClickListener listener) {
+        mEmptyGuildListPanel.findViewById(R.id.btn_join_guild).setOnClickListener(listener);
     }
 
     private class RtcEngineEventHandler extends IRtcEngineEventHandler {

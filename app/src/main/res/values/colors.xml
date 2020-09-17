@@ -80,6 +80,7 @@
     <color name="pinkPrimary">#FF7896</color>
     <color name="status_online">#67D78E</color>
     <color name="blackPrimary">#313131</color>
+    <color name="blackAlert">#2E2E2E</color>
     <color name="black_20">#33000000</color>
     <color name="transparent">#00000000</color>
     <color name="msg_desp_mention">#CDFF7A6B</color>
@@ -88,4 +89,5 @@
     <color name="uncheck_thumb">#A2A2A2</color>
     <color name="uncheck_track">#61A2A2A2</color>
     <color name="check_track">#61FF7896</color>
+    <color name="empty_channel_desp">#B0B0B0</color>
 </resources>

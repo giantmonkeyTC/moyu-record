@@ -39,7 +39,7 @@
             android:label="ChannelListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             />
 
         <activity android:name=".ui.activities.SecondActivity" />

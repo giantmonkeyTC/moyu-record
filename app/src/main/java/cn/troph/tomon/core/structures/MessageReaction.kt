@@ -79,7 +79,7 @@ class MessageReaction(
             }
             var name: String = ""
             if (data.has("name")) {
-                name = data["name"].asString
+                name = data["name"].optString ?: ""
             }
             return EmojiData(id, name)
         }
