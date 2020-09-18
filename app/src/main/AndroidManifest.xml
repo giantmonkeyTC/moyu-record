@@ -35,16 +35,18 @@
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activities.GuildNickNameSettingsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity
             android:name=".ui.activities.TomonMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity android:name=".ui.activities.SecondActivity" />
+
+        <activity
+            android:name=".ui.activities.GuildNickNameSettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <receiver
             android:name=".ui.states.NetworkChangeReceiver"

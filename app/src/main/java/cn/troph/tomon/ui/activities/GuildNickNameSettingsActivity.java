@@ -18,6 +18,7 @@ import cn.troph.tomon.R;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.network.services.GuildService;
 import cn.troph.tomon.core.structures.Guild;
+import cn.troph.tomon.core.utils.KeyboardUtils;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
 import cn.troph.tomon.ui.widgets.TomonToast;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -35,6 +36,7 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
     private Button mBtnChangeNickName;
     private TextView mGuildAvatarHolder;
     private ImageView mIvClear;
+    private String mOrigNickName;
     private Guild mCurrentGuild;
 
     @Override
@@ -70,8 +72,9 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
             }
         });
         mTvGuildName.setText(mCurrentGuild.getName());
-        mEtGuildNickName.setText(mCurrentGuild.getMembers().get(
-                Client.Companion.getGlobal().getMe().getId()).getDisplayName());
+        mOrigNickName = mCurrentGuild.getMembers().get(
+                Client.Companion.getGlobal().getMe().getId()).getDisplayName();
+        mEtGuildNickName.setText(mOrigNickName);
         mEtGuildNickName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -87,41 +90,58 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
             }
         });
         GuildAvatarUtils.setGuildAvatar(mGuildAvatar, mGuildAvatarHolder, mCurrentGuild);
+        updateFinishButtonStyle(mEtGuildNickName.getText().toString().trim());
         mBtnChangeNickName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newNickName = mEtGuildNickName.getText().toString().trim();
-                Client.Companion.getGlobal().getRest().getGuildService().setNickName(
-                        mCurrentGuild.getId(),
-                        Client.Companion.getGlobal().getAuth(),
-                        new GuildService.SetNickNameRequest(newNickName))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(new Consumer<JsonObject>() {
-                            @Override
-                            public void accept(JsonObject jsonObject) throws Throwable {
-                                TomonToast.makeText(
-                                        getApplicationContext(),
-                                        getString(R.string.set_nickname_success),
-                                        Toast.LENGTH_SHORT).show();
-                                setResult(Activity.RESULT_OK);
-                                finish();
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Throwable {
-                                TomonToast.makeText(
-                                        getApplicationContext(),
-                                        getString(R.string.set_nickname_failed),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                changeNickName();
             }
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        KeyboardUtils.showKeyBoard(mEtGuildNickName, this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        KeyboardUtils.hideKeyBoard(this);
+    }
+
+    private void changeNickName() {
+        String newNickName = mEtGuildNickName.getText().toString().trim();
+        Client.Companion.getGlobal().getRest().getGuildService().setNickName(
+                mCurrentGuild.getId(),
+                Client.Companion.getGlobal().getAuth(),
+                new GuildService.SetNickNameRequest(newNickName))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<JsonObject>() {
+                    @Override
+                    public void accept(JsonObject jsonObject) throws Throwable {
+                        TomonToast.makeText(
+                                getApplicationContext(),
+                                getString(R.string.set_nickname_success),
+                                Toast.LENGTH_SHORT).show();
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        TomonToast.makeText(
+                                getApplicationContext(),
+                                getString(R.string.set_nickname_failed),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void updateFinishButtonStyle(CharSequence s) {
-        if (s.length() > 16 || s.length() < 1) {
+        if (s.length() > 16 || s.length() < 1 || s.toString().equals(mOrigNickName)) {
             mBtnChangeNickName.setEnabled(false);
             mBtnChangeNickName.setTextColor(getColor(R.color.white_70));
         } else {
