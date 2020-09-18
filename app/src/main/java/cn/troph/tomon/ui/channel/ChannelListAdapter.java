@@ -63,7 +63,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
-        mDataList = root.flatten();
+        if (root == null) {
+            mDataList = new ArrayList<>();
+        } else {
+            mDataList = root.flatten();
+        }
         mCurrentGuildID = guildID;
         notifyDataSetChanged();
     }

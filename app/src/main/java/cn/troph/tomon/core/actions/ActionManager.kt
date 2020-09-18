@@ -79,6 +79,8 @@ class ActionManager(val client: Client) {
 
     fun presenceUpdate(data: JsonObject): Presence? = PresenceUpdateAction(client).handle(data)
 
+    fun guildMemberUpdate(data: JsonObject): GuildMember? = GuildMemberUpdateAction(client).handle(data)
+
     fun guildSettingsUpdate(data: JsonObject): GuildSettings? =
         GuildSettingsUpdateAction(client).handle(data)
 

@@ -217,5 +217,13 @@
     <string name="mark_guild_read">标记为已读</string>
     <string name="setting_failed">设置失败，请重试</string>
     <string name="mark_read_failed">标记失败，请重试</string>
+    <string name="empty_channel_list">频道君消失了</string>
+    <string name="empty_guild_list">你还没有群组，快去加入一个吧</string>
+    <string name="join_guild">加入群组</string>
+    <string name="guild_nickname_settings">群组内昵称</string>
+    <string name="guild_name_settings_desp">群组昵称修改后，只会在此群组内显示。</string>
+    <string name="finish">完成</string>
+    <string name="set_nickname_success">设置成功</string>
+    <string name="set_nickname_failed">设置昵称失败，请重试</string>
     <string name="copied_invite">邀请链接已复制</string>
 </resources>

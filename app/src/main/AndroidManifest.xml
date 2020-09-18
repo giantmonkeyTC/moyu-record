@@ -34,14 +34,16 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/app_logo"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".ui.activities.TomonMainActivity"
-            android:label="ChannelListActivity"
+        <activity
+            android:name=".ui.activities.GuildNickNameSettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            />
-
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+        <activity
+            android:name=".ui.activities.TomonMainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity android:name=".ui.activities.SecondActivity" />
 
         <receiver
@@ -71,7 +73,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -82,7 +83,6 @@
                     android:host="invite"
                     android:scheme="tomon" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -94,7 +94,6 @@
                     android:pathPrefix="/invite"
                     android:scheme="https" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".ui.activities.RegisterActivity"

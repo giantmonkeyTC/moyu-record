@@ -9,9 +9,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -26,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -62,6 +65,7 @@ import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
 import cn.troph.tomon.ui.widgets.TomonTabButton;
 import cn.troph.tomon.ui.widgets.TomonToast;
+import cn.troph.tomon.ui.widgets.UserAvatar;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -80,7 +84,7 @@ public class TomonMainActivity extends BaseActivity {
     private TomonTabButton mTabBtnDm;
     private RelativeLayout mTabRlMe;
     private ImageView mMeSelectedRing;
-    private ImageView mAvatar;
+    private UserAvatar mAvatar;
     private RelativeLayout mMyStatus;
     private String mCurrentFragmentTag;
     private EditText mEtSearchBar;
@@ -165,9 +169,7 @@ public class TomonMainActivity extends BaseActivity {
 
     private void updateMeStatus() {
         Me me = Client.Companion.getGlobal().getMe();
-        Glide.with(mAvatar).load(me.getAvatarURL())
-                .transform(new CenterCrop(), new CircleCrop())
-                .into(mAvatar);
+        mAvatar.setUser(me);
         Presence myPresence = Client.Companion.getGlobal().getPresences().get(me.getId());
         if (myPresence == null) {
             mMyStatus.setVisibility(View.INVISIBLE);
@@ -273,7 +275,7 @@ public class TomonMainActivity extends BaseActivity {
         mDrawerLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                KeyboardUtils.hideKeyBoard(mEtSearchBar);
+                KeyboardUtils.hideKeyBoard(TomonMainActivity.this);
                 return false;
             }
         });
@@ -306,6 +308,12 @@ public class TomonMainActivity extends BaseActivity {
                 if (mAdapter == null) {
                     return;
                 }
+                if (Client.Companion.getGlobal().getGuilds().getSize() == 0) {
+                    showEmptyGuildListView();
+                    return;
+                } else {
+                    enableDrawerSlide();
+                }
                 mAdapter.setDataAndNotifyChanged(Client.Companion.getGlobal().getGuilds().getList().toList(),
                         mEtSearchBar.getText().toString().trim());
                 if (mAdapter.getCurrentGuildId().equals(guildDeleteEvent.getGuild().getId())) {
@@ -318,6 +326,36 @@ public class TomonMainActivity extends BaseActivity {
         });
     }
 
+    private void enableDrawerSlide() {
+        mDrawerLayout.setDrawerEnabledInTouch(Gravity.START, true);
+        mDrawerLayout.setDrawerEnabledInTouch(Gravity.END, true);
+    }
+
+    private void disableDrawerSlide() {
+        mDrawerLayout.setDrawerEnabledInTouch(Gravity.START, false);
+        mDrawerLayout.setDrawerEnabledInTouch(Gravity.END, false);
+    }
+
+    private void showEmptyGuildListView() {
+        ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager()
+                .findFragmentByTag(ChannelListFragment.TAG);
+        showEmptyGuildListView(channelListFragment);
+    }
+
+    private void showEmptyGuildListView(ChannelListFragment channelListFragment) {
+        mDrawerLayout.closeDrawer(true);
+        disableDrawerSlide();
+        if (channelListFragment != null) {
+            channelListFragment.showEmptyGuildsView();
+            channelListFragment.setOnJoinGuildClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    joinGuild();
+                }
+            });
+        }
+    }
+
     private void observeGuildCreated() {
         mChatVM.getGuildCreateLD().observe(this, new Observer<GuildCreateEvent>() {
             @Override
@@ -328,6 +366,16 @@ public class TomonMainActivity extends BaseActivity {
 
                 if (mAdapter.isInviting()) {
                     mAdapter.setCurrentGuildId(guildCreateEvent.getGuild().getId());
+                }
+                if (!mDrawerLayout.isDrawerSlidable(Gravity.START)) {
+                    enableDrawerSlide();
+                    ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager()
+                            .findFragmentByTag(ChannelListFragment.TAG);
+                    if (channelListFragment != null) {
+                        channelListFragment.hideEmptyGuildsView();
+                        mAdapter.setCurrentGuildId(guildCreateEvent.getGuild().getId());
+                        showGuildChannelList(guildCreateEvent.getGuild().getId());
+                    }
                 }
                 mAdapter.setDataAndNotifyChanged(
                         Client.Companion.getGlobal().getGuilds().getList().toList(),
@@ -474,7 +522,7 @@ public class TomonMainActivity extends BaseActivity {
                     mAdapter.setOnItemClickListener(new GuildListAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(int position, Guild guild) {
-                            KeyboardUtils.hideKeyBoard(mEtSearchBar);
+                            KeyboardUtils.hideKeyBoard(TomonMainActivity.this);
                             mAdapter.setCurrentGuildId(guild.getId());
                             mAdapter.notifyDataSetChanged();
                             mDrawerLayout.closeDrawer(true);
@@ -506,7 +554,7 @@ public class TomonMainActivity extends BaseActivity {
         extraData.putString(ChannelListFragment.GUILD_ID, guildId);
 
         if (ChannelListFragment.TAG.equals(mCurrentFragmentTag)) {
-            channelListFragment.updateGuildBanner(guildId);
+            channelListFragment.updateWholePage(guildId);
         } else {
             channelListFragment.setArguments(extraData);
             getSupportFragmentManager().beginTransaction()
@@ -515,6 +563,9 @@ public class TomonMainActivity extends BaseActivity {
         }
         mCurrentFragmentTag = ChannelListFragment.TAG;
         saveLastGuildId(guildId);
+        if (Client.Companion.getGlobal().getGuilds().getSize() == 0) {
+            showEmptyGuildListView();
+        }
     }
 
     private void initJoinGuildView() {
@@ -533,13 +584,14 @@ public class TomonMainActivity extends BaseActivity {
         });
     }
 
-    private void joinGuild() {
+    public void joinGuild() {
         View viewBase = LayoutInflater.from(this).inflate(R.layout.coordinator_join_guild, null);
         View bottomSheetView = viewBase.findViewById(R.id.bottom_sheet_join_guild);
         EditText etLink = bottomSheetView.findViewById(R.id.bs_textfield);
         BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.CustomBottomSheetDialogTheme);
         dialog.setContentView(viewBase);
         View windowBg = dialog.getWindow().findViewById(R.id.design_bottom_sheet);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         if (windowBg != null) {
             windowBg.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -582,8 +634,15 @@ public class TomonMainActivity extends BaseActivity {
 
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                KeyboardUtils.hideKeyBoard(mEtSearchBar);
+            public void onDismiss(DialogInterface dialogI) {
+                KeyboardUtils.hideKeyBoard(TomonMainActivity.this);
+            }
+        });
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogI) {
+                KeyboardUtils.showKeyBoard(etLink, TomonMainActivity.this);
             }
         });
 
