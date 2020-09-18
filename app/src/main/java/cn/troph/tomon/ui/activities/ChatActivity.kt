@@ -49,7 +49,6 @@ class ChatActivity : BaseActivity() {
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount
         }
-        Client.global.dmChannels
 
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)
@@ -83,35 +82,6 @@ class ChatActivity : BaseActivity() {
             }
 
         })
-        mChatSharedViewModel.upEventDrawerLD.observe(this, Observer {
-            val event = it as? AppUIEvent
-            when (event?.type) {
-                AppUIEventType.CHANNEL_DRAWER -> {
-                    hideKeyboard()
-                    val isOpen = event.value as Boolean
-                    if (isOpen) overlapping_panels.openStartPanel() else
-                        overlapping_panels.closePanels()
-                }
-                AppUIEventType.MEMBER_DRAWER -> {
-                    hideKeyboard()
-                    val isOpen = event.value as Boolean
-                    if (isOpen) overlapping_panels.openEndPanel() else
-                        overlapping_panels.closePanels()
-                }
-            }
-        })
-        overlapping_panels.registerStartPanelStateListeners(object :
-            OverlappingPanelsLayout.PanelStateListener {
-            override fun onPanelStateChange(panelState: PanelState) {
-                hideKeyboard()
-            }
-        })
-        overlapping_panels.registerEndPanelStateListeners(object :
-            OverlappingPanelsLayout.PanelStateListener {
-            override fun onPanelStateChange(panelState: PanelState) {
-                hideKeyboard()
-            }
-        })
         mChatSharedViewModel.channelUpdateLD.observe(this, Observer {
             if (it.channel.id == AppState.global.channelSelection.value.channelId) {
                 updateToolbarAndInputEditTextView(it.channel)
@@ -135,24 +105,6 @@ class ChatActivity : BaseActivity() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun setDrawerEdge(mDrawerLayout: DrawerLayout, isLeftDrawer: Boolean = true) {
-        try {
-            val manager = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val width = DisplayMetrics().also { manager.defaultDisplay.getMetrics(it) }.widthPixels
-
-            val viewDragHelper = mDrawerLayout::class.java
-                .getDeclaredField(if (isLeftDrawer) "mLeftDragger" else "mRightDragger")
-                .apply { isAccessible = true }
-                .run { get(mDrawerLayout) as ViewDragHelper }
-
-            viewDragHelper.let { it::class.java.getDeclaredField("mEdgeSize") }
-                .apply { isAccessible = true }
-                .apply { setInt(viewDragHelper, width / 2) }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     private fun updateToolbarAndInputEditTextView(channel: Channel) {
         if (channel is GuildChannel) {
@@ -197,12 +149,10 @@ class ChatActivity : BaseActivity() {
         when (item.itemId) {
             android.R.id.home -> {
                 hideKeyboard()
-                overlapping_panels.openStartPanel()
             }
             R.id.members -> {
                 if (AppState.global.channelSelection.value.channelId != null) {
                     hideKeyboard()
-                    overlapping_panels.openEndPanel()
                 }
             }
 

@@ -64,7 +64,6 @@ class ChatSharedViewModel : ViewModel() {
     )
 
     val channelSelectionLD = MutableLiveData<ChannelSelection>()
-    val upEventDrawerLD = MutableLiveData<Any>()
     val channelCollapses = MutableLiveData<Map<String, Boolean>>()
     val channelUpdateLD = MutableLiveData<ChannelUpdateEvent>()
 
@@ -138,9 +137,6 @@ class ChatSharedViewModel : ViewModel() {
                 channelSelectionLD.value = it
             })
 
-        AppState.global.eventBus.observeEventsOnUi().subscribe(Consumer {
-            upEventDrawerLD.value = it
-        })
 
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(Consumer {

@@ -22,6 +22,10 @@ class DmChannelSelectorFragment : Fragment() {
     private val mDMchannelList = mutableListOf<DmChannel>()
     private val mDMchennelAdapter = DmChannelSelectorAdapter(mDMchannelList)
 
+    companion object {
+        val TAG = "DmChannelSelectorFragment"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

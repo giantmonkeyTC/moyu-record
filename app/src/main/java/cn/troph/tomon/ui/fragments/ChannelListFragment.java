@@ -770,7 +770,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             public void onTextChannelClick(TextChannel channel) {
                 mChatVM.getChannelSelectionLD().setValue(new ChannelSelection(mCurrentGuild.getId(), channel.getId()));
                 Intent intent = new Intent(requireContext(), ChatActivity.class);
-                startActivity(intent, ActivityOptions.makeCustomAnimation(requireContext(), R.anim.slide_in_right_custom, R.anim.slide_out_right_custom).toBundle());
+                startActivity(intent, ActivityOptions.makeCustomAnimation(requireContext(), R.anim.slide_in_right_custom, R.anim.no_animation).toBundle());
             }
         });
     }

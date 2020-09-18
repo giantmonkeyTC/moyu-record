@@ -1,25 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.discord.panels.OverlappingPanelsLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/overlapping_panels"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <FrameLayout
-        android:id="@+id/start_panel"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start">
-        <androidx.fragment.app.FragmentContainerView
-            android:elevation="10dp"
-            android:id="@+id/fragment_channel_selector"
-            android:name="cn.troph.tomon.ui.chat.fragments.ChannelSelectorFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start" />
-    </FrameLayout>
-
     <FrameLayout
         android:id="@+id/center_panel"
         android:layout_width="match_parent"
@@ -29,21 +14,4 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>
-
-    <!-- Set layout_gravity on the end panel to "end" -->
-    <FrameLayout
-        android:id="@+id/end_panel"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end">
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_member_selector"
-            android:layout_width="match_parent"
-            android:elevation="10dp"
-            android:name="cn.troph.tomon.ui.chat.fragments.ChannelInfoFragment"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            />
-    </FrameLayout>
-
-</com.discord.panels.OverlappingPanelsLayout>
+</FrameLayout>

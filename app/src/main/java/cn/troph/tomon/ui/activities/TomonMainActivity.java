@@ -57,7 +57,9 @@ import cn.troph.tomon.core.structures.StampPack;
 import cn.troph.tomon.core.utils.Assets;
 import cn.troph.tomon.core.utils.KeyboardUtils;
 import cn.troph.tomon.core.utils.Url;
+import cn.troph.tomon.ui.chat.fragments.DmChannelSelectorFragment;
 import cn.troph.tomon.ui.chat.fragments.Invite;
+import cn.troph.tomon.ui.chat.fragments.MeFragment;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.fragments.ChannelListFragment;
 import cn.troph.tomon.ui.guild.GuildListAdapter;
@@ -116,18 +118,21 @@ public class TomonMainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 setChannelSelected();
+                showGuildChannelList(getLastGuildId());
             }
         });
         mTabBtnDm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setDmSelected();
+                showDmFragment();
             }
         });
         mTabRlMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setMeSelected();
+                showMeFragment();
             }
         });
     }
@@ -543,6 +548,38 @@ public class TomonMainActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    private void showMeFragment() {
+        MeFragment mefragment = (MeFragment) getSupportFragmentManager()
+                .findFragmentByTag(MeFragment.Companion.getTAG());
+
+        if (mefragment == null) {
+            mefragment = new MeFragment();
+        }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, mefragment, MeFragment.Companion.getTAG())
+                .commit();
+
+        mCurrentFragmentTag = MeFragment.Companion.getTAG();
+    }
+
+    private void showDmFragment() {
+        DmChannelSelectorFragment dmfragment = (DmChannelSelectorFragment) getSupportFragmentManager()
+                .findFragmentByTag(DmChannelSelectorFragment.Companion.getTAG());
+
+        if (dmfragment == null) {
+            dmfragment = new DmChannelSelectorFragment();
+        }
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, dmfragment, DmChannelSelectorFragment.Companion.getTAG())
+                .commit();
+        mCurrentFragmentTag = DmChannelSelectorFragment.Companion.getTAG();
+
     }
 
     private void showGuildChannelList(String guildId) {
