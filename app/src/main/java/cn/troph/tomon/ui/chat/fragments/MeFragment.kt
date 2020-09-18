@@ -8,11 +8,6 @@ import androidx.fragment.app.Fragment
 import cn.troph.tomon.R
 
 class MeFragment : Fragment() {
-    companion object {
-        val TAG = "MeFragment"
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

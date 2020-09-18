@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.activities;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,15 +21,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -62,6 +61,7 @@ import cn.troph.tomon.ui.chat.fragments.Invite;
 import cn.troph.tomon.ui.chat.fragments.MeFragment;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.fragments.ChannelListFragment;
+import cn.troph.tomon.ui.fragments.TomonMainPagerAdapter;
 import cn.troph.tomon.ui.guild.GuildListAdapter;
 import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
@@ -72,9 +72,13 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class TomonMainActivity extends BaseActivity {
+public class TomonMainActivity extends BaseActivity implements TomonMainPagerAdapter.FragmentSupplier {
 
     private static final String TAG = "TomonMainActivity";
+    public static final int NUM_PAGER = 3;
+    public static final int POS_CHANNEL_LIST = 0;
+    public static final int POS_DM_LIST = 1;
+    public static final int POS_ME = 2;
 
     private ChatSharedViewModel mChatVM;
     private RecyclerView mGuildListRecyclerView;
@@ -88,8 +92,9 @@ public class TomonMainActivity extends BaseActivity {
     private ImageView mMeSelectedRing;
     private UserAvatar mAvatar;
     private RelativeLayout mMyStatus;
-    private String mCurrentFragmentTag;
     private EditText mEtSearchBar;
+    private ViewPager2 mVpFragments;
+    private TomonMainPagerAdapter mPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,11 +107,17 @@ public class TomonMainActivity extends BaseActivity {
         initChannelList(savedInstanceState);
     }
 
+    @SuppressLint("WrongConstant")
     private void initChannelList(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             return;
         }
-        showGuildChannelList(getLastGuildId());
+        mVpFragments = findViewById(R.id.vp_fragment_container);
+        mPagerAdapter = new TomonMainPagerAdapter(this, this);
+        mVpFragments.setAdapter(mPagerAdapter);
+        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
+        mVpFragments.setOffscreenPageLimit(NUM_PAGER);
+        mVpFragments.setUserInputEnabled(false);
     }
 
     private void initTab() {
@@ -117,24 +128,36 @@ public class TomonMainActivity extends BaseActivity {
         mTabBtnChannel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setChannelSelected();
-                showGuildChannelList(getLastGuildId());
+                selectChannelListTab();
             }
         });
         mTabBtnDm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setDmSelected();
-                showDmFragment();
+                selectDmListTab();
             }
         });
         mTabRlMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setMeSelected();
-                showMeFragment();
+                selectMeTab();
             }
         });
+    }
+
+    private void selectMeTab() {
+        setMeSelected();
+        mVpFragments.setCurrentItem(POS_ME, false);
+    }
+
+    private void selectDmListTab() {
+        setDmSelected();
+        mVpFragments.setCurrentItem(POS_DM_LIST, false);
+    }
+
+    private void selectChannelListTab() {
+        setChannelSelected();
+        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
     }
 
     private void setMeSelected() {
@@ -324,7 +347,7 @@ public class TomonMainActivity extends BaseActivity {
                 if (mAdapter.getCurrentGuildId().equals(guildDeleteEvent.getGuild().getId())) {
                     Guild guild = mAdapter.getGuildList().get(0);
                     mAdapter.setCurrentGuildId(guild.getId());
-                    showGuildChannelList(guild.getId());
+                    updateGuildChannelList(guild.getId());
                 }
 
             }
@@ -342,8 +365,7 @@ public class TomonMainActivity extends BaseActivity {
     }
 
     private void showEmptyGuildListView() {
-        ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager()
-                .findFragmentByTag(ChannelListFragment.TAG);
+        ChannelListFragment channelListFragment = (ChannelListFragment) mPagerAdapter.getFragment(POS_CHANNEL_LIST);
         showEmptyGuildListView(channelListFragment);
     }
 
@@ -374,12 +396,11 @@ public class TomonMainActivity extends BaseActivity {
                 }
                 if (!mDrawerLayout.isDrawerSlidable(Gravity.START)) {
                     enableDrawerSlide();
-                    ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager()
-                            .findFragmentByTag(ChannelListFragment.TAG);
+                    ChannelListFragment channelListFragment = (ChannelListFragment) mPagerAdapter.getFragment(POS_CHANNEL_LIST);
                     if (channelListFragment != null) {
                         channelListFragment.hideEmptyGuildsView();
                         mAdapter.setCurrentGuildId(guildCreateEvent.getGuild().getId());
-                        showGuildChannelList(guildCreateEvent.getGuild().getId());
+                        updateGuildChannelList(guildCreateEvent.getGuild().getId());
                     }
                 }
                 mAdapter.setDataAndNotifyChanged(
@@ -389,7 +410,7 @@ public class TomonMainActivity extends BaseActivity {
                     mAdapter.setIsInviting(false);
                     mGuildListRecyclerView.scrollToPosition(
                             mAdapter.getGuildList().indexOf(guildCreateEvent.getGuild()));
-                    showGuildChannelList(guildCreateEvent.getGuild().getId());
+                    updateGuildChannelList(guildCreateEvent.getGuild().getId());
                     mDrawerLayout.closeDrawer(true);
                 }
             }
@@ -531,7 +552,8 @@ public class TomonMainActivity extends BaseActivity {
                             mAdapter.setCurrentGuildId(guild.getId());
                             mAdapter.notifyDataSetChanged();
                             mDrawerLayout.closeDrawer(true);
-                            showGuildChannelList(guild.getId());
+                            updateGuildChannelList(guild.getId());
+                            selectChannelListTab();
                         }
                     });
                 } else {
@@ -550,58 +572,43 @@ public class TomonMainActivity extends BaseActivity {
         });
     }
 
-    private void showMeFragment() {
-        MeFragment mefragment = (MeFragment) getSupportFragmentManager()
-                .findFragmentByTag(MeFragment.Companion.getTAG());
-
+    private MeFragment showMeFragment() {
+        MeFragment mefragment = (MeFragment) mPagerAdapter.getFragment(POS_ME);
         if (mefragment == null) {
             mefragment = new MeFragment();
         }
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, mefragment, MeFragment.Companion.getTAG())
-                .commit();
-
-        mCurrentFragmentTag = MeFragment.Companion.getTAG();
+        return mefragment;
     }
 
-    private void showDmFragment() {
-        DmChannelSelectorFragment dmfragment = (DmChannelSelectorFragment) getSupportFragmentManager()
-                .findFragmentByTag(DmChannelSelectorFragment.Companion.getTAG());
-
+    private DmChannelSelectorFragment showDmFragment() {
+        DmChannelSelectorFragment dmfragment = (DmChannelSelectorFragment) mPagerAdapter.getFragment(POS_DM_LIST);
         if (dmfragment == null) {
             dmfragment = new DmChannelSelectorFragment();
         }
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, dmfragment, DmChannelSelectorFragment.Companion.getTAG())
-                .commit();
-        mCurrentFragmentTag = DmChannelSelectorFragment.Companion.getTAG();
+        return dmfragment;
 
     }
 
-    private void showGuildChannelList(String guildId) {
-        ChannelListFragment channelListFragment = (ChannelListFragment) getSupportFragmentManager().findFragmentByTag(ChannelListFragment.TAG);
-        if (channelListFragment == null) {
-            channelListFragment = new ChannelListFragment();
-        }
+    private ChannelListFragment createGuildChannelList(String guildId) {
+        ChannelListFragment channelListFragment = new ChannelListFragment();
         Bundle extraData = new Bundle();
         extraData.putString(ChannelListFragment.GUILD_ID, guildId);
-
-        if (ChannelListFragment.TAG.equals(mCurrentFragmentTag)) {
-            channelListFragment.updateWholePage(guildId);
-        } else {
-            channelListFragment.setArguments(extraData);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, channelListFragment, ChannelListFragment.TAG)
-                    .commit();
-        }
-        mCurrentFragmentTag = ChannelListFragment.TAG;
+        channelListFragment.setArguments(extraData);
         saveLastGuildId(guildId);
         if (Client.Companion.getGlobal().getGuilds().getSize() == 0) {
             showEmptyGuildListView();
+        }
+        return channelListFragment;
+    }
+
+    private void updateGuildChannelList(String guildId) {
+        ChannelListFragment channelListFragment = (ChannelListFragment) mPagerAdapter.getFragment(POS_CHANNEL_LIST);
+        channelListFragment.updateWholePage(guildId);
+        if (Client.Companion.getGlobal().getGuilds().getSize() == 0) {
+            showEmptyGuildListView();
+            saveLastGuildId("");
+        } else {
+            saveLastGuildId(guildId);
         }
     }
 
@@ -717,7 +724,7 @@ public class TomonMainActivity extends BaseActivity {
                                 mEtSearchBar.getText().toString().trim());
                         mGuildListRecyclerView.scrollToPosition(
                                 mAdapter.getGuildList().indexOf(each));
-                        showGuildChannelList(guild.getId());
+                        updateGuildChannelList(guild.getId());
                         mDrawerLayout.closeDrawer(true);
                         break;
                     }
@@ -779,5 +786,25 @@ public class TomonMainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public Fragment getFragmentByPosition(int pos) {
+        Fragment toReturn = null;
+        if (pos == POS_CHANNEL_LIST) {
+            toReturn = createGuildChannelList(getLastGuildId());
+        } else if (pos == POS_DM_LIST) {
+            toReturn = showDmFragment();
+        } else if (pos == POS_ME) {
+            toReturn = showMeFragment();
+        } else {
+            throw new RuntimeException("Your pager number is:" + NUM_PAGER + ", current pos is:" + pos);
+        }
+        return toReturn;
+    }
+
+    @Override
+    public int getFragmentNum() {
+        return NUM_PAGER;
     }
 }

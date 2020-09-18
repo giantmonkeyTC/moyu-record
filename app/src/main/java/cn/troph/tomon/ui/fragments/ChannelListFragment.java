@@ -81,6 +81,8 @@ import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
+import cn.troph.tomon.core.events.MessageDeleteEvent;
+import cn.troph.tomon.core.events.MessageUpdateEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
 import cn.troph.tomon.core.network.services.ChannelService;
 import cn.troph.tomon.core.network.services.GuildService;
@@ -121,7 +123,7 @@ import retrofit2.Response;
 
 public class ChannelListFragment extends Fragment implements PermissionListener {
 
-    public static final String TAG = "ChannelListFragment";
+    private static final String TAG = "ChannelListFragment";
     public static final String GUILD_ID = "guild_id";
 
     private ImageView mIvGuildAvater;

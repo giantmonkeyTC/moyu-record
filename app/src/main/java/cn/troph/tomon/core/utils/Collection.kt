@@ -20,7 +20,7 @@ open class Collection<T>(m: Map<String, T>? = null): Iterable<T> {
 
     open fun remove(key: String): T? = map.remove(key)
 
-    fun contains(key: String): Boolean = map.contains(key)
+    fun contains(key: String): Boolean = map.containsKey(key)
 
     open fun clear() = map.clear()
 

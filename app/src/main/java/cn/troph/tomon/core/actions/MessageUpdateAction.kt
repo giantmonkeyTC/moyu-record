@@ -14,9 +14,15 @@ class MessageUpdateAction(client: Client) : Action<Message>(client) {
         val channel = client.channels[obj["channel_id"].asString] as TextChannelBase
         val message = channel.messages[obj["id"].asString]
         if (message != null) {
+            val origMsgIsMention = message.mentions.contains(client.me.id) && channel is TextChannel
             message.update(obj)
             if (message.mentions.contains(client.me.id) && channel is TextChannel) {
-                channel.mention += 1
+                if (!origMsgIsMention) {
+                    channel.mention += 1
+                }
+                client.eventBus.postEvent(MessageAtMeEvent(message = message))
+            } else if (origMsgIsMention && channel is TextChannel){
+                channel.mention -= 1
                 client.eventBus.postEvent(MessageAtMeEvent(message = message))
             }
             client.eventBus.postEvent(MessageUpdateEvent(message = message))

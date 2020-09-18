@@ -25,6 +25,10 @@ public class ChannelRV {
         return mChannel;
     }
 
+    public void setChannel(GuildChannel channel) {
+        mChannel = channel;
+    }
+
     public String getName() {
         return mChannel.getName();
     }

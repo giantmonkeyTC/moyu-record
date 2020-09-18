@@ -33,6 +33,9 @@ class MessageDeleteAction(client: Client) : Action<Message>(client) {
     private fun textChannel(channel: TextChannel, obj: JsonObject): Message? {
         val message = channel.messages[obj["id"].asString]
         if (message != null) {
+            if (message.mentions.contains(client.me.id)) {
+                channel.mention -= 1
+            }
             channel.messages.remove(obj["id"].asString)
             client.eventBus.postEvent(MessageDeleteEvent(message = message))
         }

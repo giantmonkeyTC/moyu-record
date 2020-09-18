@@ -26,7 +26,9 @@ import cn.troph.tomon.core.collections.MessageCollection;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
 import cn.troph.tomon.core.events.MessageAtMeEvent;
 import cn.troph.tomon.core.events.MessageCreateEvent;
+import cn.troph.tomon.core.events.MessageDeleteEvent;
 import cn.troph.tomon.core.events.MessageReadEvent;
+import cn.troph.tomon.core.events.MessageUpdateEvent;
 import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
 import cn.troph.tomon.core.structures.Base;
 import cn.troph.tomon.core.structures.GuildChannel;
@@ -64,6 +66,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
+        mLastedMessageCache.clear();
         if (root == null) {
             mDataList = new ArrayList<>();
         } else {
@@ -149,6 +152,18 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     MessageReadEvent readEvent = (MessageReadEvent) event;
                     if (readEvent.getMessage().getChannelId().equals(channel.getId())) {
                         mLastedMessageCache.put(channel.getId(), readEvent.getMessage());
+                        notifyItemChanged(position, new Object());
+                    }
+                } else if (event instanceof MessageDeleteEvent){
+                    MessageDeleteEvent deleteEvent = (MessageDeleteEvent) event;
+                    if (deleteEvent.getMessage().getChannelId().equals(channel.getId())) {
+                        mLastedMessageCache.remove(channel.getId());
+                        notifyItemChanged(position, new Object());
+                    }
+                } else if (event instanceof MessageUpdateEvent) {
+                    MessageUpdateEvent updateEvent = (MessageUpdateEvent) event;
+                    if (updateEvent.getMessage().getChannelId().equals(channel.getId())) {
+                        mLastedMessageCache.put(channel.getId(), updateEvent.getMessage());
                         notifyItemChanged(position, new Object());
                     }
                 } else if (event instanceof GuildVoiceSelectorEvent) {
