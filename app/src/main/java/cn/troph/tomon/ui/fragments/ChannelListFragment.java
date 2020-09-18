@@ -466,7 +466,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private void showChangeNickNameActivity() {
         Intent intent = new Intent(getContext(), GuildNickNameSettingsActivity.class);
         intent.putExtra(GuildNickNameSettingsActivity.KEY_GUILD_ID, mCurrentGuild.getId());
-        startActivityForResult(intent, 0);
+        startActivity(intent);
     }
 
     private void showLeaveAlertDialog() {
@@ -963,15 +963,6 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         public void onError(int i) {
             super.onError(i);
             Log.e(TAG, "an error during Angora SDK runtime: " + i);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Huan", "result code" + resultCode);
-        if (resultCode == Activity.RESULT_OK) {
-
         }
     }
 }
