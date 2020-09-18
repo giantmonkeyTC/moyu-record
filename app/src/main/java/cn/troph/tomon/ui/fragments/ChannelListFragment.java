@@ -2,6 +2,7 @@ package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -98,6 +99,7 @@ import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
+import cn.troph.tomon.ui.activities.ChatActivity;
 import cn.troph.tomon.ui.activities.GuildNickNameSettingsActivity;
 import cn.troph.tomon.ui.activities.TomonMainActivity;
 import cn.troph.tomon.ui.channel.ChannelGroupRV;
@@ -106,6 +108,7 @@ import cn.troph.tomon.ui.channel.ChannelRV;
 import cn.troph.tomon.ui.chat.fragments.VoiceBottomSheet;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
+import cn.troph.tomon.ui.states.ChannelSelection;
 import cn.troph.tomon.ui.utils.TomonMaterialColors;
 import cn.troph.tomon.ui.utils.TomonViewUtils;
 import cn.troph.tomon.ui.widgets.TomonToast;
@@ -141,11 +144,11 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     private ArrayMap<String, ChannelGroupRV> mChannelGroupCache = new ArrayMap<>();
     private ArrayMap<String, ArrayList<GuildChannel>> mChannelOrphans = new ArrayMap<>();
     private static final int[][] ENABLED_CHECKED_STATES =
-            new int[][] {
-                    new int[] {android.R.attr.state_enabled, android.R.attr.state_checked}, // [0]
-                    new int[] {android.R.attr.state_enabled, -android.R.attr.state_checked}, // [1]
-                    new int[] {-android.R.attr.state_enabled, android.R.attr.state_checked}, // [2]
-                    new int[] {-android.R.attr.state_enabled, -android.R.attr.state_checked} // [3]
+            new int[][]{
+                    new int[]{android.R.attr.state_enabled, android.R.attr.state_checked}, // [0]
+                    new int[]{android.R.attr.state_enabled, -android.R.attr.state_checked}, // [1]
+                    new int[]{-android.R.attr.state_enabled, android.R.attr.state_checked}, // [2]
+                    new int[]{-android.R.attr.state_enabled, -android.R.attr.state_checked} // [3]
             };
 
     @Override
@@ -353,24 +356,24 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     }
 
     private ColorStateList getMaterialThemeColorsThumbTintList(SwitchMaterial view) {
-            int colorSurface = getResources().getColor(R.color.uncheck_thumb, null);
-            int colorControlActivated = getResources().getColor(R.color.pinkPrimary, null);
-            float thumbElevation = getResources().getDimension(R.dimen.mtrl_switch_thumb_elevation);
-            ElevationOverlayProvider elevationOverlayProvider = new ElevationOverlayProvider(getContext());
-            if (elevationOverlayProvider.isThemeElevationOverlayEnabled()) {
-                thumbElevation += TomonViewUtils.getParentAbsoluteElevation(view);
-            }
-            int colorThumbOff =
-                    elevationOverlayProvider.compositeOverlayIfNeeded(colorSurface, thumbElevation);
+        int colorSurface = getResources().getColor(R.color.uncheck_thumb, null);
+        int colorControlActivated = getResources().getColor(R.color.pinkPrimary, null);
+        float thumbElevation = getResources().getDimension(R.dimen.mtrl_switch_thumb_elevation);
+        ElevationOverlayProvider elevationOverlayProvider = new ElevationOverlayProvider(getContext());
+        if (elevationOverlayProvider.isThemeElevationOverlayEnabled()) {
+            thumbElevation += TomonViewUtils.getParentAbsoluteElevation(view);
+        }
+        int colorThumbOff =
+                elevationOverlayProvider.compositeOverlayIfNeeded(colorSurface, thumbElevation);
 
-            int[] switchThumbColorsList = new int[ENABLED_CHECKED_STATES.length];
-            switchThumbColorsList[0] =
-                    TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_FULL);
-            switchThumbColorsList[1] = colorThumbOff;
-            switchThumbColorsList[2] =
-                    TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_DISABLED);
-            switchThumbColorsList[3] = colorThumbOff;
-                    return new ColorStateList(ENABLED_CHECKED_STATES, switchThumbColorsList);
+        int[] switchThumbColorsList = new int[ENABLED_CHECKED_STATES.length];
+        switchThumbColorsList[0] =
+                TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_FULL);
+        switchThumbColorsList[1] = colorThumbOff;
+        switchThumbColorsList[2] =
+                TomonMaterialColors.layer(colorSurface, colorControlActivated, MaterialColors.ALPHA_DISABLED);
+        switchThumbColorsList[3] = colorThumbOff;
+        return new ColorStateList(ENABLED_CHECKED_STATES, switchThumbColorsList);
     }
 
     private ColorStateList getMaterialThemeColorsTrackTintList() {
@@ -532,7 +535,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             setOnJoinGuildClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((TomonMainActivity)getActivity()).joinGuild();
+                    ((TomonMainActivity) getActivity()).joinGuild();
                 }
             });
             return;
@@ -600,6 +603,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             mChannelListAdapter = new ChannelListAdapter(mChannelTreeRoot, guild.getId());
             mChannelListAdapter.setChatSharedVM(mChatVM);
             setOnVoiceChannelClickListener();
+            setOnTextChannelClickListener();
             registerObserver();
             mRvChannelList.setAdapter(mChannelListAdapter);
             connectVoiceChannelIfNeeded(guildId);
@@ -756,6 +760,17 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 mRtcEngineEventHandler.setCurrentVoiceChannel(channel);
                 Dexter.withContext(getContext()).withPermission(Manifest.permission.RECORD_AUDIO)
                         .withListener(ChannelListFragment.this).check();
+            }
+        });
+    }
+
+    private void setOnTextChannelClickListener() {
+        mChannelListAdapter.setOnTextChannelClickListener(new ChannelListAdapter.OnTextChannelItemClickListener() {
+            @Override
+            public void onTextChannelClick(TextChannel channel) {
+                mChatVM.getChannelSelectionLD().setValue(new ChannelSelection(mCurrentGuild.getId(), channel.getId()));
+                Intent intent = new Intent(requireContext(), ChatActivity.class);
+                startActivity(intent, ActivityOptions.makeCustomAnimation(requireContext(), R.anim.slide_in_right_custom, R.anim.slide_out_right_custom).toBundle());
             }
         });
     }

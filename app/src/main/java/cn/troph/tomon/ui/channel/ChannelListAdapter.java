@@ -50,6 +50,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private String mCurrentGuildID;
     private ChatSharedViewModel mFragmentVM;
     private OnVoiceChannelItemClickListener mOnVoiceChannelClickListener;
+    private OnTextChannelItemClickListener mOnTextChannelClickListener;
 
     public ChannelListAdapter(ChannelGroupRV root, String guildId) {
         if (root != null) {
@@ -78,6 +79,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void setOnVoiceChannelClickListener(OnVoiceChannelItemClickListener listener) {
         mOnVoiceChannelClickListener = listener;
+    }
+
+    public void setOnTextChannelClickListener(OnTextChannelItemClickListener listener) {
+        mOnTextChannelClickListener = listener;
     }
 
     public OnVoiceChannelItemClickListener getOnVoiceChannelClickListener() {
@@ -182,6 +187,14 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.setUnreadView(textChannel.getUnread(), textChannel.getMention() > 0);
             setTextChannelLatestMsgDespAndTime(holder, textChannel);
             holder.itemView.setOnClickListener(null);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnTextChannelClickListener != null) {
+                        mOnTextChannelClickListener.onTextChannelClick(textChannel);
+                    }
+                }
+            });
         } else if (type == ChannelType.VOICE) {
             holder.tvChannelTime.setVisibility(View.INVISIBLE);
             holder.ivChannelIcon.setImageResource(R.drawable.channel_voice_icon);
@@ -496,5 +509,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public interface OnVoiceChannelItemClickListener {
         void onVoiceChannelClick(VoiceChannel channel);
+    }
+
+    public interface OnTextChannelItemClickListener {
+        void onTextChannelClick(TextChannel channel);
     }
 }

@@ -1,8 +1,10 @@
 package cn.troph.tomon.core.utils
 
+import java.util.concurrent.ConcurrentHashMap
+
 open class Collection<T>(m: Map<String, T>? = null): Iterable<T> {
 
-    private var map: LinkedHashMap<String, T> = LinkedHashMap(m ?: mapOf<String, T>())
+    private var map: ConcurrentHashMap<String, T> = ConcurrentHashMap(m ?: mapOf<String, T>())
 
     open operator fun get(key: String): T? = map[key]
 

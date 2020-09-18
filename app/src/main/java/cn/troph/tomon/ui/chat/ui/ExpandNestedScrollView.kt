@@ -58,14 +58,14 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
             )).toInt()
     }
 
-    override fun scrollTo(x: Int, y: Int) {
-        super.scrollTo(x, y)
-        if (y == 0) {
-            onScrollListener?.let {
-                it.onReset()
-            }
-        }
-    }
+//    override fun scrollTo(x: Int, y: Int) {
+//        super.scrollTo(x, y)
+//        if (y == 0) {
+//            onScrollListener?.let {
+//                it.onReset()
+//            }
+//        }
+//    }
 
     override fun onNestedPreScroll(target: View, dx: Int, dy: Int, consumed: IntArray, type: Int) {
         if (scrollY >= header.height) {

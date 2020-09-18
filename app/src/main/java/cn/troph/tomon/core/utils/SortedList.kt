@@ -1,6 +1,7 @@
 package cn.troph.tomon.core.utils
 
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 class SortedList<T>(
     private val comparator: Comparator<T>,
@@ -8,7 +9,7 @@ class SortedList<T>(
 ) :
     Iterable<T> {
 
-    private var list: MutableList<T> = l?.toMutableList() ?: mutableListOf()
+    private var list: MutableList<T> = CopyOnWriteArrayList(l?.toMutableList() ?: mutableListOf())
 
     init {
         list.sortedWith(comparator)

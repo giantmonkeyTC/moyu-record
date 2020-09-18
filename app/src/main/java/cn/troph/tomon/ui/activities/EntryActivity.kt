@@ -119,7 +119,7 @@ class EntryActivity : BaseActivity() {
 
     private fun gotoChannelList() {
         try {
-            val intent = Intent(this, ChatActivity::class.java)
+            val intent = Intent(this, TomonMainActivity::class.java)
             startActivity(
                 intent,
                 ActivityOptions.makeCustomAnimation(

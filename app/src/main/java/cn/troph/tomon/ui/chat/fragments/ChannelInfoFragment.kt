@@ -44,6 +44,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
 
@@ -110,6 +111,10 @@ class ChannelInfoFragment : Fragment() {
 
         }
 
+    override fun onStop() {
+        super.onStop()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -143,7 +148,7 @@ class ChannelInfoFragment : Fragment() {
                     space_expand.visibility = View.GONE
                     expandIcon.visibility = View.VISIBLE
                 }
-
+9
             }
         }
         channel_info_scroll_view.setOnScrollListener(object :
@@ -458,6 +463,7 @@ class ChannelInfoFragment : Fragment() {
 
     }
 }
+
 
 enum class ChannelMuteState(val value: Int) {
     DEFAULT(0),
