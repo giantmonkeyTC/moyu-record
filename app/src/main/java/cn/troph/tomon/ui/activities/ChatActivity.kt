@@ -23,6 +23,7 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
+import cn.troph.tomon.ui.states.ChannelSelection
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.google.gson.Gson
@@ -41,7 +42,13 @@ class ChatActivity : BaseActivity() {
         val mChatSharedViewModel: ChatSharedViewModel by viewModels()
 
         val map = HashMap<String, Int>()
-
+        val bundle = intent.extras
+        bundle?.let {
+            mChatSharedViewModel.channelSelectionLD.value = ChannelSelection(
+                guildId = bundle.getString("guildId"),
+                channelId = bundle.getString("channelId")
+            )
+        }
 
 
 

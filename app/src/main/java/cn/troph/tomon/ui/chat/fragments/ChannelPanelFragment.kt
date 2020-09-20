@@ -1,7 +1,6 @@
 package cn.troph.tomon.ui.chat.fragments
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context

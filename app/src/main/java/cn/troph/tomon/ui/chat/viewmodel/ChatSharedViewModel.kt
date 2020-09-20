@@ -131,11 +131,11 @@ class ChatSharedViewModel : ViewModel() {
 
     fun setUpEvents() {
 
-        AppState.global.channelSelection.observable
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
-                channelSelectionLD.value = it
-            })
+//        AppState.global.channelSelection.observable
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(Consumer {
+//                channelSelectionLD.value = it
+//            })
 
 
         AppState.global.updateEnabled.observable.observeOn(AndroidSchedulers.mainThread())
