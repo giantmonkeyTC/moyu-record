@@ -653,7 +653,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
                 } else if (inviteCode.contains(Url.inviteUrl)) {
                     inviteCode = Url.INSTANCE.parseInviteCode(inviteCode);
                 } else {
-                    TomonToast.makeText(getApplicationContext(),
+                    TomonToast.makeErrorText(getApplicationContext(),
                             getString(R.string.invalid_invite),
                             Toast.LENGTH_LONG).show();
                     return;
@@ -668,7 +668,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        TomonToast.makeText(getApplicationContext(),
+                        TomonToast.makeErrorText(getApplicationContext(),
                                 getString(R.string.invalid_invite),
                                 Toast.LENGTH_LONG).show();
                     }

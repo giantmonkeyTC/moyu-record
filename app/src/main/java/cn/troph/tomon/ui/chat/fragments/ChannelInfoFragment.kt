@@ -364,7 +364,7 @@ class ChannelInfoFragment : Fragment() {
                                     muteState = ChannelMuteState.MUTED
                                 }
                                 ) {
-                                    TomonToast.makeText(
+                                    TomonToast.makeErrorText(
                                         requireContext().applicationContext,
                                         getString(R.string.setting_failed),
                                         Toast.LENGTH_SHORT
@@ -394,7 +394,7 @@ class ChannelInfoFragment : Fragment() {
                                     muteState = ChannelMuteState.DEFAULT
                                 }
                                 ) {
-                                    TomonToast.makeText(
+                                    TomonToast.makeErrorText(
                                         requireContext().applicationContext,
                                         getString(R.string.setting_failed),
                                         Toast.LENGTH_SHORT

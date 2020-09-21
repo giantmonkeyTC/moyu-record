@@ -132,7 +132,7 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        TomonToast.makeText(
+                        TomonToast.makeErrorText(
                                 getApplicationContext(),
                                 getString(R.string.set_nickname_failed),
                                 Toast.LENGTH_SHORT).show();

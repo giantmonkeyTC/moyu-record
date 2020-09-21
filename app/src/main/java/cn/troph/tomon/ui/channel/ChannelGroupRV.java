@@ -1,10 +1,13 @@
 package cn.troph.tomon.ui.channel;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.ui.utils.GuildUtils;
 
 public class ChannelGroupRV extends ChannelRV {
 
@@ -18,8 +21,8 @@ public class ChannelGroupRV extends ChannelRV {
         }
     };
 
-    public ChannelGroupRV(ChannelGroupRV parent, GuildChannel channel, List<ChannelRV> channels) {
-        super(parent, channel);
+    public ChannelGroupRV(Context context, ChannelGroupRV parent, GuildChannel channel, List<ChannelRV> channels) {
+        super(context, parent, channel);
         mChildren = channels;
     }
 
@@ -65,7 +68,8 @@ public class ChannelGroupRV extends ChannelRV {
         }
         for (ChannelRV each : mChildren) {
             if (each instanceof ChannelGroupRV) {
-                if (((ChannelGroupRV) each).isCollapsed()) {
+                if (((ChannelGroupRV) each).isCollapsed()
+                        || GuildUtils.isCollapsedChannelId(getContext(), each.getChannel().getId())) {
                     flattenedChannels.add(each);
                 } else {
                     flattenedChannels.addAll(((ChannelGroupRV) each).flatten());
