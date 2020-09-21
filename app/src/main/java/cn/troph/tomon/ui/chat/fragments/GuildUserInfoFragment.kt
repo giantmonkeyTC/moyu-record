@@ -1,7 +1,9 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.app.ActivityOptions
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
@@ -29,6 +31,7 @@ import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.GuildMember
 import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.ui.activities.ChatActivity
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
@@ -94,14 +97,21 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
                     user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             dialog?.dismiss()
+                            val intent = Intent(requireContext(), ChatActivity::class.java)
+                            val bundle = Bundle()
+                            bundle.putString("guildId", "@me")
+                            bundle.putString("channelId", it["id"].asString)
+                            intent.putExtras(bundle)
+                            startActivity(
+                                intent,
+                                ActivityOptions.makeCustomAnimation(
+                                    requireContext(),
+                                    R.anim.slide_in_right_custom,
+                                    R.anim.no_animation
+                                ).toBundle()
+                            )
                             AppState.global.channelSelection.value =
                                 ChannelSelection(guildId = "@me", channelId = it["id"].asString)
-                            AppState.global.eventBus.postEvent(
-                                AppUIEvent(
-                                    AppUIEventType.MEMBER_DRAWER,
-                                    false
-                                )
-                            )
                         }
                 }
                 view.user_info_menu.setOnClickListener {

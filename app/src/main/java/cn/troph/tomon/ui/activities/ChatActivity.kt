@@ -2,34 +2,29 @@ package cn.troph.tomon.ui.activities
 
 
 import android.app.Activity
-import android.content.Context
+import android.app.ActivityOptions
+import android.content.ClipData
 import android.content.Intent
 import android.os.Bundle
-import android.util.DisplayMetrics
-
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.customview.widget.ViewDragHelper
-import androidx.drawerlayout.widget.DrawerLayout
-
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.*
-import cn.troph.tomon.core.utils.Assets
+import cn.troph.tomon.core.structures.Channel
+import cn.troph.tomon.core.structures.DmChannel
+import cn.troph.tomon.core.structures.GuildChannel
+import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
-import cn.troph.tomon.ui.states.AppUIEvent
-import cn.troph.tomon.ui.states.AppUIEventType
 import cn.troph.tomon.ui.states.ChannelSelection
-import com.discord.panels.OverlappingPanelsLayout
-import com.discord.panels.PanelState
-import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.fragment_channel_detail.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
 
@@ -40,7 +35,6 @@ class ChatActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         val mChatSharedViewModel: ChatSharedViewModel by viewModels()
-
         val map = HashMap<String, Int>()
         val bundle = intent.extras
         bundle?.let {
@@ -60,7 +54,7 @@ class ChatActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         text_toolbar_title.text = getString(R.string.app_name_capital)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.navigationIcon = getDrawable(R.drawable.ic_channel_selector)
+        toolbar.navigationIcon = getDrawable(R.drawable.channel_info_back)
 
         mChatSharedViewModel.channelSelectionLD.observe(this, Observer {
             if (it.channelId != null) {
@@ -148,17 +142,46 @@ class ChatActivity : BaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_chat, menu)
-        return true
+        if (intent.extras?.get("guildId") as String == "@me") {
+            menuInflater.inflate(R.menu.dmchannel_temporary_menu, menu)
+            return true
+        } else {
+            menuInflater.inflate(R.menu.activity_chat, menu)
+            return true
+        }
+
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+        overridePendingTransition(R.anim.no_animation, R.anim.slide_out_right_custom)
+        hideKeyboard()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                finish()
+                overridePendingTransition(R.anim.no_animation, R.anim.slide_out_right_custom)
                 hideKeyboard()
             }
             R.id.members -> {
                 if (AppState.global.channelSelection.value.channelId != null) {
+                    val intent = Intent(this, ChannelInfoActivity::class.java)
+                    val bundle = Bundle()
+                    bundle.putString("guildId", getIntent().extras?.getString("guildId"))
+                    bundle.putString("channelId", mCurrentChannel.id)
+                    intent.putExtras(bundle)
+                    startActivity(
+                        intent,
+                        ActivityOptions.makeCustomAnimation(
+                            this,
+                            R.anim.slide_in_right_custom,
+                            R.anim.no_animation
+                        ).toBundle()
+                    )
+
                     hideKeyboard()
                 }
             }

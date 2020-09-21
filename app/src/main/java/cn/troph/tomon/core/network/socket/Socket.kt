@@ -69,7 +69,8 @@ class Socket : Observer<SocketEvent>, LifecycleObserver {
         "VOICE_STATE_UPDATE" to handleVoiceStateHandler,
         "LEAVE" to handleVoiceLeaveHandler,
         "JOIN" to handleVoiceJoinHandler,
-        "GUILD_MEMBER_UPDATE" to handleGuildMemberUpdate
+        "GUILD_MEMBER_UPDATE" to handleGuildMemberUpdate,
+        "USER_UPDATE" to handleUserUpdate
     )
 
     constructor(client: Client) {

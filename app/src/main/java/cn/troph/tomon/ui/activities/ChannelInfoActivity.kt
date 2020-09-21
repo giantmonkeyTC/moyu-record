@@ -1,4 +1,4 @@
-package cn.troph.tomon.ui.chat.fragments
+package cn.troph.tomon.ui.activities
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -6,19 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import at.blogc.android.views.ExpandableTextView
 import cn.troph.tomon.R
@@ -26,15 +25,15 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.Client.Companion.global
 import cn.troph.tomon.core.MessageNotificationsType
 import cn.troph.tomon.core.network.services.ChannelService
-import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.TextChannel
-import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.Url
+import cn.troph.tomon.ui.chat.fragments.ChannelMemberFragment
 import cn.troph.tomon.ui.chat.ui.ExpandNestedScrollView
 import cn.troph.tomon.ui.chat.ui.NestedViewPager
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
+import cn.troph.tomon.ui.states.ChannelSelection
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import cn.troph.tomon.ui.widgets.TomonToast
 import com.google.android.material.snackbar.Snackbar
@@ -44,17 +43,16 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
 
 
-class ChannelInfoFragment : Fragment() {
+class ChannelInfoActivity : BaseActivity() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var viewPager: NestedViewPager
     private lateinit var tabLayout: TabLayout
     private var needMeasure: Boolean = true
-    private val chatSharedViewModel: ChatSharedViewModel by activityViewModels()
+    private val chatSharedViewModel: ChatSharedViewModel by viewModels()
     private var muteState = ChannelMuteState.DEFAULT
         set(value) {
             field = value
@@ -63,11 +61,11 @@ class ChannelInfoFragment : Fragment() {
                     channel_info_mute?.let {
                         channel_info_mute.setCompoundDrawablesWithIntrinsicBounds(
                             null,
-                            requireContext().getDrawable(R.drawable.channel_info_mute),
+                            getDrawable(R.drawable.channel_info_mute),
                             null,
                             null
                         )
-                        channel_info_mute.setTextColor(requireContext().getColor(R.color.whiteAlpha70))
+                        channel_info_mute.setTextColor(getColor(R.color.whiteAlpha70))
                     }
 
                 }
@@ -75,11 +73,11 @@ class ChannelInfoFragment : Fragment() {
                     channel_info_mute?.let {
                         channel_info_mute.setCompoundDrawablesWithIntrinsicBounds(
                             null,
-                            requireContext().getDrawable(R.drawable.channel_info_muted),
+                            getDrawable(R.drawable.channel_info_muted),
                             null,
                             null
                         )
-                        channel_info_mute.setTextColor(requireContext().getColor(R.color.primaryColorAlpha80))
+                        channel_info_mute.setTextColor(getColor(R.color.primaryColorAlpha80))
                     }
                 }
             }
@@ -111,52 +109,45 @@ class ChannelInfoFragment : Fragment() {
 
         }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+        overridePendingTransition(R.anim.no_animation, R.anim.slide_out_right_custom)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_channel_detail, container, false)
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bundle = intent.extras
+        bundle?.let {
+            chatSharedViewModel.channelSelectionLD.value = ChannelSelection(
+                guildId = bundle.getString("guildId"),
+                channelId = bundle.getString("channelId")
+            )
+        }
+        AppState.global.scrollPercent.value = 0f
+        setContentView(R.layout.fragment_channel_detail)
         val channelInfoDescription =
-            view.findViewById<ExpandableTextView>(R.id.channel_info_description)
-        val expandIcon = view.findViewById<ImageView>(R.id.ic_expand_text)
-        val channelInfo = view.findViewById<TextView>(R.id.channel_info)
+            findViewById<ExpandableTextView>(R.id.channel_info_description)
+        val expandIcon = findViewById<ImageView>(R.id.ic_expand_text)
+        val channelInfo = findViewById<TextView>(R.id.channel_info)
 
         channelInfoDescription.post {
-            if (needMeasure) {
-                actionbarHeight = channel_info_actionbar.measuredHeight
-                needMeasure = false
-            }
-
+            actionbarHeight = channel_info_actionbar.measuredHeight
             val layout = channelInfoDescription.layout
-            val lines = layout.lineCount
-            if (lines > 0) {
-                val count = layout.getEllipsisCount(lines - 1)
-                if (count == 0) {
-                    space_expand.visibility = View.VISIBLE
-                    expandIcon.visibility = View.GONE
-                } else {
-                    space_expand.visibility = View.GONE
-                    expandIcon.visibility = View.VISIBLE
+            layout?.let {
+                val lines = it.lineCount
+                if (lines > 0) {
+                    val count = it.getEllipsisCount(lines - 1)
+                    if (count == 0) {
+                        space_expand.visibility = View.VISIBLE
+                        expandIcon.visibility = View.GONE
+                    } else {
+                        space_expand.visibility = View.GONE
+                        expandIcon.visibility = View.VISIBLE
+                    }
                 }
-9
             }
         }
-        channel_info_scroll_view.setOnScrollListener(object :
-            ExpandNestedScrollView.OnScrollListener {
-            override fun onReset() {
-                AppState.global.scrollPercent.value = 0f
-            }
-        })
         channel_info_scroll_view.setOnScrollChangeListener { v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
             if (scrollY >= channel_info_header.height) {
                 AppState.global.scrollPercent.value =
@@ -168,13 +159,12 @@ class ChannelInfoFragment : Fragment() {
 
         }
         var point = Point()
-        (requireActivity().getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(
+        (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.getSize(
             point
         )
-        channel_info_invite
         channel_info_channel_name.maxWidth =
-            point.x - DensityUtil.dip2px(context, 48f) * 2
-        chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
+            point.x - DensityUtil.dip2px(this, 48f) * 2
+        chatSharedViewModel.channelSelectionLD.observe(this, Observer {
             channel_info_scroll_view.scrollTo(0, 0)
             channelId = it.channelId
             channelId?.let {
@@ -193,26 +183,27 @@ class ChannelInfoFragment : Fragment() {
             channelInfoDescription.post {
                 channelInfoDescription.collapse()
                 expandIcon.setImageResource(R.drawable.channel_info_expand_arrow)
-                moveY = DensityUtil.dip2px(context, actionBarMoveY).toFloat()
+                moveY = DensityUtil.dip2px(this, actionBarMoveY).toFloat()
                 moveX = imageView6.x - channelInfo.x
                 guildMoveX = channel_info_guild_name.x - channelInfo.x
                 val layout = channelInfoDescription.layout
-                val lines = layout.lineCount
-                if (lines > 0) {
-                    val count = layout.getEllipsisCount(lines - 1)
-                    if (count == 0) {
-                        space_expand.visibility = View.VISIBLE
-                        expandIcon.visibility = View.GONE
-                    } else {
-                        space_expand.visibility = View.GONE
-                        expandIcon.visibility = View.VISIBLE
+                layout?.let {
+                    val lines = it.lineCount
+                    if (lines > 0) {
+                        val count = it.getEllipsisCount(lines - 1)
+                        if (count == 0) {
+                            space_expand.visibility = View.VISIBLE
+                            expandIcon.visibility = View.GONE
+                        } else {
+                            space_expand.visibility = View.GONE
+                            expandIcon.visibility = View.VISIBLE
+                        }
                     }
-
                 }
 
             }
         })
-        chatSharedViewModel.channelUpdateLD.observe(viewLifecycleOwner, Observer {
+        chatSharedViewModel.channelUpdateLD.observe(this, Observer {
             if (it.channel.id == channelId && it.channel is TextChannel) {
                 channel_info_channel_name.text = it.channel.name
                 if (it.channel.topic != "") {
@@ -222,27 +213,28 @@ class ChannelInfoFragment : Fragment() {
                     expand_text.visibility = View.GONE
                 channelInfoDescription.post {
                     val layout = channelInfoDescription.layout
-                    val lines = layout.lineCount
-                    if (lines > 0) {
-                        val count = layout.getEllipsisCount(lines - 1)
-                        if (count == 0) {
-                            space_expand.visibility = View.VISIBLE
-                            expandIcon.visibility = View.GONE
-                        } else {
-                            space_expand.visibility = View.GONE
-                            expandIcon.visibility = View.VISIBLE
+                    layout?.let {
+                        val lines = it.lineCount
+                        if (lines > 0) {
+                            val count = it.getEllipsisCount(lines - 1)
+                            if (count == 0) {
+                                space_expand.visibility = View.VISIBLE
+                                expandIcon.visibility = View.GONE
+                            } else {
+                                space_expand.visibility = View.GONE
+                                expandIcon.visibility = View.VISIBLE
+                            }
                         }
-
                     }
                 }
                 channelInfoDescription.post {
-                    moveY = DensityUtil.dip2px(context, actionBarMoveY).toFloat()
+                    moveY = DensityUtil.dip2px(this, actionBarMoveY).toFloat()
                     moveX = imageView6.x - channelInfo.x
                     guildMoveX = channel_info_guild_name.x - channelInfo.x
                 }
             }
         })
-        chatSharedViewModel.guildUpdateLD.observe(viewLifecycleOwner, Observer { event ->
+        chatSharedViewModel.guildUpdateLD.observe(this, Observer { event ->
             channelId?.let {
                 val channel = global.channels[it]
                 if (channel is TextChannel) {
@@ -251,7 +243,7 @@ class ChannelInfoFragment : Fragment() {
                     }
                     channel_info_scroll_view.scrollTo(0, 0)
                     channelInfoDescription.post {
-                        moveY = DensityUtil.dip2px(context, actionBarMoveY).toFloat()
+                        moveY = DensityUtil.dip2px(this, actionBarMoveY).toFloat()
                         moveX = imageView6.x - channelInfo.x
                         guildMoveX = channel_info_guild_name.x - channelInfo.x
                     }
@@ -298,24 +290,24 @@ class ChannelInfoFragment : Fragment() {
                             token = Client.global.auth
                         ).doOnNext {
                             inviteCode = it.code
-                        }.doOnError { Toast.makeText(context, "获取频道邀请码失败", Toast.LENGTH_SHORT) },
+                        }.doOnError { Toast.makeText(this, "获取频道邀请码失败", Toast.LENGTH_SHORT) },
                         Client.global.rest.inviteService.getTickets(token = Client.global.auth)
                             .doOnNext {
                                 ticketCode = it.code
                             }.doOnError {
-                                Toast.makeText(context, "获取激活码失败", Toast.LENGTH_SHORT)
+                                Toast.makeText(this, "获取激活码失败", Toast.LENGTH_SHORT)
                             }
                     ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             if (inviteCode != "" && ticketCode != "") {
                                 val inviteLink = Url.inviteFormat.format(inviteCode, ticketCode)
                                 GeneralSnackbar.make(
-                                    GeneralSnackbar.findSuitableParent(view)!!,
+                                    GeneralSnackbar.findSuitableParent(viewPager)!!,
                                     getString(R.string.copied_invite),
                                     Snackbar.LENGTH_SHORT
                                 ).show()
                                 val clipboard =
-                                    view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 val clip: ClipData =
                                     ClipData.newPlainText("copy", inviteLink)
                                 clipboard.setPrimaryClip(clip)
@@ -324,7 +316,7 @@ class ChannelInfoFragment : Fragment() {
                                     setType("text/plain")
                                     putExtra(Intent.EXTRA_TEXT, inviteLink)
                                 }
-                                if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                                if (intent.resolveActivity(packageManager) != null) {
                                     startActivity(intent)
                                 }
 
@@ -365,7 +357,7 @@ class ChannelInfoFragment : Fragment() {
                                 }
                                 ) {
                                     TomonToast.makeText(
-                                        requireContext().applicationContext,
+                                        applicationContext,
                                         getString(R.string.setting_failed),
                                         Toast.LENGTH_SHORT
                                     ).show()
@@ -395,7 +387,7 @@ class ChannelInfoFragment : Fragment() {
                                 }
                                 ) {
                                     TomonToast.makeText(
-                                        requireContext().applicationContext,
+                                        applicationContext,
                                         getString(R.string.setting_failed),
                                         Toast.LENGTH_SHORT
                                     ).show()
@@ -417,10 +409,11 @@ class ChannelInfoFragment : Fragment() {
             }
         }
         viewPagerAdapter =
-            ViewPagerAdapter(requireFragmentManager())
-        viewPager = view.findViewById(R.id.channel_info_viewpager)
+            ViewPagerAdapter(supportFragmentManager)
+        viewPager = findViewById(R.id.channel_info_viewpager)
         viewPager.adapter = viewPagerAdapter
-        tabLayout = view.findViewById(R.id.channel_info_tab)
+        tabLayout = findViewById(R.id.channel_info_tab)
+        chatSharedViewModel.setUpEvents()
 //        tabLayout.addTab(tabLayout.newTab().apply {
 //            this.
 //            text = "成员"
@@ -456,8 +449,12 @@ class ChannelInfoFragment : Fragment() {
 //            }
 //
 //        })
+        btn_back.setOnClickListener {
+            finish()
+            overridePendingTransition(R.anim.no_animation, R.anim.slide_out_right_custom)
+        }
         tabLayout.setupWithViewPager(viewPager)
-        chatSharedViewModel.channelSelectionLD.observe(viewLifecycleOwner, Observer {
+        chatSharedViewModel.channelSelectionLD.observe(this, Observer {
             channelId = it.channelId
         })
 
@@ -469,6 +466,7 @@ enum class ChannelMuteState(val value: Int) {
     DEFAULT(0),
     MUTED(1)
 }
+
 
 class ViewPagerAdapter(
     fragmentManager: FragmentManager

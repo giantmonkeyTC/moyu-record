@@ -1,6 +1,8 @@
 package cn.troph.tomon.ui.chat.members
 
+import android.app.ActivityOptions
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
@@ -8,6 +10,7 @@ import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
 import android.text.SpannableString
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -20,6 +23,7 @@ import android.widget.PopupWindow
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.graphics.toColor
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +36,7 @@ import cn.troph.tomon.core.structures.User
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.color
 import cn.troph.tomon.core.utils.spannable
+import cn.troph.tomon.ui.activities.ChatActivity
 import cn.troph.tomon.ui.chat.fragments.DmChannelSelectorFragment
 import cn.troph.tomon.ui.chat.fragments.ReportFragment
 import cn.troph.tomon.ui.states.AppState
@@ -136,14 +141,22 @@ class MemberListAdapter<T>(
                 member.directMessage(member.id).observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         dialog.dismiss()
+                        val intent = Intent(view.context, ChatActivity::class.java)
+                        val bundle = Bundle()
+                        bundle.putString("guildId", "@me")
+                        bundle.putString("channelId", it["id"].asString)
+                        intent.putExtras(bundle)
+                        startActivity(
+                            view.context,
+                            intent,
+                            ActivityOptions.makeCustomAnimation(
+                                view.context,
+                                R.anim.slide_in_right_custom,
+                                R.anim.no_animation
+                            ).toBundle()
+                        )
                         AppState.global.channelSelection.value =
                             ChannelSelection(guildId = "@me", channelId = it["id"].asString)
-                        AppState.global.eventBus.postEvent(
-                            AppUIEvent(
-                                AppUIEventType.MEMBER_DRAWER,
-                                false
-                            )
-                        )
                     }
             }
             view.user_info_menu.setOnClickListener {

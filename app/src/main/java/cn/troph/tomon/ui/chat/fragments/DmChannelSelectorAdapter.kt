@@ -1,13 +1,19 @@
 package cn.troph.tomon.ui.chat.fragments
 
+import android.app.ActivityOptions
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.User
+import cn.troph.tomon.ui.activities.ChannelInfoActivity
+import cn.troph.tomon.ui.activities.ChatActivity
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.AppUIEvent
 import cn.troph.tomon.ui.states.AppUIEventType
@@ -41,14 +47,22 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
 
     private fun bind(itemView: View, dmChannel: DmChannel) {
         itemView.setOnClickListener {
+            val intent = Intent(itemView.context, ChatActivity::class.java)
+            val bundle = Bundle()
+            bundle.putString("guildId", "@me")
+            bundle.putString("channelId", dmChannel.id)
+            intent.putExtras(bundle)
+            startActivity(
+                itemView.context,
+                intent,
+                ActivityOptions.makeCustomAnimation(
+                    itemView.context,
+                    R.anim.slide_in_right_custom,
+                    R.anim.no_animation
+                ).toBundle()
+            )
             AppState.global.channelSelection.value =
                 ChannelSelection(guildId = "@me", channelId = dmChannel.id)
-            AppState.global.eventBus.postEvent(
-                AppUIEvent(
-                    AppUIEventType.CHANNEL_DRAWER,
-                    false
-                )
-            )
         }
         itemView.dmchannel_user_avatar.user = dmChannel.recipient
         itemView.text_name.text = dmChannel.recipient?.name

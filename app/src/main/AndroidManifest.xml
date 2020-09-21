@@ -41,6 +41,20 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity android:name=".ui.activities.SecondActivity" />
+        <activity
+            android:name=".ui.activities.ChannelInfoActivity"
+            android:label="ChannelInfoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <activity
+            android:name=".ui.activities.MeProfileActivity"
+            android:label="MeProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
         <activity
             android:name=".ui.activities.GuildNickNameSettingsActivity"

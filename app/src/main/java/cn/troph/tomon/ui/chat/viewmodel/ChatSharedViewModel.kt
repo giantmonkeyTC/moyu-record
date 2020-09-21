@@ -129,6 +129,10 @@ class ChatSharedViewModel : ViewModel() {
 
     val guildMemberUpdateLD: MutableLiveData<GuildMemberUpdateEvent> = MutableLiveData()
 
+    fun setUpProfile(){
+
+    }
+
     fun setUpEvents() {
 
 //        AppState.global.channelSelection.observable

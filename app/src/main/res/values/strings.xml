@@ -43,7 +43,7 @@
 
     <string name="profile_username">用户名</string>
     <string name="profile_phone">手机号</string>
-    <string name="profile_email">电子邮箱</string>
+    <string name="profile_email">邮箱</string>
     <string name="profile_empty">未填写</string>
     <string name="profile_logout">退出登录</string>
     <string name="report">举报</string>
@@ -226,4 +226,13 @@
     <string name="set_nickname_success">设置成功</string>
     <string name="set_nickname_failed">设置昵称失败，请重试</string>
     <string name="copied_invite">邀请链接已复制</string>
+    <string name="offline">离线</string>
+    <string name="online">在线</string>
+    <string name="nickname">昵称</string>
+    <string name="username">用户名</string>
+    <string name="bio">签名</string>
+    <string name="pwd">密码</string>
+    <string name="delete_account">删除账户</string>
+    <string name="account_info">账户信息</string>
+    <string name="pwd_placeholder">(/▽╲)</string>
 </resources>

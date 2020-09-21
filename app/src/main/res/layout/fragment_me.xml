@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/backgroundMask"
+        android:foreground="?android:attr/selectableItemBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -25,38 +26,52 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/me_goto"
+            android:layout_width="7dp"
+            android:layout_height="12dp"
+            android:layout_marginEnd="24dp"
+            android:src="@drawable/setting_goto"
+            app:layout_constraintBottom_toBottomOf="@+id/me_avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/me_avatar" />
+
         <TextView
             android:id="@+id/me_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:textSize="18sp"
-            android:layout_marginTop="54dp"
             android:ellipsize="end"
             android:maxWidth="200dp"
             android:maxLines="1"
             android:textColor="@color/primaryText"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/me_avatar" />
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/me_bio"
+            app:layout_constraintStart_toEndOf="@id/me_avatar"
+            app:layout_constraintTop_toTopOf="@id/me_avatar"
+            app:layout_constraintVertical_chainStyle="packed" />
+
         <TextView
             android:id="@+id/me_identifier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:textSize="15sp"
             android:textColor="@color/whiteAlpha50"
-            app:layout_constraintBottom_toBottomOf="@id/me_name"
-            app:layout_constraintStart_toEndOf="@id/me_name"
-            />
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@+id/me_name"
+            app:layout_constraintStart_toEndOf="@id/me_name" />
+
         <TextView
+            android:id="@+id/me_bio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@color/whiteAlpha87"
+            app:layout_constraintBottom_toBottomOf="@+id/me_avatar"
             app:layout_constraintStart_toStartOf="@id/me_name"
-            app:layout_constraintTop_toBottomOf="@id/me_name"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/me_name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/setting_section1"
         android:layout_width="0dp"
@@ -75,6 +90,7 @@
             android:layout_marginTop="17dp"
             android:layout_marginEnd="20dp"
             android:src="@drawable/setting_goto"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -83,9 +99,9 @@
             android:layout_width="7dp"
             android:layout_height="12dp"
             android:layout_marginEnd="20dp"
-            android:visibility="gone"
             android:layout_marginBottom="17dp"
             android:src="@drawable/setting_goto"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -95,12 +111,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="13dp"
-            android:text="@string/status"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="13dp"
+            android:text="@string/status"
             android:textColor="@color/primaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/status_icon"
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/user_status"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/status_display"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
 
         <TextView
             android:id="@+id/status_display"
@@ -110,18 +138,18 @@
             android:layout_marginTop="13dp"
             android:layout_marginEnd="17dp"
             android:textColor="@color/primaryText"
-            app:layout_constraintEnd_toStartOf="@id/me_status_goto"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/mention_me_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:layout_marginStart="12dp"
             android:layout_marginTop="25dp"
             android:layout_marginEnd="17dp"
             android:textColor="@color/primaryText"
+            android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@id/me_mention_me_goto"
             app:layout_constraintTop_toBottomOf="@id/me_status" />
 
@@ -131,9 +159,9 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="13dp"
             android:text="@string/mentionMe"
-            android:visibility="gone"
             android:textColor="@color/primaryText"
             android:textSize="14sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/me_status"
             app:layout_constraintTop_toBottomOf="@id/me_status" />
@@ -175,18 +203,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
+        android:id="@+id/logout"
         android:layout_width="0dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/profile_logout"
-        android:background="@drawable/shape_settings"
         android:layout_height="wrap_content"
-        android:textColor="@color/error"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/shape_settings"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="center"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/setting_section2"
-        app:layout_constraintStart_toStartOf="@id/setting_section2"
+        android:text="@string/profile_logout"
+        android:textColor="@color/error"
         app:layout_constraintEnd_toEndOf="@id/setting_section2"
-        />
+        app:layout_constraintStart_toStartOf="@id/setting_section2"
+        app:layout_constraintTop_toBottomOf="@id/setting_section2" />
 </androidx.constraintlayout.widget.ConstraintLayout>
