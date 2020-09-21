@@ -2,7 +2,6 @@ package cn.troph.tomon.ui.channel;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Assets;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
+import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.utils.LocalDateUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
@@ -66,7 +66,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
-        mLastedMessageCache.clear();
+        if (!TextUtils.equals(guildID, mCurrentGuildID)) {
+            mLastedMessageCache.clear();
+        }
         if (root == null) {
             mDataList = new ArrayList<>();
         } else {
@@ -253,6 +255,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onClick(View v) {
                 List<ChannelRV> toggleChannels = channelGroup.toggleCollapse();
+                GuildUtils.saveCollapseChannelId(
+                        holder.itemView.getContext(), channelGroup.getChannel().getId(),
+                        channelGroup.isCollapsed());
                 if (channelGroup.isCollapsed()) {
                     mDataList.removeAll(toggleChannels);
                     notifyItemRangeRemoved(position+1, toggleChannels.size());
@@ -264,6 +269,9 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             }
         });
+        channelGroup.setCollapsed(GuildUtils.isCollapsedChannelId(
+                holder.itemView.getContext(),
+                channelGroup.getChannel().getId()));
         if (channelGroup.isCollapsed()) {
             groupHolder.ivCategoryExpandStateIcon.setImageResource(R.drawable.channel_group_collapse);
         } else {
@@ -443,6 +451,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     LocalDateTime timestamp = message.getTimestamp();
                                     holder.tvChannelTime.setText(LocalDateUtils.timestampConverterSimple(holder.itemView.getContext(), timestamp));
                                 }
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Throwable {
+
                             }
                         });
             }

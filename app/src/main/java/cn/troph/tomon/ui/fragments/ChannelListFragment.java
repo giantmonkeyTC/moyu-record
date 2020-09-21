@@ -200,7 +200,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 mRtcEngine.enableAudioVolumeIndication(200, 3, true);
             } catch (Exception e) {
                 Log.e(TAG, "RtcEngine create error:", e);
-                TomonToast.makeText(
+                TomonToast.makeErrorText(
                         getContext().getApplicationContext(),
                         R.string.join_voice_fail,
                         Toast.LENGTH_SHORT
@@ -291,7 +291,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             @Override
             public void accept(Throwable throwable) throws Throwable {
                 Log.e(TAG, "mark unread error:", throwable);
-                TomonToast.makeText(getContext().getApplicationContext(),
+                TomonToast.makeErrorText(getContext().getApplicationContext(),
                         R.string.mark_read_failed, Toast.LENGTH_SHORT).show();
             }
         });
@@ -351,7 +351,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        TomonToast.makeText(getContext().getApplicationContext(), getString(R.string.setting_failed), Toast.LENGTH_SHORT).show();
+                        TomonToast.makeErrorText(getContext().getApplicationContext(), getString(R.string.setting_failed), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -525,7 +525,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        TomonToast.makeText(getContext().getApplicationContext(), "请重试", Toast.LENGTH_LONG).show();
+                        TomonToast.makeErrorText(getContext().getApplicationContext(), "请重试", Toast.LENGTH_LONG).show();
                         Log.e(TAG, "error:", throwable);
                     }
                 });
@@ -576,8 +576,10 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
         GuildChannelCollection channels = guild.getChannels();
         if (channels.getSize() > 0) {
-            mChannelTreeRoot = new ChannelGroupRV(null, null, new ArrayList<>());
+            mChannelTreeRoot = new ChannelGroupRV(getContext(),null, null, new ArrayList<>());
             mEmptyChannelListPanel.setVisibility(View.GONE);
+            mChannelOrphans.clear();
+            mChannelGroupCache.clear();
         } else {
             mChannelTreeRoot = null;
             mEmptyChannelListPanel.setVisibility(View.VISIBLE);
@@ -782,7 +784,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     private void insertChannelAndCacheGroup(ChannelGroupRV root, GuildChannel channel) {
         if (channel.getType() == ChannelType.CATEGORY) {
-            ChannelGroupRV group = new ChannelGroupRV(root, channel, new ArrayList<>());
+            ChannelGroupRV group = new ChannelGroupRV(getContext(), root, channel, new ArrayList<>());
             root.addSortedByPostion(group);
             mChannelGroupCache.put(channel.getId(), group);
             ArrayList<GuildChannel> orphans = mChannelOrphans.get(channel.getId());
@@ -793,7 +795,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 insertChannelAndCacheGroup(group, orphan);
             }
         } else {
-            root.addSortedByPostion(new ChannelRV(root, channel));
+            root.addSortedByPostion(new ChannelRV(getContext(), root, channel));
         }
     }
 
@@ -848,7 +850,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-        TomonToast.makeText(
+        TomonToast.makeErrorText(
                 getContext(),
                 R.string.join_permission_msg,
                 Toast.LENGTH_SHORT

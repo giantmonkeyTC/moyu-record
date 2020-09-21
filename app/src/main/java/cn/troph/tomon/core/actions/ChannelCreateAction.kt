@@ -4,6 +4,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.ChannelCreateEvent
 import cn.troph.tomon.core.events.ChannelMemberUpdateEvent
 import cn.troph.tomon.core.structures.Channel
+import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.core.structures.GuildChannel
 import com.google.gson.JsonElement
 

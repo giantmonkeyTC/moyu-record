@@ -18,7 +18,7 @@ class ApplicationObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
-        if (Client.global.isBackground && Client.global.loggedIn) {
+        if (Client.global.isBackground && !Client.global.loggedIn) {
             Client.global.socket.close()
             Client.global.cacheChannelMap.clear()
 //            Client.global.channelNeedUpdate.clear()

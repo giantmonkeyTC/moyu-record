@@ -1,10 +1,13 @@
 package cn.troph.tomon.ui.channel;
 
+import android.content.Context;
+
 import cn.troph.tomon.core.structures.GuildChannel;
 
 public class ChannelRV {
-    private GuildChannel mChannel;
 
+    private Context mContext;
+    private GuildChannel mChannel;
     private ChannelGroupRV mParent;
     private boolean mIsVisible = true;
 
@@ -12,9 +15,14 @@ public class ChannelRV {
      * construct a channel node
      * @param channel
      */
-    public ChannelRV(ChannelGroupRV parent, GuildChannel channel) {
+    public ChannelRV(Context context, ChannelGroupRV parent, GuildChannel channel) {
+        mContext = context;
         mChannel = channel;
         mParent = parent;
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     public ChannelGroupRV getParent() {
