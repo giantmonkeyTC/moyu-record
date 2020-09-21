@@ -65,14 +65,27 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         mFragmentVM = vm;
     }
 
+    public List<ChannelRV> getFlattenChannels() {
+        return mDataList;
+    }
+
     public void setDataAndNotifyChanged(ChannelGroupRV root, String guildID) {
-        if (!TextUtils.equals(guildID, mCurrentGuildID)) {
-            mLastedMessageCache.clear();
-        }
         if (root == null) {
             mDataList = new ArrayList<>();
         } else {
             mDataList = root.flatten();
+        }
+        setDataAndNotifyChanged(mDataList, guildID);
+    }
+
+    public void setDataAndNotifyChanged(List<ChannelRV> data, String guildID) {
+        if (!TextUtils.equals(guildID, mCurrentGuildID)) {
+            mLastedMessageCache.clear();
+        }
+        if (data == null) {
+            mDataList = new ArrayList<>();
+        } else {
+            mDataList = data;
         }
         mCurrentGuildID = guildID;
         notifyDataSetChanged();

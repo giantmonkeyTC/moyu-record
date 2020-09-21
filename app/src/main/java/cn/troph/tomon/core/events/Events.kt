@@ -15,6 +15,7 @@ data class GuildCreateEvent(val guild: Guild) : Event()
 data class GuildDeleteEvent(val guild: Guild) : Event()
 data class GuildUpdateEvent(val guild: Guild) : Event()
 data class GuildPositionEvent(val guilds: List<Position>) : Event()
+data class ChannelPositionEvent(val guildId:String, val channels: List<Position>) : Event()
 
 class ChannelSyncEvent(val guild: Guild?) : Event()
 data class ChannelFetchEvent(val channels: List<Channel>) : Event()

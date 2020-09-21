@@ -65,6 +65,7 @@ class Socket : Observer<SocketEvent>, LifecycleObserver {
         "MESSAGE_REACTION_ADD" to handleMessageReactionAdd,
         "MESSAGE_REACTION_REMOVE" to handleMessageReactionRemove,
         "GUILD_POSITION" to handleGuildPosition,
+        "CHANNEL_POSITION" to handleChannelPosition,
         "USER_PRESENCE_UPDATE" to handlePresenceUpdate,
         "VOICE_STATE_UPDATE" to handleVoiceStateHandler,
         "LEAVE" to handleVoiceLeaveHandler,

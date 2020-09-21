@@ -71,12 +71,14 @@ import cn.troph.tomon.R;
 import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.MessageNotificationsType;
+import cn.troph.tomon.core.actions.Position;
 import cn.troph.tomon.core.collections.GuildChannelCollection;
 import cn.troph.tomon.core.collections.GuildMemberCollection;
 import cn.troph.tomon.core.collections.GuildSettingsCollection;
 import cn.troph.tomon.core.events.ChannelAckEvent;
 import cn.troph.tomon.core.events.ChannelCreateEvent;
 import cn.troph.tomon.core.events.ChannelDeleteEvent;
+import cn.troph.tomon.core.events.ChannelPositionEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
@@ -687,6 +689,24 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                     mChannelListAdapter.notifyDataSetChanged();
                     mChatVM.getGuildUpdateLD().setValue(new GuildUpdateEvent(mCurrentGuild));
                 }
+            }
+        });
+
+        mChatVM.getChannelPositionLD().observe(getViewLifecycleOwner(), new Observer<ChannelPositionEvent>() {
+            @Override
+            public void onChanged(ChannelPositionEvent channelPositionEvent) {
+                if (!channelPositionEvent.getGuildId().equals(mCurrentGuild.getId())) {
+                    return;
+                }
+                for (Position position : channelPositionEvent.getChannels()) {
+                    GuildChannelCollection channels = mCurrentGuild.getChannels();
+                    channels.get(position.getId()).setPosition(position.getPosition());
+                    String parent_id = position.getParent_id();
+                    if (!TextUtils.equals(parent_id, "default")) {
+                        channels.get(position.getId()).setParentId(parent_id);
+                    }
+                }
+                updateWholePage(mCurrentGuild.getId());
             }
         });
 

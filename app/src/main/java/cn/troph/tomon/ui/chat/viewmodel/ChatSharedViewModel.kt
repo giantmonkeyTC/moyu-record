@@ -119,6 +119,8 @@ class ChatSharedViewModel : ViewModel() {
 
     val guildPositionLD: MutableLiveData<GuildPositionEvent> = MutableLiveData()
 
+    val channelPositionLD: MutableLiveData<ChannelPositionEvent> = MutableLiveData()
+
     val guildCreateLD: MutableLiveData<GuildCreateEvent> = MutableLiveData()
 
     val guildDeleteLD: MutableLiveData<GuildDeleteEvent> = MutableLiveData()
@@ -254,6 +256,13 @@ class ChatSharedViewModel : ViewModel() {
                 guildPositionLD.value = it
             }
         )
+
+        Client.global.eventBus.observeEventOnUi<ChannelPositionEvent>().subscribe(
+            Consumer {
+                channelPositionLD.value = it
+            }
+        )
+
         Client.global.eventBus.observeEventOnUi<GuildCreateEvent>().subscribe(
             Consumer {
                 guildCreateLD.value = it
