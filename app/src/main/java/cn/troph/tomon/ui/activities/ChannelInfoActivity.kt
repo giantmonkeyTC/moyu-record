@@ -41,6 +41,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
+import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -117,6 +118,8 @@ class ChannelInfoActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ImmersionBar.with(this).reset().init()
+        ImmersionBar.with(this).statusBarColor(R.color.blackPrimary, 0.2f).transparentNavigationBar().fitsSystemWindows(true).init()
         val bundle = intent.extras
         bundle?.let {
             chatSharedViewModel.channelSelectionLD.value = ChannelSelection(

@@ -13,6 +13,7 @@ import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.gyf.immersionbar.ImmersionBar
 import com.orhanobut.logger.Logger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_entry.*

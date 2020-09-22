@@ -14,9 +14,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.gyf.immersionbar.ImmersionBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +102,8 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImmersionBar.with(this).reset().init();
+        ImmersionBar.with(this).navigationBarColor(R.color.channel_list_tab_bg).init();
         setContentView(R.layout.activity_tomon_main);
         initViewModel();
         initGuildListAndRegistObserver();
@@ -115,9 +120,27 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         mVpFragments = findViewById(R.id.vp_fragment_container);
         mPagerAdapter = new TomonMainPagerAdapter(this, this);
         mVpFragments.setAdapter(mPagerAdapter);
-        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
         mVpFragments.setOffscreenPageLimit(NUM_PAGER);
         mVpFragments.setUserInputEnabled(false);
+        mVpFragments.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                switch (position) {
+                    case POS_CHANNEL_LIST:
+                        ImmersionBar.with(TomonMainActivity.this).reset().init();
+                        ImmersionBar.with(TomonMainActivity.this).navigationBarColor(R.color.channel_list_tab_bg).init();
+                        break;
+                    case POS_DM_LIST:
+                        ImmersionBar.with(TomonMainActivity.this).statusBarColor(R.color.blackPrimary, 0.0f).navigationBarColor(R.color.channel_list_tab_bg).fitsSystemWindows(true).init();
+                        break;
+                    case POS_ME:
+                        ImmersionBar.with(TomonMainActivity.this).statusBarColor(R.color.blackPrimary, 0.2f).navigationBarColor(R.color.channel_list_tab_bg).fitsSystemWindows(true).init();
+                        break;
+                }
+            }
+        });
+        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
     }
 
     private void initTab() {
