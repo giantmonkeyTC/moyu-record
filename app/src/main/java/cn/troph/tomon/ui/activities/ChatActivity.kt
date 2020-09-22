@@ -22,6 +22,7 @@ import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
+import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
@@ -34,6 +35,12 @@ class ChatActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary, 0.0f)
+            .keyboardEnable(true)
+            .navigationBarColor(R.color.inputPanelBackground)
+            .fitsSystemWindows(true)
+            .init()
         val mChatSharedViewModel: ChatSharedViewModel by viewModels()
         val map = HashMap<String, Int>()
         val bundle = intent.extras
@@ -43,9 +50,6 @@ class ChatActivity : BaseActivity() {
                 channelId = bundle.getString("channelId")
             )
         }
-
-
-
 
         Client.global.dmChannels.forEach {
             map[it.id] = it.unReadCount

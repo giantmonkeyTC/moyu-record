@@ -13,6 +13,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -26,6 +27,7 @@ import cn.troph.tomon.core.utils.Validator
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import cn.troph.tomon.ui.widgets.TomonToast
 import com.google.android.material.snackbar.Snackbar
+import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_activity_register.*
@@ -51,7 +53,12 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_register)
-
+        ImmersionBar.with(this).reset().init()
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary, 0.2f)
+            .navigationBarColor(R.color.blackPrimary)
+            .fitsSystemWindows(true)
+            .init()
         button_confirmation.setOnClickListener {
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(button_confirmation.windowToken, 0)

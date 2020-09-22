@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
 import com.github.razir.progressbutton.showProgress
+import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.android.synthetic.main.layout_activity_login.*
@@ -85,6 +87,12 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ImmersionBar.with(this).reset().init()
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary, 0.2f)
+            .navigationBarColor(R.color.blackPrimary)
+            .fitsSystemWindows(true)
+            .init()
         setContentView(R.layout.layout_activity_login)
         bindProgressButton(button_login)
         button_login.attachTextChangeAnimator()

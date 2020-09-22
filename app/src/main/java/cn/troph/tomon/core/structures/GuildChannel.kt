@@ -26,9 +26,7 @@ open class GuildChannel(client: Client, data: JsonObject) : Channel(client, data
     var guildId: String? = null
         private set
     var position: Int = 0
-        private set
     var parentId: String? = null
-        private set
     var permissionOverwrites: Collection<PermissionOverwrites> = Collection()
         private set
 

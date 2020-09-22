@@ -208,4 +208,8 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.3.4"
 
     implementation 'at.blogc:expandabletextview:1.0.5'
+
+    implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
+    implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
+    implementation 'com.gyf.immersionbar:immersionbar-ktx:3.0.0'
 }

@@ -6,12 +6,14 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import cn.troph.tomon.R
+import com.gyf.immersionbar.ImmersionBar
 import kotlinx.android.synthetic.main.layout_activity_entry_option.*
 
-class EntryOptionActivity : AppCompatActivity() {
+class EntryOptionActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_entry_option)
+        ImmersionBar.with(this).statusBarColor(R.color.blackPrimary, 0.2f).fitsSystemWindows(true).init()
         button_login_route.setOnClickListener {
             gotoLogin()
         }

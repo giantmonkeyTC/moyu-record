@@ -73,6 +73,12 @@ public class WelcomeView extends FrameLayout {
     private ImageView mIvRightTop;
     private ImageView mIvRightCenter;
     private ImageView mIvRightBottom;
+    private ObjectAnimator mOccurAnim;
+    private ObjectAnimator mMoveXAnim;
+    private ObjectAnimator mMoveYAnim;
+    private ObjectAnimator mScaleXAnim;
+    private ObjectAnimator mScaleYAnim;
+    private ObjectAnimator mMissAnim;
 
     public WelcomeView(@NonNull Context context) {
         this(context, null);
@@ -90,6 +96,9 @@ public class WelcomeView extends FrameLayout {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        if (mOccurAnim != null) {
+            return;
+        }
         fillViews(w, h);
     }
 
@@ -270,26 +279,26 @@ public class WelcomeView extends FrameLayout {
     }
 
     private void startAnim(final View view, final int w, final int h, final int deviationX, final int deviationY) {
-        ObjectAnimator occurAnim = ObjectAnimator.ofFloat(view, "alpha", 0f, 1.0f);
-        occurAnim.setDuration(DRAWABLE_OCCUR_DURATION_IN_MILLIS);
-        occurAnim.addListener(new AnimatorListenerAdapter() {
+        mOccurAnim = ObjectAnimator.ofFloat(view, "alpha", 0f, 1.0f);
+        mOccurAnim.setDuration(DRAWABLE_OCCUR_DURATION_IN_MILLIS);
+        mOccurAnim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                ObjectAnimator moveXAnim = ObjectAnimator.ofFloat(view, "x",
+                mMoveXAnim = ObjectAnimator.ofFloat(view, "x",
                         view.getX(),
                         getX() + getWidth() / 2 - view.getWidth() / 2);
-                ObjectAnimator moveYAnim = ObjectAnimator.ofFloat(view, "y",
+                mMoveYAnim = ObjectAnimator.ofFloat(view, "y",
                         view.getY(),
                         getY() + getHeight() / 2 - view.getHeight() / 2);
-                moveXAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
-                moveYAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
-                ObjectAnimator scaleXAnim = ObjectAnimator.ofFloat(view, "scaleX", view.getScaleX(), view.getScaleX()*0.6f);
-                ObjectAnimator scaleYAnim = ObjectAnimator.ofFloat(view, "scaleY", view.getScaleY(), view.getScaleY()*0.6f);
-                scaleXAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
-                scaleYAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
-                ObjectAnimator missAnim = ObjectAnimator.ofFloat(view, "alpha", 1.0f, 0.0f);
-                missAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
-                missAnim.addListener(new AnimatorListenerAdapter() {
+                mMoveXAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
+                mMoveYAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
+                mScaleXAnim = ObjectAnimator.ofFloat(view, "scaleX", view.getScaleX(), view.getScaleX()*0.6f);
+                mScaleYAnim = ObjectAnimator.ofFloat(view, "scaleY", view.getScaleY(), view.getScaleY()*0.6f);
+                mScaleXAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
+                mScaleYAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
+                mMissAnim = ObjectAnimator.ofFloat(view, "alpha", 1.0f, 0.0f);
+                mMissAnim.setDuration(DRAWABLE_MISS_DURATION_IN_MILLIS);
+                mMissAnim.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         if (view == mIvTopLeft) {
@@ -316,15 +325,15 @@ public class WelcomeView extends FrameLayout {
 
                     }
                 });
-                scaleXAnim.start();
-                scaleYAnim.start();
-                moveXAnim.start();
-                moveYAnim.start();
-                missAnim.start();
+                mScaleXAnim.start();
+                mScaleYAnim.start();
+                mMoveXAnim.start();
+                mMoveYAnim.start();
+                mMissAnim.start();
             }
         });
-        occurAnim.setStartDelay(new Random(getSeed()).nextInt(Math.min(sOccurJitterInSeconds++, MAX_OCCUR_JITTER_IN_SECONDS)) * 1000);
-        occurAnim.start();
+        mOccurAnim.setStartDelay(new Random(getSeed()).nextInt(Math.min(sOccurJitterInSeconds++, MAX_OCCUR_JITTER_IN_SECONDS)) * 1000);
+        mOccurAnim.start();
     }
 
     private static void setWidthAndHeight(int w, int h, ImageView view) {

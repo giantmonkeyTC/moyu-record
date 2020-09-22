@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.gyf.immersionbar.ImmersionBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +65,7 @@ import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.fragments.ChannelListFragment;
 import cn.troph.tomon.ui.fragments.TomonMainPagerAdapter;
 import cn.troph.tomon.ui.guild.GuildListAdapter;
+import cn.troph.tomon.ui.utils.AppUtils;
 import cn.troph.tomon.ui.utils.GuildUtils;
 import cn.troph.tomon.ui.widgets.TomonDrawerLayout;
 import cn.troph.tomon.ui.widgets.TomonTabButton;
@@ -99,12 +102,29 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImmersionBar.with(this).reset().init();
+        ImmersionBar.with(this).navigationBarColor(R.color.channel_list_tab_bg).init();
         setContentView(R.layout.activity_tomon_main);
         initViewModel();
         initGuildListAndRegistObserver();
         initGuildEmoji();
         initTab();
         initChannelList(savedInstanceState);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (AppUtils.isFirstRun(TomonMainActivity.this) &&
+                Client.Companion.getGlobal().getGuilds().getSize() > 0) {
+            mDrawerLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mDrawerLayout.openDrawer(Gravity.LEFT, true);
+                    AppUtils.setIsFirstRun(TomonMainActivity.this, false);
+                }
+            });
+        }
     }
 
     @SuppressLint("WrongConstant")
@@ -115,9 +135,27 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         mVpFragments = findViewById(R.id.vp_fragment_container);
         mPagerAdapter = new TomonMainPagerAdapter(this, this);
         mVpFragments.setAdapter(mPagerAdapter);
-        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
         mVpFragments.setOffscreenPageLimit(NUM_PAGER);
         mVpFragments.setUserInputEnabled(false);
+        mVpFragments.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                switch (position) {
+                    case POS_CHANNEL_LIST:
+                        ImmersionBar.with(TomonMainActivity.this).reset().init();
+                        ImmersionBar.with(TomonMainActivity.this).navigationBarColor(R.color.channel_list_tab_bg).init();
+                        break;
+                    case POS_DM_LIST:
+                        ImmersionBar.with(TomonMainActivity.this).statusBarColor(R.color.blackPrimary, 0.0f).navigationBarColor(R.color.channel_list_tab_bg).fitsSystemWindows(true).init();
+                        break;
+                    case POS_ME:
+                        ImmersionBar.with(TomonMainActivity.this).statusBarColor(R.color.blackPrimary, 0.2f).navigationBarColor(R.color.channel_list_tab_bg).fitsSystemWindows(true).init();
+                        break;
+                }
+            }
+        });
+        mVpFragments.setCurrentItem(POS_CHANNEL_LIST, false);
     }
 
     private void initTab() {
@@ -377,7 +415,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
             channelListFragment.setOnJoinGuildClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    joinGuild();
+                    showJoinGuildBottomSheet();
                 }
             });
         }
@@ -411,7 +449,12 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
                     mGuildListRecyclerView.scrollToPosition(
                             mAdapter.getGuildList().indexOf(guildCreateEvent.getGuild()));
                     updateGuildChannelList(guildCreateEvent.getGuild().getId());
-                    mDrawerLayout.closeDrawer(true);
+                    if (AppUtils.isFirstRun(TomonMainActivity.this)) {
+                        mDrawerLayout.openDrawer(Gravity.LEFT, true);
+                        AppUtils.setIsFirstRun(TomonMainActivity.this, false);
+                    } else {
+                        mDrawerLayout.closeDrawer(true);
+                    }
                 }
             }
         });
@@ -623,12 +666,12 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         mJoinGuild.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinGuild();
+                showJoinGuildBottomSheet();
             }
         });
     }
 
-    public void joinGuild() {
+    public void showJoinGuildBottomSheet() {
         View viewBase = LayoutInflater.from(this).inflate(R.layout.coordinator_join_guild, null);
         View bottomSheetView = viewBase.findViewById(R.id.bottom_sheet_join_guild);
         EditText etLink = bottomSheetView.findViewById(R.id.bs_textfield);
@@ -694,7 +737,8 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
 
     }
 
-    private void checkAndAcceptInvite(Invite invite, EditText etLink, String inviteCode, BottomSheetDialog dialog) {
+    private void checkAndAcceptInvite(Invite invite, EditText etLink, String inviteCode,
+                                      BottomSheetDialog dialog) {
         if (invite == null) {
             return;
         }
@@ -715,6 +759,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
                 TomonToast.makeText(getApplicationContext(),
                         getString(R.string.guild_joined_success),
                         Toast.LENGTH_LONG).show();
+                KeyboardUtils.hideKeyBoard(TomonMainActivity.this);
                 mAdapter.setIsInviting(true);
                 for (Guild each : mAdapter.getGuildList()) {
                     if (each.getId().equals(guild.getId())) {
@@ -725,7 +770,12 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
                         mGuildListRecyclerView.scrollToPosition(
                                 mAdapter.getGuildList().indexOf(each));
                         updateGuildChannelList(guild.getId());
-                        mDrawerLayout.closeDrawer(true);
+                        if (AppUtils.isFirstRun(TomonMainActivity.this)) {
+                            mDrawerLayout.openDrawer(Gravity.LEFT, true);
+                            AppUtils.setIsFirstRun(TomonMainActivity.this, false);
+                        } else {
+                            mDrawerLayout.closeDrawer(true);
+                        }
                         break;
                     }
                 }
@@ -781,6 +831,20 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mDrawerLayout.setContentSensitiveEdgeSize(metrics.widthPixels);
         mDrawerLayout.setContentFadeColor(getColor(R.color.black_50));
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
     @Override

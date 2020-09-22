@@ -4,6 +4,7 @@
     android:layout_gravity="start"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="visible"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:background="@color/guildlist_bg">

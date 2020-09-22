@@ -16,8 +16,3 @@ class GuildPositionAction(client: Client) : Action<Unit>(client) {
         return Unit
     }
 }
-
-data class Position(
-    @SerializedName("id") val id: String,
-    @SerializedName("position") val position: Int
-)
