@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/overlapping_panels"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <FrameLayout
-        android:id="@+id/center_panel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
         <include
             layout="@layout/partial_chat_app_bar"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </FrameLayout>
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
