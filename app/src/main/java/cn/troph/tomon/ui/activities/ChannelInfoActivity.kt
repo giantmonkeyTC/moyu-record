@@ -119,7 +119,11 @@ class ChannelInfoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ImmersionBar.with(this).reset().init()
-        ImmersionBar.with(this).statusBarColor(R.color.blackPrimary, 0.2f).transparentNavigationBar().fitsSystemWindows(true).init()
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary, 0.2f)
+            .navigationBarColor(R.color.blackPrimary)
+            .fitsSystemWindows(true)
+            .init()
         val bundle = intent.extras
         bundle?.let {
             chatSharedViewModel.channelSelectionLD.value = ChannelSelection(
