@@ -1,7 +1,6 @@
 package cn.troph.tomon.ui.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -83,8 +82,6 @@ import cn.troph.tomon.core.events.ChannelSyncEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
-import cn.troph.tomon.core.events.MessageDeleteEvent;
-import cn.troph.tomon.core.events.MessageUpdateEvent;
 import cn.troph.tomon.core.events.VoiceSpeakEvent;
 import cn.troph.tomon.core.network.services.ChannelService;
 import cn.troph.tomon.core.network.services.GuildService;
@@ -112,7 +109,6 @@ import cn.troph.tomon.ui.channel.ChannelRV;
 import cn.troph.tomon.ui.chat.fragments.VoiceBottomSheet;
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel;
 import cn.troph.tomon.ui.guild.GuildAvatarUtils;
-import cn.troph.tomon.ui.states.ChannelSelection;
 import cn.troph.tomon.ui.utils.TomonMaterialColors;
 import cn.troph.tomon.ui.utils.TomonViewUtils;
 import cn.troph.tomon.ui.widgets.TomonToast;
@@ -539,7 +535,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             setOnJoinGuildClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((TomonMainActivity) getActivity()).joinGuild();
+                    ((TomonMainActivity) getActivity()).showJoinGuildBottomSheet();
                 }
             });
             return;

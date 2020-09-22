@@ -4,6 +4,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -80,13 +81,18 @@ class LoginViewModel : ViewModel() {
 
 }
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ImmersionBar.with(this).statusBarColor(R.color.blackPrimary, 0.2f).fitsSystemWindows(true).init()
+        ImmersionBar.with(this).reset().init()
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary, 0.2f)
+            .navigationBarColor(R.color.blackPrimary)
+            .fitsSystemWindows(true)
+            .init()
         setContentView(R.layout.layout_activity_login)
         bindProgressButton(button_login)
         button_login.attachTextChangeAnimator()

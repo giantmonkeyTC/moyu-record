@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+import com.gyf.immersionbar.ImmersionBar;
 
 import cn.troph.tomon.R;
 import cn.troph.tomon.core.Client;
@@ -42,6 +43,12 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImmersionBar.with(this)
+                .statusBarColor(R.color.blackPrimary)
+                .keyboardEnable(true)
+                .navigationBarColor(R.color.blackPrimary)
+                .fitsSystemWindows(true)
+                .init();
         setContentView(R.layout.activity_guild_nick_name_settings);
         String guildId = getIntent().getStringExtra(KEY_GUILD_ID);
         if (TextUtils.isEmpty(guildId)) {
