@@ -149,7 +149,6 @@ class ChatActivity : BaseActivity() {
             menuInflater.inflate(R.menu.activity_chat, menu)
             return true
         }
-
     }
 
     override fun onBackPressed() {
@@ -167,7 +166,6 @@ class ChatActivity : BaseActivity() {
                 hideKeyboard()
             }
             R.id.members -> {
-                if (AppState.global.channelSelection.value.channelId != null) {
                     val intent = Intent(this, ChannelInfoActivity::class.java)
                     val bundle = Bundle()
                     bundle.putString("guildId", getIntent().extras?.getString("guildId"))
@@ -183,7 +181,6 @@ class ChatActivity : BaseActivity() {
                     )
 
                     hideKeyboard()
-                }
             }
 
         }

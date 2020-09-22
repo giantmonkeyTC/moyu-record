@@ -49,6 +49,13 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
+            android:name=".ui.activities.MeSettingsActivity"
+            android:label="MeSettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <activity
             android:name=".ui.activities.MeProfileActivity"
             android:label="MeProfileActivity"
             android:screenOrientation="portrait"

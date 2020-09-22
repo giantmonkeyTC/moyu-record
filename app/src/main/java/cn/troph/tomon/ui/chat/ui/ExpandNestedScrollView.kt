@@ -12,26 +12,17 @@ import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.ui.activities.ChannelInfoActivity
 import cn.troph.tomon.ui.states.AppState
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.fragment_channel_detail.*
 
 
 class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
     NestedScrollView(context, attrs) {
     private lateinit var header: ConstraintLayout
     private lateinit var tab: TabLayout
-    private lateinit var viewPager: ViewPager
+    private lateinit var viewPager: NestedViewPager
     private var mHeaderHeight: Int = 0
-    private var mTouchSlop = 0
-    private var mMaximumVelocity = 0
-    private var mMinimumVelocity: Int = 0
 
 
-    init {
-        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop()
-        mMaximumVelocity = ViewConfiguration.get(context)
-            .getScaledMaximumFlingVelocity()
-        mMinimumVelocity = ViewConfiguration.get(context)
-            .getScaledMinimumFlingVelocity()
-    }
     
 
     override fun onFinishInflate() {

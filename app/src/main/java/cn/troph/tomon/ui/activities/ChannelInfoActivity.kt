@@ -290,15 +290,17 @@ class ChannelInfoActivity : BaseActivity() {
                             token = Client.global.auth
                         ).doOnNext {
                             inviteCode = it.code
-                        }.doOnError { Toast.makeText(this, "获取频道邀请码失败", Toast.LENGTH_SHORT) },
+                        }.doOnError {
+                            TomonToast.makeText(this, "获取频道邀请码失败", Toast.LENGTH_SHORT).show()
+                        },
                         Client.global.rest.inviteService.getTickets(token = Client.global.auth)
                             .doOnNext {
                                 ticketCode = it.code
                             }.doOnError {
-                                Toast.makeText(this, "获取激活码失败", Toast.LENGTH_SHORT)
+                                TomonToast.makeText(this, "获取激活码失败", Toast.LENGTH_SHORT).show()
                             }
                     ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
+                        .subscribe({
                             if (inviteCode != "" && ticketCode != "") {
                                 val inviteLink = Url.inviteFormat.format(inviteCode, ticketCode)
                                 GeneralSnackbar.make(
@@ -321,6 +323,8 @@ class ChannelInfoActivity : BaseActivity() {
                                 }
 
                             }
+                        }) {
+                            TomonToast.makeText(this, "获取频道邀请码失败", Toast.LENGTH_SHORT).show()
                         }
 
 

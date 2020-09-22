@@ -25,9 +25,11 @@ class MessageCreateAction(client: Client) : Action<Message>(client) {
                     channel.mention += 1
                     client.eventBus.postEvent(MessageAtMeEvent(message = message))
                 }
-                channel.patch(JsonObject().apply {
-                    addProperty("last_message_id", message?.id)
-                })
+                if (message.authorId != client.me.id) {
+                    channel.patch(JsonObject().apply {
+                        addProperty("last_message_id", message?.id)
+                    })
+                }
                 client.eventBus.postEvent(MessageCreateEvent(message = message))
             }
         } else if (channel is DmChannel) {
@@ -37,9 +39,11 @@ class MessageCreateAction(client: Client) : Action<Message>(client) {
                 if (message.mentions.contains(client.me.id)) {
                     client.eventBus.postEvent(MessageAtMeEvent(message = message))
                 }
-                channel.patch(JsonObject().apply {
-                    addProperty("last_message_id", message.id)
-                })
+                if (message.authorId != client.me.id) {
+                    channel.patch(JsonObject().apply {
+                        addProperty("last_message_id", message.id)
+                    })
+                }
                 client.eventBus.postEvent(MessageCreateEvent(message = message))
             }
         }

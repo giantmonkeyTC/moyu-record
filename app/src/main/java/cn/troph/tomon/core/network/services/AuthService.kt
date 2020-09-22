@@ -4,9 +4,7 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface AuthService {
 
@@ -63,4 +61,20 @@ interface AuthService {
         @Body request: VerifyRequest
     ): Observable<Response<Void>>
 
+
+    data class MeSettingsRequest(
+        @SerializedName("name")
+        val name: String? = null,
+        @SerializedName("username")
+        val username: String? = null,
+        @SerializedName("password")
+        val password: String? = null,
+        @SerializedName("email")
+        val email: String? = null
+    )
+    @PATCH("users/@me")
+    fun meSettings(
+        @Header("Authorization") token: String,
+        @Body request: MeSettingsRequest
+    ):Observable<JsonObject>
 }
