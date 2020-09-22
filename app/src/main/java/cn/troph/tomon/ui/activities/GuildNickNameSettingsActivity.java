@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,9 +44,11 @@ public class GuildNickNameSettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImmersionBar.with(this).reset().init();
         ImmersionBar.with(this)
                 .statusBarColor(R.color.blackPrimary)
                 .keyboardEnable(true)
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
                 .navigationBarColor(R.color.blackPrimary)
                 .fitsSystemWindows(true)
                 .init();

@@ -685,6 +685,8 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         bottomSheetView.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.clearFocus();
+                etLink.requestFocus();
                 dialog.dismiss();
             }
         });
@@ -722,6 +724,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogI) {
+                etLink.requestFocus();
                 KeyboardUtils.hideKeyBoard(TomonMainActivity.this);
             }
         });
