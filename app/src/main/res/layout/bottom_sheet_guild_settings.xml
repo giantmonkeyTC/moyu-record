@@ -97,12 +97,16 @@
 
         <TextView
             android:id="@+id/tv_guild_nickname"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
-            android:text="owl"
+            android:text="owlowlowlowlowlowlowlowlowlowlowlowlowlowlowl"
             android:textColor="@color/white_50"
+            android:gravity="end"
             android:textSize="14dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/iv_change_guild_nickname"
             app:layout_constraintHorizontal_bias="1.0"
