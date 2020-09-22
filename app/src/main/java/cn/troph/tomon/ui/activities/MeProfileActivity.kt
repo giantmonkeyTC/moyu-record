@@ -25,7 +25,7 @@ class MeProfileActivity : BaseActivity() {
                 if (me.email == null) getString(R.string.profile_empty) else me.email
             me_phone_content.text =
                 if (me.phone == null) getString(R.string.profile_empty) else me.phone
-            me_profile_name_goto.setOnClickListener {
+            bar1.setOnClickListener {
                 val intent = Intent(this, MeSettingsActivity::class.java)
                 val bundle = Bundle()
                 bundle.putString("property", "name")
@@ -39,7 +39,7 @@ class MeProfileActivity : BaseActivity() {
                     ).toBundle()
                 )
             }
-            me_username_goto.setOnClickListener {
+            bar2.setOnClickListener {
                 val intent = Intent(this, MeSettingsActivity::class.java)
                 val bundle = Bundle()
                 bundle.putString("property", "username")
@@ -53,7 +53,7 @@ class MeProfileActivity : BaseActivity() {
                     ).toBundle()
                 )
             }
-            me_email_goto.setOnClickListener {
+            bar_email.setOnClickListener {
                 val intent = Intent(this, MeSettingsActivity::class.java)
                 val bundle = Bundle()
                 bundle.putString("property", "email")
@@ -67,7 +67,7 @@ class MeProfileActivity : BaseActivity() {
                     ).toBundle()
                 )
             }
-//            me_phone_goto.setOnClickListener {
+//            bar_phone.setOnClickListener {
 //                val intent = Intent(this, MeSettingsActivity::class.java)
 //                val bundle = Bundle()
 //                bundle.putString("property", "phone")

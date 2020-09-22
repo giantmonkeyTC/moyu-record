@@ -9,12 +9,13 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
     override fun handle(data: JsonElement?, vararg extras: Any?): Unit? {
         client.users.clear()
         client.guilds.clear()
+        client.guilds.list.toList().clear()
         client.channels.clear()
         client.dmChannels.clear()
         client.me.clear()
         client.stamps.clear()
         client.preferences.edit {
-            remove("token")
+            remove("token").commit()
         }
         client.socket.close()
         client.eventBus.postEvent(UserLogoutEvent())
