@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -804,6 +805,20 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mDrawerLayout.setContentSensitiveEdgeSize(metrics.widthPixels);
         mDrawerLayout.setContentFadeColor(getColor(R.color.black_50));
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
     @Override
