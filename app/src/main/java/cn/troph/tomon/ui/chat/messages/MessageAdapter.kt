@@ -1,6 +1,5 @@
 package cn.troph.tomon.ui.chat.messages
 
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -9,14 +8,11 @@ import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Bundle
 import android.os.Environment
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.*
@@ -26,7 +22,6 @@ import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import androidx.emoji.widget.EmojiTextView
-import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -35,8 +30,6 @@ import cn.troph.tomon.core.events.ShowUserProfileEvent
 import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.core.utils.*
 import cn.troph.tomon.ui.chat.fragments.GuildUserInfoFragment
-import cn.troph.tomon.ui.chat.fragments.LogoutDialogFragment
-import cn.troph.tomon.ui.chat.fragments.ReplySourcePreviewFragment
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.UpdateEnabled
 import cn.troph.tomon.ui.widgets.GeneralSnackbar
@@ -45,17 +38,14 @@ import com.aliyun.player.source.UrlSource
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.target.Target
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
 import com.stfalcon.imageviewer.StfalconImageViewer
-import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import io.noties.markwon.*
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.html.HtmlTag
@@ -69,7 +59,6 @@ import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_message.view.*
 import kotlinx.android.synthetic.main.header_loading_view.view.*
-import kotlinx.android.synthetic.main.image_view_overlay.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.*
 import kotlinx.android.synthetic.main.item_chat_file.view.textView
 import kotlinx.android.synthetic.main.item_chat_image.view.*
@@ -83,11 +72,9 @@ import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.io.File
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.random.Random
 
 const val INVITE_LINK = "https://beta.tomon.co/invite/"
 const val STAMP_URL = "https://cdn.tomon.co/stamps/%s.png?x-oss-process=image/resize,p_80"
@@ -337,7 +324,7 @@ class MessageAdapter(
                     }
                     holder.itemView.message_avatar_file.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_file.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_file.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -465,7 +452,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_image.visibility = View.VISIBLE
                     holder.itemView.message_avatar_image.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_image.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_image.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -683,7 +670,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_invite.visibility = View.VISIBLE
                     holder.itemView.message_avatar_invite.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_invite.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_invite.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -808,7 +795,7 @@ class MessageAdapter(
                 } else {
                     holder.itemView.widget_message_author_name_text_invite.text =
                         messageList[position].author?.name
-                            ?: holder.itemView.context.getString(R.string.deleted_name)
+                            ?: holder.itemView.context.getString(R.string.unknown_name)
                 }
 
                 holder.view.widget_message_timestamp_text_invite.text =
@@ -830,11 +817,11 @@ class MessageAdapter(
                         name = member.displayName
                     } else {
                         name = messageList[position].author?.name ?: holder.itemView.context.getString(
-                            R.string.deleted_name)
+                            R.string.unknown_name)
                     }
                 } else {
                     name = messageList[position].author?.name ?: holder.itemView.context.getString(
-                        R.string.deleted_name)
+                        R.string.unknown_name)
                 }
                 name = "**" + (name) + "**"
                 markdown?.setMarkdown(holder.itemView.system_txt_welcome, welMsg.format(name))
@@ -871,7 +858,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_stamp.visibility = View.VISIBLE
                     holder.itemView.message_avatar_stamp.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_stamp.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_stamp.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -980,7 +967,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_video.visibility = View.VISIBLE
                     holder.itemView.message_avatar_video.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_video.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_video.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -1199,7 +1186,7 @@ class MessageAdapter(
                     holder.itemView.widget_message_timestamp_text_link.visibility = View.VISIBLE
                     holder.itemView.message_avatar_link.user = messageList[position].author
                     holder.itemView.widget_message_author_name_text_link.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_link.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -1360,7 +1347,7 @@ class MessageAdapter(
                     holder.itemView.message_avatar_reply.user = messageList[position].author
 
                     holder.itemView.widget_message_author_name_text_reply.text =
-                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.deleted_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
+                        "${messageList[position].author?.name ?: holder.itemView.context.getString(R.string.unknown_name)}${if (messageList[position].author?.type == 32) " \uD83E\uDD16" else ""}"
                     holder.itemView.widget_message_author_name_text_reply.setTextColor(
                         holder.itemView.context.getColor(
                             R.color.white
@@ -1430,7 +1417,7 @@ class MessageAdapter(
                         holder.itemView.name_divider.visibility = View.VISIBLE
                         holder.itemView.source_content_author.text =
                             "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                R.string.deleted_name
+                                R.string.unknown_name
                             )}"
                         for (item in it.stamps) {
                             Glide.with(holder.itemView)
@@ -1453,7 +1440,7 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.VISIBLE
                                 holder.itemView.source_content_author.text =
                                     "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
+                                        R.string.unknown_name
                                     )}"
                                 for (item in it.attachments.values) {
                                     Glide.with(holder.itemView)
@@ -1552,7 +1539,7 @@ class MessageAdapter(
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
                                     "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
+                                        R.string.unknown_name
                                     )}:[视频]"
                             } else {
                                 if (holder.itemView.source_content.hasOnClickListeners()) {
@@ -1564,7 +1551,7 @@ class MessageAdapter(
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
                                     "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
+                                        R.string.unknown_name
                                     )}:[文件]"
                             }
                             break
@@ -1592,7 +1579,7 @@ class MessageAdapter(
                                     }
                                 })).build(),
                             "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                R.string.deleted_name
+                                R.string.unknown_name
                             )}:${it.content}",
                             holder.itemView.source_content
                         )
@@ -1639,14 +1626,14 @@ class MessageAdapter(
                     displayNameNewOwner = newOwner.displayName
                 } else {
                     displayNameNewOwner = Client.global.users[message.content ?: ""]?.name
-                        ?: holder.itemView.context.resources.getString(R.string.deleted_name)
+                        ?: holder.itemView.context.resources.getString(R.string.unknown_name)
                 }
 
                 if (oldOwner != null) {
                     displayNameOldOwner = oldOwner.displayName
                 } else {
                     displayNameOldOwner = Client.global.users[message.authorId ?: ""]?.name
-                        ?: holder.itemView.context.resources.getString(R.string.deleted_name)
+                        ?: holder.itemView.context.resources.getString(R.string.unknown_name)
                 }
 
                 holder.itemView.tv_new_owner.text = displayNameNewOwner
@@ -1661,7 +1648,7 @@ class MessageAdapter(
         }
 
         return Client.global.users[message.content ?: ""]?.name
-            ?: context.resources.getString(R.string.deleted_name)
+            ?: context.resources.getString(R.string.unknown_name)
 
     }
 
@@ -1748,7 +1735,7 @@ class MessageAdapter(
                 itemView.widget_message_author_name_text.text = "T🐱"
             } else {
                 itemView.widget_message_author_name_text.text =
-                    "${message.author?.name ?: holder.itemView.context.getString(R.string.deleted_name)} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
+                    "${message.author?.name ?: holder.itemView.context.getString(R.string.unknown_name)} ${if (message.author?.type == 32) " \uD83E\uDD16" else ""}"
                 itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
                 if (member != null) {
                     itemView.widget_message_author_name_text.setTextColor(
@@ -1761,7 +1748,7 @@ class MessageAdapter(
             }
         } else {
             itemView.widget_message_author_name_text.text =
-                message.author?.name ?: holder.itemView.context.getString(R.string.deleted_name)
+                message.author?.name ?: holder.itemView.context.getString(R.string.unknown_name)
             itemView.widget_message_author_name_text.setTextColor(itemView.context.getColor(R.color.white))
         }
         if (message.content != null && (Assets.regexEmoji.containsMatchIn(message.content!!) || Assets.regexAtUser.containsMatchIn(

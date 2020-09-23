@@ -96,7 +96,7 @@
     <string name="channel_tab_text">频道</string>
     <string name="dm_tab_text">私聊</string>
     <string name="message_update_bar_text">正在编辑消息</string>
-    <string name="deleted_name">被注销的账号</string>
+    <string name="unknown_name">未知用户</string>
     <string name="regist_successed">注册成功</string>s
     <string name="user_existed_info_error">注册失败:该账户已存在或注册信息有误</string>
     <string name="regist_unknown_error">\"注册失败:未知错误 \"</string>
