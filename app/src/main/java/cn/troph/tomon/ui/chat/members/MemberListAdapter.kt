@@ -62,8 +62,6 @@ class MemberListAdapter<T>(
 
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    private val memberCount = mutableMapOf<Long, Int>()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.widget_member_item, parent, false)
@@ -240,27 +238,13 @@ class MemberListAdapter<T>(
     }
 
     override fun getHeaderId(position: Int): Long {
-        if (memberList[position] is GuildMember) {
-            if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline") {
-//                if (memberCount.containsKey(0xffffff)) {
-//                    memberCount[0xffffff]?.let {
-//                        memberCount.replace(0xffffff, it + 1)
-//                    }
-//                } else memberCount[0xffffff] = 1
-                return 0xffffff
-            } else {
-//                val highestIndex =
-//                    (memberList[position] as GuildMember).roles.highest?.index?.toLong() ?: -1
-//                if (memberCount.containsKey(highestIndex)) {
-//                    memberCount[highestIndex]?.let {
-//                        memberCount.replace(highestIndex, it + 1)
-//                    }
-//                } else memberCount[highestIndex] = 1
-                return (memberList[position] as GuildMember).roles.highest?.index?.toLong() ?: -1
-            }
-
+        return if (memberList[position] is GuildMember) {
+            if (Client.global.presences[(memberList[position] as GuildMember).id]?.status == "offline")
+                0xffffff
+            else
+                (memberList[position] as GuildMember).roles.highest!!.index.toLong()
         } else
-            return -1
+            -1
     }
 
     override fun onCreateHeaderViewHolder(parent: ViewGroup?): HeaderViewHolder {
@@ -273,16 +257,8 @@ class MemberListAdapter<T>(
         if (member is GuildMember) {
             if (Client.global.presences[member.id]?.status == "offline")
                 itemView.widget_role_list_header_text.text = "离线"
-//                    String.format("离线 - %d", memberCount[0xffffff])
             else
-//                itemView.widget_role_list_header_text.text =
-//                    String.format(
-//                        "%s - %d",
-//                        member.roles.highest!!.name,
-//                        memberCount[member.roles.highest?.index?.toLong()]
-//                    )
-                itemView.widget_role_list_header_text.text =
-                    member.roles.highest!!.name
+                itemView.widget_role_list_header_text.text = member.roles.highest!!.name
         } else if (member is User)
             itemView.widget_role_list_header.visibility = View.GONE
     }
