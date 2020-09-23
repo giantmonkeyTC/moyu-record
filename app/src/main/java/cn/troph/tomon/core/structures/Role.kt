@@ -77,7 +77,7 @@ class Role(client: Client, data: JsonObject) : Base(client, data) {
     companion object {
         fun comparePositions(role1: Role, role2: Role): Int {
             if (role1.isEveryone != role2.isEveryone)
-                return (if (role1.isEveryone) 1 else 0) - (if (role1.isEveryone) 1 else 0)
+                return (if (role1.isEveryone) 1 else 0) - (if (role2.isEveryone) 1 else 0)
             if (role1.position != role2.position)
                 return role2.position - role1.position
             return role1.id.snowflake.compareTo(role2.id.snowflake)
