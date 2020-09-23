@@ -22,6 +22,7 @@ import cn.troph.tomon.core.ChannelType;
 import cn.troph.tomon.core.Client;
 import cn.troph.tomon.core.MessageType;
 import cn.troph.tomon.core.collections.MessageCollection;
+import cn.troph.tomon.core.events.ChannelUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
 import cn.troph.tomon.core.events.MessageAtMeEvent;
 import cn.troph.tomon.core.events.MessageCreateEvent;
@@ -30,6 +31,7 @@ import cn.troph.tomon.core.events.MessageReadEvent;
 import cn.troph.tomon.core.events.MessageUpdateEvent;
 import cn.troph.tomon.core.events.VoiceStateUpdateEvent;
 import cn.troph.tomon.core.structures.Base;
+import cn.troph.tomon.core.structures.Channel;
 import cn.troph.tomon.core.structures.GuildChannel;
 import cn.troph.tomon.core.structures.GuildMember;
 import cn.troph.tomon.core.structures.Message;
@@ -198,6 +200,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                     String channelId = ((VoiceStateUpdateEvent) event).getVoiceUpdate().getChannelId();
                     if (TextUtils.isEmpty(channelId) || channelId.equals(channel.getId())) {
+                        notifyItemChanged(position, new Object());
+                    }
+                } else if (event instanceof ChannelUpdateEvent) {
+                    Channel updatedChannel = ((ChannelUpdateEvent) event).getChannel();
+                    if (updatedChannel.getId().equals(channel.getId())) {
+                        channelRV.setChannel((GuildChannel) updatedChannel);
                         notifyItemChanged(position, new Object());
                     }
                 }

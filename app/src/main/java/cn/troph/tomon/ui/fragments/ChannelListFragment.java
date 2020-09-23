@@ -79,6 +79,7 @@ import cn.troph.tomon.core.events.ChannelCreateEvent;
 import cn.troph.tomon.core.events.ChannelDeleteEvent;
 import cn.troph.tomon.core.events.ChannelPositionEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
+import cn.troph.tomon.core.events.ChannelUpdateEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;

@@ -83,6 +83,8 @@ import kotlinx.android.synthetic.main.item_reaction_view.view.*
 import kotlinx.android.synthetic.main.item_system_welcome_msg.view.*
 import kotlinx.android.synthetic.main.widget_message_item.view.*
 import java.io.File
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.random.Random
@@ -816,12 +818,25 @@ class MessageAdapter(
             5 -> {
                 val welcomeArray =
                     holder.itemView.context.resources.getStringArray(R.array.welcome_array)
-                val index = Random.nextInt(0, welcomeArray.size)
+                val mod = BigInteger(messageList[position].id).rem(BigInteger.valueOf(8861)).toInt()
+                val index = mod % welcomeArray.size
                 val welMsg = welcomeArray[index]
-                val name =
-                    "**" + (messageList[position].author?.name ?: holder.itemView.context.getString(
-                        R.string.deleted_name
-                    )) + "**"
+                var name = ""
+                if (Client.global.channels[messageList[position].channelId] is TextChannel) {
+                    val member =
+                        (Client.global.channels[messageList[position].channelId] as TextChannel).members[messageList[position].authorId
+                            ?: ""]
+                    if (member != null) {
+                        name = member.displayName
+                    } else {
+                        name = messageList[position].author?.name ?: holder.itemView.context.getString(
+                            R.string.deleted_name)
+                    }
+                } else {
+                    name = messageList[position].author?.name ?: holder.itemView.context.getString(
+                        R.string.deleted_name)
+                }
+                name = "**" + (name) + "**"
                 markdown?.setMarkdown(holder.itemView.system_txt_welcome, welMsg.format(name))
             }
             6 -> {
