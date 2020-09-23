@@ -90,7 +90,7 @@
     <dimen name="tab_me_status_dot_content_height">6dp</dimen>
     <dimen name="channel_list_tab_height">54dp</dimen>
     <dimen name="channel_tab_text_margin_top">4dp</dimen>
-    <dimen name="channel_tab_icon_width">20dp</dimen>
+    <dimen name="channel_tab_icon_width">21dp</dimen>
     <dimen name="channel_tab_text_size">9dp</dimen>
     <dimen name="tab_me_width">33dp</dimen>
     <dimen name="tab_me_height">33dp</dimen>
