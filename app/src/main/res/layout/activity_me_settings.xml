@@ -163,6 +163,13 @@
                 app:layout_constraintTop_toTopOf="@+id/imageView8"
                 app:srcCompat="@drawable/et_clear" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="me_settings_pwd_hint,imageView8,me_pwd_iv_clear,me_settings_pwd_placeholder,me_pwd_content" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
@@ -180,12 +187,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="me_settings_pwd_hint,imageView8,me_pwd_iv_clear,me_settings_pwd_placeholder,me_pwd_content" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
