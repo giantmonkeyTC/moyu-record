@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -19,6 +20,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_me_settings.*
 import retrofit2.HttpException
+import java.util.logging.Logger
 
 class MeSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +109,12 @@ class MeSettingsActivity : BaseActivity() {
             }
 
         })
-        me_pwd_content.setText("")
+        me_pwd_content.post {
+            if (me_settings_content.length() == 0) {
+                me_settings_content.setText("")
+            }
+            me_pwd_content.setText("")
+        }
     }
 
     private fun updateFinishButtonStyle(property: String) {
@@ -192,6 +199,20 @@ class MeSettingsActivity : BaseActivity() {
                             getString(R.string.wrong_password),
                             Toast.LENGTH_SHORT
                         ).show()
+                    else if (it.code() == 400)
+                        TomonToast.makeErrorText(
+                            applicationContext,
+                            getString(R.string.occupied_email_address),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    else {
+                        TomonToast.makeErrorText(
+                            applicationContext,
+                            getString(R.string.me_settings_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e("MeSettingsActivity", "SettingsError", it)
+                    }
                 } else
                     TomonToast.makeErrorText(
                         applicationContext,
@@ -210,6 +231,7 @@ class MeSettingsActivity : BaseActivity() {
         super.onPause()
         KeyboardUtils.hideKeyBoard(this)
     }
+
 
     override fun onBackPressed() {
         super.onBackPressed()

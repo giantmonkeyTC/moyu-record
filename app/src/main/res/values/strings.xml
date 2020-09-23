@@ -226,6 +226,7 @@
     <string name="set_nickname_success">设置成功</string>
     <string name="set_nickname_failed">设置昵称失败，请重试</string>
     <string name="wrong_password">密码错误</string>
+    <string name="occupied_email_address">该邮箱已被注册</string>
     <string name="me_settings_failed">设置失败，请重试</string>
     <string name="copied_invite">邀请链接已复制</string>
     <string name="offline">离线</string>

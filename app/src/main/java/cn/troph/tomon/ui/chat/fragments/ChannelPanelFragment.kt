@@ -460,10 +460,14 @@ class ChannelPanelFragment : BaseFragment() {
 
             bar_reply_message.message_reply_to.text =
 
-                "${if ((guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "").length > 6) (guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "".substring(
-                    0,
-                    6
-                ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""}:${it.message?.content ?: ""}"
+                "${
+                    if ((guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: "").length > 6) (guildMemberOf(
+                        it.message
+                    )?.displayName ?: it.message?.author?.name ?: "".substring(
+                        0,
+                        6
+                    ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""
+                }:${it.message?.content ?: ""}"
 
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
@@ -605,7 +609,7 @@ class ChannelPanelFragment : BaseFragment() {
         KeyboardVisibilityEvent.setEventListener(requireActivity(),
             object : KeyboardVisibilityEventListener {
                 override fun onVisibilityChanged(isOpen: Boolean) {
-                    if (isOpen) {
+                    if (isOpen && !isUpdateEnabled) {
                         btn_message_menu.isChecked = false
                         emoji_tv.isChecked = false
                         btn_scroll_to_bottom.visibility = View.GONE
@@ -655,8 +659,7 @@ class ChannelPanelFragment : BaseFragment() {
                                 reply = mChatSharedVM.replyLd.value!!.message?.id ?: ""
                             )
                         )
-                    ).asJsonObject
-                    ,
+                    ).asJsonObject,
                     token = Client.global.auth
                 ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ _ ->
@@ -686,17 +689,24 @@ class ChannelPanelFragment : BaseFragment() {
                                 mMsgListAdapter.notifyItemChanged(mMsgList.indexOf(emptyMsg))
                                 scrollToBottom()
                             }, 300)
-                        }
-                            , { e ->
-                                if (e.message?.contains("500") ?: false) {
-                                    Toast.makeText(requireContext().applicationContext, R.string.guild_deleted, Toast.LENGTH_SHORT)
-                                        .show()
-                                } else {
-                                    Toast.makeText(requireContext().applicationContext, R.string.send_fail, Toast.LENGTH_SHORT)
-                                        .show()
-                                }
+                        }, { e ->
+                            if (e.message?.contains("500") ?: false) {
+                                Toast.makeText(
+                                    requireContext().applicationContext,
+                                    R.string.guild_deleted,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            } else {
+                                Toast.makeText(
+                                    requireContext().applicationContext,
+                                    R.string.send_fail,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
 
-                            })
+                        })
                 }
 
             } else {
@@ -712,8 +722,12 @@ class ChannelPanelFragment : BaseFragment() {
                         }
                         scrollToBottom()
                     }, { e ->
-                        if (e.message?.contains("500")?:false) {
-                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                        if (e.message?.contains("500") ?: false) {
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.guild_deleted,
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         } else {
                             Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)
@@ -1425,7 +1439,11 @@ class ChannelPanelFragment : BaseFragment() {
                         mMsgList.remove(it)
                         mMsgListAdapter.notifyItemRemoved(index)
                         if (exception.message?.contains("500") ?: false) {
-                            Toast.makeText(requireContext(), R.string.guild_deleted, Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.guild_deleted,
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         } else {
                             Toast.makeText(requireContext(), R.string.send_fail, Toast.LENGTH_SHORT)

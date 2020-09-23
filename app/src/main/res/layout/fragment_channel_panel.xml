@@ -32,7 +32,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/coordinatorLayout" />
-
     <LinearLayout
         android:id="@+id/bar_update_message"
         android:layout_width="match_parent"
@@ -78,7 +77,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/view_messages">
+        app:layout_constraintBottom_toTopOf="@id/bar_update_message">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,13 +111,13 @@
 
     <ImageView
         android:id="@+id/btn_scroll_to_bottom"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="28dp"
-        android:src="@drawable/ic_chevron_circle_down_solid"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/scroll_to_bottom"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/view_messages"
+        app:layout_constraintBottom_toTopOf="@id/bar_reply_message"
         app:layout_constraintEnd_toEndOf="@id/view_messages" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
