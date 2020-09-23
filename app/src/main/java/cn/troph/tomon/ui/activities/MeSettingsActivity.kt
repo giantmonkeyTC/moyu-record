@@ -5,23 +5,32 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.Client.Companion.global
 import cn.troph.tomon.core.network.services.AuthService
+import cn.troph.tomon.core.utils.KeyboardUtils
 import cn.troph.tomon.ui.widgets.TomonToast
+import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_invite_confirm.*
 import kotlinx.android.synthetic.main.activity_me_settings.*
 import retrofit2.HttpException
-import retrofit2.Retrofit
 
 class MeSettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ImmersionBar.with(this).reset().init()
+        ImmersionBar.with(this)
+            .statusBarColor(R.color.blackPrimary)
+            .keyboardEnable(true)
+            .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            .navigationBarColor(R.color.blackPrimary)
+            .fitsSystemWindows(true)
+            .init()
         setContentView(R.layout.activity_me_settings)
         val bundle = intent.extras
         val property = bundle?.get("property") as String
@@ -56,7 +65,6 @@ class MeSettingsActivity : BaseActivity() {
             me_settings_content.setText("")
         }
         btn_change_confirm.setOnClickListener {
-            hideKeyboard()
             confirmChange(property)
         }
         iv_back.setOnClickListener {
@@ -193,16 +201,14 @@ class MeSettingsActivity : BaseActivity() {
             }
     }
 
-    private fun hideKeyboard() {
-        val imm: InputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(this)
-        }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    override fun onResume() {
+        super.onResume()
+        KeyboardUtils.showKeyBoard(me_settings_content, this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        KeyboardUtils.hideKeyBoard(this)
     }
 
     override fun onBackPressed() {
