@@ -47,10 +47,10 @@ public class TomonTabButton extends LinearLayout {
         addView(mName);
         LinearLayout.LayoutParams iconLp = (LayoutParams) mIcon.getLayoutParams();
         iconLp.width = getResources().getDimensionPixelSize(R.dimen.channel_tab_icon_width);
-        iconLp.height = LayoutParams.WRAP_CONTENT;
+        iconLp.height = getResources().getDimensionPixelSize(R.dimen.channel_tab_icon_width);
         mIcon.setLayoutParams(iconLp);
         if (bgResId != -1) {
-            mIcon.setBackgroundResource(bgResId);
+            mIcon.setImageResource(bgResId);
         }
         mIcon.setFocusable(true);
         LinearLayout.LayoutParams textLp = (LayoutParams) mName.getLayoutParams();

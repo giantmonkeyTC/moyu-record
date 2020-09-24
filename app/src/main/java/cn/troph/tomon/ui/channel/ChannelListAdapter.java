@@ -37,6 +37,7 @@ import cn.troph.tomon.core.structures.GuildMember;
 import cn.troph.tomon.core.structures.Message;
 import cn.troph.tomon.core.structures.MessageAttachment;
 import cn.troph.tomon.core.structures.TextChannel;
+import cn.troph.tomon.core.structures.User;
 import cn.troph.tomon.core.structures.VoiceChannel;
 import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Assets;
@@ -368,14 +369,27 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return member.getDisplayName();
     }
 
-    private String getAuthorNameInChannel(Context context, String authorId, GuildChannel channel) {
+    private String getAuthorNameInChannel(Context context, Message msg, String toShowMemberId, GuildChannel channel) {
         String displayName = null;
-        GuildMember guildMember = channel.getMembers().get(authorId);
+        GuildMember guildMember = channel.getMembers().get(toShowMemberId);
         if (guildMember != null) {
             displayName = guildMember.getDisplayName();
         }
         if (TextUtils.isEmpty(displayName)) {
-            displayName =context.getResources().getString(R.string.deleted_name);
+            String name = null;
+            if (!msg.getAuthorId().equals(toShowMemberId)) {
+                User user = Client.Companion.getGlobal().getUsers().get(toShowMemberId);
+                name =  user == null ? "" : user.getName();
+            } else {
+                User user = msg.getAuthor();
+                name = user == null ? "" : user.getName();
+            }
+            if (TextUtils.isEmpty(name)) {
+                displayName = context.getResources().getString(R.string.unknown_name);
+            } else {
+                displayName = name;
+            }
+
         }
         if (displayName.length() > 14) {
             displayName = displayName.substring(0, 14) + "...";
@@ -385,12 +399,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private void setMessageDesp(ChannelViewHolder holder, Message msg, TextChannel channel) {
         boolean hasMentionedUnread = channel.getUnread() && channel.getMention() > 0;
-        String name = getAuthorNameInChannel(holder.itemView.getContext(), msg.getAuthorId(), channel);
+        String name = getAuthorNameInChannel(holder.itemView.getContext(), msg, msg.getAuthorId(), channel);
         if (msg.getType() == MessageType.GUILD_MEMBER_JOIN) {
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.user_joined_guild, name));
         } else if (msg.getType() == MessageType.GUILD_OWNER_CHANGE) {
             String newOwnerId = msg.getContent();
-            String newOwnerName = getAuthorNameInChannel(holder.itemView.getContext(), newOwnerId, channel);
+            String newOwnerName = getAuthorNameInChannel(holder.itemView.getContext(), msg, newOwnerId, channel);
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.guild_owner_changed, newOwnerName));
         } else if (msg.getStamps().size() > 0 && msg.getType() == MessageType.DEFAULT) {
             holder.tvChannelDesp.setText(holder.itemView.getContext().getString(R.string.msg_desp_stamp));
@@ -404,7 +418,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
             List<Assets.ContentAtUser> contentAtUsers = contentSpan.getContentAtUser();
             for (Assets.ContentAtUser contentAtUser : contentAtUsers) {
-                tmpMsg = tmpMsg.replaceFirst("<@"+contentAtUser.getId()+">", "@" + getAuthorNameInChannel(holder.itemView.getContext(), contentAtUser.getId(), channel));
+                tmpMsg = tmpMsg.replaceFirst("<@"+contentAtUser.getId()+">", "@" + getAuthorNameInChannel(holder.itemView.getContext(), msg, contentAtUser.getId(), channel));
             }
             holder.tvChannelDesp.setText(String.format("%s: %s", name, tmpMsg));
         } else if (TextUtils.isEmpty(msg.getContent()) && msg.getAttachments().getSize() > 0) {

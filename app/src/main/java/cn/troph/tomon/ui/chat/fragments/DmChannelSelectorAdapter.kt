@@ -249,7 +249,7 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
             displayName = recipient.name
         }
         if (TextUtils.isEmpty(displayName)) {
-            displayName = context.resources.getString(R.string.deleted_name)
+            displayName = context.resources.getString(R.string.unknown_name)
         }
         if (displayName!!.length > 14) {
             displayName = displayName.substring(0, 14) + "..."
