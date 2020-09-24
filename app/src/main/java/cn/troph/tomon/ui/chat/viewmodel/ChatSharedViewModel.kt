@@ -295,7 +295,7 @@ class ChatSharedViewModel : ViewModel() {
 
     fun loadTextChannelMessage(channelId: String) {
         val channel = Client.global.channels[channelId] as TextChannel
-        if (channel.messages.size == 0) {
+        if (channel.messages.size == 1) {
             messageLoadingLiveData.value = true
             channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(
@@ -338,7 +338,7 @@ class ChatSharedViewModel : ViewModel() {
 
     fun loadDmChannelMessage(channelId: String) {
         val channel = Client.global.channels[channelId] as DmChannel
-        if (channel.messages.size == 0) {
+        if (channel.messages.size == 1) {
             messageLoadingLiveData.value = true
             channel.messages.fetch(limit = 50).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({

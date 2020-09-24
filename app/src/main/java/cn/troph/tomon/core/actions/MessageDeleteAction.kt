@@ -25,10 +25,15 @@ class MessageDeleteAction(client: Client) : Action<Message>(client) {
         val message = channel.messages[obj["id"].asString]
         if (message != null) {
             if (message.id == channel.lastMessageId) {
-                val index = channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
-                channel.patch(JsonObject().apply {
-                    addProperty("last_message_id", channel.messages.getSortedList()[index - 1].id)
-                })
+                val index =
+                    channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
+                if (index - 1 >= 0)
+                    channel.patch(JsonObject().apply {
+                        addProperty(
+                            "last_message_id",
+                            channel.messages.getSortedList()[index - 1].id
+                        )
+                    })
             }
             channel.messages.remove(obj["id"].asString)
             client.eventBus.postEvent(MessageDeleteEvent(message = message))
@@ -43,10 +48,15 @@ class MessageDeleteAction(client: Client) : Action<Message>(client) {
                 channel.mention -= 1
             }
             if (message.id == channel.lastMessageId) {
-                val index = channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
-                channel.patch(JsonObject().apply {
-                    addProperty("last_message_id", channel.messages.getSortedList()[index - 1].id)
-                })
+                val index =
+                    channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
+                if (index - 1 >= 0)
+                    channel.patch(JsonObject().apply {
+                        addProperty(
+                            "last_message_id",
+                            channel.messages.getSortedList()[index - 1].id
+                        )
+                    })
             }
             channel.messages.remove(obj["id"].asString)
             client.eventBus.postEvent(MessageDeleteEvent(message = message))

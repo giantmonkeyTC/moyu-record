@@ -172,7 +172,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         mLastedMessageCache.put(channel.getId(), readEvent.getMessage());
                         notifyItemChanged(position, new Object());
                     }
-                } else if (event instanceof MessageDeleteEvent){
+                } else if (event instanceof MessageDeleteEvent) {
                     MessageDeleteEvent deleteEvent = (MessageDeleteEvent) event;
                     if (deleteEvent.getMessage().getChannelId().equals(channel.getId())) {
                         mLastedMessageCache.remove(channel.getId());
@@ -180,7 +180,8 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 } else if (event instanceof MessageUpdateEvent) {
                     MessageUpdateEvent updateEvent = (MessageUpdateEvent) event;
-                    if (updateEvent.getMessage().getChannelId().equals(channel.getId())) {
+                    if (updateEvent.getMessage().getChannelId().equals(channel.getId()) &&
+                            updateEvent.getMessage().getId().equals(((TextChannel) channel).getLastMessageId())) {
                         mLastedMessageCache.put(channel.getId(), updateEvent.getMessage());
                         notifyItemChanged(position, new Object());
                     }
@@ -269,7 +270,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         groupHolder.tvCategoryName.setText(channelGroup.getName());
         int indent = channelGroup.getChannel().getIndent() + 1;
         int marginStart = indent * groupHolder.itemView.getContext().getResources().getDimensionPixelSize(
-                        R.dimen.channel_list_expand_margin_left);
+                R.dimen.channel_list_expand_margin_left);
         ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) groupHolder.ivCategoryExpandStateIcon.getLayoutParams();
         lp.setMarginStart(marginStart);
         groupHolder.ivCategoryExpandStateIcon.setLayoutParams(lp);
@@ -282,11 +283,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         channelGroup.isCollapsed());
                 if (channelGroup.isCollapsed()) {
                     mDataList.removeAll(toggleChannels);
-                    notifyItemRangeRemoved(position+1, toggleChannels.size());
+                    notifyItemRangeRemoved(position + 1, toggleChannels.size());
                     notifyItemRangeChanged(position, mDataList.size() - position);
                 } else {
-                    mDataList.addAll(position+1, toggleChannels);
-                    notifyItemRangeInserted(position+1, toggleChannels.size());
+                    mDataList.addAll(position + 1, toggleChannels);
+                    notifyItemRangeInserted(position + 1, toggleChannels.size());
                     notifyItemRangeChanged(position, mDataList.size() - position);
                 }
             }
@@ -346,7 +347,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 channelDesp = holder.itemView.getContext().getString(
                         channelDespStringResId,
                         replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember1));
-            } else if (voiceStates.size() == 2){
+            } else if (voiceStates.size() == 2) {
                 channelDesp = holder.itemView.getContext().getString(
                         channelDespStringResId,
                         replaceMeMemberNameIfNeeded(holder.itemView.getContext(), guildMember1),
@@ -379,7 +380,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String name = null;
             if (!msg.getAuthorId().equals(toShowMemberId)) {
                 User user = Client.Companion.getGlobal().getUsers().get(toShowMemberId);
-                name =  user == null ? "" : user.getName();
+                name = user == null ? "" : user.getName();
             } else {
                 User user = msg.getAuthor();
                 name = user == null ? "" : user.getName();
@@ -414,11 +415,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String tmpMsg = msg.getContent();
             List<Assets.ContentEmoji> contentEmojis = contentSpan.getContentEmoji();
             for (Assets.ContentEmoji contentEmoji : contentEmojis) {
-                tmpMsg = tmpMsg.replaceFirst(contentEmoji.getRaw(), "["+contentEmoji.getName()+"]");
+                tmpMsg = tmpMsg.replaceFirst(contentEmoji.getRaw(), "[" + contentEmoji.getName() + "]");
             }
             List<Assets.ContentAtUser> contentAtUsers = contentSpan.getContentAtUser();
             for (Assets.ContentAtUser contentAtUser : contentAtUsers) {
-                tmpMsg = tmpMsg.replaceFirst("<@"+contentAtUser.getId()+">", "@" + getAuthorNameInChannel(holder.itemView.getContext(), msg, contentAtUser.getId(), channel));
+                tmpMsg = tmpMsg.replaceFirst("<@" + contentAtUser.getId() + ">", "@" + getAuthorNameInChannel(holder.itemView.getContext(), msg, contentAtUser.getId(), channel));
             }
             holder.tvChannelDesp.setText(String.format("%s: %s", name, tmpMsg));
         } else if (TextUtils.isEmpty(msg.getContent()) && msg.getAttachments().getSize() > 0) {

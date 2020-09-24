@@ -123,7 +123,7 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
                     }
                 } else if (event is MessageUpdateEvent) {
                     val (message) = event
-                    if (message.channelId == channel.id) {
+                    if (message.channelId == channel.id && message.id == channel.lastMessageId) {
                         mLastedMessageCache.put(channel.id, message)
                         notifyItemChanged(position, Any())
                     }
