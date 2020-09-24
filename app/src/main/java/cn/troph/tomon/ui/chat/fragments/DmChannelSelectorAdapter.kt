@@ -78,7 +78,6 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
         holder.itemView.text_name.text = dmChannel.recipient?.name
         holder.itemView.dm_user_unread_tv.visibility =
             if (dmChannel.unread) View.VISIBLE else View.GONE
-        dmChannel.messageNotifications
     }
 
     private fun registerObserverForChannel(position: Int, holder: RecyclerView.ViewHolder) {
@@ -94,8 +93,6 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
                 if (event is MessageCreateEvent) {
                     val (message) = event
                     if (message.channelId == channel.id) {
-                        holder.itemView.dm_user_unread_tv.visibility =
-                            if (channel.unread) View.VISIBLE else View.GONE
                         mLastedMessageCache.put(channel.id, message)
                         notifyItemChanged(position, Any())
                     }
@@ -108,16 +105,12 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
                 } else if (event is MessageReadEvent) {
                     val (message) = event
                     if (message.channelId == channel.id) {
-                        holder.itemView.dm_user_unread_tv.visibility =
-                            if (channel.unread) View.VISIBLE else View.GONE
                         mLastedMessageCache.put(channel.id, message)
                         notifyItemChanged(position, Any())
                     }
                 } else if (event is MessageDeleteEvent) {
                     val (message) = event
                     if (message.channelId == channel.id) {
-                        holder.itemView.dm_user_unread_tv.visibility =
-                            if (channel.unread) View.VISIBLE else View.GONE
                         mLastedMessageCache.remove(channel.id)
                         notifyItemChanged(position, Any())
                     }

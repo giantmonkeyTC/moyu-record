@@ -11,8 +11,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.*
 import cn.troph.tomon.core.structures.DmChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
+import io.reactivex.rxjava3.functions.Consumer
 
 import kotlinx.android.synthetic.main.fragment_dmchannel_selector.*
 
@@ -50,6 +52,14 @@ class DmChannelSelectorFragment : Fragment() {
                 mDMchennelAdapter.notifyDataSetChanged()
             }
         })
+        Client.global.eventBus.observeEventsOnUi().subscribe(
+            Consumer { event ->
+                if (event is MessageCreateEvent) {
+                    mChatVM.loadDmChannel()
+                } else if (event is MessageDeleteEvent) {
+                    mChatVM.loadDmChannel()
+                }
+            })
         mChatVM.dmUnReadLiveData.observe(viewLifecycleOwner, Observer { map ->
             map.keys.forEach { key ->
                 mDMchannelList.find { dmChannel ->
