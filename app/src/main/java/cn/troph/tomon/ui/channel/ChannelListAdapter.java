@@ -469,7 +469,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             } else {
                 holder.tvChannelDesp.setText("");
                 holder.tvChannelTime.setText("");
-                messages.fetch(null, null, 1)
+                messages.fetchWithoutStorage(null, null, 1)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<List<Message>>() {

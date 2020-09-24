@@ -157,7 +157,7 @@ class DmChannelSelectorAdapter(private val dmChannelList: MutableList<DmChannel>
             } else {
                 holder.itemView.text_user_last_msg.text = ""
                 holder.itemView.last_message_time.text = ""
-                messages.fetch(null, null, 1)
+                messages.fetchWithoutStorage(null, null, 1)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(Consumer { messages ->

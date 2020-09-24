@@ -1,11 +1,14 @@
 package cn.troph.tomon.core.collections
 
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.MessageFetchEvent
 import cn.troph.tomon.core.network.services.MessageService
 import cn.troph.tomon.core.structures.Channel
 import cn.troph.tomon.core.structures.Message
+import cn.troph.tomon.core.structures.TextChannelBase
 import cn.troph.tomon.core.utils.SortedList
 import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import io.reactivex.rxjava3.annotations.NonNull
 import io.reactivex.rxjava3.core.Observable
@@ -141,6 +144,65 @@ class MessageCollection(client: Client, val channel: Channel) :
                 client.actions.messageFetch(it)
             }
         }
+    }
+
+    fun fetchWithoutStorage(
+        beforeId: String? = null,
+        afterId: String? = null,
+        limit: Int = 50
+    ): Observable<List<Message>> {
+        return client.rest.messageService.getMessages(
+            channel.id,
+            beforeId,
+            afterId,
+            limit,
+            client.auth
+        ).subscribeOn(Schedulers.io()).map {
+            if (it.size() < limit) {
+                parseMessages(it, true, channel.id)
+            } else {
+                parseMessages(it)
+            }
+        }
+    }
+
+    fun parseMessages(
+        data: JsonElement,
+        gotBeginning: Boolean? = false,
+        channelId: String? = null
+    ): List<Message>? {
+        val getChannelId = { data: JsonElement ->
+            if (data.isJsonArray) {
+                data.asJsonArray.get(0)?.asJsonObject?.get("channel_id")?.optString
+            } else {
+                data.asJsonObject["channel_id"].optString
+            }
+        }
+        val tempChannelId = channelId as? String ?: (getChannelId(data!!) ?: "")
+        val channel =
+            (if (tempChannelId == "") null else client.channels[tempChannelId ?: ""]) ?: return null
+        if (channel !is TextChannelBase) {
+            return null
+        }
+        val messages = mutableListOf<Message>()
+        val parse = { obj: JsonObject ->
+            val message = Message(client, obj)
+            if (message != null) {
+                messages.add(message)
+            }
+        }
+        if (data!!.isJsonArray) {
+            data!!.asJsonArray.forEach { parse(it.asJsonObject) }
+        } else {
+            parse(data!!.asJsonObject)
+        }
+        if (messages.isNotEmpty()) {
+            client.eventBus.postEvent(MessageFetchEvent(messages))
+        }
+        if (gotBeginning != false) {
+            channel.messages.gotBeginning = true
+        }
+        return messages
     }
 
     fun create(content: String, nonce: String): Observable<Unit> {
