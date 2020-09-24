@@ -43,14 +43,20 @@ val handleVoiceStateHandler: Handler = { client, packet ->
             }
         }
     } else {
-        val channel = Client.global.channels[voiceStateUpdateEvent.voiceUpdate.channelId]
-        if (channel is VoiceChannel) {
-            val find = channel.voiceStates.find {
-                it.userId == voiceStateUpdateEvent.voiceUpdate.userId
+        for (channel in Client.global.channels) {
+            if (channel is VoiceChannel) {
+                val find = channel.voiceStates.find {
+                    it.userId == voiceStateUpdateEvent.voiceUpdate.userId
+                }
+                channel.voiceStates.remove(find)
+                if (channel.voiceStates.size ==0) {
+                    channel.isJoined = false
+                }
+                if (channel.id == voiceStateUpdateEvent.voiceUpdate.channelId) {
+                    channel.voiceStates.add(voiceStateUpdateEvent.voiceUpdate)
+                    channel.isJoined = true
+                }
             }
-            channel.voiceStates.remove(find)
-            channel.voiceStates.add(voiceStateUpdateEvent.voiceUpdate)
-            channel.isJoined = true
         }
     }
 
