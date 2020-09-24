@@ -609,33 +609,8 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             setOnTextChannelClickListener();
             registerObserver();
             mRvChannelList.setAdapter(mChannelListAdapter);
-            connectVoiceChannelIfNeeded(guildId);
         } else {
             mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot, guild.getId());
-        }
-    }
-
-    public void connectVoiceChannelIfNeeded(String guildId) {
-        Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
-        if (guild == null) {
-            return;
-        }
-        for (GuildChannel channel : guild.getChannels().clone()) {
-            if (channel instanceof VoiceChannel && ((VoiceChannel) channel).isJoined()) {
-                VoiceChannel voiceChannel = (VoiceChannel) channel;
-                boolean isMeJoined = false;
-                List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
-                for (VoiceUpdate voiceUpdate : voiceStates) {
-                    if (voiceUpdate.getUserId().equals(Client.Companion.getGlobal().getMe().getId())) {
-                        isMeJoined = true;
-                        break;
-                    }
-                }
-                if (isMeJoined) {
-                    mChannelListAdapter.getOnVoiceChannelClickListener().onVoiceChannelClick(voiceChannel);
-                }
-                break;
-            }
         }
     }
 
@@ -757,6 +732,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             @Override
             public void onChanged(Boolean open) {
                 if (open) {
+                    if (mChatVM.getVoiceSocketJoinLD().getValue() == null) {
+                        return;
+                    }
                     Client.Companion.getGlobal().getVoiceSocket().send(GatewayOp.DISPATCH,
                             new Gson().toJsonTree(new VoiceIdentify(
                                     Client.Companion.getGlobal().getMe().getId(),

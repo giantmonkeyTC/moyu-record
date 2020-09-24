@@ -201,9 +201,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         return;
                     }
                     String channelId = ((VoiceStateUpdateEvent) event).getVoiceUpdate().getChannelId();
-                    if (TextUtils.isEmpty(channelId) || channelId.equals(channel.getId())) {
+//                    if (TextUtils.isEmpty(channelId) || channelId.equals(channel.getId())) {
+                    if (channel instanceof VoiceChannel) {
                         notifyItemChanged(position, new Object());
                     }
+//                    }
                 } else if (event instanceof ChannelUpdateEvent) {
                     Channel updatedChannel = ((ChannelUpdateEvent) event).getChannel();
                     if (updatedChannel.getId().equals(channel.getId())) {
@@ -309,23 +311,8 @@ public class ChannelListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private void setVoiceChannelStateDesp(ChannelViewHolder holder, VoiceChannel voiceChannel) {
         boolean joined = voiceChannel.isJoined();
-        List<VoiceUpdate> voiceStatesOrig = voiceChannel.getVoiceStates();
-        List<VoiceUpdate> voiceStates = voiceStatesOrig;
-        if (joined) {
-            boolean isWebNotCheckMeLeave = mFragmentVM.getSelectedCurrentVoiceChannel().getValue() == null;
-            if (isWebNotCheckMeLeave) {
-                voiceStates = new ArrayList<>();
-                for (VoiceUpdate each : voiceStatesOrig) {
-                    if (each.getUserId().equals(Client.Companion.getGlobal().getMe().getId())) {
-                        continue;
-                    }
-                    voiceStates.add(each);
-                }
-                joined = voiceStates.size() > 0;
-            }
-        }
-
-        if (!joined) {
+        List<VoiceUpdate> voiceStates = voiceChannel.getVoiceStates();
+        if (!joined || voiceStates.size() == 0) {
             holder.tvChannelDesp.setText(R.string.voice_channel_no_joined_desp);
         } else {
             GuildMember guildMember1 = voiceChannel.getMembers().get(voiceStates.get(0).getUserId());
