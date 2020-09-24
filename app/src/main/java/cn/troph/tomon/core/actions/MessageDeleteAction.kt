@@ -24,6 +24,12 @@ class MessageDeleteAction(client: Client) : Action<Message>(client) {
     private fun dmChannel(channel: DmChannel, obj: JsonObject): Message? {
         val message = channel.messages[obj["id"].asString]
         if (message != null) {
+            if (message.id == channel.lastMessageId) {
+                val index = channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
+                channel.patch(JsonObject().apply {
+                    addProperty("last_message_id", channel.messages.getSortedList()[index - 1].id)
+                })
+            }
             channel.messages.remove(obj["id"].asString)
             client.eventBus.postEvent(MessageDeleteEvent(message = message))
         }
@@ -35,6 +41,12 @@ class MessageDeleteAction(client: Client) : Action<Message>(client) {
         if (message != null) {
             if (message.mentions.contains(client.me.id)) {
                 channel.mention -= 1
+            }
+            if (message.id == channel.lastMessageId) {
+                val index = channel.messages.getSortedList().indexOfFirst { it.id == channel.lastMessageId }
+                channel.patch(JsonObject().apply {
+                    addProperty("last_message_id", channel.messages.getSortedList()[index - 1].id)
+                })
             }
             channel.messages.remove(obj["id"].asString)
             client.eventBus.postEvent(MessageDeleteEvent(message = message))

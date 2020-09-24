@@ -22,6 +22,8 @@ import cn.troph.tomon.core.structures.TextChannel
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
+import cn.troph.tomon.ui.states.ReplyEnabled
+import cn.troph.tomon.ui.states.UpdateEnabled
 import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -44,6 +46,7 @@ class ChatActivity : BaseActivity() {
         val mChatSharedViewModel: ChatSharedViewModel by viewModels()
         val map = HashMap<String, Int>()
         val bundle = intent.extras
+        AppState.global.updateEnabled.value = UpdateEnabled(flag = false, message = null)
         bundle?.let {
             mChatSharedViewModel.channelSelectionLD.value = ChannelSelection(
                 guildId = bundle.getString("guildId"),
@@ -170,21 +173,21 @@ class ChatActivity : BaseActivity() {
                 hideKeyboard()
             }
             R.id.members -> {
-                    val intent = Intent(this, ChannelInfoActivity::class.java)
-                    val bundle = Bundle()
-                    bundle.putString("guildId", getIntent().extras?.getString("guildId"))
-                    bundle.putString("channelId", mCurrentChannel.id)
-                    intent.putExtras(bundle)
-                    startActivity(
-                        intent,
-                        ActivityOptions.makeCustomAnimation(
-                            this,
-                            R.anim.slide_in_right_custom,
-                            R.anim.no_animation
-                        ).toBundle()
-                    )
+                val intent = Intent(this, ChannelInfoActivity::class.java)
+                val bundle = Bundle()
+                bundle.putString("guildId", getIntent().extras?.getString("guildId"))
+                bundle.putString("channelId", mCurrentChannel.id)
+                intent.putExtras(bundle)
+                startActivity(
+                    intent,
+                    ActivityOptions.makeCustomAnimation(
+                        this,
+                        R.anim.slide_in_right_custom,
+                        R.anim.no_animation
+                    ).toBundle()
+                )
 
-                    hideKeyboard()
+                hideKeyboard()
             }
 
         }

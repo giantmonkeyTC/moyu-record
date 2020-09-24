@@ -976,12 +976,12 @@ class ChannelPanelFragment : BaseFragment() {
                     if (mChannelId != null) {
                         if (Client.global.channels[mChannelId!!] is TextChannel) {
                             (Client.global.channels[mChannelId!!] as TextChannel).apply {
-                                if (messages.list.size != 0) {
-                                    val lastMessageId = messages.list[messages.size - 1]
-                                    val lastMessage = messages[lastMessageId.substring(2)]
+                                if (messages.getSortedList().size != 0) {
+                                    val lastMessageId = messages.getSortedList()[messages.size - 1].id
+                                    val lastMessage = messages[lastMessageId?:""]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId.substring(2))
-                                        addProperty("last_message_id", lastMessageId.substring(2))
+                                        addProperty("ack_message_id", lastMessageId)
+                                        addProperty("last_message_id", lastMessageId)
                                     })
                                     this.mention = 0
                                     lastMessage?.let {
@@ -997,11 +997,11 @@ class ChannelPanelFragment : BaseFragment() {
                         }
                         if (Client.global.channels[mChannelId!!] is DmChannel) {
                             (Client.global.channels[mChannelId!!] as DmChannel).apply {
-                                if (messages.list.size != 0) {
-                                    val lastMessageId = messages.list[messages.size - 1]
-                                    val lastMessage = messages[lastMessageId.substring(2)]
+                                if (messages.getSortedList().size != 0) {
+                                    val lastMessageId = messages.getSortedList()[messages.size - 1].id
+                                    val lastMessage = messages[lastMessageId?:""]
                                     patch(JsonObject().apply {
-                                        addProperty("ack_message_id", lastMessageId.substring(2))
+                                        addProperty("ack_message_id", lastMessageId)
                                     })
                                     lastMessage?.let {
                                         it.ack().observeOn(AndroidSchedulers.mainThread())

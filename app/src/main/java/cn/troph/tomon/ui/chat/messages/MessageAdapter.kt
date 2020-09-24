@@ -282,10 +282,15 @@ class MessageAdapter(
                             messageList[holder.adapterPosition].author?.let { author ->
                                 avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                             }
-                            true
+                            holder.itemView.message_avatar.isHapticFeedbackEnabled = true
+                            return@setOnLongClickListener true
+                        } else {
+                            holder.itemView.message_avatar.isHapticFeedbackEnabled = false
+                            return@setOnLongClickListener true
                         }
                     }
-                    false
+                    holder.itemView.message_avatar.isHapticFeedbackEnabled = false
+                    true
                 }
 
                 holder.itemView.setOnLongClickListener {
@@ -328,11 +333,18 @@ class MessageAdapter(
                     holder.itemView.widget_message_author_name_text_file.visibility = View.VISIBLE
                     holder.itemView.message_avatar_file.setOnLongClickListener {
                         messageList[holder.adapterPosition].authorId?.let {
-                            if (it != Client.global.me.id)
+                            if (it != Client.global.me.id) {
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_file.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_file.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
+                            }
                         }
+                        holder.itemView.message_avatar_file.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.message_avatar_file.user = messageList[position].author
@@ -444,8 +456,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_image.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_image.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_image.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.space_image.visibility = View.VISIBLE
@@ -527,11 +545,13 @@ class MessageAdapter(
                     }
                     Glide.with(holder.itemView)
                         .load(
-                            if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
-                                    ".gif",
-                                    true
-                                )
-                            ) "" else "?x-oss-process=image/resize,p_100"}"
+                            if (item.url.isEmpty()) item.fileName else "${item.url}${
+                                if (item.url.endsWith(
+                                        ".gif",
+                                        true
+                                    )
+                                ) "" else "?x-oss-process=image/resize,p_100"
+                            }"
                         )
                         .transform(RoundedCorners(25))
                         .placeholder(R.drawable.loading_solid_gray)
@@ -557,9 +577,11 @@ class MessageAdapter(
                                             .setOnClickListener {
                                                 Toast.makeText(
                                                     holder.itemView.context,
-                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
-                                                        Environment.DIRECTORY_DOWNLOADS
-                                                    )?.absolutePath}",
+                                                    "文件保存至:${
+                                                        holder.itemView.context.getExternalFilesDir(
+                                                            Environment.DIRECTORY_DOWNLOADS
+                                                        )?.absolutePath
+                                                    }",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                                 val path = File(
@@ -625,15 +647,19 @@ class MessageAdapter(
                     holder.itemView.animation_view.visibility = View.GONE
                     holder.itemView.loading_text_header.text =
                         if (msg.isGuild) {
-                            if (msg.channelText.length <= 10) "欢迎来到#${msg.channelText} 频道!" else "欢迎来到#${msg.channelText.substring(
-                                0,
-                                10
-                            )}··· 频道!"
+                            if (msg.channelText.length <= 10) "欢迎来到#${msg.channelText} 频道!" else "欢迎来到#${
+                                msg.channelText.substring(
+                                    0,
+                                    10
+                                )
+                            }··· 频道!"
                         } else {
-                            if (msg.channelText.length <= 10) "与@${msg.channelText} 私聊的开始" else "与@${msg.channelText.substring(
-                                0,
-                                10
-                            )}··· 私聊的开始"
+                            if (msg.channelText.length <= 10) "与@${msg.channelText} 私聊的开始" else "与@${
+                                msg.channelText.substring(
+                                    0,
+                                    10
+                                )
+                            }··· 私聊的开始"
                         }
                     holder.itemView.loading_text_header.setCompoundDrawablesWithIntrinsicBounds(
                         if (msg.isGuild) holder.itemView.context.getDrawable(
@@ -663,8 +689,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_invite.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_invite.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_invite.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.message_avatar_invite.visibility = View.VISIBLE
@@ -750,10 +782,12 @@ class MessageAdapter(
                                 if (it.joined)
                                     holder.itemView.join_image.setImageResource(R.drawable.shadow_panel)
                                 holder.itemView.invite_guild_name.text =
-                                    if (it.guild.name.length <= 10) it.guild.name else "${it.guild.name.substring(
-                                        0,
-                                        10
-                                    )}···"
+                                    if (it.guild.name.length <= 10) it.guild.name else "${
+                                        it.guild.name.substring(
+                                            0,
+                                            10
+                                        )
+                                    }···"
                                 holder.itemView.joined_cover.visibility =
                                     if (it.joined) View.VISIBLE else View.GONE
                                 if (it.guild.icon != null) {
@@ -829,12 +863,15 @@ class MessageAdapter(
                     if (member != null) {
                         name = member.displayName
                     } else {
-                        name = messageList[position].author?.name ?: holder.itemView.context.getString(
-                            R.string.deleted_name)
+                        name =
+                            messageList[position].author?.name ?: holder.itemView.context.getString(
+                                R.string.deleted_name
+                            )
                     }
                 } else {
                     name = messageList[position].author?.name ?: holder.itemView.context.getString(
-                        R.string.deleted_name)
+                        R.string.deleted_name
+                    )
                 }
                 name = "**" + (name) + "**"
                 markdown?.setMarkdown(holder.itemView.system_txt_welcome, welMsg.format(name))
@@ -863,8 +900,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_stamp.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_stamp.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_stamp.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.widget_message_author_name_text_stamp.visibility = View.VISIBLE
@@ -960,8 +1003,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_video.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_video.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_video.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.message_avatar_video.visibility = View.VISIBLE
@@ -1178,8 +1227,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_link.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_link.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_link.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.message_avatar_link.visibility = View.VISIBLE
@@ -1338,8 +1393,14 @@ class MessageAdapter(
                                 messageList[holder.adapterPosition].author?.let { author ->
                                     avatarLongClickListener.onAvatarLongClick(identifier = author.identifier)
                                 }
+                                holder.itemView.message_avatar_reply.isHapticFeedbackEnabled = true
+                                return@setOnLongClickListener true
+                            } else {
+                                holder.itemView.message_avatar_reply.isHapticFeedbackEnabled = false
+                                return@setOnLongClickListener true
                             }
                         }
+                        holder.itemView.message_avatar_reply.isHapticFeedbackEnabled = false
                         true
                     }
                     holder.itemView.message_avatar_reply.visibility = View.VISIBLE
@@ -1429,9 +1490,11 @@ class MessageAdapter(
                         holder.itemView.source_content_author.visibility = View.VISIBLE
                         holder.itemView.name_divider.visibility = View.VISIBLE
                         holder.itemView.source_content_author.text =
-                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                R.string.deleted_name
-                            )}"
+                            "${
+                                guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                    R.string.deleted_name
+                                )
+                            }"
                         for (item in it.stamps) {
                             Glide.with(holder.itemView)
                                 .load(
@@ -1452,17 +1515,21 @@ class MessageAdapter(
                                 holder.itemView.source_content_author.visibility = View.VISIBLE
                                 holder.itemView.name_divider.visibility = View.VISIBLE
                                 holder.itemView.source_content_author.text =
-                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
-                                    )}"
+                                    "${
+                                        guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                            R.string.deleted_name
+                                        )
+                                    }"
                                 for (item in it.attachments.values) {
                                     Glide.with(holder.itemView)
                                         .load(
-                                            if (item.url.isEmpty()) item.fileName else "${item.url}${if (item.url.endsWith(
-                                                    ".gif",
-                                                    true
-                                                )
-                                            ) "" else "?x-oss-process=image/resize,p_100"}"
+                                            if (item.url.isEmpty()) item.fileName else "${item.url}${
+                                                if (item.url.endsWith(
+                                                        ".gif",
+                                                        true
+                                                    )
+                                                ) "" else "?x-oss-process=image/resize,p_100"
+                                            }"
                                         )
                                         .transform(RoundedCorners(25))
                                         .placeholder(R.drawable.loading_solid_gray)
@@ -1487,9 +1554,11 @@ class MessageAdapter(
                                                             .setOnClickListener {
                                                                 Toast.makeText(
                                                                     holder.itemView.context,
-                                                                    "文件保存至:${holder.itemView.context.getExternalFilesDir(
-                                                                        Environment.DIRECTORY_DOWNLOADS
-                                                                    )?.absolutePath}",
+                                                                    "文件保存至:${
+                                                                        holder.itemView.context.getExternalFilesDir(
+                                                                            Environment.DIRECTORY_DOWNLOADS
+                                                                        )?.absolutePath
+                                                                    }",
                                                                     Toast.LENGTH_SHORT
                                                                 ).show()
                                                                 val path = File(
@@ -1551,9 +1620,11 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
-                                    )}:[视频]"
+                                    "${
+                                        guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                            R.string.deleted_name
+                                        )
+                                    }:[视频]"
                             } else {
                                 if (holder.itemView.source_content.hasOnClickListeners()) {
                                     holder.itemView.source_content.setOnClickListener(null)
@@ -1563,9 +1634,11 @@ class MessageAdapter(
                                 holder.itemView.name_divider.visibility = View.GONE
                                 holder.itemView.source_content.visibility = View.VISIBLE
                                 holder.itemView.source_content.text =
-                                    "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                        R.string.deleted_name
-                                    )}:[文件]"
+                                    "${
+                                        guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                            R.string.deleted_name
+                                        )
+                                    }:[文件]"
                             }
                             break
                         }
@@ -1591,9 +1664,11 @@ class MessageAdapter(
                                             .load(drawable.destination)
                                     }
                                 })).build(),
-                            "${guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
-                                R.string.deleted_name
-                            )}:${it.content}",
+                            "${
+                                guildMemberOf(it)?.displayName ?: it.author?.name ?: holder.itemView.context.getString(
+                                    R.string.deleted_name
+                                )
+                            }:${it.content}",
                             holder.itemView.source_content
                         )
                         holder.itemView.source_content.setOnClickListener {

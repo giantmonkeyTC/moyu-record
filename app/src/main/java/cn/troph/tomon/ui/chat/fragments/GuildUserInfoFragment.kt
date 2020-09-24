@@ -58,6 +58,7 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
         super.onCreate(savedInstanceState)
         setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.Theme_App_Dialog_Bottomsheet)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,6 +76,8 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
         val roles = view.findViewById<ConstraintLayout>(R.id.role_section)
         mChatVM.guildUserInfoLD.observe(viewLifecycleOwner, Observer { user ->
             avatar.user = user
+            val channel =
+                Client.global.dmChannels[mChatVM.channelSelectionLD.value?.channelId ?: ""]
             if (member == null) {
                 roles.visibility = View.GONE
                 view.user_info_name.text =
@@ -93,6 +96,8 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
             if (user.id != Client.global.me.id && user.id != "1") {
                 view.user_info_menu.visibility = View.VISIBLE
                 view.goto_dm.visibility = View.VISIBLE
+                if (channel?.recipientId == user.id)
+                    view.goto_dm.visibility = View.GONE
                 goto_dm.setOnClickListener {
                     user.directMessage(user.id).observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -135,11 +140,18 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
                     }
 
                     popUp.elevation = 10f
-                    popUp.showAsDropDown(
-                        it,
-                        DensityUtil.dip2px(context, 90f).unaryMinus(),
-                        DensityUtil.dip2px(context, 10f)
-                    )
+                    if (channel?.recipientId == user.id)
+                        popUp.showAsDropDown(
+                            it,
+                            DensityUtil.dip2px(context, 110f).unaryMinus(),
+                            DensityUtil.dip2px(context, 36f).unaryMinus()
+                        )
+                    else
+                        popUp.showAsDropDown(
+                            it,
+                            DensityUtil.dip2px(context, 90f).unaryMinus(),
+                            DensityUtil.dip2px(context, 10f)
+                        )
 //                dialog.dismiss()
                 }
             } else {

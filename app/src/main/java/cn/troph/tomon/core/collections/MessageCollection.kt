@@ -32,7 +32,7 @@ class MessageCollection(client: Client, val channel: Channel) :
     private val sortedList: SortedList<String> =
         SortedList(Comparator { o1, o2 -> o1.compareTo(o2) })
 
-    val list get() = sortedList
+    private val list get() = sortedList
 
     fun getSortedList(): MutableList<Message> {
         val cloneMap = this.clone().toMap()
