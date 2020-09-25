@@ -40,13 +40,13 @@ class MentionListAdapter(
         }
         holder.itemView.mention_user_name.text = member.displayName
         val discriminatorSpan: SpannableString =
-            spannable { color(Color.GRAY, " #" + member.user!!.discriminator) }
+            spannable { color(Color.GRAY, " #" + member.user?.discriminator ?: "0000") }
         val displaynameSpan: SpannableString =
             spannable {
                 color(
                     (if (member.roles.color == null)
                         0 or 0X60FFFFFF.toInt() else member.roles.color!!.color or 0x60000000.toInt()),
-                    member.displayName
+                    member.user?.username ?: holder.itemView.context.getString(R.string.unknown_name)
                 )
             }
         if (Client.global.presences[member.id]?.status == "offline") {
