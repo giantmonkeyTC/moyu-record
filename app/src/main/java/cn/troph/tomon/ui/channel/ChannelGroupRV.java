@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import cn.troph.tomon.core.structures.GuildChannel;
+import cn.troph.tomon.core.utils.Snowflake;
 import cn.troph.tomon.ui.utils.GuildUtils;
 
 public class ChannelGroupRV extends ChannelRV {
@@ -14,20 +15,20 @@ public class ChannelGroupRV extends ChannelRV {
     private List<ChannelRV> mChildren;
     private boolean mCollapsed = false;
 
-    private Comparator<ChannelRV> comparator =  new Comparator<ChannelRV>() {
+    public Comparator<ChannelRV> comparator =  new Comparator<ChannelRV>() {
         @Override
         public int compare(ChannelRV o1, ChannelRV o2) {
-            return o1.getChannel().getPosition() - o2.getChannel().getPosition();
+            int position = o1.getChannel().getPosition() - o2.getChannel().getPosition();
+            if (position != 0) {
+                return position;
+            }
+            return new Snowflake(o1.getChannel().getId()).compareTo(new Snowflake(o2.getChannel().getId()));
         }
     };
 
     public ChannelGroupRV(Context context, ChannelGroupRV parent, GuildChannel channel, List<ChannelRV> channels) {
         super(context, parent, channel);
         mChildren = channels;
-    }
-
-    public List<ChannelRV> getChildrenChannels() {
-        return mChildren;
     }
 
     public void addSortedByPostion(ChannelRV channel) {
