@@ -56,7 +56,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.gyf.immersionbar.ImmersionBar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -81,7 +80,6 @@ import cn.troph.tomon.core.events.ChannelCreateEvent;
 import cn.troph.tomon.core.events.ChannelDeleteEvent;
 import cn.troph.tomon.core.events.ChannelPositionEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
-import cn.troph.tomon.core.events.ChannelUpdateEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
@@ -101,7 +99,6 @@ import cn.troph.tomon.core.structures.VoiceConnectSend;
 import cn.troph.tomon.core.structures.VoiceConnectStateReceive;
 import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
-import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
 import cn.troph.tomon.core.utils.Snowflake;
 import cn.troph.tomon.ui.activities.ChatActivity;
@@ -227,6 +224,12 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
             @Override
             public void onClick(View v) {
                 showGuildSettings();
+            }
+        });
+        mIvGuildAvater.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((TomonMainActivity)getActivity()).openDrawer();
             }
         });
         mIvGuildBanner.post(new Runnable() {
