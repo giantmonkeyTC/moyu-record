@@ -56,6 +56,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -228,6 +229,24 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 showGuildSettings();
             }
         });
+        mIvGuildBanner.post(new Runnable() {
+            @Override
+            public void run() {
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) mIvGuildBanner.getLayoutParams();
+                layoutParams.height += getStatusBarHeight();
+                mIvGuildBanner.setLayoutParams(layoutParams);
+            }
+        });
+
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     private void showGuildSettings() {
