@@ -228,7 +228,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
 
-    private fun setNoPermissionViewIfNeeded(channel: TextChannel) {
+    fun setNoPermissionViewIfNeeded(channel: TextChannel) {
         var meMember = channel.members[Client.global.me.id]
         var canSendMessage: Boolean? = false
         if (meMember != null) {
@@ -938,6 +938,11 @@ class ChannelPanelFragment : BaseFragment() {
         animIn.setInterpolator(LinearInterpolator())
         animIn.duration = 400
 
+        Client.global.channels[mChannelId?:""]?.let {
+            if (it is TextChannel) {
+                setNoPermissionViewIfNeeded(it)
+            }
+        }
 
         btn_scroll_to_bottom.setOnClickListener {
             view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)
