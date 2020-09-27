@@ -14,6 +14,7 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.Client.Companion.global
 import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.KeyboardUtils
+import cn.troph.tomon.core.utils.Validator
 import cn.troph.tomon.ui.widgets.TomonToast
 import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -120,7 +121,7 @@ class MeSettingsActivity : BaseActivity() {
     private fun updateFinishButtonStyle(property: String) {
         when (property) {
             "name" -> {
-                if (me_settings_content.text.length > 16 || me_settings_content.text.isEmpty() || me_settings_content.text.toString() == global.me.name) {
+                if (me_settings_content.text.trim().length < 1 || me_settings_content.text.trim().length > 16 || me_settings_content.text.trim().isEmpty() || me_settings_content.text.trim().toString() == global.me.name) {
                     btn_change_confirm.setEnabled(false)
                     btn_change_confirm.setTextColor(getColor(R.color.white_70))
                 } else {
@@ -129,7 +130,12 @@ class MeSettingsActivity : BaseActivity() {
                 }
             }
             "username" -> {
-                if (me_settings_content.text.length > 16 || me_settings_content.text.isEmpty() || me_settings_content.text.toString() == global.me.username || me_pwd_content.text.isEmpty()) {
+                if (me_settings_content.text.trim().length < 1
+                    || me_settings_content.text.trim().length > 16
+                    || me_settings_content.text.trim().isEmpty()
+                    || me_settings_content.text.trim().toString() == global.me.username
+                    || !Validator.isUserName(me_settings_content.text.trim().toString())
+                    || me_pwd_content.text.isEmpty() || me_pwd_content.text.length < 8 || me_pwd_content.text.length > 32) {
                     btn_change_confirm.setEnabled(false)
                     btn_change_confirm.setTextColor(getColor(R.color.white_70))
                 } else {
@@ -138,7 +144,10 @@ class MeSettingsActivity : BaseActivity() {
                 }
             }
             "email" -> {
-                if (me_settings_content.text.isEmpty() || me_settings_content.text.toString() == global.me.email || me_pwd_content.text.isEmpty()) {
+                if (me_settings_content.text.trim().isEmpty()
+                    || me_settings_content.text.trim().toString() == global.me.email
+                    || me_pwd_content.text.trim().isEmpty()
+                    || !Validator.isEmail(me_settings_content.text.trim().toString())) {
                     btn_change_confirm.setEnabled(false)
                     btn_change_confirm.setTextColor(getColor(R.color.white_70))
                 } else {

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="@color/background4">
+    android:background="@color/blackPrimary">
 
     <cn.troph.tomon.ui.widgets.UserAvatar
         android:id="@+id/mention_user_avatar"

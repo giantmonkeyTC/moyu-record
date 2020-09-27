@@ -874,4 +874,8 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
     public int getFragmentNum() {
         return NUM_PAGER;
     }
+
+    public void openDrawer() {
+        mDrawerLayout.openDrawer(Gravity.LEFT, true);
+    }
 }
