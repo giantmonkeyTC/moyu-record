@@ -19,11 +19,9 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
     NestedScrollView(context, attrs) {
     private lateinit var header: ConstraintLayout
     private lateinit var tab: TabLayout
-    private lateinit var viewPager: NestedViewPager
+    private lateinit var viewPager: ViewPager
     private var mHeaderHeight: Int = 0
 
-
-    
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -41,27 +39,43 @@ class ExpandNestedScrollView(context: Context, attrs: AttributeSet?) :
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val params = viewPager.layoutParams
         params.height =
-            measuredHeight - tab.measuredHeight + ((1 - AppState.global.scrollPercent.value) * DensityUtil.dip2px(
+            measuredHeight - tab.measuredHeight - DensityUtil.dip2px(
                 context,
                 ChannelInfoActivity.actionBarMoveY
-            )).toInt()
+            )
     }
 
 
     override fun onNestedPreScroll(target: View, dx: Int, dy: Int, consumed: IntArray, type: Int) {
-        if (scrollY >= header.height) {
-            consumed[1] = 0
+        if (scrollY >= header.height - DensityUtil.dip2px(
+                context,
+                ChannelInfoActivity.actionBarMoveY
+            )
+        ) {
+            //up scroll
+            if (target.canScrollVertically(1) && dy > 0)
+                consumed[1] = 0
+            if (!target.canScrollVertically(-1) && dy < 0) {
+                consumed[1] = dy
+                scrollTo(0, scrollY + dy)
+            }
         } else {
-            scrollBy(0, dy)
+            if (scrollY + dy > header.height - DensityUtil.dip2px(
+                    context,
+                    ChannelInfoActivity.actionBarMoveY
+                )
+            )
+                scrollTo(
+                    0, header.height - DensityUtil.dip2px(
+                        context,
+                        ChannelInfoActivity.actionBarMoveY
+                    )
+                )
+            else
+                scrollTo(0, scrollY + dy)
             consumed[1] = dy
         }
     }
-
-
-
-
-
-
 
 
 }
