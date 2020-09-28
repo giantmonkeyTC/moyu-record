@@ -880,7 +880,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     @Override
     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
         TomonToast.makeErrorText(
-                getContext(),
+                getContext().getApplicationContext(),
                 R.string.join_permission_msg,
                 Toast.LENGTH_SHORT
         ).show();
@@ -888,6 +888,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+        permissionToken.continuePermissionRequest();
     }
 
     public void showEmptyGuildsView() {
