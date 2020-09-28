@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Point
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
+import androidx.viewpager.widget.ViewPager
 import at.blogc.android.views.ExpandableTextView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
@@ -45,12 +47,13 @@ import com.gyf.immersionbar.ImmersionBar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_me_settings.*
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
 
 
 class ChannelInfoActivity : BaseActivity() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
-    private lateinit var viewPager: NestedViewPager
+    private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private var needMeasure: Boolean = true
     private val chatSharedViewModel: ChatSharedViewModel by viewModels()
@@ -86,6 +89,7 @@ class ChannelInfoActivity : BaseActivity() {
 
     companion object {
         val actionBarMoveY = 55f
+        val groupMoveY = 76f
     }
 
     private var moveY = 0f
@@ -156,12 +160,29 @@ class ChannelInfoActivity : BaseActivity() {
             }
         }
         channel_info_scroll_view.setOnScrollChangeListener { v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
-            if (scrollY >= channel_info_header.height) {
+            if (scrollY >= DensityUtil.dip2px(this, groupMoveY).toFloat()) {
+                val pixels = DensityUtil.dip2px(this, groupMoveY).toFloat()
+                channelInfo.alpha = 0f
+                channel_info_channel_name.translationX = moveX.unaryMinus()
+                imageView6.translationX = moveX.unaryMinus()
+                channel_info_guild_name.translationX = guildMoveX.unaryMinus()
+                    channel_info_actionbar.background = ColorDrawable(getColor(R.color.backgroundMask))
+                    channel_info_actionbar.alpha = 1f
+                    group3.alpha = 0f
+                    group2.visibility = View.VISIBLE
                 AppState.global.scrollPercent.value =
                     1f
             } else {
+                channel_info_actionbar.background = ColorDrawable(getColor(R.color.transparent))
+                group3.alpha = 1f
+                group2.visibility = View.GONE
                 AppState.global.scrollPercent.value =
-                    scrollY.toFloat() / channel_info_header.height.toFloat()
+                    scrollY.toFloat() / DensityUtil.dip2px(this, groupMoveY).toFloat()
+                val it = scrollY.toFloat() / DensityUtil.dip2px(this, groupMoveY).toFloat()
+                channelInfo.alpha = 1 - 2 * it
+                channel_info_channel_name.translationX = (it * moveX).unaryMinus()
+                imageView6.translationX = (it * moveX).unaryMinus()
+                channel_info_guild_name.translationX = (it * guildMoveX).unaryMinus()
             }
 
         }
@@ -179,6 +200,8 @@ class ChannelInfoActivity : BaseActivity() {
                 if (channel is TextChannel) {
                     channel_info_channel_name.text = channel.name
                     channel_info_guild_name.text = channel.guild?.name ?: "群组不存在"
+                    channel_info_channel_name_actionbar.text = channel.name
+                    channel_info_guild_name_actionbar.text = channel.guild?.name ?: "群组不存在"
                     if (channel.topic != "") {
                         expand_text.visibility = View.VISIBLE
                         channelInfoDescription.text = channel.topic
@@ -260,30 +283,6 @@ class ChannelInfoActivity : BaseActivity() {
         channelInfoDescription.setInterpolator(OvershootInterpolator())
         AppState.global.scrollPercent.observable.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                if (it > 1f) {
-                    channelInfo.alpha = 0f
-                    channel_info_channel_name.translationY = moveY.unaryMinus()
-                    channel_info_channel_name.translationX = moveX.unaryMinus()
-                    imageView6.translationY = moveY.unaryMinus()
-                    imageView6.translationX = moveX.unaryMinus()
-                    channel_info_guild_name.translationY = moveY.unaryMinus()
-                    channel_info_guild_name.translationX = guildMoveX.unaryMinus()
-                    channel_info_actionbar.updateLayoutParams {
-                        this.height = actionbarHeight - moveY.toInt()
-                    }
-                } else {
-                    channelInfo.alpha = 1 - 2 * it
-                    channel_info_channel_name.translationY = (it * moveY).unaryMinus()
-                    channel_info_channel_name.translationX = (it * moveX).unaryMinus()
-                    imageView6.translationY = (it * moveY).unaryMinus()
-                    imageView6.translationX = (it * moveX).unaryMinus()
-                    channel_info_guild_name.translationY = (it * moveY).unaryMinus()
-                    channel_info_guild_name.translationX = (it * guildMoveX).unaryMinus()
-                    channel_info_actionbar.updateLayoutParams {
-                        this.height = actionbarHeight - (it * moveY).toInt()
-                    }
-                }
-
             }
         channel_info_invite.setOnClickListener {
             channelId?.let {

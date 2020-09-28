@@ -64,6 +64,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import cn.troph.tomon.R;
@@ -79,7 +80,6 @@ import cn.troph.tomon.core.events.ChannelCreateEvent;
 import cn.troph.tomon.core.events.ChannelDeleteEvent;
 import cn.troph.tomon.core.events.ChannelPositionEvent;
 import cn.troph.tomon.core.events.ChannelSyncEvent;
-import cn.troph.tomon.core.events.ChannelUpdateEvent;
 import cn.troph.tomon.core.events.GuildMemberUpdateEvent;
 import cn.troph.tomon.core.events.GuildUpdateEvent;
 import cn.troph.tomon.core.events.GuildVoiceSelectorEvent;
@@ -99,8 +99,8 @@ import cn.troph.tomon.core.structures.VoiceConnectSend;
 import cn.troph.tomon.core.structures.VoiceConnectStateReceive;
 import cn.troph.tomon.core.structures.VoiceIdentify;
 import cn.troph.tomon.core.structures.VoiceLeaveConnect;
-import cn.troph.tomon.core.structures.VoiceUpdate;
 import cn.troph.tomon.core.utils.Collection;
+import cn.troph.tomon.core.utils.Snowflake;
 import cn.troph.tomon.ui.activities.ChatActivity;
 import cn.troph.tomon.ui.activities.GuildNickNameSettingsActivity;
 import cn.troph.tomon.ui.activities.TomonMainActivity;
@@ -226,6 +226,30 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 showGuildSettings();
             }
         });
+        mIvGuildAvater.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((TomonMainActivity)getActivity()).openDrawer();
+            }
+        });
+        mIvGuildBanner.post(new Runnable() {
+            @Override
+            public void run() {
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) mIvGuildBanner.getLayoutParams();
+                layoutParams.height += getStatusBarHeight();
+                mIvGuildBanner.setLayoutParams(layoutParams);
+            }
+        });
+
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     private void showGuildSettings() {
@@ -596,6 +620,16 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                         mChannelOrphans.put(channel.getParentId(), orphans);
                     }
                     orphans.add(channel);
+                    orphans.sort(new Comparator<GuildChannel>() {
+                        @Override
+                        public int compare(GuildChannel o1, GuildChannel o2) {
+                            int position = o1.getPosition() - o2.getPosition();
+                            if (position != 0) {
+                                return position;
+                            }
+                            return new Snowflake(o1.getId()).compareTo(new Snowflake(o2.getId()));
+                        }
+                    });
                 } else {
                     insertChannelAndCacheGroup(channelGroupRV, channel);
                 }

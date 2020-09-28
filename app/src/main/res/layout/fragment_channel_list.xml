@@ -17,9 +17,10 @@
     <ImageView
         android:id="@+id/iv_guild_banner_mask"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/guild_image_height"
+        android:layout_height="0dp"
         android:background="@drawable/guild_background_mask"
         android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_guild_banner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

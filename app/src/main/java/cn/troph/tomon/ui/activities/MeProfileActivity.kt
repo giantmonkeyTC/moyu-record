@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import kotlinx.android.synthetic.main.fragment_user_information.view.*
 import kotlinx.android.synthetic.main.me_profile.*
@@ -24,7 +25,15 @@ class MeProfileActivity : BaseActivity() {
             me_email_content.text =
                 if (me.email == null) getString(R.string.profile_empty) else me.email
             me_phone_content.text =
-                if (me.phone == null) getString(R.string.profile_empty) else me.phone
+                if (me.phone == null){
+                    getString(R.string.profile_empty)
+                } else{
+                    if (me.phone?.length == 11) {
+                        me.phone?.replaceRange(3, 7, "****")
+                    } else {
+                        me.phone
+                    }
+                }
             bar1.setOnClickListener {
                 val intent = Intent(this, MeSettingsActivity::class.java)
                 val bundle = Bundle()
@@ -90,7 +99,16 @@ class MeProfileActivity : BaseActivity() {
                 me_email_content.text =
                     if (me.email == null) getString(R.string.profile_empty) else me.email
                 me_phone_content.text =
-                    if (me.phone == null) getString(R.string.profile_empty) else me.phone
+                    if (me.phone == null) {
+                        getString(R.string.profile_empty)
+                    } else {
+                        if (me.phone?.length == 11) {
+                            me.phone?.replaceRange(3, 7, "****")
+                        } else {
+                            me.phone
+                        }
+
+                    }
             }
         })
         back_to_me.setOnClickListener {
