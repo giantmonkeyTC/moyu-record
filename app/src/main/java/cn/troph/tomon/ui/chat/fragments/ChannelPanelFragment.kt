@@ -820,13 +820,13 @@ class ChannelPanelFragment : BaseFragment() {
         })
 
         //show user profile
-        mChatSharedVM.showUserProfileLD.observe(viewLifecycleOwner, Observer {
-            val guildUserInfoFragment = GuildUserInfoFragment(it.id)
-            guildUserInfoFragment.show(
-                parentFragmentManager,
-                guildUserInfoFragment.tag
-            )
-        })
+//        mChatSharedVM.showUserProfileLD.observe(viewLifecycleOwner, Observer {
+//            val guildUserInfoFragment = GuildUserInfoFragment(it.id)
+//            guildUserInfoFragment.show(
+//                parentFragmentManager,
+//                guildUserInfoFragment.tag
+//            )
+//        })
 
         //删除消息
         mChatSharedVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {

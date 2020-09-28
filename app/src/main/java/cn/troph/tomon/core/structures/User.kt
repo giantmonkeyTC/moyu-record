@@ -15,6 +15,10 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         protected set
 
     @Expose
+    var deleted: Boolean = false
+        protected set
+
+    @Expose
     var username: String = ""
         protected set
 
@@ -57,6 +61,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
     private fun patchSelf(data: JsonObject) {
         if (data.has("id")) {
             id = data["id"].optString ?: ""
+        }
+        if (data.has("deleted")) {
+            deleted = data["deleted"].optBoolean ?: false
         }
         if (data.has("type")) {
             type = data["type"].asInt
@@ -103,5 +110,9 @@ open class User(client: Client, data: JsonObject) : Base(client, data) {
         ).map {
             it
         }
+    }
+
+    fun isDeletedUser(): Boolean {
+        return deleted
     }
 }
