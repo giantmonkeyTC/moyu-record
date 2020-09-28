@@ -38,7 +38,6 @@ class MentionListAdapter(
                 member.user?.identifier!!
             )
         }
-        holder.itemView.mention_user_name.text = member.displayName
         val discriminatorSpan: SpannableString =
             spannable { color(Color.GRAY, " #" + member.user!!.discriminator) }
         val displaynameSpan: SpannableString =
@@ -54,8 +53,9 @@ class MentionListAdapter(
         } else {
             holder.itemView.mention_user_online.visibility = View.VISIBLE
         }
+        holder.itemView.mention_user_name.text = displaynameSpan
         holder.itemView.mention_user_discriminator.text =
-            TextUtils.concat(displaynameSpan, discriminatorSpan)
+            TextUtils.concat(member.user?.username ?: "用户ID为空", discriminatorSpan)
         holder.itemView.mention_user_avatar.user = member.user
     }
 

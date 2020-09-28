@@ -3,6 +3,8 @@ package cn.troph.tomon.core.structures
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.utils.Assets
 import cn.troph.tomon.core.utils.optBoolean
+import cn.troph.tomon.core.utils.optString
+import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 
 open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
@@ -25,7 +27,12 @@ open class Emoji(client: Client, data: JsonObject) : Base(client, data) {
             id = data["id"].asString
         }
         if (data.has("name")) {
-            name = data["name"].asString
+            name = if (data["name"] is JsonNull) {
+                "emoji"
+            } else if (data["name"].asString == "") {
+                "emoji"
+            } else
+                data["name"].asString
         }
         if (data.has("user")) {
             val user = client.users.add(data["user"].asJsonObject)
