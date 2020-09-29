@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -250,7 +251,11 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
     }
 
     private String getLastGuildId() {
-        return GuildUtils.getLastGuildId(this);
+        String guildId = GuildUtils.getLastGuildId(this);
+        if (TextUtils.isEmpty(guildId) || !Client.Companion.getGlobal().getGuilds().contains(guildId)) {
+            guildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
+        }
+        return guildId;
     }
 
     private void saveLastGuildId(String id) {
@@ -632,8 +637,9 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
 
     }
 
-    private ChannelListFragment createGuildChannelList(String guildId) {
+    private ChannelListFragment showChannelListFragment() {
         ChannelListFragment channelListFragment = new ChannelListFragment();
+        String guildId = getLastGuildId();
         Bundle extraData = new Bundle();
         extraData.putString(ChannelListFragment.GUILD_ID, guildId);
         channelListFragment.setArguments(extraData);
@@ -859,7 +865,7 @@ public class TomonMainActivity extends BaseActivity implements TomonMainPagerAda
     public Fragment getFragmentByPosition(int pos) {
         Fragment toReturn = null;
         if (pos == POS_CHANNEL_LIST) {
-            toReturn = createGuildChannelList(getLastGuildId());
+            toReturn = showChannelListFragment();
         } else if (pos == POS_DM_LIST) {
             toReturn = showDmFragment();
         } else if (pos == POS_ME) {

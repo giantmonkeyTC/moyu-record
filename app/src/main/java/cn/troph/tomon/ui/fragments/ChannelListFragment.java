@@ -570,7 +570,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         } else {
             hideEmptyGuildsView();
         }
-        if (TextUtils.isEmpty(guildId)) {
+        if (TextUtils.isEmpty(guildId) || !Client.Companion.getGlobal().getGuilds().contains(guildId)) {
             guildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
         }
         Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
