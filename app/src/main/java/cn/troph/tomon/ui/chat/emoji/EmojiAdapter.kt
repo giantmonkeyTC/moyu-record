@@ -74,18 +74,17 @@ class EmojiAdapter(
                     it.textview_emoji?.visibility = View.GONE
                     it.imageview_emoji.setOnTouchListener { v, event ->
                         when (event.action) {
-                            MotionEvent.ACTION_DOWN ->{
-                                if (!isPreviewEnabled){
+                            MotionEvent.ACTION_DOWN -> {
+                                if (!isPreviewEnabled) {
                                     print("previewEnabled")
                                     false
-                                }
-                                else
+                                } else
                                     true
                             }
-                            MotionEvent.ACTION_MOVE ->{
+                            MotionEvent.ACTION_MOVE -> {
                                 false
                             }
-                            MotionEvent.ACTION_UP ->{
+                            MotionEvent.ACTION_UP -> {
                                 false
                             }
                             else -> {
@@ -116,21 +115,26 @@ class EmojiAdapter(
                             DensityUtil.dip2px(context, 16f),
                             true
                         )
+                        popUp.animationStyle = 0
+                        popUpArrow.animationStyle = 0
+                        popUp.isOutsideTouchable = true
+                        popUpArrow.isOutsideTouchable = true
 //                        popUp.elevation = 10f
 //                        popUpArrow.elevation = 10f
-                        popUp.setOnDismissListener {
+                        popUpArrow.setOnDismissListener {
                             isPreviewEnabled = false
-                            popUpArrow.dismiss()
+                            popUp.dismiss()
+
                         }
                         it.isHapticFeedbackEnabled = false
-                        popUpArrow.showAsDropDown(
-                            it, DensityUtil.dip2px(context, 5f),
-                            DensityUtil.dip2px(context, 56f).unaryMinus()
-                        )
                         popUp.showAsDropDown(
                             it,
                             DensityUtil.dip2px(context, 35f).unaryMinus(),
                             DensityUtil.dip2px(context, 148f).unaryMinus()
+                        )
+                        popUpArrow.showAsDropDown(
+                            it, DensityUtil.dip2px(context, 5f),
+                            DensityUtil.dip2px(context, 56f).unaryMinus()
                         )
                         Glide.with(it.context).load(emojiSectionObj.emojiList[position].url)
                             .into(menu.emoji_preview_image)
