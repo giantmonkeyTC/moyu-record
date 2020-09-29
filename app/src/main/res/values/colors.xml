@@ -102,4 +102,5 @@
     <color name="uncheck_track">#61A2A2A2</color>
     <color name="check_track">#61FF7896</color>
     <color name="empty_channel_desp">#B0B0B0</color>
+    <color name="emoji_preview">#7A7A7A</color>
 </resources>

@@ -124,7 +124,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
                 emojiList = item.emojis.values.toMutableList()
             )
             guildIcon.add(GuildIcon(item.iconURL, item.name,null))
-            val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener)
+            val sectionAdapter = EmojiAdapter(sectionData, emojiClickListener,requireContext())
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
         val guildIconDefault = mutableListOf<Drawable>()
@@ -151,7 +151,7 @@ class ReactionFragment : BottomSheetDialogFragment() {
                     name = item.key,
                     isBuildIn = true,
                     systemEmojiListData = item.value
-                ), emojiClickListener
+                ), emojiClickListener,requireContext()
             )
             mSectionDataManager.addSection(adapter, 1)
 //            guildIcon.add(GuildIcon(null, item.value[0].code,null))

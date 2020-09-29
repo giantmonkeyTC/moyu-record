@@ -86,7 +86,7 @@ class EmojiFragment(val onEmojiClickListener: OnEmojiClickListener) : Fragment()
                 emojiList = item.emojis.values.toMutableList()
             )
             guildIcon.add(GuildIcon(item.iconURL, item.name, null))
-            val sectionAdapter = EmojiAdapter(sectionData, onEmojiClickListener)
+            val sectionAdapter = EmojiAdapter(sectionData, onEmojiClickListener, requireContext())
             mSectionDataManager.addSection(sectionAdapter, 1)
         }
         val guildIconDefault = mutableListOf<Drawable>()
@@ -113,7 +113,7 @@ class EmojiFragment(val onEmojiClickListener: OnEmojiClickListener) : Fragment()
                     name = item.key,
                     isBuildIn = true,
                     systemEmojiListData = item.value
-                ), onEmojiClickListener
+                ), onEmojiClickListener, requireContext()
             )
             mSectionDataManager.addSection(adapter, 1)
 //            guildIcon.add(GuildIcon(null, item.value[0].code,null))

@@ -12,6 +12,8 @@ apply plugin: 'com.google.gms.google-services'
 
 apply plugin: 'com.google.firebase.crashlytics'
 
+apply plugin: 'walle'
+
 repositories {
     jcenter()
 }
@@ -49,13 +51,6 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-
-            android.applicationVariants.all { variant ->
-                variant.outputs.all {
-                    def formattedDate = new Date().format('yyyyMMddHHmmss')
-                    outputFileName = "Tomon-${variant.versionName}-${formattedDate}-${variant.buildType.name}.apk"
-                }
-            }
         }
 
         debug {
@@ -77,9 +72,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    dataBinding {
-        enabled = true
-    }
+
 }
 
 ext {
@@ -96,6 +89,14 @@ sentry {
     // during a build.  If you disable this you'll need to manually
     // upload the mapping files with sentry-cli when you do a release.
     autoUpload true
+}
+
+walle {
+    apkOutputFolder = new File("${project.buildDir}/outputs/channels");
+    // 定制渠道包的APK的文件名称
+    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}.apk';
+    // 渠道配置文件
+    channelFile = new File("${project.getProjectDir()}/channel/channel.json")
 }
 
 
@@ -212,4 +213,6 @@ dependencies {
     implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
     implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
     implementation 'com.gyf.immersionbar:immersionbar-ktx:3.0.0'
+
+    implementation 'com.meituan.android.walle:library:1.1.7'
 }
