@@ -15,10 +15,7 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.ChannelType
 import cn.troph.tomon.core.Client
-import cn.troph.tomon.core.structures.Channel
-import cn.troph.tomon.core.structures.DmChannel
-import cn.troph.tomon.core.structures.GuildChannel
-import cn.troph.tomon.core.structures.TextChannel
+import cn.troph.tomon.core.structures.*
 import cn.troph.tomon.ui.chat.viewmodel.ChatSharedViewModel
 import cn.troph.tomon.ui.states.AppState
 import cn.troph.tomon.ui.states.ChannelSelection
@@ -30,6 +27,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_channel_detail.*
 import kotlinx.android.synthetic.main.fragment_channel_panel.*
 import kotlinx.android.synthetic.main.partial_chat_app_bar.*
+import kotlinx.android.synthetic.main.partial_chat_panel.*
 
 class ChatActivity : BaseActivity() {
     private lateinit var mCurrentChannel: Channel
@@ -131,8 +129,22 @@ class ChatActivity : BaseActivity() {
             if (iconId != null) {
                 image_toolbar_icon.setImageResource(iconId)
             }
-            editText.setHint(getString(R.string.emoji_et_hint))
-            enableInputPanel()
+            var meMember = channel.members[Client.global.me.id]
+            var canSendMessage: Boolean = false
+            if (meMember != null) {
+                canSendMessage = channel.permissionForMember(meMember)?.has(Permissions.SEND_MESSAGES) ?: false
+            } else {
+                canSendMessage = false
+            }
+            if (canSendMessage) {
+                editText.setHint(getString(R.string.emoji_et_hint))
+                enableInputPanel()
+            } else {
+                editText?.let {
+                    it.hint = getString(R.string.ed_msg_hint_no_permisson)
+                    it.isEnabled = false
+                }
+            }
         } else if (channel is DmChannel) {
             text_toolbar_title.text = channel.recipient?.name
             image_toolbar_icon.setImageResource(R.drawable.ic_channel_text_unlock)

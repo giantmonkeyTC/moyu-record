@@ -61,12 +61,15 @@ class DmChannelSelectorFragment : Fragment() {
                 }
             })
         mChatVM.dmUnReadLiveData.observe(viewLifecycleOwner, Observer { map ->
-            map.keys.forEach { key ->
-                mDMchannelList.find { dmChannel ->
-                    dmChannel.id == key
-                }?.unReadCount = map[key] ?: 0
+            map?.let {
+                it.keys.forEach { key ->
+                    mDMchannelList.find { dmChannel ->
+                        dmChannel.id == key
+                    }?.unReadCount = map[key] ?: 0
+                }
+                mDMchennelAdapter.notifyDataSetChanged()
             }
-            mDMchennelAdapter.notifyDataSetChanged()
+
         })
 
         mChatVM.mChannelCreateLD.observe(viewLifecycleOwner, Observer {

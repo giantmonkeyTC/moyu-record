@@ -238,6 +238,9 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
                 ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) mIvGuildBanner.getLayoutParams();
                 layoutParams.height += getStatusBarHeight();
                 mIvGuildBanner.setLayoutParams(layoutParams);
+                if (mCurrentGuild != null) {
+                    updateBanner(mCurrentGuild);
+                }
             }
         });
 
@@ -567,7 +570,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         } else {
             hideEmptyGuildsView();
         }
-        if (TextUtils.isEmpty(guildId)) {
+        if (TextUtils.isEmpty(guildId) || !Client.Companion.getGlobal().getGuilds().contains(guildId)) {
             guildId = Client.Companion.getGlobal().getGuilds().getList().get(0).getId();
         }
         Guild guild = Client.Companion.getGlobal().getGuilds().get(guildId);
@@ -577,25 +580,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         mCurrentGuild = guild;
         GuildAvatarUtils.setGuildAvatar(mIvGuildAvater, mTvGuildAvaterTextHolder, guild);
         mTvGuildName.setText(guild.getName());
-        Glide.with(mIvGuildBanner).clear(mIvGuildBanner);
-        Glide.with(mIvGuildBanner)
-                .load(guild.getBackgroundUrl())
-                .transform(new CenterCrop())
-                .placeholder(R.drawable.guild_background_placeholder)
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        mIvGuildBannerMask.setVisibility(View.INVISIBLE);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        mIvGuildBannerMask.setVisibility(View.VISIBLE);
-                        return false;
-                    }
-                })
-                .into(mIvGuildBanner);
+        updateBanner(guild);
 
         GuildChannelCollection channels = guild.getChannels();
         if (channels.getSize() > 0) {
@@ -646,6 +631,28 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
         } else {
             mChannelListAdapter.setDataAndNotifyChanged(mChannelTreeRoot, guild.getId());
         }
+    }
+
+    private void updateBanner(Guild guild) {
+        Glide.with(mIvGuildBanner).clear(mIvGuildBanner);
+        Glide.with(mIvGuildBanner)
+                .load(guild.getBackgroundUrl())
+                .transform(new CenterCrop())
+                .placeholder(R.drawable.guild_background_placeholder)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        mIvGuildBannerMask.setVisibility(View.INVISIBLE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        mIvGuildBannerMask.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .into(mIvGuildBanner);
     }
 
     private void registerObserver() {
@@ -880,7 +887,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
     @Override
     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
         TomonToast.makeErrorText(
-                getContext(),
+                getContext().getApplicationContext(),
                 R.string.join_permission_msg,
                 Toast.LENGTH_SHORT
         ).show();
@@ -888,6 +895,7 @@ public class ChannelListFragment extends Fragment implements PermissionListener 
 
     @Override
     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+        permissionToken.continuePermissionRequest();
     }
 
     public void showEmptyGuildsView() {

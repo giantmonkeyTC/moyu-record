@@ -2051,17 +2051,17 @@ class TomonTagHandler : SimpleTagHandler() {
 class MentionClickableSpan : ClickableSpan() {
 
     override fun onClick(widget: View) {
-        val tv = widget as EmojiTextView
-        val spanned = tv.text as Spanned
-        val start = spanned.getSpanStart(this)
-        val end = spanned.getSpanEnd(this)
-        val name = spanned.substring(start, end)
-        Client.global.users.forEach {
-            val matchName = "@${it.name}#${it.discriminator}"
-            if (matchName == name) {
-                Client.global.eventBus.postEvent(ShowUserProfileEvent(it))
-            }
-        }
+//        val tv = widget as EmojiTextView
+//        val spanned = tv.text as Spanned
+//        val start = spanned.getSpanStart(this)
+//        val end = spanned.getSpanEnd(this)
+//        val name = spanned.substring(start, end)
+//        Client.global.users.forEach {
+//            val matchName = "@${it.name}#${it.discriminator}"
+//            if (matchName == name) {
+//                Client.global.eventBus.postEvent(ShowUserProfileEvent(it))
+//            }
+//        }
     }
 
     override fun updateDrawState(ds: TextPaint) {

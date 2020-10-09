@@ -46,12 +46,14 @@ class Client {
     val presences = PresenceCollection(this)
     val guildSettings = GuildSettingsCollection(this)
     val stamps: MutableList<StampPack> = mutableListOf()
+    lateinit var application:Application
 
     val token get() = me.token
     val auth get() = "Bearer ${token ?: ""}"
     val loggedIn get() = socket.state == SocketClientState.OPEN
 
     fun initialize(app: Application) {
+        application = app
         preferences = app.getSharedPreferences("tomon", Context.MODE_PRIVATE)
         val token = preferences.getString("token", null)
         if (token != null) {

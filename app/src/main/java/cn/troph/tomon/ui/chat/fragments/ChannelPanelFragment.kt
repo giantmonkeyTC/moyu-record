@@ -228,7 +228,7 @@ class ChannelPanelFragment : BaseFragment() {
             }
         }
 
-    private fun setNoPermissionViewIfNeeded(channel: TextChannel) {
+    fun setNoPermissionViewIfNeeded(channel: TextChannel) {
         var meMember = channel.members[Client.global.me.id]
         var canSendMessage: Boolean? = false
         if (meMember != null) {
@@ -819,13 +819,13 @@ class ChannelPanelFragment : BaseFragment() {
         })
 
         //show user profile
-        mChatSharedVM.showUserProfileLD.observe(viewLifecycleOwner, Observer {
-            val guildUserInfoFragment = GuildUserInfoFragment(it.id)
-            guildUserInfoFragment.show(
-                parentFragmentManager,
-                guildUserInfoFragment.tag
-            )
-        })
+//        mChatSharedVM.showUserProfileLD.observe(viewLifecycleOwner, Observer {
+//            val guildUserInfoFragment = GuildUserInfoFragment(it.id)
+//            guildUserInfoFragment.show(
+//                parentFragmentManager,
+//                guildUserInfoFragment.tag
+//            )
+//        })
 
         //删除消息
         mChatSharedVM.messageDeleteLD.observe(viewLifecycleOwner, Observer {
@@ -937,6 +937,11 @@ class ChannelPanelFragment : BaseFragment() {
         animIn.setInterpolator(LinearInterpolator())
         animIn.duration = 400
 
+        Client.global.channels[mChannelId?:""]?.let {
+            if (it is TextChannel) {
+                setNoPermissionViewIfNeeded(it)
+            }
+        }
 
         btn_scroll_to_bottom.setOnClickListener {
             view_messages.scrollToPosition(mMsgListAdapter.itemCount - 1)

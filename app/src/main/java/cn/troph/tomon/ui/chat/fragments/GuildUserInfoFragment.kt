@@ -24,6 +24,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 
 import androidx.lifecycle.Observer
@@ -57,6 +58,13 @@ class GuildUserInfoFragment(private val userId: String, private val member: Guil
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.Theme_App_Dialog_Bottomsheet)
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        if (Client.global.users[userId]?.isDeletedUser() == true) {
+            return
+        }
+        super.show(manager, tag)
     }
 
     override fun onCreateView(

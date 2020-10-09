@@ -3,6 +3,7 @@ package cn.troph.tomon.core.actions
 import androidx.core.content.edit
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.events.UserLogoutEvent
+import cn.troph.tomon.ui.utils.GuildUtils
 import com.google.gson.JsonElement
 
 class UserLogoutAction(client: Client) : Action<Unit>(client) {
@@ -17,6 +18,7 @@ class UserLogoutAction(client: Client) : Action<Unit>(client) {
         client.preferences.edit {
             remove("token").commit()
         }
+        GuildUtils.saveLastGuildId(client.application, GuildUtils.NO_GUILD_ID)
         client.socket.close()
         client.eventBus.postEvent(UserLogoutEvent())
         return null
