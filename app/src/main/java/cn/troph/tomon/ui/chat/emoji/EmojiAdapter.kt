@@ -1,6 +1,7 @@
 package cn.troph.tomon.ui.chat.emoji
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -12,13 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.SwitchEmojiPreviewEvent
 import cn.troph.tomon.core.utils.DensityUtil
+import cn.troph.tomon.core.utils.event.observeEventOnUi
 import cn.troph.tomon.core.utils.url
 import cn.troph.tomon.ui.chat.fragments.ReportFragment
 import com.bumptech.glide.Glide
 import com.cruxlab.sectionedrecyclerview.lib.BaseSectionAdapter
 import com.cruxlab.sectionedrecyclerview.lib.SectionAdapter
 import com.google.gson.annotations.SerializedName
+import com.orhanobut.logger.Logger
+import io.reactivex.rxjava3.functions.Consumer
 import kotlinx.android.synthetic.main.emoji_image.view.*
 import kotlinx.android.synthetic.main.emoji_item.view.*
 import kotlinx.android.synthetic.main.emoji_preview_menu.view.*
@@ -59,6 +64,23 @@ class EmojiAdapter(
     }
 
     override fun onBindItemViewHolder(holder: EmojiItemViewHolder?, position: Int) {
+        val inflater =
+            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val menu = inflater.inflate(R.layout.emoji_preview_menu, null)
+        val popUp = PopupWindow(
+            menu,
+            DensityUtil.dip2px(context, 100f),
+            DensityUtil.dip2px(context, 100f),
+            true
+        )
+        val arrow = inflater.inflate(R.layout.emoji_preview_arrow, null)
+        val popUpArrow = PopupWindow(
+            arrow, DensityUtil.dip2px(context, 24f),
+            DensityUtil.dip2px(context, 16f),
+            true
+        )
+
+
         holder?.let {
             it.itemView?.let {
                 if (emojiSectionObj.isBuildIn) {
@@ -71,6 +93,17 @@ class EmojiAdapter(
                         emojiClickListener.onSystemEmojiSelected(parseEmoji(emojiSectionObj.systemEmojiListData[holder.sectionAdapterPosition]))
                     }
                 } else {
+                    Client.global.eventBus.observeEventOnUi<SwitchEmojiPreviewEvent>().subscribe(
+                        Consumer { event ->
+                            val rect = Rect()
+                            it.imageview_emoji.getGlobalVisibleRect(rect)
+                            if (!rect.contains(event.rawX, event.rawY)) {
+                                if (popUp.isShowing)
+                                    popUp.dismiss()
+                            } else {
+                                it.imageview_emoji.performLongClick()
+                            }
+                        })
                     it.textview_emoji?.visibility = View.GONE
                     it.imageview_emoji.setOnTouchListener { v, event ->
                         when (event.action) {
@@ -82,10 +115,24 @@ class EmojiAdapter(
                                     true
                             }
                             MotionEvent.ACTION_MOVE -> {
+                                val rawx = event.rawX.toInt()
+                                val rawy = event.rawY.toInt()
+                                    Client.global.eventBus.postEvent(
+                                        SwitchEmojiPreviewEvent(
+                                            rawx,
+                                            rawy
+                                        )
+                                    )
                                 false
                             }
                             MotionEvent.ACTION_UP -> {
-                                false
+                                if (!isPreviewEnabled) {
+                                    false
+                                } else {
+                                    if (popUp.isShowing)
+                                        popUp.dismiss()
+                                    true
+                                }
                             }
                             else -> {
                                 false
@@ -100,38 +147,26 @@ class EmojiAdapter(
                     }
                     it.imageview_emoji.setOnLongClickListener {
                         isPreviewEnabled = true
-                        val inflater =
-                            context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val menu = inflater.inflate(R.layout.emoji_preview_menu, null)
-                        val popUp = PopupWindow(
-                            menu,
-                            DensityUtil.dip2px(context, 100f),
-                            DensityUtil.dip2px(context, 100f),
-                            true
-                        )
-                        val arrow = inflater.inflate(R.layout.emoji_preview_arrow, null)
-                        val popUpArrow = PopupWindow(
-                            arrow, DensityUtil.dip2px(context, 24f),
-                            DensityUtil.dip2px(context, 16f),
-                            true
-                        )
-                        popUp.animationStyle = 0
                         popUpArrow.animationStyle = 0
-                        popUp.isOutsideTouchable = true
-                        popUpArrow.isOutsideTouchable = true
-//                        popUp.elevation = 10f
-//                        popUpArrow.elevation = 10f
-                        popUpArrow.setOnDismissListener {
+                        popUp.animationStyle = 0
+                        popUp.setOnDismissListener {
                             isPreviewEnabled = false
-                            popUp.dismiss()
-
+                            popUpArrow.dismiss()
                         }
                         it.isHapticFeedbackEnabled = false
+                        popUp.isTouchable = false
+                        popUpArrow.isTouchable = false
+                        popUpArrow.setTouchInterceptor(object : View.OnTouchListener {
+                            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                                return false
+                            }
+                        })
                         popUp.showAsDropDown(
                             it,
                             DensityUtil.dip2px(context, 35f).unaryMinus(),
                             DensityUtil.dip2px(context, 148f).unaryMinus()
                         )
+
                         popUpArrow.showAsDropDown(
                             it, DensityUtil.dip2px(context, 5f),
                             DensityUtil.dip2px(context, 56f).unaryMinus()

@@ -15,7 +15,7 @@ data class GuildCreateEvent(val guild: Guild) : Event()
 data class GuildDeleteEvent(val guild: Guild) : Event()
 data class GuildUpdateEvent(val guild: Guild) : Event()
 data class GuildPositionEvent(val guilds: List<Position>) : Event()
-data class ChannelPositionEvent(val guildId:String, val channels: List<Position>) : Event()
+data class ChannelPositionEvent(val guildId: String, val channels: List<Position>) : Event()
 
 class ChannelSyncEvent(val guild: Guild?) : Event()
 data class ChannelFetchEvent(val channels: List<Channel>) : Event()
@@ -69,9 +69,11 @@ data class VoiceSocketStateEvent(val isOpen: Boolean) : Event()
 
 data class VoiceStateUpdateEvent(val voiceUpdate: VoiceUpdate) : Event()
 
-data class SyncMessageEvent(val channel: Channel,val needSync: Boolean) : Event()
+data class SyncMessageEvent(val channel: Channel, val needSync: Boolean) : Event()
 
 data class GuildVoiceSelectorEvent(val channelId: String) : Event()
 
 data class LinkParseReadyEvent(val linkList: MutableList<Link>) : Event()
 data class ShowUserProfileEvent(val user: User) : Event()
+
+data class SwitchEmojiPreviewEvent(val rawX: Int, val rawY: Int) : Event()

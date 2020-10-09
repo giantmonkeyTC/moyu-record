@@ -18,4 +18,12 @@ class NestedViewPager(context: Context, attrs: AttributeSet?) : ViewPager(contex
         }
         return super.dispatchTouchEvent(ev)
     }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return false
+    }
+
+    override fun onInterceptTouchEvent(event: MotionEvent?): Boolean {
+        return false
+    }
 }

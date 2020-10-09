@@ -468,7 +468,6 @@ class ChannelPanelFragment : BaseFragment() {
                         6
                     ) ?: "") + "···" else guildMemberOf(it.message)?.displayName ?: it.message?.author?.name ?: ""
                 }:${it.message?.content ?: ""}"
-
         })
         bar_reply_message.btn_reply_message_cancel.setOnClickListener {
             mChatSharedVM.replyLd.value = ReplyEnabled(flag = false, message = null)
