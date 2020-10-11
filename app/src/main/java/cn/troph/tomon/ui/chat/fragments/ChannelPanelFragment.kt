@@ -401,6 +401,7 @@ class ChannelPanelFragment : BaseFragment() {
         viewPagerCollectionAdapter =
             ViewPagerCollectionAdapter(mEmojiClickListener, requireFragmentManager())
         viewPager = view.findViewById(R.id.reaction_stamp_viewpager)
+        viewPager.observeEmojiPreview()
         viewPager.adapter = viewPagerCollectionAdapter
         mChatSharedVM.updateLD.observe(viewLifecycleOwner, Observer {
             message = it.message

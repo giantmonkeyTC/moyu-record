@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.events.EmojiPreviewExitEvent
 import cn.troph.tomon.core.events.SwitchEmojiPreviewEvent
 import cn.troph.tomon.core.utils.DensityUtil
 import cn.troph.tomon.core.utils.event.observeEventOnUi
@@ -104,35 +105,57 @@ class EmojiAdapter(
                                 it.imageview_emoji.performLongClick()
                             }
                         })
+                    Client.global.eventBus.observeEventOnUi<EmojiPreviewExitEvent>().subscribe(
+                        Consumer { event ->
+                            val rect = Rect()
+                            it.imageview_emoji.getGlobalVisibleRect(rect)
+                            if (popUp.isShowing) {
+                                isPreviewEnabled = false
+                                popUp.dismiss()
+                            }
+
+                        })
                     it.textview_emoji?.visibility = View.GONE
                     it.imageview_emoji.setOnTouchListener { v, event ->
                         when (event.action) {
                             MotionEvent.ACTION_DOWN -> {
-                                if (!isPreviewEnabled) {
-                                    print("previewEnabled")
+                                if (!isPreviewEnabled)
                                     false
-                                } else
+                                else
                                     true
                             }
                             MotionEvent.ACTION_MOVE -> {
-                                val rawx = event.rawX.toInt()
-                                val rawy = event.rawY.toInt()
+                                if (isPreviewEnabled) {
+                                    val rawx = event.rawX.toInt()
+                                    val rawy = event.rawY.toInt()
                                     Client.global.eventBus.postEvent(
                                         SwitchEmojiPreviewEvent(
                                             rawx,
                                             rawy
                                         )
                                     )
-                                false
+                                    false
+                                } else
+                                    false
+
                             }
                             MotionEvent.ACTION_UP -> {
-                                if (!isPreviewEnabled) {
+                                if (isPreviewEnabled) {
+                                    val rawx = event.rawX.toInt()
+                                    val rawy = event.rawY.toInt()
+                                    Client.global.eventBus.postEvent(
+                                        EmojiPreviewExitEvent(
+                                            rawx,
+                                            rawy
+                                        )
+                                    )
                                     false
-                                } else {
-                                    if (popUp.isShowing)
-                                        popUp.dismiss()
-                                    true
-                                }
+                                } else false
+
+                            }
+                            MotionEvent.ACTION_CANCEL -> {
+                                popUp.dismiss()
+                                false
                             }
                             else -> {
                                 false
@@ -150,7 +173,6 @@ class EmojiAdapter(
                         popUpArrow.animationStyle = 0
                         popUp.animationStyle = 0
                         popUp.setOnDismissListener {
-                            isPreviewEnabled = false
                             popUpArrow.dismiss()
                         }
                         it.isHapticFeedbackEnabled = false

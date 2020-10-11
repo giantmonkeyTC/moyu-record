@@ -77,3 +77,5 @@ data class LinkParseReadyEvent(val linkList: MutableList<Link>) : Event()
 data class ShowUserProfileEvent(val user: User) : Event()
 
 data class SwitchEmojiPreviewEvent(val rawX: Int, val rawY: Int) : Event()
+
+data class EmojiPreviewExitEvent(val rawX: Int, val rawY: Int):Event()

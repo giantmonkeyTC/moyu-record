@@ -17,7 +17,7 @@
         app:layout_constraintBottom_toTopOf="@id/line_view"
         >
 
-        <androidx.recyclerview.widget.RecyclerView
+        <cn.troph.tomon.ui.chat.ui.NestedRecyclerView
             android:id="@+id/reaction_rr"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
