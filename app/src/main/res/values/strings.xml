@@ -12,6 +12,8 @@
     <string name="welcome">欢迎来到Tomon</string>
     <string name="slogan">類はTomonを呼ぶ</string>
 
+    <string name="login_with_number">手机号登录/注册</string>
+    <string name="login_with_code">密码登录</string>
 
     <string name="register_invite_code">邀请码</string>
     <string name="register_confirmation_code">验证码</string>
@@ -242,4 +244,27 @@
     <string name="change_username">修改用户名</string>
     <string name="change_email">修改邮箱</string>
     <string name="change_phone">修改手机号</string>
+    <string name="login_by_number">验证码登录</string>
+    <string name="login_with_number_hint">未注册手机验证后自动注册。</string>
+    <string name="login_verification">登录验证</string>
+    <string name="sent_code_hint">验证码已发送到你的手机</string>
+    <string name="login_by_pwd">密码登录</string>
+    <string name="forget_pwd">忘记密码</string>
+    <string name="login_new_pwd_hint">请输入8-32位密码。</string>
+    <string name="login_forget_pwd_hint">通过验证手机号找回密码。</string>
+    <string name="enable_account">激活账户</string>
+    <string name="enable_hint">Tomon 处于内测阶段,\n快找相关伙伴获取激活码吧！</string>
+    <string name="set_info">完善信息</string>
+    <string name="set_info_hint">请不要使用敏感/黄暴信息哟~</string>
+    <string name="set_pwd">创建密码</string>
+    <string name="set_pwd_hint">请输入8~32位密码。</string>
+    <string name="apply_for_code">申请激活码</string>
+    <string name="apply_email">请输入申请邮箱</string>
+    <string name="query_tomon_source">你是从哪里得知 Tomon 的？（必选）</string>
+    <string name="apply">提交申请</string>
+    <string name="enter_tomon">进入TOMON</string>
+    <string name="next">下一步</string>
+    <string name="resend">重新发送</string>
+    <string name="skip">跳过</string>
+    <string name="confirm_pwd_change">确认修改</string>
 </resources>

@@ -1,89 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background3"
-    >
+    android:background="@color/background3">
 
-    <cn.troph.tomon.ui.widgets.WelcomeView
+    <ImageView
         android:id="@+id/register_n_login"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="49dp"
-        android:background="#33000000"
-        app:layout_constraintBottom_toTopOf="@+id/slogan_japan"
+        android:layout_height="304dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent"/>
 
-
-    </cn.troph.tomon.ui.widgets.WelcomeView>
+    <ImageView
+        android:id="@+id/login_character"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/login_character"
+        app:layout_constraintBottom_toBottomOf="@id/register_n_login"
+        app:layout_constraintEnd_toEndOf="@id/register_n_login" />
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/register_n_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/register_n_login"
-        app:srcCompat="@drawable/login_register_logo" />
-    <Button
+        app:srcCompat="@drawable/login_logo" />
+
+    <TextView
         android:id="@+id/button_register_route"
-        android:layout_width="0dp"
+        android:layout_width="211dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="24dp"
-        android:background="#FF7896"
+        android:background="@drawable/shape_button_radius_58"
         android:gravity="center"
-        android:text="@string/register_button"
-        android:textColor="@color/white"
-        android:textSize="15dp"
+        android:lineHeight="18dp"
+        android:text="@string/login_with_number"
+        android:textColor="@color/primaryColor"
+        android:textSize="16dp"
         app:layout_constraintBottom_toTopOf="@+id/button_login_route"
         app:layout_constraintEnd_toEndOf="@+id/button_login_route"
-        app:layout_constraintStart_toStartOf="@+id/button_login_route" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/button_login_route"
+        app:layout_constraintTop_toBottomOf="@+id/register_n_login"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-    <Button
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="165dp"
+        android:src="@drawable/login_button_background"
+        app:layout_constraintBottom_toBottomOf="@id/button_register_route"
+        app:layout_constraintEnd_toEndOf="@id/button_register_route" />
+
+    <TextView
         android:id="@+id/button_login_route"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
+        android:layout_marginTop="@dimen/margin_24dp"
         android:layout_marginEnd="60dp"
         android:layout_marginBottom="50dp"
-        android:background="#FF7896"
         android:gravity="center"
-        android:text="@string/login_button"
-        android:textColor="@color/white"
+        android:text="@string/login_with_code"
+        android:textColor="@color/primaryColor"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_register_route" />
 
     <TextView
-        android:id="@+id/slogan_chinese"
+        android:id="@+id/private_agreement_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:text="独特的人会找到独特的人"
+        android:layout_marginBottom="16dp"
+        android:gravity="end"
+        android:text="@string/privacy_agreement"
         android:textColor="@color/white"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/button_register_route"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColorLink="@color/primaryColor"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/private_agreement_tv2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/slogan_japan"
+        android:id="@+id/private_agreement_tv2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="類はTomonを呼ぶ"
-        android:textColor="#DEFFFFFF"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/slogan_chinese"
+        android:text="@string/privacy_agreement_pri"
+        android:textColor="@color/white"
+        android:textColorLink="@color/primaryColor"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@+id/private_agreement_tv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/private_agreement_tv"
+        app:layout_constraintTop_toTopOf="@+id/private_agreement_tv" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

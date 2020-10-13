@@ -142,7 +142,7 @@
         <activity
             android:name=".ui.activities.EntryOptionActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoTitleWithTransitions" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.LoginActivity"
             android:label="@string/login_title"

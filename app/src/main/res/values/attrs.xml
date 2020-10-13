@@ -36,4 +36,13 @@
         <attr name="icon_background" format="reference"/>
         <attr name="name_text" format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="CodeVerificationEditText">
+        <attr name="strokeHeight" format="dimension"/>
+        <attr name="strokeWidth" format="dimension"/>
+        <attr name="strokePadding" format="dimension"/>
+        <attr name="strokeLength" format="integer"/>
+        <attr name="strokeDrawable" format="reference"/>
+        <attr name="focusedDrawable" format="reference"/>
+    </declare-styleable>
 </resources>
