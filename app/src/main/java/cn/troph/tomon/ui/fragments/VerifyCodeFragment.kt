@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import cn.troph.tomon.R
-import kotlinx.android.synthetic.main.layout_activity_register.*
+
 import kotlinx.android.synthetic.main.layout_login_verification.*
 import kotlinx.android.synthetic.main.layout_login_verification.view.*
 import java.lang.NullPointerException
@@ -55,7 +55,7 @@ class VerifyCodeFragment : Fragment() {
             else
                 login_verification.next.visibility = View.GONE
         }
-        val timer = object : CountDownTimer(10000, 1000) {
+        val timer = object : CountDownTimer(60000, 1000) {
             override fun onFinish() {
                 login_verification.resend_code.text = getString(R.string.resend)
                 login_verification.resend_code.isEnabled = true
@@ -66,6 +66,7 @@ class VerifyCodeFragment : Fragment() {
             }
         }
         timer.start()
+
         timer.cancel()
     }
 

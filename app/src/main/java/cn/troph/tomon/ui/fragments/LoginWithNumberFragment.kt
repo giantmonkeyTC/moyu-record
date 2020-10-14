@@ -95,6 +95,10 @@ class LoginWithNumberFragment : Fragment() {
         }
     }
 
+    private fun getInstance(): LoginWithNumberFragment {
+        return this
+    }
+
     private fun fragmentReplace(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction().apply {
             setCustomAnimations(
@@ -104,6 +108,7 @@ class LoginWithNumberFragment : Fragment() {
             replace(R.id.content, fragment)
         }.commit()
     }
+
     private fun fragmentAdd(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction().apply {
             setCustomAnimations(
@@ -111,6 +116,7 @@ class LoginWithNumberFragment : Fragment() {
                 R.anim.no_animation
             )
             add(R.id.content, fragment)
+//            hide(getInstance())
             addToBackStack(null)
         }.commit()
     }
