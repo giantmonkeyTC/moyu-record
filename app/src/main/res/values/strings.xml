@@ -267,4 +267,5 @@
     <string name="resend">重新发送</string>
     <string name="skip">跳过</string>
     <string name="confirm_pwd_change">确认修改</string>
+    <string name="wrong_phone">手机号格式错误</string>
 </resources>

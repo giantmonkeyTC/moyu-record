@@ -56,6 +56,12 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
+        <activity android:name=".ui.activities.OptionalLoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden|adjustResize"
+            />
+
         <activity android:name=".ui.activities.SecondActivity" />
         <activity
             android:name=".ui.activities.ChannelInfoActivity"

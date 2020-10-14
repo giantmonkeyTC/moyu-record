@@ -1,5 +1,6 @@
 package cn.troph.tomon.ui.activities
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -7,7 +8,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -15,33 +15,30 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
-import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import cn.troph.tomon.R
 import cn.troph.tomon.core.utils.DensityUtil
 import com.gyf.immersionbar.ImmersionBar
 import kotlinx.android.synthetic.main.layout_activity_entry_option.*
-import kotlinx.android.synthetic.main.layout_activity_entry_option.private_agreement_tv
-import kotlinx.android.synthetic.main.layout_activity_entry_option.private_agreement_tv2
-import kotlinx.android.synthetic.main.layout_activity_register.*
-import kotlin.math.acos
 
+val LOGIN_NUMBER: Int = 0
+val LOGIN_PASSWORD: Int = 1
 class EntryOptionActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ImmersionBar.with(this).reset().init()
         setContentView(R.layout.layout_activity_entry_option)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        actionBar?.hide()
         button_login_route.setOnClickListener {
-            gotoLogin()
+            loginWithPwd()
         }
 
-        button_register_route.setOnClickListener { gotoRegister() }
+        button_register_route.setOnClickListener {
+            loginWithNumber() }
 
         setPrivacyLink()
     }
@@ -143,27 +140,23 @@ class EntryOptionActivity : BaseActivity() {
     }
 
 
-    private fun gotoLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(
-            intent,
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                register_n_login as View,
-                "register_n_login"
-            ).toBundle()
-        )
+    private fun loginWithNumber() {
+        val intent = Intent(this, OptionalLoginActivity::class.java)
+        intent.putExtra("login_type", LOGIN_NUMBER)
+        startActivity(intent,ActivityOptions.makeCustomAnimation(
+            this,
+            R.anim.slide_in_right_custom,
+            R.anim.no_animation
+        ).toBundle())
     }
 
-    private fun gotoRegister() {
-        val intent = Intent(this, RegisterActivity::class.java)
-        startActivity(
-            intent,
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                register_n_login as View,
-                "register_n_login"
-            ).toBundle()
-        )
+    private fun loginWithPwd() {
+        val intent = Intent(this, OptionalLoginActivity::class.java)
+        intent.putExtra("login_type", LOGIN_PASSWORD)
+        startActivity(intent,ActivityOptions.makeCustomAnimation(
+            this,
+            R.anim.slide_in_right_custom,
+            R.anim.no_animation
+        ).toBundle())
     }
 }
