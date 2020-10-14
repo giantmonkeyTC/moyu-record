@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_with_pwd"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background3">
 
     <TextView
@@ -32,36 +32,35 @@
 
     <ImageView
         android:id="@+id/hint_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/login_hint_background"
-        android:scaleType="centerCrop"
         android:background="@color/blackAlpha20"
-        />
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_hint_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/back_to_option"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/back"
         android:layout_marginStart="@dimen/margin_32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="60dp"
-        />
+        android:src="@drawable/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="@color/primaryText"
-        android:textSize="20dp"
         android:lineHeight="23px"
         android:text="@string/login_by_pwd"
-        app:layout_constraintStart_toEndOf="@id/back_to_option"
-        app:layout_constraintTop_toTopOf="@id/back_to_option"
+        android:textColor="@color/primaryText"
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="@id/back_to_option"
-        />
+        app:layout_constraintStart_toEndOf="@id/back_to_option"
+        app:layout_constraintTop_toTopOf="@id/back_to_option" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline6"
@@ -78,6 +77,7 @@
         app:layout_constraintGuide_end="32dp" />
 
     <Button
+        android:id="@+id/button5"
         android:layout_width="0dp"
         android:layout_height="38dp"
         android:layout_marginStart="42dp"
@@ -92,6 +92,22 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline6" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="42dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="42dp"
+        android:background="@drawable/shape_button_register"
+        android:text="@string/register_button"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/button5" />
+
     <EditText
         android:id="@+id/editText2"
         android:layout_width="0dp"

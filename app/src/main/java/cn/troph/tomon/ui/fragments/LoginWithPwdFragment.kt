@@ -15,6 +15,8 @@ import android.webkit.WebViewClient
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import cn.troph.tomon.R
+import kotlinx.android.synthetic.main.layout_forget_pwd.*
+import kotlinx.android.synthetic.main.layout_forget_pwd.view.*
 import kotlinx.android.synthetic.main.layout_login_with_number.*
 import kotlinx.android.synthetic.main.layout_login_with_pwd.*
 import kotlinx.android.synthetic.main.layout_login_with_pwd.private_agreement_tv
@@ -35,16 +37,37 @@ class LoginWithPwdFragment:Fragment() {
         setPrivacyLink()
         textView18.setOnClickListener {
             val loginNumberFragment = LoginWithNumberFragment()
+            loginNumberFragment.arguments = Bundle().apply {
+                putInt(PHONE_CODE_TYPE, PHONE_CODE_TYPE_LOGIN)
+            }
             fragmentReplace(loginNumberFragment)
         }
         login_with_pwd.textView17.setOnClickListener {
-
+            val loginWithNumberFragment = LoginWithNumberFragment()
+            loginWithNumberFragment.arguments = Bundle().apply {
+                putInt(PHONE_CODE_TYPE, PHONE_CODE_TYPE_FORGET)
+            }
+            fragmentAdd(loginWithNumberFragment)
         }
     }
 
     private fun fragmentReplace(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction().apply {
             replace(R.id.content, fragment)
+        }.commit()
+    }
+    private fun getInstance(): LoginWithPwdFragment {
+        return this
+    }
+    private fun fragmentAdd(fragment: Fragment) {
+        requireActivity().supportFragmentManager.beginTransaction().apply {
+            setCustomAnimations(
+                R.anim.slide_in_right_custom,
+                R.anim.no_animation
+            )
+            add(R.id.content, fragment)
+            hide(getInstance())
+            addToBackStack(null)
         }.commit()
     }
 
