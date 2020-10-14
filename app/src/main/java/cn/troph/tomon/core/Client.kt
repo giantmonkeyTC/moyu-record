@@ -63,12 +63,14 @@ class Client {
 
     fun login(
         unionId: String? = null,
-        password: String? = null
+        password: String? = null,
+        code:String? = null
     ): Observable<Unit> {
         return me.login(
             unionId = unionId,
             password = password,
-            token = if (unionId != null && password != null) null else me.token
+            token = if (unionId != null && password != null) null else me.token,
+            code = code
         )
             .map {
                 socket.open()

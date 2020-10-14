@@ -87,7 +87,8 @@ class LoginWithNumberFragment : Fragment() {
                 login_with_number.next.isEnabled = true
                 val verifyCodeFragment = VerifyCodeFragment()
                 verifyCodeFragment.arguments = Bundle().apply {
-                    putInt("verify_type", VERIFY_TYPE_LOGIN)
+                    putInt(VERIFY_TYPE, VERIFY_TYPE_LOGIN)
+                    putString(VERIFY_PHONE,phone)
                 }
                 fragmentAdd(verifyCodeFragment)
             } else

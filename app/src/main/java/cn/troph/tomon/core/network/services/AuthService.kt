@@ -18,7 +18,9 @@ interface AuthService {
         @SerializedName("password")
         val password: String? = null,
         @SerializedName("token")
-        val token: String? = null
+        val token: String? = null,
+        @SerializedName("code")
+        val code: String? = null
     )
 
     @DELETE("users/@me")

@@ -59,7 +59,7 @@
         <activity android:name=".ui.activities.OptionalLoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden|adjustResize"
+            android:windowSoftInputMode="stateVisible|adjustResize"
             />
 
         <activity android:name=".ui.activities.SecondActivity" />

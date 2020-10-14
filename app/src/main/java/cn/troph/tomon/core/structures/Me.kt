@@ -68,21 +68,26 @@ class Me(client: Client, data: JsonObject = JsonObject()) : User(client, data) {
     fun login(
         unionId: String? = null,
         password: String? = null,
-        token: String? = null
+        token: String? = null,
+        code: String? = null
     ): Observable<User?> {
         val request = when {
             token?.isNotEmpty() == true -> AuthService.LoginRequest(token = token)
-            Validator.isFullName(unionId) -> AuthService.LoginRequest(
+            Validator.isFullName(unionId) && password != null -> AuthService.LoginRequest(
                 full_name = unionId,
                 password = password
             )
-            Validator.isEmail(unionId) -> AuthService.LoginRequest(
+            Validator.isEmail(unionId) && password != null -> AuthService.LoginRequest(
                 email = unionId,
                 password = password
             )
-            Validator.isPhone(unionId) -> AuthService.LoginRequest(
+            Validator.isPhone(unionId) && password != null -> AuthService.LoginRequest(
                 phone = unionId,
                 password = password
+            )
+            Validator.isPhone(unionId) && code != null && password == null -> AuthService.LoginRequest(
+                phone = unionId,
+                code = code
             )
             else -> null
         }
