@@ -269,4 +269,5 @@
     <string name="confirm_pwd_change">确认修改</string>
     <string name="wrong_phone">手机号格式错误</string>
     <string name="register_verification">注册验证</string>
+    <string name="apply_code">没有激活码？点击申请</string>
 </resources>

@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:backgroundTint="@color/whiteAlpha50"
-        android:hint="手机号"
+        android:hint="昵称"
         android:textColor="@color/white"
         android:textColorHint="@color/whiteAlpha50"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
