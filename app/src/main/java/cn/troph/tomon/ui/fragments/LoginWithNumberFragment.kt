@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,8 +23,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import cn.troph.tomon.R
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.Validator
+import cn.troph.tomon.ui.activities.OptionalLoginActivity
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import cn.troph.tomon.ui.widgets.TomonToast
+import com.google.android.material.snackbar.Snackbar
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_activity_login.*
+import kotlinx.android.synthetic.main.layout_activity_register.*
 import kotlinx.android.synthetic.main.layout_forget_pwd.*
 import kotlinx.android.synthetic.main.layout_forget_pwd.view.*
 import kotlinx.android.synthetic.main.layout_login_with_number.*
@@ -97,7 +107,11 @@ class LoginWithNumberFragment : Fragment() {
         viewModel.loginForm.observe(requireActivity(), Observer {
             val loginState = it ?: return@Observer
             if (loginState.phoneError != null) {
-                forget_pwd.forget_pwd_et.error = getString(loginState.phoneError)
+                TomonToast.makeErrorText(
+                    requireContext(),
+                    getString(loginState.phoneError),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
         forget_pwd.forget_pwd_next.setOnClickListener {
@@ -124,7 +138,11 @@ class LoginWithNumberFragment : Fragment() {
         viewModel.loginForm.observe(requireActivity(), Observer {
             val loginState = it ?: return@Observer
             if (loginState.phoneError != null) {
-                login_with_number.editText2.error = getString(loginState.phoneError)
+                TomonToast.makeErrorText(
+                    requireContext(),
+                    getString(loginState.phoneError),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
         login_with_number.textView17.setOnClickListener {
@@ -136,13 +154,31 @@ class LoginWithNumberFragment : Fragment() {
             val phone = login_with_number.editText2.text.toString()
             val valid = viewModel.loginDataValidate(phone)
             if (valid) {
-                login_with_number.next.isEnabled = true
-                val verifyCodeFragment = VerifyCodeFragment()
-                verifyCodeFragment.arguments = Bundle().apply {
-                    putInt(VERIFY_TYPE, VERIFY_TYPE_LOGIN)
-                    putString(VERIFY_PHONE, phone)
+                Client.global.rest.authService.verify(
+                    AuthService.VerifyRequest(
+                        phone = phone,
+                        type = TYPE_LOGIN
+                    )
+                ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe {
+                    if (it.isSuccessful) {
+                        login_with_number.next.isEnabled = true
+                        val verifyCodeFragment = VerifyCodeFragment()
+                        verifyCodeFragment.arguments = Bundle().apply {
+                            putInt(VERIFY_TYPE, VERIFY_TYPE_LOGIN)
+                            putString(VERIFY_PHONE, phone)
+                        }
+                        fragmentAdd(verifyCodeFragment)
+                    } else {
+                        login_with_number.next.isEnabled = true
+                        val verifyCodeFragment = VerifyCodeFragment()
+                        verifyCodeFragment.arguments = Bundle().apply {
+                            putInt(REGISTER_TYPE, REGISTER_TYPE_WITH_NUMBER)
+                            putInt(VERIFY_TYPE, VERIFY_TYPE_REGISTER)
+                            putString(VERIFY_PHONE, phone)
+                        }
+                        fragmentAdd(verifyCodeFragment)
+                    }
                 }
-                fragmentAdd(verifyCodeFragment)
             } else
                 login_with_number.next.isEnabled = true
         }
@@ -244,4 +280,6 @@ class LoginWithNumberFragment : Fragment() {
         private_agreement_tv2.movementMethod = LinkMovementMethod.getInstance()
         private_agreement_tv2.highlightColor = Color.TRANSPARENT
     }
+
+
 }

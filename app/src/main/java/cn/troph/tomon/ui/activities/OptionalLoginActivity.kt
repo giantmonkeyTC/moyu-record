@@ -13,6 +13,15 @@ import cn.troph.tomon.ui.fragments.PHONE_CODE_TYPE_LOGIN
 import com.gyf.immersionbar.ImmersionBar
 
 class OptionalLoginActivity : AppCompatActivity() {
+
+    data class UserInfo(
+        var phone: String? = null,
+        var pwd: String? = null,
+        var verification: String? = null,
+        var activateCode: String? = null
+    )
+    val userInfo = UserInfo()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ImmersionBar.with(this).reset().init()

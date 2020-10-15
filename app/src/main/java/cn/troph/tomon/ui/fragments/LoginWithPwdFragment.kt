@@ -7,29 +7,41 @@ import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import cn.troph.tomon.R
-import kotlinx.android.synthetic.main.layout_forget_pwd.*
-import kotlinx.android.synthetic.main.layout_forget_pwd.view.*
-import kotlinx.android.synthetic.main.layout_login_with_number.*
+import cn.troph.tomon.core.Client
+import cn.troph.tomon.core.network.services.AuthService
+import cn.troph.tomon.core.utils.Validator
+import cn.troph.tomon.ui.activities.OptionalLoginActivity
+import cn.troph.tomon.ui.activities.RegisterActivity
+import cn.troph.tomon.ui.widgets.GeneralSnackbar
+import cn.troph.tomon.ui.widgets.TomonToast
+import com.google.android.material.snackbar.Snackbar
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.android.synthetic.main.layout_activity_register.*
 import kotlinx.android.synthetic.main.layout_login_with_pwd.*
 import kotlinx.android.synthetic.main.layout_login_with_pwd.private_agreement_tv
 import kotlinx.android.synthetic.main.layout_login_with_pwd.private_agreement_tv2
 import kotlinx.android.synthetic.main.layout_login_with_pwd.view.*
+import kotlinx.android.synthetic.main.layout_login_with_pwd.view.textView17
 
-class LoginWithPwdFragment:Fragment() {
+
+class LoginWithPwdFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.layout_login_with_pwd,null)
+        return inflater.inflate(R.layout.layout_login_with_pwd, null)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,6 +61,47 @@ class LoginWithPwdFragment:Fragment() {
             }
             fragmentAdd(loginWithNumberFragment)
         }
+        login_with_pwd.pwd_register.setOnClickListener {
+            if (validation()){
+                val phone = login_with_pwd.editText2.text.toString()
+                val pwd = login_with_pwd.editText4.text.toString()
+                Client.global.rest.authService.verify(
+                    AuthService.VerifyRequest(
+                        phone = phone,
+                        type = TYPE_REGISTER
+                    )
+                ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe {
+                    login_with_pwd.pwd_register.isEnabled = true
+                    val verifyCodeFragment = VerifyCodeFragment()
+                    verifyCodeFragment.arguments = Bundle().apply {
+                        putInt(REGISTER_TYPE, REGISTER_TYPE_WITH_PWD)
+                        putInt(VERIFY_TYPE, VERIFY_TYPE_REGISTER)
+                        getUserInfo().phone = phone
+                        getUserInfo().pwd = pwd
+                        putString(VERIFY_PHONE, phone)
+                    }
+                    fragmentAdd(verifyCodeFragment)
+                }
+            }
+        }
+
+    }
+
+    private fun validation(): Boolean {
+        val phone = login_with_pwd.editText2.text.toString()
+        val pwd = login_with_pwd.editText4.text.toString()
+        if (!Validator.isPhone(phone)) {
+            TomonToast.makeErrorText(requireContext(),  getString(R.string.wrong_phone), Toast.LENGTH_LONG).show()
+            return false
+        } else if (pwd.length < 8 || pwd.length > 32) {
+            TomonToast.makeErrorText(requireContext(), getString(R.string.login_new_pwd_hint), Toast.LENGTH_LONG).show()
+            return false
+        }
+        return true
+    }
+
+    private fun getUserInfo(): OptionalLoginActivity.UserInfo {
+        return (requireActivity() as OptionalLoginActivity).userInfo
     }
 
     private fun fragmentReplace(fragment: Fragment) {
@@ -56,9 +109,11 @@ class LoginWithPwdFragment:Fragment() {
             replace(R.id.content, fragment)
         }.commit()
     }
+
     private fun getInstance(): LoginWithPwdFragment {
         return this
     }
+
     private fun fragmentAdd(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction().apply {
             setCustomAnimations(
