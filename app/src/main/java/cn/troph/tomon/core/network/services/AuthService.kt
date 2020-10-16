@@ -99,5 +99,5 @@ interface AuthService {
     )
 
     @PATCH("auth/password")
-    fun newPwd(@Body request: ResetPwdRequest): Observable<JsonObject>
+    fun newPwd(@Body request: NewPwdRequest): Observable<JsonObject>
 }

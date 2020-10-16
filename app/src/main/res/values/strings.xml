@@ -270,4 +270,5 @@
     <string name="wrong_phone">手机号格式错误</string>
     <string name="register_verification">注册验证</string>
     <string name="apply_code">没有激活码？点击申请</string>
+    <string name="different_pwd_hint">两次密码输入不一致</string>
 </resources>
