@@ -81,7 +81,7 @@ class LoginWithPwdFragment : Fragment() {
         }
         login_with_pwd.pwd_register.setOnClickListener {
             if (validation()) {
-                val phone = login_with_pwd.editText2.text.toString()
+                val phone = login_with_pwd.editText2.text()
                 val pwd = login_with_pwd.editText4.text.toString()
                 Client.global.rest.authService.verify(
                     AuthService.VerifyRequest(
@@ -110,7 +110,7 @@ class LoginWithPwdFragment : Fragment() {
     }
 
     private fun validation(): Boolean {
-        val phone = login_with_pwd.editText2.text.toString()
+        val phone = login_with_pwd.editText2.text()
         val pwd = login_with_pwd.editText4.text.toString()
         if (!Validator.isPhone(phone)) {
             TomonToast.makeErrorText(
@@ -229,7 +229,7 @@ class LoginWithPwdFragment : Fragment() {
 
     private fun login() {
         Client.global.login(
-            unionId = login_with_pwd.editText2.text.toString(),
+            unionId = login_with_pwd.editText2.text(),
             password = login_with_pwd.editText4.text.toString()
         ).observeOn(AndroidSchedulers.mainThread()).subscribe({
             login_with_pwd.button5.hideProgress(R.string.login_succeed)

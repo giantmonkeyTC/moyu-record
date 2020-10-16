@@ -32,7 +32,7 @@ class SetPwdFragment : Fragment() {
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                getUserInfo().pwd = set_pwd.editText2.toString()
+                getUserInfo().pwd = set_pwd.editText2.text.toString()
                 activateAccount()
             }
 

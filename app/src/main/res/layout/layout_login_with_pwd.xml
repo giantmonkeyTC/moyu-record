@@ -110,20 +110,6 @@
         app:layout_constraintStart_toStartOf="@+id/guideline6"
         app:layout_constraintTop_toBottomOf="@+id/button5" />
 
-    <EditText
-        android:id="@+id/editText2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:backgroundTint="@color/whiteAlpha50"
-        android:hint="手机号"
-        android:textColor="@color/white"
-        android:textColorHint="@color/whiteAlpha50"
-        app:layout_constraintEnd_toStartOf="@+id/guideline7"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toBottomOf="@+id/hint_background" />
-
-
     <TextView
         android:id="@+id/private_agreement_tv"
         android:layout_width="wrap_content"
@@ -139,7 +125,16 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
+    <cn.troph.tomon.ui.widgets.CountryCodeEdittext
+        android:id="@+id/editText2"
+        android:layout_width="0dp"
+        android:layout_marginTop="44dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintStart_toStartOf="@id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/hint_background"
 
+        />
     <TextView
         android:id="@+id/private_agreement_tv2"
         android:layout_width="wrap_content"

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/forget_pwd_verification"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background3">
 
@@ -57,6 +58,7 @@
         android:text="@string/sent_code_hint"
         />
     <cn.troph.tomon.ui.widgets.CodeVerificationEditText
+        android:id="@+id/forget_pwd_verification_edittext"
         android:layout_width="224dp"
         android:layout_height="44dp"
         android:layout_marginTop="74dp"
@@ -85,6 +87,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="32dp" />
     <Button
+        android:id="@+id/forget_pwd_verification_resend"
         android:layout_width="0dp"
         android:layout_height="38dp"
         android:layout_marginStart="42dp"
@@ -95,6 +98,23 @@
         android:text="@string/resend"
         android:textColor="@color/white"
         android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline6" />
+    <Button
+        android:id="@+id/forget_pwd_verification_next"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="42dp"
+        android:layout_marginEnd="42dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/shape_button_radius_58"
+        android:backgroundTint="@color/primaryColor"
+        android:text="@string/next"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintHorizontal_bias="1.0"

@@ -1,9 +1,7 @@
 package cn.troph.tomon.ui.fragments
 
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.text.InputType
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
@@ -27,13 +25,9 @@ import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.AuthService
 import cn.troph.tomon.core.utils.Validator
 import cn.troph.tomon.ui.activities.OptionalLoginActivity
-import cn.troph.tomon.ui.widgets.GeneralSnackbar
 import cn.troph.tomon.ui.widgets.TomonToast
-import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.layout_activity_login.*
-import kotlinx.android.synthetic.main.layout_activity_register.*
 import kotlinx.android.synthetic.main.layout_forget_pwd.*
 import kotlinx.android.synthetic.main.layout_forget_pwd.view.*
 import kotlinx.android.synthetic.main.layout_login_with_number.*
@@ -41,7 +35,6 @@ import kotlinx.android.synthetic.main.layout_login_with_number.private_agreement
 import kotlinx.android.synthetic.main.layout_login_with_number.private_agreement_tv2
 import kotlinx.android.synthetic.main.layout_login_with_number.view.*
 import kotlinx.android.synthetic.main.layout_login_with_number.view.editText2
-import kotlinx.android.synthetic.main.layout_login_with_pwd.*
 import java.lang.NullPointerException
 
 
@@ -102,8 +95,6 @@ class LoginWithNumberFragment : Fragment() {
     }
 
     private fun forgetPwdConfig() {
-        forget_pwd.forget_pwd_et.inputType = InputType.TYPE_CLASS_PHONE
-        forget_pwd.forget_pwd_et.setRawInputType(Configuration.KEYBOARD_QWERTY)
         viewModel.loginForm.observe(requireActivity(), Observer {
             val loginState = it ?: return@Observer
             if (loginState.phoneError != null) {
@@ -116,7 +107,7 @@ class LoginWithNumberFragment : Fragment() {
         })
         forget_pwd.forget_pwd_next.setOnClickListener {
             forget_pwd.forget_pwd_next.isEnabled = false
-            val phone = forget_pwd.forget_pwd_et.text.toString()
+            val phone = forget_pwd.forget_pwd_editText2.text()
             val valid = viewModel.loginDataValidate(phone)
             if (valid) {
                 forget_pwd.forget_pwd_next.isEnabled = true
@@ -133,8 +124,6 @@ class LoginWithNumberFragment : Fragment() {
 
     private fun loginConfig() {
         setPrivacyLink()
-        login_with_number.editText2.inputType = InputType.TYPE_CLASS_PHONE
-        login_with_number.editText2.setRawInputType(Configuration.KEYBOARD_QWERTY)
         viewModel.loginForm.observe(requireActivity(), Observer {
             val loginState = it ?: return@Observer
             if (loginState.phoneError != null) {
@@ -151,7 +140,7 @@ class LoginWithNumberFragment : Fragment() {
         }
         login_with_number.next.setOnClickListener {
             login_with_number.next.isEnabled = false
-            val phone = login_with_number.editText2.text.toString()
+            val phone = login_with_number.editText2.text()
             val valid = viewModel.loginDataValidate(phone)
             if (valid) {
                 Client.global.rest.authService.verify(
@@ -169,6 +158,7 @@ class LoginWithNumberFragment : Fragment() {
                         }
                         fragmentAdd(verifyCodeFragment)
                     } else {
+                        getUserInfo().phone = phone
                         login_with_number.next.isEnabled = true
                         val verifyCodeFragment = VerifyCodeFragment()
                         verifyCodeFragment.arguments = Bundle().apply {
@@ -281,5 +271,8 @@ class LoginWithNumberFragment : Fragment() {
         private_agreement_tv2.highlightColor = Color.TRANSPARENT
     }
 
+    private fun getUserInfo(): OptionalLoginActivity.UserInfo {
+        return (requireActivity() as OptionalLoginActivity).userInfo
+    }
 
 }

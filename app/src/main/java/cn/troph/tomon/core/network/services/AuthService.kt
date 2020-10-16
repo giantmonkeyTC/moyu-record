@@ -74,9 +74,30 @@ interface AuthService {
         @SerializedName("email")
         val email: String? = null
     )
+
     @PATCH("users/@me")
     fun meSettings(
         @Header("Authorization") token: String,
         @Body request: MeSettingsRequest
-    ):Observable<JsonObject>
+    ): Observable<JsonObject>
+
+    data class ResetPwdRequest(
+        @SerializedName("code")
+        val code: String? = null,
+        @SerializedName("phone")
+        val phone: String? = null
+    )
+
+    @POST("auth/password/reset")
+    fun resetPwd(@Body request: ResetPwdRequest): Observable<JsonObject>
+
+    data class NewPwdRequest(
+        @SerializedName("new_password")
+        val newPwd: String? = null,
+        @SerializedName("reset")
+        val reset: String? = null
+    )
+
+    @PATCH("auth/password")
+    fun newPwd(@Body request: ResetPwdRequest): Observable<JsonObject>
 }

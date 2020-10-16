@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import cn.troph.tomon.R
 import cn.troph.tomon.core.Client
 import cn.troph.tomon.core.network.services.AuthService
+import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.ui.activities.OptionalLoginActivity
 import cn.troph.tomon.ui.activities.TomonMainActivity
 import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
@@ -23,6 +24,9 @@ import com.github.razir.progressbutton.hideProgress
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.android.synthetic.main.layout_forget_pwd.*
+import kotlinx.android.synthetic.main.layout_forget_pwd_verification.*
+import kotlinx.android.synthetic.main.layout_forget_pwd_verification.view.*
 import kotlinx.android.synthetic.main.layout_login_verification.*
 import kotlinx.android.synthetic.main.layout_login_verification.view.*
 import retrofit2.HttpException
@@ -37,9 +41,11 @@ val VERIFICATION_CODE_MAX_LENGTH = 4
 val VERIFY_PHONE = "verify_phone"
 val TYPE_LOGIN = "login"
 val TYPE_REGISTER = "register"
+val TYPE_RESET = "reset"
 val REGISTER_TYPE = "register_type"
 val REGISTER_TYPE_WITH_PWD = 0
 val REGISTER_TYPE_WITH_NUMBER = 1
+val RESET_PWD_TOKEN = "token"
 
 
 class VerifyCodeFragment : Fragment() {
@@ -108,17 +114,21 @@ class VerifyCodeFragment : Fragment() {
             }
         }
         login_verification.verification_et.doOnTextChanged { text, start, before, count ->
-            val textLength = login_verification.verification_et.length()
-            if (textLength == VERIFICATION_CODE_MAX_LENGTH) {
-                login_verification.next.visibility = View.VISIBLE
-                arguments?.getInt(REGISTER_TYPE)?.let {
-                    if (it == REGISTER_TYPE_WITH_PWD)
-                        activateAccount()
-                    else if (it == REGISTER_TYPE_WITH_NUMBER)
-                        setPwd()
-                }
-            } else
-                login_verification.next.visibility = View.GONE
+            login_verification.verification_et.text?.let { edit ->
+                if (edit.length == VERIFICATION_CODE_MAX_LENGTH) {
+                    login_verification.next.visibility = View.VISIBLE
+                    arguments?.getInt(REGISTER_TYPE)?.let {
+                        if (it == REGISTER_TYPE_WITH_PWD) {
+                            getUserInfo().verification = edit.toString()
+                            activateAccount()
+                        } else if (it == REGISTER_TYPE_WITH_NUMBER) {
+                            getUserInfo().verification = edit.toString()
+                            setPwd()
+                        }
+                    }
+                } else
+                    login_verification.next.visibility = View.GONE
+            }
         }
     }
 
@@ -179,6 +189,7 @@ class VerifyCodeFragment : Fragment() {
                 login_verification.resend_code.text = "冷却中：${millisUntilFinished / 1000}秒"
             }
         }
+        timer.start()
         login_verification.resend_code.isEnabled = false
         login_verification.resend_code.background.setTint(requireContext().getColor(R.color.whiteAlpha20))
         login_verification.resend_code.setOnClickListener {
@@ -236,6 +247,7 @@ class VerifyCodeFragment : Fragment() {
                     type = type
                 )
             ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe {
+
             }
         }
     }
@@ -257,6 +269,59 @@ class VerifyCodeFragment : Fragment() {
 
 
     private fun forgetPwdConfig() {
+        timer = object : CountDownTimer(60000, 1000) {
+            override fun onFinish() {
+                forget_pwd_verification_resend.background.setTint(requireContext().getColor(R.color.primaryColor))
+                forget_pwd_verification_resend.text = getString(R.string.resend)
+                forget_pwd_verification_resend.isEnabled = true
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                forget_pwd_verification_resend.text = "冷却中：${millisUntilFinished / 1000}秒"
+            }
+        }
+        forget_pwd_verification_resend.isEnabled = false
+        forget_pwd_verification_resend.background.setTint(requireContext().getColor(R.color.whiteAlpha20))
+        forget_pwd_verification_resend.setOnClickListener {
+            forget_pwd_verification_resend.isEnabled = false
+            forget_pwd_verification_resend.background.setTint(requireContext().getColor(R.color.whiteAlpha20))
+            sendCodeRequest(type = TYPE_RESET)
+        }
+        forget_pwd_verification_next.setOnClickListener {
+            forget_pwd_verification_edittext.text?.let {
+                if (it.length == VERIFICATION_CODE_MAX_LENGTH)
+                    resetPwd()
+            }
+        }
+        forget_pwd_verification_edittext.doOnTextChanged { text, start, before, count ->
+            val textLength = forget_pwd_verification_edittext.length()
+            if (textLength == VERIFICATION_CODE_MAX_LENGTH) {
+                forget_pwd_verification_next.visibility = View.VISIBLE
+                resetPwd()
+            } else
+                forget_pwd_verification_next.visibility = View.GONE
+        }
+    }
+
+    private fun resetPwd() {
+        arguments?.getString(VERIFY_PHONE)?.let {
+            Client.global.rest.authService.resetPwd(
+                request = AuthService.ResetPwdRequest(
+                    code = forget_pwd_verification_edittext.text.toString(),
+                    phone = it
+                )
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    if (it.has("token")) {
+                        val token = it["token"].optString
+                        token?.let {
+                            fragmentAdd(ResetPwdFragment().apply {
+                                this.arguments?.putString(RESET_PWD_TOKEN, it)
+                            })
+                        }
+                    }
+                }
+        }
 
     }
 

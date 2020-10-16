@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/login_with_number"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background3">
 
     <ImageView
         android:id="@+id/hint_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/login_hint_background"
-        android:scaleType="centerCrop"
         android:background="@color/blackAlpha20"
-        />
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_hint_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/back_to_option"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/back"
         android:layout_marginStart="@dimen/margin_32dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="60dp"
-        />
+        android:src="@drawable/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="@color/primaryText"
-        android:textSize="20dp"
         android:lineHeight="23px"
         android:text="@string/login_by_number"
-        app:layout_constraintStart_toEndOf="@id/back_to_option"
-        app:layout_constraintTop_toTopOf="@id/back_to_option"
+        android:textColor="@color/primaryText"
+        android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="@id/back_to_option"
-        />
+        app:layout_constraintStart_toEndOf="@id/back_to_option"
+        app:layout_constraintTop_toTopOf="@id/back_to_option" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/back_to_option"
-        app:layout_constraintStart_toStartOf="@id/back_to_option"
-        android:layout_marginTop="6dp"
         android:layout_marginStart="10dp"
-        android:textColor="@color/whiteAlpha50"
+        android:layout_marginTop="6dp"
         android:text="@string/login_with_number_hint"
-        />
+        android:textColor="@color/whiteAlpha50"
+        app:layout_constraintStart_toStartOf="@id/back_to_option"
+        app:layout_constraintTop_toBottomOf="@id/back_to_option" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline6"
         android:layout_width="wrap_content"
@@ -62,6 +62,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_end="32dp" />
+
     <Button
         android:id="@+id/next"
         android:layout_width="0dp"
@@ -78,18 +79,60 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline6" />
-    <EditText
+
+
+    <cn.troph.tomon.ui.widgets.CountryCodeEdittext
         android:id="@+id/editText2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
-        android:backgroundTint="@color/whiteAlpha50"
-        android:hint="手机号"
-        android:textColor="@color/white"
-        android:textColorHint="@color/whiteAlpha50"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toBottomOf="@+id/hint_background" />
+        app:layout_constraintStart_toStartOf="@id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/hint_background"
+
+        />
+<!--    <EditText-->
+<!--        android:id="@+id/editText2"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="44dp"-->
+<!--        android:backgroundTint="@color/whiteAlpha50"-->
+<!--        android:hint="手机号"-->
+<!--        android:paddingStart="80dp"-->
+<!--        android:paddingBottom="20dp"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textColorHint="@color/whiteAlpha50"-->
+<!--        android:textSize="14dp"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/guideline7"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline6"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/hint_background" />-->
+
+<!--    <com.hbb20.CountryCodePicker-->
+<!--        android:id="@+id/countryPicker"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="10dp"-->
+<!--        android:paddingBottom="10dp"-->
+<!--        app:ccp_autoDetectCountry="true"-->
+<!--        app:ccp_contentColor="@color/white"-->
+<!--        app:ccp_showFlag="false"-->
+<!--        app:ccp_defaultLanguage="CHINESE_SIMPLIFIED"-->
+<!--        app:ccp_showNameCode="false"-->
+<!--        app:ccp_textSize="14dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/editText2"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/guideline6"-->
+<!--        app:layout_constraintTop_toTopOf="@id/editText2" />-->
+
+<!--    <View-->
+
+<!--        android:layout_width="1dp"-->
+<!--        android:layout_height="23dp"-->
+<!--        android:layout_marginStart="66dp"-->
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:background="@color/whiteAlpha50"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/editText2"-->
+<!--        app:layout_constraintStart_toStartOf="@id/editText2"-->
+<!--        app:layout_constraintTop_toTopOf="@id/editText2" />-->
 
 
     <TextView

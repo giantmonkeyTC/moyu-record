@@ -82,11 +82,8 @@ class ActivateAccountFragment : Fragment() {
                             Toast.LENGTH_LONG
                         ).show()
                     }
-
                 }
-
             }, {
-
             })
         }
     }
