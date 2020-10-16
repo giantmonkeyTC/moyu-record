@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,6 +19,7 @@ import cn.troph.tomon.core.utils.optString
 import cn.troph.tomon.ui.activities.OptionalLoginActivity
 import cn.troph.tomon.ui.activities.TomonMainActivity
 import cn.troph.tomon.ui.chat.viewmodel.DataPullingViewModel
+import cn.troph.tomon.ui.widgets.TomonToast
 import com.github.razir.progressbutton.attachTextChangeAnimator
 import com.github.razir.progressbutton.bindProgressButton
 import com.github.razir.progressbutton.hideProgress
@@ -311,7 +313,7 @@ class VerifyCodeFragment : Fragment() {
                     phone = it
                 )
             ).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({
                     if (it.has("token")) {
                         val token = it["token"].optString
                         token?.let {
@@ -320,7 +322,10 @@ class VerifyCodeFragment : Fragment() {
                             })
                         }
                     }
-                }
+                }, {
+                    forget_pwd_verification_edittext.setText("")
+                    TomonToast.makeErrorText(context, "验证失败", Toast.LENGTH_LONG).show()
+                })
         }
 
     }
